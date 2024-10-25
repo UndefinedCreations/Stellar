@@ -36,7 +36,7 @@ Next go to your `plugin.yml` and change the project name and main class path. (S
 ```kotlin
 name: Template
 version: '0.0.1'
-main: com.undefined.template.Template
+main: com.undefined.stellar.Template
 api-version: '1.21'
 ```
 
