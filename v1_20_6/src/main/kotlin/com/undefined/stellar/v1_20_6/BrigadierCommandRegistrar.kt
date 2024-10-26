@@ -1,12 +1,19 @@
 package com.undefined.stellar.v1_20_6
 
 import com.mojang.brigadier.CommandDispatcher
+import com.mojang.brigadier.arguments.StringArgumentType
+import com.mojang.brigadier.builder.ArgumentBuilder
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
+import com.mojang.brigadier.context.CommandContext
 import com.undefined.stellar.BaseStellarCommand
-import com.undefined.stellar.v1_20_6.BrigadierCommandRegistrar.handleAliases
+import com.undefined.stellar.exception.UnsupportedSubCommandException
+import com.undefined.stellar.sub.BaseStellarSubCommand
+import com.undefined.stellar.sub.StellarSubCommand
+import com.undefined.stellar.sub.brigadier.NativeTypeSubCommand
 import net.minecraft.commands.CommandSourceStack
 import org.bukkit.Bukkit
 import org.bukkit.craftbukkit.CraftServer
+
 
 object BrigadierCommandRegistrar {
 
@@ -18,13 +25,26 @@ object BrigadierCommandRegistrar {
         }
     }
 
-    private fun LiteralArgumentBuilder<CommandSourceStack>.handleCommand(stellarCommand: BaseStellarCommand) {
+    private fun BaseStellarSubCommand.argumentBuilder(alias: String = ""): ArgumentBuilder<CommandSourceStack, *> =
+        when (this) {
+            is StellarSubCommand -> LiteralArgumentBuilder.literal(alias.ifEmpty { name })
+            is NativeTypeSubCommand -> ArgumentHelper.nativeSubCommandToArgument(this)
+            else -> throw UnsupportedSubCommandException()
+        }
+
+    private fun BaseStellarSubCommand.handleExecutions(context: CommandContext<CommandSourceStack>) =
+        when (this) {
+            is NativeTypeSubCommand -> ArgumentHelper.handleNativeSubCommandExecutors(this, context)
+            else -> throw UnsupportedSubCommandException()
+        }
+
+    private fun ArgumentBuilder<CommandSourceStack, *>.handleCommand(stellarCommand: BaseStellarCommand) {
         handleSubCommands(stellarCommand)
         handleRequirements(stellarCommand)
         handleExecutions(stellarCommand)
     }
 
-    private fun LiteralArgumentBuilder<CommandSourceStack>.handleAliases(stellarCommand: BaseStellarCommand) {
+    private fun ArgumentBuilder<CommandSourceStack, *>.handleAliases(stellarCommand: BaseStellarCommand) {
         stellarCommand.aliases.forEach { alias ->
             val childArgumentBuilder = LiteralArgumentBuilder.literal<CommandSourceStack>(alias)
             childArgumentBuilder.handleCommand(stellarCommand)
@@ -32,16 +52,16 @@ object BrigadierCommandRegistrar {
         }
     }
 
-    private fun LiteralArgumentBuilder<CommandSourceStack>.handleSubCommands(stellarCommand: BaseStellarCommand) {
+    private fun ArgumentBuilder<CommandSourceStack, *>.handleSubCommands(stellarCommand: BaseStellarCommand) {
         stellarCommand.subCommands.forEach { subCommand ->
-            val subCommandArgument = LiteralArgumentBuilder.literal<CommandSourceStack>(subCommand.name)
+            val subCommandArgument = subCommand.argumentBuilder()
             subCommandArgument.handleCommand(subCommand)
             this.handleAliases(subCommand)
             then(subCommandArgument)
         }
     }
 
-    private fun LiteralArgumentBuilder<CommandSourceStack>.handleRequirements(command: BaseStellarCommand) =
+    private fun ArgumentBuilder<CommandSourceStack, *>.handleRequirements(command: BaseStellarCommand) =
         requires { context ->
             val requirements = command.requirements.all {
                 it.run(context.bukkitSender)
@@ -52,9 +72,12 @@ object BrigadierCommandRegistrar {
             requirements.and(permissionRequirements)
         }
 
-    private fun LiteralArgumentBuilder<CommandSourceStack>.handleExecutions(command: BaseStellarCommand) =
+    private fun ArgumentBuilder<CommandSourceStack, *>.handleExecutions(stellarCommand: BaseStellarCommand) =
         executes { context ->
-            command.executions.forEach { it.run(context.source.bukkitSender) }
+            if (stellarCommand is BaseStellarSubCommand) stellarCommand.handleExecutions(context)
+            stellarCommand.executions.forEach {
+                it.run(context.source.bukkitSender)
+            }
             return@executes 1
         }
 

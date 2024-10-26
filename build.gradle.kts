@@ -15,6 +15,10 @@ repositories {
         name = "spigotmc-repo"
         url = uri("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
     }
+    maven {
+        name = "minecraft-repo"
+        url = uri("https://libraries.minecraft.net/")
+    }
     maven("https://repo.codemc.io/repository/maven-snapshots/")
 }
 
