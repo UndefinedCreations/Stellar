@@ -1,5 +1,8 @@
 package com.undefined.stellar
 
+import com.undefined.stellar.data.requirement.PermissionStellarRequirement
+import com.undefined.stellar.data.StellarExecution
+import com.undefined.stellar.data.requirement.StellarRequirement
 import com.undefined.stellar.sub.BaseStellarSubCommand
 import org.bukkit.command.CommandSender
 
@@ -7,11 +10,22 @@ abstract class BaseStellarCommand(val name: String) {
 
     val aliases: MutableList<String> = mutableListOf()
     val requirements: MutableList<StellarRequirement<*>> = mutableListOf()
+    val permissionRequirements: MutableList<PermissionStellarRequirement> = mutableListOf()
     val subCommands: MutableList<BaseStellarSubCommand> = mutableListOf()
     val executions: MutableList<StellarExecution<*>> = mutableListOf()
 
     fun addAlias(name: String): BaseStellarCommand {
         aliases.add(name)
+        return this
+    }
+
+    fun addRequirement(permission: String): BaseStellarCommand {
+        permissionRequirements.add(PermissionStellarRequirement(1, permission))
+        return this
+    }
+
+    fun addRequirement(permissionLevel: Int): BaseStellarCommand {
+        permissionRequirements.add(PermissionStellarRequirement(permissionLevel))
         return this
     }
 

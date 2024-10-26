@@ -3,6 +3,7 @@ package com.undefined.stellar.v1_20_6
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.undefined.stellar.BaseStellarCommand
+import com.undefined.stellar.v1_20_6.BrigadierCommandRegistrar.handleAliases
 import net.minecraft.commands.CommandSourceStack
 import org.bukkit.Bukkit
 import org.bukkit.craftbukkit.CraftServer
@@ -13,7 +14,7 @@ object BrigadierCommandRegistrar {
         stellarCommand.aliases.plus(stellarCommand.name).forEach { alias ->
             val mainArgumentBuilder = LiteralArgumentBuilder.literal<CommandSourceStack>(alias)
             mainArgumentBuilder.handleCommand(stellarCommand)
-            getCommandDispatcher().register(mainArgumentBuilder)
+            commandDispatcher().register(mainArgumentBuilder)
         }
     }
 
@@ -41,7 +42,15 @@ object BrigadierCommandRegistrar {
     }
 
     private fun LiteralArgumentBuilder<CommandSourceStack>.handleRequirements(command: BaseStellarCommand) =
-        requires { context -> command.requirements.all { it.run(context.bukkitSender) } }
+        requires { context ->
+            val requirements = command.requirements.all {
+                it.run(context.bukkitSender)
+            }
+            val permissionRequirements = command.permissionRequirements.all {
+                if (it.permission.isEmpty()) context.hasPermission(it.permissionLevel) else context.hasPermission(it.permissionLevel, it.permission)
+            }
+            requirements.and(permissionRequirements)
+        }
 
     private fun LiteralArgumentBuilder<CommandSourceStack>.handleExecutions(command: BaseStellarCommand) =
         executes { context ->
@@ -49,6 +58,6 @@ object BrigadierCommandRegistrar {
             return@executes 1
         }
 
-    private fun getCommandDispatcher(): CommandDispatcher<CommandSourceStack> = (Bukkit.getServer() as CraftServer).server.functions.dispatcher
+    private fun commandDispatcher(): CommandDispatcher<CommandSourceStack> = (Bukkit.getServer() as CraftServer).server.functions.dispatcher
 
 }

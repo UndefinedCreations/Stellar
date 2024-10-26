@@ -9,6 +9,8 @@ class Main : JavaPlugin() {
     override fun onEnable() {
         StellarCommand("test")
             .addAlias("othertest")
+            .addRequirement("test.test.test")
+            .addRequirement(5)
             .addSubCommand("test")
             .addExecute<Player> {
                 sendMessage("Test!")
