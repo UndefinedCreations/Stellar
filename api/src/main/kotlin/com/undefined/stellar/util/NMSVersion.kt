@@ -2,4 +2,6 @@ package com.undefined.stellar.util
 
 import org.bukkit.Bukkit
 
-fun getNMSVersion(): String = Bukkit.getBukkitVersion().split("-")[0]
+object NMSVersion {
+    val version by lazy { Bukkit.getBukkitVersion().split("-")[0] }
+}
