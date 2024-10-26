@@ -1,8 +1,5 @@
 package com.undefined.stellar
 
-import com.undefined.stellar.command.register
-import org.bukkit.Bukkit
-import org.bukkit.Material
 import org.bukkit.command.ConsoleCommandSender
 import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin

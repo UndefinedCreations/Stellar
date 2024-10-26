@@ -31,4 +31,6 @@ abstract class BaseStellarCommand(val name: String) {
         return this
     }
 
+    abstract fun register()
+
 }

@@ -1,3 +1,7 @@
 package com.undefined.stellar
 
-class StellarCommand(name: String) : BaseStellarCommand(name)
+abstract class StellarCommand(name: String) : BaseStellarCommand(name) {
+    override fun register() {
+
+    }
+}
