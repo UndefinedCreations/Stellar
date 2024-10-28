@@ -10,11 +10,14 @@ import com.undefined.stellar.sub.brigadier.entity.EntityDisplayType
 import com.undefined.stellar.sub.brigadier.entity.EntitySubCommand
 import com.undefined.stellar.sub.brigadier.player.GameProfileSubCommand
 import com.undefined.stellar.sub.brigadier.primitive.*
+import com.undefined.stellar.sub.brigadier.world.Location2DSubCommand
 import com.undefined.stellar.sub.brigadier.world.LocationSubCommand
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.arguments.EntityArgument
 import net.minecraft.commands.arguments.GameProfileArgument
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument
+import net.minecraft.commands.arguments.coordinates.ColumnPosArgument
+import net.minecraft.commands.synchronization.ArgumentTypeInfos
 import org.bukkit.Location
 
 object ArgumentHelper {
@@ -32,6 +35,7 @@ object ArgumentHelper {
             is EntitySubCommand -> RequiredArgumentBuilder.argument(subCommand.name, subCommand.type.brigadier())
             is GameProfileSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, GameProfileArgument.gameProfile())
             is LocationSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, BlockPosArgument.blockPos())
+            is Location2DSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, ColumnPosArgument.columnPos())
             else -> throw UnsupportedSubCommandException()
         }
 
@@ -59,6 +63,10 @@ object ArgumentHelper {
             is LocationSubCommand -> subCommand.customExecutions.forEach {
                 val blockPos = BlockPosArgument.getBlockPos(context, subCommand.name)
                 it.run(context.source.bukkitSender, Location(context.source.bukkitWorld, blockPos.x.toDouble(), blockPos.y.toDouble(), blockPos.z.toDouble()))
+            }
+            is Location2DSubCommand -> subCommand.customExecutions.forEach {
+                val columnPos = BlockPosArgument.getBlockPos(context, subCommand.name)
+                it.run(context.source.bukkitSender, Location(context.source.bukkitWorld, columnPos.x.toDouble(), columnPos.y.toDouble(), columnPos.z.toDouble()))
             }
             else -> throw UnsupportedSubCommandException()
         }
