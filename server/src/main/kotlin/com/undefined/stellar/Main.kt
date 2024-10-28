@@ -14,9 +14,7 @@ class Main : JavaPlugin() {
     override fun onEnable() {
         StellarCommand("test")
             .addEnumSubCommand<Status>("enum", { enum -> enum.name.lowercase().replaceFirstChar { char -> char.uppercase() } }, { Status.valueOf(it.uppercase()) })
-            .addSuggestion<Player> {
-                return@addSuggestion listOf("fdafsdaafs", "Fdafs")
-            }
+            .addSuggestion("fdafsdaafs", "Fdafs")
             .addEnumExecution<Player> { enum ->
                 sendMessage(enum.name)
             }
