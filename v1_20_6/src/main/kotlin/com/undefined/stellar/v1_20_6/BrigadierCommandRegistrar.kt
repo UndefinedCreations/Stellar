@@ -7,11 +7,13 @@ import com.mojang.brigadier.builder.RequiredArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
 import com.undefined.stellar.BaseStellarCommand
 import com.undefined.stellar.exception.UnsupportedSubCommandException
-import com.undefined.stellar.sub.BaseStellarSubCommand
+import com.undefined.stellar.sub.AbstractStellarSubCommand
 import com.undefined.stellar.sub.StellarSubCommand
 import com.undefined.stellar.sub.brigadier.NativeTypeSubCommand
+import com.undefined.stellar.v1_20_6.BrigadierCommandRegistrar.handleExecutions
 import net.minecraft.commands.CommandSourceStack
 import org.bukkit.Bukkit
+import org.bukkit.command.CommandSender
 import org.bukkit.craftbukkit.CraftServer
 
 
@@ -25,18 +27,24 @@ object BrigadierCommandRegistrar {
         }
     }
 
-    private fun BaseStellarSubCommand<*>.argumentBuilder(alias: String = ""): ArgumentBuilder<CommandSourceStack, *> =
+    private fun AbstractStellarSubCommand<*>.argumentBuilder(alias: String = ""): ArgumentBuilder<CommandSourceStack, *> =
         when (this) {
             is StellarSubCommand -> LiteralArgumentBuilder.literal(alias.ifEmpty { name })
-            is NativeTypeSubCommand -> ArgumentHelper.nativeSubCommandToArgument(this).handleSuggestions(this)
+            is NativeTypeSubCommand -> {
+                println("Test")
+                ArgumentHelper.nativeSubCommandToArgument(this).handleSuggestions(this)
+            }
             else -> throw UnsupportedSubCommandException()
         }
 
-    private fun BaseStellarSubCommand<*>.handleExecutions(context: CommandContext<CommandSourceStack>) =
+    private fun AbstractStellarSubCommand<*>.handleExecutions(context: CommandContext<CommandSourceStack>) {
+        this.getBase().subCommands.forEach { subCommand -> if (!handleSubCommandRunnables(subCommand, context)) return }
         when (this) {
+            is StellarSubCommand -> this.executions.forEach { it.run(context.source.bukkitSender) }
             is NativeTypeSubCommand -> ArgumentHelper.handleNativeSubCommandExecutors(this, context)
             else -> throw UnsupportedSubCommandException()
         }
+    }
 
     private fun ArgumentBuilder<CommandSourceStack, *>.handleCommand(stellarCommand: BaseStellarCommand<*>) {
         handleSubCommands(stellarCommand)
@@ -61,13 +69,15 @@ object BrigadierCommandRegistrar {
         }
     }
 
-    private fun RequiredArgumentBuilder<CommandSourceStack, *>.handleSuggestions(command: BaseStellarSubCommand<*>) =
-        suggests { context, suggestionBuilder ->
+    private fun RequiredArgumentBuilder<CommandSourceStack, *>.handleSuggestions(command: AbstractStellarSubCommand<*>): RequiredArgumentBuilder<CommandSourceStack, *> {
+        if (command.suggestions.isEmpty()) return this
+        return suggests { context, suggestionBuilder ->
             command.suggestions.forEach { suggestion ->
                 suggestion.get(context.source.bukkitSender, suggestionBuilder.remaining).forEach { suggestionBuilder.suggest(it) }
             }
             return@suggests suggestionBuilder.buildFuture()
         }
+    }
 
     private fun ArgumentBuilder<CommandSourceStack, *>.handleRequirements(command: BaseStellarCommand<*>) =
         requires { context ->
@@ -82,12 +92,22 @@ object BrigadierCommandRegistrar {
 
     private fun ArgumentBuilder<CommandSourceStack, *>.handleExecutions(stellarCommand: BaseStellarCommand<*>) =
         executes { context ->
-            if (stellarCommand is BaseStellarSubCommand<*>) stellarCommand.handleExecutions(context)
-            stellarCommand.executions.forEach {
-                it.run(context.source.bukkitSender)
+            stellarCommand.runnables.forEach { runnable ->
+                if (!runnable.run(context.source.bukkitSender)) return@executes 1
             }
+            if (stellarCommand is AbstractStellarSubCommand<*>) stellarCommand.handleExecutions(context)
+            stellarCommand.executions.forEach { it.run(context.source.bukkitSender) }
             return@executes 1
         }
+
+    private fun handleSubCommandRunnables(subCommand: AbstractStellarSubCommand<*>, context: CommandContext<CommandSourceStack>): Boolean {
+        when (subCommand) {
+            is StellarSubCommand -> subCommand.runnables.forEach { if (!it.run(context.source.bukkitSender)) return false }
+            is NativeTypeSubCommand -> if (!ArgumentHelper.handleNativeSubCommandRunnables(subCommand, context)) return false
+            else -> throw UnsupportedSubCommandException()
+        }
+        return true
+    }
 
     private fun commandDispatcher(): CommandDispatcher<CommandSourceStack> = (Bukkit.getServer() as CraftServer).server.functions.dispatcher
 

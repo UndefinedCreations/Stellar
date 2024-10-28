@@ -2,11 +2,13 @@ package com.undefined.stellar.sub.brigadier.primitive
 
 import com.undefined.stellar.BaseStellarCommand
 import com.undefined.stellar.data.execution.CustomStellarExecution
+import com.undefined.stellar.data.execution.CustomStellarRunnable
 import com.undefined.stellar.sub.brigadier.NativeTypeSubCommand
 import org.bukkit.command.CommandSender
 import java.lang.Enum.valueOf
 import kotlin.reflect.KClass
 
+@Suppress("UNCHECKED_CAST")
 class EnumSubCommand<T : Enum<T>>(
     parent: BaseStellarCommand<*>,
     name: String,
@@ -30,6 +32,11 @@ class EnumSubCommand<T : Enum<T>>(
 
     inline fun <reified C : CommandSender> addEnumExecution(noinline execution: C.(T) -> Unit): EnumSubCommand<T> {
         customExecutions.add(CustomStellarExecution(C::class, execution) as CustomStellarExecution<*, Any>)
+        return this
+    }
+
+    inline fun <reified C : CommandSender> alwaysRunEnum(noinline execution: C.(T) -> Boolean): EnumSubCommand<T> {
+        customRunnables.add(CustomStellarRunnable(C::class, execution) as CustomStellarRunnable<*, Any>)
         return this
     }
 }

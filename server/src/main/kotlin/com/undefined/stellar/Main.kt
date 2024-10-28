@@ -21,8 +21,10 @@ class Main : JavaPlugin() {
                     null
                 }
             })
-            .addSuggestion("fdafsdaafs", "Fdafs")
-            .addSuggestion("dsada", "dsadsa")
+            .alwaysRunEnum<Player> { enum ->
+                sendMessage(enum.name)
+                return@alwaysRunEnum true
+            }
             .addEnumExecution<Player> { enum ->
                 sendMessage(enum.name)
             }

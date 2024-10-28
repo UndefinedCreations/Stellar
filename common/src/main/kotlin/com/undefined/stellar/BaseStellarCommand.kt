@@ -1,7 +1,9 @@
 package com.undefined.stellar
 
+import com.undefined.stellar.data.execution.CustomStellarRunnable
 import com.undefined.stellar.data.requirement.PermissionStellarRequirement
 import com.undefined.stellar.data.execution.StellarExecution
+import com.undefined.stellar.data.execution.StellarRunnable
 import com.undefined.stellar.data.requirement.StellarRequirement
 import com.undefined.stellar.sub.SubCommandHandler
 import org.bukkit.command.CommandSender
@@ -9,12 +11,13 @@ import org.bukkit.command.CommandSender
 @Suppress("UNCHECKED_CAST")
 abstract class BaseStellarCommand<T>(val name: String) : SubCommandHandler() {
 
-    override fun getThis(): BaseStellarCommand<T> = this
+    override fun getBase(): BaseStellarCommand<*> = this
 
     val aliases: MutableList<String> = mutableListOf()
     val requirements: MutableList<StellarRequirement<*>> = mutableListOf()
     val permissionRequirements: MutableList<PermissionStellarRequirement> = mutableListOf()
     val executions: MutableList<StellarExecution<*>> = mutableListOf()
+    val runnables: MutableList<StellarRunnable<*>> = mutableListOf()
 
     fun addAlias(name: String): T {
         aliases.add(name)
@@ -38,6 +41,11 @@ abstract class BaseStellarCommand<T>(val name: String) : SubCommandHandler() {
 
     inline fun <reified C : CommandSender> addExecution(noinline execution: C.() -> Unit): T {
         executions.add(StellarExecution(C::class, execution))
+        return this as T
+    }
+
+    inline fun <reified C : CommandSender> alwaysRun(noinline execution: C.() -> Boolean): T {
+        runnables.add(StellarRunnable(C::class, execution))
         return this as T
     }
 

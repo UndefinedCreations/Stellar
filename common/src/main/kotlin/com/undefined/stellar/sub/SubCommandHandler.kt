@@ -10,72 +10,72 @@ import java.util.UUID
 
 open class SubCommandHandler {
 
-    open fun getThis(): BaseStellarCommand<*>? = null
-    val subCommands: MutableList<BaseStellarSubCommand<*>> = mutableListOf()
-    val optionalSubCommands: MutableList<BaseStellarSubCommand<*>> = mutableListOf()
+    open fun getBase(): BaseStellarCommand<*>? = null
+    val subCommands: MutableList<AbstractStellarSubCommand<*>> = mutableListOf()
+    val optionalSubCommands: MutableList<AbstractStellarSubCommand<*>> = mutableListOf()
 
     fun addSubCommand(name: String): StellarSubCommand {
-        val subCommand = StellarSubCommand(getThis()!!, name)
+        val subCommand = StellarSubCommand(getBase()!!, name)
         subCommands.add(subCommand)
         return subCommand
     }
 
     fun addStringSubCommand(name: String, type: StringType = StringType.SINGLE_WORD): StringSubCommand {
-        val subCommand = StringSubCommand(getThis()!!, name, type)
+        val subCommand = StringSubCommand(getBase()!!, name, type)
         subCommands.add(subCommand)
         return subCommand
     }
 
     fun addIntegerSubCommand(name: String, min: Int = Int.MIN_VALUE, max: Int = Int.MAX_VALUE): IntegerSubCommand {
-        val subCommand = IntegerSubCommand(getThis()!!, name, min, max)
+        val subCommand = IntegerSubCommand(getBase()!!, name, min, max)
         subCommands.add(subCommand)
         return subCommand
     }
 
     fun addLongSubCommand(name: String, min: Long = Long.MIN_VALUE, max: Long = Long.MAX_VALUE): LongSubCommand {
-        val subCommand = LongSubCommand(getThis()!!, name, min, max)
+        val subCommand = LongSubCommand(getBase()!!, name, min, max)
         subCommands.add(subCommand)
         return subCommand
     }
 
     fun addFloatSubCommand(name: String, min: Float = Float.MIN_VALUE, max: Float = Float.MAX_VALUE): FloatSubCommand {
-        val subCommand = FloatSubCommand(getThis()!!, name, min, max)
+        val subCommand = FloatSubCommand(getBase()!!, name, min, max)
         subCommands.add(subCommand)
         return subCommand
     }
 
     fun addDoubleSubCommand(name: String, min: Double = Double.MIN_VALUE, max: Double = Double.MAX_VALUE): DoubleSubCommand {
-        val subCommand = DoubleSubCommand(getThis()!!, name, min, max)
+        val subCommand = DoubleSubCommand(getBase()!!, name, min, max)
         subCommands.add(subCommand)
         return subCommand
     }
 
     fun addBooleanSubCommand(name: String): BooleanSubCommand {
-        val subCommand = BooleanSubCommand(getThis()!!, name)
+        val subCommand = BooleanSubCommand(getBase()!!, name)
         subCommands.add(subCommand)
         return subCommand
     }
 
     fun <T> addListSubCommand(name: String, list: List<T>, parse: (String) -> T): ListSubCommand<T> {
-        val subCommand = ListSubCommand(getThis()!!, name, list, parse = parse)
+        val subCommand = ListSubCommand(getBase()!!, name, list, parse = parse)
         subCommands.add(subCommand)
         return subCommand
     }
 
     fun addStringListSubCommand(name: String, list: List<String>): ListSubCommand<String> {
-        val subCommand = ListSubCommand(getThis()!!, name, list) { it }
+        val subCommand = ListSubCommand(getBase()!!, name, list) { it }
         subCommands.add(subCommand)
         return subCommand
     }
 
     fun addUUIDListSubCommand(name: String, list: List<UUID>): ListSubCommand<UUID> {
-        val subCommand = ListSubCommand<UUID>(getThis()!!, name, list) { UUID.fromString(it) }
+        val subCommand = ListSubCommand<UUID>(getBase()!!, name, list) { UUID.fromString(it) }
         subCommands.add(subCommand)
         return subCommand
     }
 
     inline fun <reified T : Enum<T>> addEnumSubCommand(name: String): EnumSubCommand<T> {
-        val subCommand = EnumSubCommand<T>(getThis()!!, name, T::class)
+        val subCommand = EnumSubCommand<T>(getBase()!!, name, T::class)
         subCommands.add(subCommand)
         return subCommand
     }
@@ -85,25 +85,25 @@ open class SubCommandHandler {
         noinline stringifier: (Enum<*>) -> String = { it.name },
         noinline parse: (String) -> Enum<T>?
     ): EnumSubCommand<T> {
-        val subCommand = EnumSubCommand(getThis()!!, name, T::class, stringifier, parse)
+        val subCommand = EnumSubCommand(getBase()!!, name, T::class, stringifier, parse)
         subCommands.add(subCommand)
         return subCommand
     }
 
     fun addEntitySubCommand(name: String, type: EntityDisplayType): EntitySubCommand {
-        val subCommand = EntitySubCommand(getThis()!!, name, type)
+        val subCommand = EntitySubCommand(getBase()!!, name, type)
         subCommands.add(subCommand)
         return subCommand
     }
 
     fun addGameProfileSubCommand(name: String): GameProfileSubCommand {
-        val subCommand = GameProfileSubCommand(getThis()!!, name)
+        val subCommand = GameProfileSubCommand(getBase()!!, name)
         subCommands.add(subCommand)
         return subCommand
     }
 
     fun addLocationSubCommand(name: String): LocationSubCommand {
-        val subCommand = LocationSubCommand(getThis()!!, name)
+        val subCommand = LocationSubCommand(getBase()!!, name)
         subCommands.add(subCommand)
         return subCommand
     }
