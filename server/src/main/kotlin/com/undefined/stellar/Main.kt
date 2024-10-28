@@ -8,17 +8,19 @@ import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.plugin.java.JavaPlugin
 import java.util.*
 
+enum class Status {
+    SUCCESS,
+    FAILURE,
+    PENDING
+}
+
 class Main : JavaPlugin() {
 
     override fun onEnable() {
         StellarCommand("test")
-            .addStringListSubCommand("test", listOf("test", "other", "fdnajfjdas", "aj"))
-            .addListExecution<Player> { string ->
-                sendMessage(string)
-            }
-            .addUUIDListSubCommand("uuid", listOf(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID()))
-            .addListExecution<Player> { uuid ->
-                sendMessage(uuid.toString())
+            .addEnumSubCommand<Status>("enum", { enum -> enum.name.lowercase().replaceFirstChar { char -> char.uppercase() } }, { Status.valueOf(it.uppercase()) })
+            .addEnumExecution<Player> { enum ->
+                sendMessage(enum.name)
             }
             .register()
     }

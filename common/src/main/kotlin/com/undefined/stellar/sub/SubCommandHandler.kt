@@ -74,6 +74,22 @@ open class SubCommandHandler {
         return subCommand
     }
 
+    inline fun <reified T : Enum<T>> addEnumSubCommand(name: String): EnumSubCommand<T> {
+        val subCommand = EnumSubCommand<T>(getThis()!!, name, T::class)
+        subCommands.add(subCommand)
+        return subCommand
+    }
+
+    inline fun <reified T : Enum<T>> addEnumSubCommand(
+        name: String,
+        noinline stringifier: (Enum<*>) -> String = { it.name },
+        noinline parse: (String) -> Enum<T>
+    ): EnumSubCommand<T> {
+        val subCommand = EnumSubCommand(getThis()!!, name, T::class, stringifier, parse)
+        subCommands.add(subCommand)
+        return subCommand
+    }
+
     fun addEntitySubCommand(name: String, type: EntityDisplayType): EntitySubCommand {
         val subCommand = EntitySubCommand(getThis()!!, name, type)
         subCommands.add(subCommand)
