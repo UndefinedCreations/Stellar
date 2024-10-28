@@ -7,7 +7,7 @@ import com.undefined.stellar.sub.brigadier.NativeTypeSubCommand
 import org.bukkit.command.CommandSender
 
 class GameProfileSubCommand(parent: BaseStellarCommand, name: String) : NativeTypeSubCommand(parent, name) {
-    inline fun <reified T : CommandSender> addGameProfileExecute(noinline execution: T.(Collection<GameProfile>) -> Unit): BaseStellarCommand {
+    inline fun <reified T : CommandSender> addGameProfileExecution(noinline execution: T.(Collection<GameProfile>) -> Unit): BaseStellarCommand {
         customExecutions.add(CustomStellarExecution(T::class, execution) as CustomStellarExecution<*, Any>)
         return this
     }

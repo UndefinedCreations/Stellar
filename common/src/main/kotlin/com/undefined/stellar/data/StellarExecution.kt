@@ -4,8 +4,8 @@ import org.bukkit.command.CommandSender
 import kotlin.reflect.KClass
 import kotlin.reflect.safeCast
 
-data class StellarExecution<T : CommandSender>(val kClass: KClass<T>, val execute: T.() -> Unit) {
+data class StellarExecution<T : CommandSender>(val kClass: KClass<T>, val execution: T.() -> Unit) {
     fun run(sender: CommandSender) {
-        execute.invoke(kClass.safeCast(sender) ?: return)
+        execution.invoke(kClass.safeCast(sender) ?: return)
     }
 }

@@ -8,41 +8,39 @@ import com.mojang.brigadier.suggestion.Suggestions
 import com.mojang.brigadier.suggestion.SuggestionsBuilder
 import java.util.concurrent.CompletableFuture
 
-//class ListArgumentType<T> private constructor(val list: List<T>) : ArgumentType<List<*>?> {
-//
-//    @Throws(CommandSyntaxException::class)
-//    override fun parse(reader: StringReader): List<T> {
-//        return reader.readBoolean()
-//    }
-//
-//    override fun <S> listSuggestions(
-//        context: CommandContext<S>,
-//        builder: SuggestionsBuilder
-//    ): CompletableFuture<Suggestions> {
-//        if ("true".startsWith(builder.remainingLowerCase)) {
-//            builder.suggest("true")
-//        }
-//
-//        if ("false".startsWith(builder.remainingLowerCase)) {
-//            builder.suggest("false")
-//        }
-//
-//        return builder.buildFuture()
-//    }
-//
-//    override fun getExamples(): Collection<String> {
-//        return EXAMPLES
-//    }
-//
-//    companion object {
-//        private val EXAMPLES: Collection<String> = mutableListOf("true", "false")
-//
-//        fun <T> list(list: List<T>): ListArgumentType {
-//            return ListArgumentType()
-//        }
-//
-//        fun getList(context: CommandContext<*>, name: String?): List<T> {
-//            return context.getArgument(name, List::class.java) as List<T>
-//        }
-//    }
-//}
+class ListArgumentType<T> private constructor(private val elementType: ArgumentType<out T>) : ArgumentType<List<T>?> {
+
+    @Throws(CommandSyntaxException::class)
+    override fun parse(reader: StringReader): List<T> {
+        val result: MutableList<T> = mutableListOf()
+        while (reader.canRead()) {
+            val type = elementType
+            val element = type.parse(reader)
+            result.add(element)
+            while (reader.canRead() && Character.isWhitespace(reader.peek())) reader.read()
+        }
+        return result
+    }
+
+    override fun getExamples(): Collection<String> {
+        return elementType.examples
+    }
+
+    override fun <S> listSuggestions(
+        context: CommandContext<S>,
+        builder: SuggestionsBuilder
+    ): CompletableFuture<Suggestions> {
+        return elementType.listSuggestions(context, builder)
+    }
+
+    companion object {
+        fun <E> list(expectedElementType: ArgumentType<out E>): ListArgumentType<E> {
+            return ListArgumentType(expectedElementType)
+        }
+
+        fun <T, S> getList(context: CommandContext<S>, name: String): List<T> {
+            return context.getArgument(name, List::class.java) as List<T>
+        }
+    }
+
+}

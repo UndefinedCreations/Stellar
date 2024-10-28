@@ -9,11 +9,13 @@ class ListSubCommand<T>(
     parent: BaseStellarCommand,
     name: String,
     val list: List<T>,
-    val serialize: T.() -> String = { this.toString() },
-    val deserialize: String.(T) -> T = { this as T }
+    val stringifier: (T) -> String = { it.toString() },
+    val parse: (String) -> T
 ) : NativeTypeSubCommand(parent, name) {
-    inline fun <reified T : CommandSender> addListExecute(noinline execution: T.(Boolean) -> Unit): BaseStellarCommand {
-        customExecutions.add(CustomStellarExecution(T::class, execution) as CustomStellarExecution<*, Any>)
+    fun getStringList(): List<String> = list.map(stringifier)
+
+    inline fun <reified C : CommandSender> addListExecution(noinline execution: C.(T) -> Unit): BaseStellarCommand {
+        customExecutions.add(CustomStellarExecution(C::class, execution) as CustomStellarExecution<*, Any>)
         return this
     }
 }

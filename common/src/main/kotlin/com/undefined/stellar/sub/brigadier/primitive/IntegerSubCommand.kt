@@ -8,7 +8,7 @@ import kotlin.reflect.KClass
 import kotlin.reflect.safeCast
 
 class IntegerSubCommand(parent: BaseStellarCommand, name: String, val min: Int, val max: Int) : NativeTypeSubCommand(parent, name) {
-    inline fun <reified T : CommandSender> addIntegerExecute(noinline execution: T.(Int) -> Unit): BaseStellarCommand {
+    inline fun <reified T : CommandSender> addIntegerExecution(noinline execution: T.(Int) -> Unit): BaseStellarCommand {
         customExecutions.add(CustomStellarExecution(T::class, execution) as CustomStellarExecution<*, Any>)
         return this
     }

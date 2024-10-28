@@ -10,7 +10,7 @@ import kotlin.reflect.KClass
 import kotlin.reflect.safeCast
 
 class StringSubCommand(parent: BaseStellarCommand, name: String, val type: StringType) : NativeTypeSubCommand(parent, name) {
-    inline fun <reified T : CommandSender> addStringExecute(noinline execution: T.(String) -> Unit): BaseStellarCommand {
+    inline fun <reified T : CommandSender> addStringExecution(noinline execution: T.(String) -> Unit): BaseStellarCommand {
         customExecutions.add(CustomStellarExecution(T::class, execution) as CustomStellarExecution<*, Any>)
         return this
     }

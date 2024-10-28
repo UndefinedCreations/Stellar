@@ -6,4 +6,6 @@ import com.undefined.stellar.sub.BaseStellarSubCommand
 
 abstract class NativeTypeSubCommand(parent: BaseStellarCommand, name: String) : BaseStellarSubCommand(parent, name) {
     val customExecutions: MutableList<CustomStellarExecution<*, Any>> = mutableListOf()
+
+//    fun addCustomExecute
 }

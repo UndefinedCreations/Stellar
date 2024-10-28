@@ -36,7 +36,7 @@ abstract class BaseStellarCommand(val name: String) : SubCommandHandler() {
         return this
     }
 
-    inline fun <reified T : CommandSender> addExecute(noinline execution: T.() -> Unit): BaseStellarCommand {
+    inline fun <reified T : CommandSender> addExecution(noinline execution: T.() -> Unit): BaseStellarCommand {
         executions.add(StellarExecution(T::class, execution))
         return this
     }
