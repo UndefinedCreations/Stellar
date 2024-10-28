@@ -44,7 +44,10 @@ object ArgumentHelper {
             is DoubleSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, DoubleArgumentType.getDouble(context, subCommand.name)) }
             is BooleanSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, BoolArgumentType.getBool(context, subCommand.name)) }
             is ListSubCommand<*> -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, subCommand.parse.invoke(StringArgumentType.getString(context, subCommand.name))!!) }
-            is EnumSubCommand<*> -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, subCommand.parse(StringArgumentType.getString(context, subCommand.name))) }
+            is EnumSubCommand<*> -> subCommand.customExecutions.forEach { execution ->
+                val enum = subCommand.parse(StringArgumentType.getString(context, subCommand.name))
+                enum?.let { execution.run(context.source.bukkitSender, enum) }
+            }
             is EntitySubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, EntityArgument.getEntity(context, subCommand.name).bukkitEntity) }
             is GameProfileSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, GameProfileArgument.getGameProfiles(context, subCommand.name)) }
             is LocationSubCommand -> subCommand.customExecutions.forEach {
