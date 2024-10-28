@@ -1,4 +1,4 @@
-package com.undefined.stellar.data
+package com.undefined.stellar.data.execution
 
 import org.bukkit.command.CommandSender
 import kotlin.reflect.KClass

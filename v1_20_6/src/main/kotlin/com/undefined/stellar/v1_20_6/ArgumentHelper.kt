@@ -20,7 +20,7 @@ import org.bukkit.Location
 
 object ArgumentHelper {
 
-    fun <T : NativeTypeSubCommand> nativeSubCommandToArgument(subCommand: T): RequiredArgumentBuilder<CommandSourceStack, *> =
+    fun <T : NativeTypeSubCommand<*>> nativeSubCommandToArgument(subCommand: T): RequiredArgumentBuilder<CommandSourceStack, *> =
         when (subCommand) {
             is StringSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, subCommand.type.brigadier())
             is IntegerSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, IntegerArgumentType.integer(subCommand.min, subCommand.max))
@@ -36,7 +36,7 @@ object ArgumentHelper {
             else -> throw UnsupportedSubCommandException()
         }
 
-    fun <T : NativeTypeSubCommand> handleNativeSubCommandExecutors(subCommand: T, context: CommandContext<CommandSourceStack>) =
+    fun <T : NativeTypeSubCommand<*>> handleNativeSubCommandExecutors(subCommand: T, context: CommandContext<CommandSourceStack>) =
         when (subCommand) {
             is StringSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, StringArgumentType.getString(context, subCommand.name)) }
             is IntegerSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, IntegerArgumentType.getInteger(context, subCommand.name)) }

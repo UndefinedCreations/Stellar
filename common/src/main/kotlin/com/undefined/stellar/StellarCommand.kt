@@ -1,3 +1,3 @@
 package com.undefined.stellar
 
-abstract class StellarCommand(name: String) : BaseStellarCommand(name)
+abstract class StellarCommand(name: String) : BaseStellarCommand<StellarCommand>(name)

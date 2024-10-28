@@ -10,11 +10,11 @@ import java.util.UUID
 
 open class SubCommandHandler {
 
-    open fun getThis(): BaseStellarCommand? = null
-    val subCommands: MutableList<BaseStellarSubCommand> = mutableListOf()
-    val optionalSubCommands: MutableList<BaseStellarSubCommand> = mutableListOf()
+    open fun getThis(): BaseStellarCommand<*>? = null
+    val subCommands: MutableList<BaseStellarSubCommand<*>> = mutableListOf()
+    val optionalSubCommands: MutableList<BaseStellarSubCommand<*>> = mutableListOf()
 
-    fun addSubCommand(name: String): BaseStellarCommand {
+    fun addSubCommand(name: String): StellarSubCommand {
         val subCommand = StellarSubCommand(getThis()!!, name)
         subCommands.add(subCommand)
         return subCommand
