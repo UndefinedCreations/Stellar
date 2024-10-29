@@ -5,8 +5,8 @@ import com.undefined.stellar.sub.brigadier.entity.EntityDisplayType
 import com.undefined.stellar.sub.brigadier.entity.EntitySubCommand
 import com.undefined.stellar.sub.brigadier.player.GameProfileSubCommand
 import com.undefined.stellar.sub.brigadier.primitive.*
-import com.undefined.stellar.sub.brigadier.world.Location2DSubCommand
 import com.undefined.stellar.sub.brigadier.world.LocationSubCommand
+import com.undefined.stellar.sub.brigadier.world.LocationType
 import java.util.UUID
 
 open class SubCommandHandler {
@@ -103,14 +103,8 @@ open class SubCommandHandler {
         return subCommand
     }
 
-    fun addLocationSubCommand(name: String): LocationSubCommand {
-        val subCommand = LocationSubCommand(getBase()!!, name)
-        subCommands.add(subCommand)
-        return subCommand
-    }
-
-    fun add2DLocationSubCommand(name: String): Location2DSubCommand {
-        val subCommand = Location2DSubCommand(getBase()!!, name)
+    fun addLocationSubCommand(name: String, type: LocationType = LocationType.LOCATION3D): LocationSubCommand {
+        val subCommand = LocationSubCommand(getBase()!!, name, type)
         subCommands.add(subCommand)
         return subCommand
     }

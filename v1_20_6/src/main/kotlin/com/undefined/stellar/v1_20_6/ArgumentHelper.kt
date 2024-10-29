@@ -10,15 +10,21 @@ import com.undefined.stellar.sub.brigadier.entity.EntityDisplayType
 import com.undefined.stellar.sub.brigadier.entity.EntitySubCommand
 import com.undefined.stellar.sub.brigadier.player.GameProfileSubCommand
 import com.undefined.stellar.sub.brigadier.primitive.*
-import com.undefined.stellar.sub.brigadier.world.Location2DSubCommand
 import com.undefined.stellar.sub.brigadier.world.LocationSubCommand
+import com.undefined.stellar.sub.brigadier.world.LocationType
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.arguments.EntityArgument
 import net.minecraft.commands.arguments.GameProfileArgument
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument
 import net.minecraft.commands.arguments.coordinates.ColumnPosArgument
-import net.minecraft.commands.synchronization.ArgumentTypeInfos
+import net.minecraft.commands.arguments.coordinates.Vec2Argument
+import net.minecraft.commands.arguments.coordinates.Vec3Argument
+import net.minecraft.core.BlockPos
+import net.minecraft.server.level.ColumnPos
+import net.minecraft.world.phys.Vec2
+import net.minecraft.world.phys.Vec3
 import org.bukkit.Location
+import org.bukkit.World
 
 object ArgumentHelper {
 
@@ -34,8 +40,12 @@ object ArgumentHelper {
             is EnumSubCommand<*> -> RequiredArgumentBuilder.argument<CommandSourceStack, String>(subCommand.name, StringArgumentType.word()).suggestStringList(subCommand.getStringList())
             is EntitySubCommand -> RequiredArgumentBuilder.argument(subCommand.name, subCommand.type.brigadier())
             is GameProfileSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, GameProfileArgument.gameProfile())
-            is LocationSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, BlockPosArgument.blockPos())
-            is Location2DSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, ColumnPosArgument.columnPos())
+            is LocationSubCommand -> when (subCommand.type) {
+                    LocationType.LOCATION3D -> RequiredArgumentBuilder.argument(subCommand.name, BlockPosArgument.blockPos())
+                    LocationType.LOCATION2D -> RequiredArgumentBuilder.argument(subCommand.name, ColumnPosArgument.columnPos())
+                    LocationType.DOUBLE_LOCATION_3D -> RequiredArgumentBuilder.argument(subCommand.name, Vec3Argument.vec3())
+                    LocationType.DOUBLE_LOCATION_2D -> RequiredArgumentBuilder.argument(subCommand.name, Vec2Argument.vec2())
+                }
             else -> throw UnsupportedSubCommandException()
         }
 
@@ -61,12 +71,8 @@ object ArgumentHelper {
             }
             is GameProfileSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, GameProfileArgument.getGameProfiles(context, subCommand.name)) }
             is LocationSubCommand -> subCommand.customExecutions.forEach {
-                val blockPos = BlockPosArgument.getBlockPos(context, subCommand.name)
-                it.run(context.source.bukkitSender, Location(context.source.bukkitWorld, blockPos.x.toDouble(), blockPos.y.toDouble(), blockPos.z.toDouble()))
-            }
-            is Location2DSubCommand -> subCommand.customExecutions.forEach {
-                val columnPos = BlockPosArgument.getBlockPos(context, subCommand.name)
-                it.run(context.source.bukkitSender, Location(context.source.bukkitWorld, columnPos.x.toDouble(), columnPos.y.toDouble(), columnPos.z.toDouble()))
+                val location = getLocation(context, subCommand)
+                it.run(context.source.bukkitSender, location)
             }
             else -> throw UnsupportedSubCommandException()
         }
@@ -120,5 +126,23 @@ object ArgumentHelper {
             list.filter { it.startsWith(suggestionsBuilder.remaining) }.forEach { suggestionsBuilder.suggest(it) }
             return@suggests suggestionsBuilder.buildFuture()
         }
+
+    private fun getLocation(context: CommandContext<CommandSourceStack>, command: LocationSubCommand): Location {
+        val world = context.source.bukkitWorld
+        return when (command.type) {
+            LocationType.LOCATION3D -> BlockPosArgument.getBlockPos(context, command.name).toLocation(world)
+            LocationType.LOCATION2D -> ColumnPosArgument.getColumnPos(context, command.name).toLocation(world)
+            LocationType.DOUBLE_LOCATION_3D -> Vec3Argument.getVec3(context, command.name).toLocation(world)
+            LocationType.DOUBLE_LOCATION_2D -> Vec2Argument.getVec2(context, command.name).toLocation(world)
+        }
+    }
+
+    private fun BlockPos.toLocation(world: World?) = Location(world, x.toDouble(), y.toDouble(), z.toDouble())
+
+    private fun ColumnPos.toLocation(world: World?) = Location(world, x.toDouble(), 0.0, z.toDouble())
+
+    private fun Vec3.toLocation(world: World?) = Location(world, x, y, z)
+
+    private fun Vec2.toLocation(world: World?) = Location(world, x.toDouble(), 0.0, y.toDouble())
 
 }
