@@ -10,21 +10,25 @@ import com.undefined.stellar.sub.brigadier.entity.EntityDisplayType
 import com.undefined.stellar.sub.brigadier.entity.EntitySubCommand
 import com.undefined.stellar.sub.brigadier.player.GameProfileSubCommand
 import com.undefined.stellar.sub.brigadier.primitive.*
+import com.undefined.stellar.sub.brigadier.world.BlockSubCommand
 import com.undefined.stellar.sub.brigadier.world.LocationSubCommand
 import com.undefined.stellar.sub.brigadier.world.LocationType
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.arguments.EntityArgument
 import net.minecraft.commands.arguments.GameProfileArgument
+import net.minecraft.commands.arguments.ResourceLocationArgument
+import net.minecraft.commands.arguments.blocks.BlockStateParser
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument
 import net.minecraft.commands.arguments.coordinates.ColumnPosArgument
 import net.minecraft.commands.arguments.coordinates.Vec2Argument
 import net.minecraft.commands.arguments.coordinates.Vec3Argument
 import net.minecraft.core.BlockPos
+import net.minecraft.core.registries.Registries
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ColumnPos
 import net.minecraft.world.phys.Vec2
 import net.minecraft.world.phys.Vec3
-import org.bukkit.Location
-import org.bukkit.World
+import org.bukkit.*
 
 object ArgumentHelper {
 
@@ -46,6 +50,9 @@ object ArgumentHelper {
                     LocationType.DOUBLE_LOCATION_3D -> RequiredArgumentBuilder.argument(subCommand.name, Vec3Argument.vec3())
                     LocationType.DOUBLE_LOCATION_2D -> RequiredArgumentBuilder.argument(subCommand.name, Vec2Argument.vec2())
                 }
+            is BlockSubCommand -> RequiredArgumentBuilder.argument<CommandSourceStack, ResourceLocation>(subCommand.name, ResourceLocationArgument.id()).suggests { context, suggestionsBuilder ->
+                BlockStateParser.fillSuggestions(context.source.level.registryAccess().lookupOrThrow(Registries.BLOCK), suggestionsBuilder, false, true)
+            }
             else -> throw UnsupportedSubCommandException()
         }
 
@@ -70,9 +77,13 @@ object ArgumentHelper {
                 }
             }
             is GameProfileSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, GameProfileArgument.getGameProfiles(context, subCommand.name)) }
-            is LocationSubCommand -> subCommand.customExecutions.forEach {
-                val location = getLocation(context, subCommand)
-                it.run(context.source.bukkitSender, location)
+            is LocationSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, getLocation(context, subCommand)) }
+            is BlockSubCommand -> {
+                subCommand.customExecutions.forEach {
+                    val id = ResourceLocationArgument.getId(context, subCommand.name)
+                    val state = BlockStateParser.parseForBlock(context.source.level.registryAccess().lookupOrThrow(Registries.BLOCK), id.toString(), true).blockState
+                    it.run(context.source.bukkitSender, state.bukkitMaterial)
+                }
             }
             else -> throw UnsupportedSubCommandException()
         }
@@ -98,9 +109,13 @@ object ArgumentHelper {
                 }
             }
             is GameProfileSubCommand -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, GameProfileArgument.getGameProfiles(context, subCommand.name))) return false }
-            is LocationSubCommand -> subCommand.customRunnables.forEach {
-                val blockPos = BlockPosArgument.getBlockPos(context, subCommand.name)
-                if (!it.run(context.source.bukkitSender, Location(context.source.bukkitWorld, blockPos.x.toDouble(), blockPos.y.toDouble(), blockPos.z.toDouble()))) return false
+            is LocationSubCommand -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, getLocation(context, subCommand))) return false }
+            is BlockSubCommand -> {
+                subCommand.customRunnables.forEach {
+                    val id = ResourceLocationArgument.getId(context, subCommand.name)
+                    val state = BlockStateParser.parseForBlock(context.source.level.registryAccess().lookupOrThrow(Registries.BLOCK), id.toString(), true).blockState
+                    if (!it.run(context.source.bukkitSender, state.bukkitMaterial)) return false
+                }
             }
             else -> throw UnsupportedSubCommandException()
         }

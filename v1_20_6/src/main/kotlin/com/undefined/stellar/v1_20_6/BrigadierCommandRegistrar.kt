@@ -31,7 +31,6 @@ object BrigadierCommandRegistrar {
         when (this) {
             is StellarSubCommand -> LiteralArgumentBuilder.literal(alias.ifEmpty { name })
             is NativeTypeSubCommand -> {
-                println("Test")
                 ArgumentHelper.nativeSubCommandToArgument(this).handleSuggestions(this)
             }
             else -> throw UnsupportedSubCommandException()
