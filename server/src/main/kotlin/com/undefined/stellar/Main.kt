@@ -8,9 +8,9 @@ class Main : JavaPlugin() {
 
     override fun onEnable() {
         StellarCommand("test")
-            .addBlockDataSubCommand("data")
-            .addBlockDataExecution<Player> { predicate ->
-                sendMessage(predicate.asString)
+            .addItemSubCommand("item")
+            .addItemExecution<Player> {
+                inventory.addItem(it)
             }
             .register()
     }

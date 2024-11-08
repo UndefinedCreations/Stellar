@@ -9,11 +9,9 @@ import com.undefined.stellar.BaseStellarCommand
 import com.undefined.stellar.exception.UnsupportedSubCommandException
 import com.undefined.stellar.sub.AbstractStellarSubCommand
 import com.undefined.stellar.sub.StellarSubCommand
-import com.undefined.stellar.sub.brigadier.NativeTypeSubCommand
-import com.undefined.stellar.v1_20_6.BrigadierCommandRegistrar.handleExecutions
+import com.undefined.stellar.sub.brigadier.BrigadierTypeSubCommand
 import net.minecraft.commands.CommandSourceStack
 import org.bukkit.Bukkit
-import org.bukkit.command.CommandSender
 import org.bukkit.craftbukkit.CraftServer
 
 
@@ -30,7 +28,7 @@ object BrigadierCommandRegistrar {
     private fun AbstractStellarSubCommand<*>.argumentBuilder(alias: String = ""): ArgumentBuilder<CommandSourceStack, *> =
         when (this) {
             is StellarSubCommand -> LiteralArgumentBuilder.literal(alias.ifEmpty { name })
-            is NativeTypeSubCommand -> {
+            is BrigadierTypeSubCommand -> {
                 ArgumentHelper.nativeSubCommandToArgument(this).handleSuggestions(this)
             }
             else -> throw UnsupportedSubCommandException()
@@ -40,7 +38,7 @@ object BrigadierCommandRegistrar {
         this.getBase().subCommands.forEach { subCommand -> if (!handleSubCommandRunnables(subCommand, context)) return }
         when (this) {
             is StellarSubCommand -> this.executions.forEach { it.run(context.source.bukkitSender) }
-            is NativeTypeSubCommand -> ArgumentHelper.handleNativeSubCommandExecutors(this, context)
+            is BrigadierTypeSubCommand -> ArgumentHelper.handleNativeSubCommandExecutors(this, context)
             else -> throw UnsupportedSubCommandException()
         }
     }
@@ -102,7 +100,7 @@ object BrigadierCommandRegistrar {
     private fun handleSubCommandRunnables(subCommand: AbstractStellarSubCommand<*>, context: CommandContext<CommandSourceStack>): Boolean {
         when (subCommand) {
             is StellarSubCommand -> subCommand.runnables.forEach { if (!it.run(context.source.bukkitSender)) return false }
-            is NativeTypeSubCommand -> if (!ArgumentHelper.handleNativeSubCommandRunnables(subCommand, context)) return false
+            is BrigadierTypeSubCommand -> if (!ArgumentHelper.handleNativeSubCommandRunnables(subCommand, context)) return false
             else -> throw UnsupportedSubCommandException()
         }
         return true

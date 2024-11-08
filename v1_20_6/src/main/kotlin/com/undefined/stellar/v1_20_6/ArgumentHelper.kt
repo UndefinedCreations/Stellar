@@ -6,12 +6,15 @@ import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.suggestion.SuggestionsBuilder
 import com.undefined.stellar.exception.ServerTypeMismatchException
 import com.undefined.stellar.exception.UnsupportedSubCommandException
-import com.undefined.stellar.sub.brigadier.NativeTypeSubCommand
+import com.undefined.stellar.sub.brigadier.BrigadierTypeSubCommand
 import com.undefined.stellar.sub.brigadier.entity.EntityDisplayType
 import com.undefined.stellar.sub.brigadier.entity.EntitySubCommand
+import com.undefined.stellar.sub.brigadier.item.ItemSubCommand
 import com.undefined.stellar.sub.brigadier.player.GameProfileSubCommand
 import com.undefined.stellar.sub.brigadier.primitive.*
 import com.undefined.stellar.sub.brigadier.world.*
+import com.undefined.stellar.sub.custom.EnumSubCommand
+import com.undefined.stellar.sub.custom.ListSubCommand
 import net.minecraft.commands.CommandBuildContext
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.arguments.EntityArgument
@@ -22,6 +25,7 @@ import net.minecraft.commands.arguments.coordinates.BlockPosArgument
 import net.minecraft.commands.arguments.coordinates.ColumnPosArgument
 import net.minecraft.commands.arguments.coordinates.Vec2Argument
 import net.minecraft.commands.arguments.coordinates.Vec3Argument
+import net.minecraft.commands.arguments.item.ItemArgument
 import net.minecraft.core.BlockPos
 import net.minecraft.server.level.ColumnPos
 import net.minecraft.world.level.block.state.pattern.BlockInWorld
@@ -31,6 +35,7 @@ import org.bukkit.*
 import org.bukkit.block.Block
 import org.bukkit.craftbukkit.CraftServer
 import org.bukkit.craftbukkit.block.data.CraftBlockData
+import org.bukkit.craftbukkit.inventory.CraftItemStack
 import java.util.function.Predicate
 
 object ArgumentHelper {
@@ -44,7 +49,7 @@ object ArgumentHelper {
         )
     }
 
-    fun <T : NativeTypeSubCommand<*>> nativeSubCommandToArgument(subCommand: T): RequiredArgumentBuilder<CommandSourceStack, *> =
+    fun <T : BrigadierTypeSubCommand<*>> nativeSubCommandToArgument(subCommand: T): RequiredArgumentBuilder<CommandSourceStack, *> =
         when (subCommand) {
             is StringSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, subCommand.type.brigadier())
             is IntegerSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, IntegerArgumentType.integer(subCommand.min, subCommand.max))
@@ -61,13 +66,14 @@ object ArgumentHelper {
                     LocationType.LOCATION2D -> RequiredArgumentBuilder.argument(subCommand.name, ColumnPosArgument.columnPos())
                     LocationType.DOUBLE_LOCATION_3D -> RequiredArgumentBuilder.argument(subCommand.name, Vec3Argument.vec3())
                     LocationType.DOUBLE_LOCATION_2D -> RequiredArgumentBuilder.argument(subCommand.name, Vec2Argument.vec2())
-                }
+            }
             is BlockDataSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, BlockStateArgument.block(COMMAND_BUILD_CONTEXT))
             is BlockPredicateSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, BlockPredicateArgument.blockPredicate(COMMAND_BUILD_CONTEXT))
+            is ItemSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, ItemArgument.item(COMMAND_BUILD_CONTEXT))
             else -> throw UnsupportedSubCommandException()
         }
 
-    fun <T : NativeTypeSubCommand<*>> handleNativeSubCommandExecutors(subCommand: T, context: CommandContext<CommandSourceStack>) =
+    fun <T : BrigadierTypeSubCommand<*>> handleNativeSubCommandExecutors(subCommand: T, context: CommandContext<CommandSourceStack>) =
         when (subCommand) {
             is StringSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, StringArgumentType.getString(context, subCommand.name)) }
             is IntegerSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, IntegerArgumentType.getInteger(context, subCommand.name)) }
@@ -89,27 +95,20 @@ object ArgumentHelper {
             }
             is GameProfileSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, GameProfileArgument.getGameProfiles(context, subCommand.name)) }
             is LocationSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, getLocation(context, subCommand)) }
-            is BlockDataSubCommand -> {
-                subCommand.customExecutions.forEach {
-                    val state = BlockStateArgument.getBlock(context, subCommand.name).state
-                    it.run(context.source.bukkitSender, CraftBlockData.fromData(state))
-                }
+            is BlockDataSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, CraftBlockData.fromData(BlockStateArgument.getBlock(context, subCommand.name).state)) }
+            is BlockPredicateSubCommand -> subCommand.customExecutions.forEach {
+                it.run(context.source.bukkitSender, Predicate<Block> { block: Block ->
+                    BlockPredicateArgument.getBlockPredicate(context, subCommand.name).test(BlockInWorld(
+                        context.source.level,
+                        BlockPos(block.x, block.y, block.z), true)
+                    )
+                })
             }
-            is BlockPredicateSubCommand -> {
-                subCommand.customExecutions.forEach {
-                    val bukkitPredicate = Predicate<Block> { block: Block ->
-                        BlockPredicateArgument.getBlockPredicate(context, subCommand.name).test(BlockInWorld(
-                            context.source.level,
-                            BlockPos(block.x, block.y, block.z), true)
-                        )
-                    }
-                    it.run(context.source.bukkitSender, bukkitPredicate)
-                }
-            }
+            is ItemSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, CraftItemStack.asBukkitCopy(ItemArgument.getItem(context, subCommand.name).createItemStack(1, false))) }
             else -> throw UnsupportedSubCommandException()
         }
 
-    fun <T : NativeTypeSubCommand<*>> handleNativeSubCommandRunnables(subCommand: T, context: CommandContext<CommandSourceStack>): Boolean {
+    fun <T : BrigadierTypeSubCommand<*>> handleNativeSubCommandRunnables(subCommand: T, context: CommandContext<CommandSourceStack>): Boolean {
         when (subCommand) {
             is StringSubCommand -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, StringArgumentType.getString(context, subCommand.name))) return false }
             is IntegerSubCommand -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, IntegerArgumentType.getInteger(context, subCommand.name))) return false }
@@ -139,15 +138,16 @@ object ArgumentHelper {
             }
             is BlockPredicateSubCommand -> {
                 subCommand.customRunnables.forEach {
-                    val bukkitPredicate = Predicate<Block> { block: Block ->
-                        BlockPredicateArgument.getBlockPredicate(context, subCommand.name).test(BlockInWorld(
-                            context.source.level,
-                            BlockPos(block.x, block.y, block.z), true)
-                        )
-                    }
-                    if (!it.run(context.source.bukkitSender, bukkitPredicate)) return false
+                    val continueOtherExecutions = it.run(context.source.bukkitSender, Predicate<Block> { block: Block ->
+                            BlockPredicateArgument.getBlockPredicate(context, subCommand.name).test(BlockInWorld(
+                                context.source.level,
+                                BlockPos(block.x, block.y, block.z), true)
+                            )
+                        })
+                    if (!continueOtherExecutions) return false
                 }
             }
+            is ItemSubCommand -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, CraftItemStack.asBukkitCopy(ItemArgument.getItem(context, subCommand.name).createItemStack(1, false)))) return false }
             else -> throw UnsupportedSubCommandException()
         }
         return true

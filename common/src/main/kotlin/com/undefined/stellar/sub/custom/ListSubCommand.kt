@@ -1,9 +1,9 @@
-package com.undefined.stellar.sub.brigadier.primitive
+package com.undefined.stellar.sub.custom
 
 import com.undefined.stellar.BaseStellarCommand
 import com.undefined.stellar.data.execution.CustomStellarExecution
 import com.undefined.stellar.data.execution.CustomStellarRunnable
-import com.undefined.stellar.sub.brigadier.NativeTypeSubCommand
+import com.undefined.stellar.sub.brigadier.BrigadierTypeSubCommand
 import org.bukkit.command.CommandSender
 
 @Suppress("UNCHECKED_CAST")
@@ -13,7 +13,7 @@ class ListSubCommand<T>(
     val list: List<T>,
     val stringifier: (T) -> String = { it.toString() },
     val parse: (String) -> T
-) : NativeTypeSubCommand<ListSubCommand<T>>(parent, name) {
+) : BrigadierTypeSubCommand<ListSubCommand<T>>(parent, name) {
     fun getStringList(): List<String> = list.map(stringifier)
 
     inline fun <reified C : CommandSender> addListExecution(noinline execution: C.(T) -> Unit): ListSubCommand<T> {

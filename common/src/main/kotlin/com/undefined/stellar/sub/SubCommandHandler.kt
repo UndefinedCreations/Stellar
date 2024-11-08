@@ -3,12 +3,15 @@ package com.undefined.stellar.sub
 import com.undefined.stellar.BaseStellarCommand
 import com.undefined.stellar.sub.brigadier.entity.EntityDisplayType
 import com.undefined.stellar.sub.brigadier.entity.EntitySubCommand
+import com.undefined.stellar.sub.brigadier.item.ItemSubCommand
 import com.undefined.stellar.sub.brigadier.player.GameProfileSubCommand
 import com.undefined.stellar.sub.brigadier.primitive.*
 import com.undefined.stellar.sub.brigadier.world.BlockPredicateSubCommand
 import com.undefined.stellar.sub.brigadier.world.BlockDataSubCommand
 import com.undefined.stellar.sub.brigadier.world.LocationSubCommand
 import com.undefined.stellar.sub.brigadier.world.LocationType
+import com.undefined.stellar.sub.custom.EnumSubCommand
+import com.undefined.stellar.sub.custom.ListSubCommand
 import java.util.UUID
 
 open class SubCommandHandler {
@@ -119,6 +122,12 @@ open class SubCommandHandler {
 
     fun addBlockPredicateSubCommand(name: String): BlockPredicateSubCommand {
         val subCommand = BlockPredicateSubCommand(getBase()!!, name)
+        subCommands.add(subCommand)
+        return subCommand
+    }
+
+    fun addItemSubCommand(name: String): ItemSubCommand {
+        val subCommand = ItemSubCommand(getBase()!!, name)
         subCommands.add(subCommand)
         return subCommand
     }

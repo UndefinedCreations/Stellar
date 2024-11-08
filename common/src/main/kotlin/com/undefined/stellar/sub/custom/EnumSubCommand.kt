@@ -1,9 +1,9 @@
-package com.undefined.stellar.sub.brigadier.primitive
+package com.undefined.stellar.sub.custom
 
 import com.undefined.stellar.BaseStellarCommand
 import com.undefined.stellar.data.execution.CustomStellarExecution
 import com.undefined.stellar.data.execution.CustomStellarRunnable
-import com.undefined.stellar.sub.brigadier.NativeTypeSubCommand
+import com.undefined.stellar.sub.brigadier.BrigadierTypeSubCommand
 import org.bukkit.command.CommandSender
 import java.lang.Enum.valueOf
 import kotlin.reflect.KClass
@@ -21,7 +21,7 @@ class EnumSubCommand<T : Enum<T>>(
             null
         }
     }
-) : NativeTypeSubCommand<EnumSubCommand<T>>(parent, name) {
+) : BrigadierTypeSubCommand<EnumSubCommand<T>>(parent, name) {
     fun getStringList(): List<String> = enum.java.enumConstants.map(stringifier)
     fun valueOf(name: String): Enum<T>? =
         try {
