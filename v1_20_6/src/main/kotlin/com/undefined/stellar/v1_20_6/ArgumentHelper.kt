@@ -16,16 +16,13 @@ import net.minecraft.commands.CommandBuildContext
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.arguments.EntityArgument
 import net.minecraft.commands.arguments.GameProfileArgument
-import net.minecraft.commands.arguments.ResourceLocationArgument
 import net.minecraft.commands.arguments.blocks.BlockPredicateArgument
-import net.minecraft.commands.arguments.blocks.BlockStateParser
+import net.minecraft.commands.arguments.blocks.BlockStateArgument
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument
 import net.minecraft.commands.arguments.coordinates.ColumnPosArgument
 import net.minecraft.commands.arguments.coordinates.Vec2Argument
 import net.minecraft.commands.arguments.coordinates.Vec3Argument
 import net.minecraft.core.BlockPos
-import net.minecraft.core.registries.Registries
-import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ColumnPos
 import net.minecraft.world.level.block.state.pattern.BlockInWorld
 import net.minecraft.world.phys.Vec2
@@ -33,6 +30,7 @@ import net.minecraft.world.phys.Vec3
 import org.bukkit.*
 import org.bukkit.block.Block
 import org.bukkit.craftbukkit.CraftServer
+import org.bukkit.craftbukkit.block.data.CraftBlockData
 import java.util.function.Predicate
 
 object ArgumentHelper {
@@ -64,9 +62,7 @@ object ArgumentHelper {
                     LocationType.DOUBLE_LOCATION_3D -> RequiredArgumentBuilder.argument(subCommand.name, Vec3Argument.vec3())
                     LocationType.DOUBLE_LOCATION_2D -> RequiredArgumentBuilder.argument(subCommand.name, Vec2Argument.vec2())
                 }
-            is BlockSubCommand -> RequiredArgumentBuilder.argument<CommandSourceStack, ResourceLocation>(subCommand.name, ResourceLocationArgument.id()).suggests { context, suggestionsBuilder ->
-                BlockStateParser.fillSuggestions(context.source.level.registryAccess().lookupOrThrow(Registries.BLOCK), suggestionsBuilder, false, true)
-            }
+            is BlockDataSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, BlockStateArgument.block(COMMAND_BUILD_CONTEXT))
             is BlockPredicateSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, BlockPredicateArgument.blockPredicate(COMMAND_BUILD_CONTEXT))
             else -> throw UnsupportedSubCommandException()
         }
@@ -93,11 +89,10 @@ object ArgumentHelper {
             }
             is GameProfileSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, GameProfileArgument.getGameProfiles(context, subCommand.name)) }
             is LocationSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, getLocation(context, subCommand)) }
-            is BlockSubCommand -> {
+            is BlockDataSubCommand -> {
                 subCommand.customExecutions.forEach {
-                    val id = ResourceLocationArgument.getId(context, subCommand.name)
-                    val state = BlockStateParser.parseForBlock(context.source.level.registryAccess().lookupOrThrow(Registries.BLOCK), id.toString(), true).blockState
-                    it.run(context.source.bukkitSender, state.bukkitMaterial)
+                    val state = BlockStateArgument.getBlock(context, subCommand.name).state
+                    it.run(context.source.bukkitSender, CraftBlockData.fromData(state))
                 }
             }
             is BlockPredicateSubCommand -> {
@@ -136,11 +131,10 @@ object ArgumentHelper {
             }
             is GameProfileSubCommand -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, GameProfileArgument.getGameProfiles(context, subCommand.name))) return false }
             is LocationSubCommand -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, getLocation(context, subCommand))) return false }
-            is BlockSubCommand -> {
+            is BlockDataSubCommand -> {
                 subCommand.customRunnables.forEach {
-                    val id = ResourceLocationArgument.getId(context, subCommand.name)
-                    val state = BlockStateParser.parseForBlock(context.source.level.registryAccess().lookupOrThrow(Registries.BLOCK), id.toString(), true).blockState
-                    if (!it.run(context.source.bukkitSender, state.bukkitMaterial)) return false
+                    val state = BlockStateArgument.getBlock(context, subCommand.name).state
+                    if (!it.run(context.source.bukkitSender, CraftBlockData.fromData(state))) return false
                 }
             }
             is BlockPredicateSubCommand -> {

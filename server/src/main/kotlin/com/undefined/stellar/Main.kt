@@ -8,9 +8,9 @@ class Main : JavaPlugin() {
 
     override fun onEnable() {
         StellarCommand("test")
-            .addBlockPredicateSubCommand("predicate")
-            .addBlockPredicateExecution<Player> { predicate ->
-                sendMessage(predicate.test(world.getBlockAt(Location(world, 0.0, 64.0, 0.0))).toString())
+            .addBlockDataSubCommand("data")
+            .addBlockDataExecution<Player> { predicate ->
+                sendMessage(predicate.asString)
             }
             .register()
     }
