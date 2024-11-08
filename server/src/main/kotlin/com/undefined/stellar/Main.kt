@@ -1,5 +1,6 @@
 package com.undefined.stellar
 
+import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
 
@@ -7,10 +8,9 @@ class Main : JavaPlugin() {
 
     override fun onEnable() {
         StellarCommand("test")
-            .addBlockSubCommand("block")
-            .addBlockExecution<Player> { type ->
-                sendMessage(type.name)
-//                sendBlockChange(state.location, Bukkit.createBlockData(Material.DIAMOND_BLOCK))
+            .addBlockPredicateSubCommand("predicate")
+            .addBlockPredicateExecution<Player> { predicate ->
+                sendMessage(predicate.test(world.getBlockAt(Location(world, 0.0, 64.0, 0.0))).toString())
             }
             .register()
     }

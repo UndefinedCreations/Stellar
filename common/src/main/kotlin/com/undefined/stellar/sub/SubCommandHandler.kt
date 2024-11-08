@@ -5,6 +5,7 @@ import com.undefined.stellar.sub.brigadier.entity.EntityDisplayType
 import com.undefined.stellar.sub.brigadier.entity.EntitySubCommand
 import com.undefined.stellar.sub.brigadier.player.GameProfileSubCommand
 import com.undefined.stellar.sub.brigadier.primitive.*
+import com.undefined.stellar.sub.brigadier.world.BlockPredicateSubCommand
 import com.undefined.stellar.sub.brigadier.world.BlockSubCommand
 import com.undefined.stellar.sub.brigadier.world.LocationSubCommand
 import com.undefined.stellar.sub.brigadier.world.LocationType
@@ -112,6 +113,12 @@ open class SubCommandHandler {
 
     fun addBlockSubCommand(name: String): BlockSubCommand {
         val subCommand = BlockSubCommand(getBase()!!, name)
+        subCommands.add(subCommand)
+        return subCommand
+    }
+
+    fun addBlockPredicateSubCommand(name: String): BlockPredicateSubCommand {
+        val subCommand = BlockPredicateSubCommand(getBase()!!, name)
         subCommands.add(subCommand)
         return subCommand
     }

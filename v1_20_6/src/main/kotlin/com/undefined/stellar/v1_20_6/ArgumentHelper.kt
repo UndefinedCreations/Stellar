@@ -4,19 +4,20 @@ import com.mojang.brigadier.arguments.*
 import com.mojang.brigadier.builder.RequiredArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.suggestion.SuggestionsBuilder
+import com.undefined.stellar.exception.ServerTypeMismatchException
 import com.undefined.stellar.exception.UnsupportedSubCommandException
 import com.undefined.stellar.sub.brigadier.NativeTypeSubCommand
 import com.undefined.stellar.sub.brigadier.entity.EntityDisplayType
 import com.undefined.stellar.sub.brigadier.entity.EntitySubCommand
 import com.undefined.stellar.sub.brigadier.player.GameProfileSubCommand
 import com.undefined.stellar.sub.brigadier.primitive.*
-import com.undefined.stellar.sub.brigadier.world.BlockSubCommand
-import com.undefined.stellar.sub.brigadier.world.LocationSubCommand
-import com.undefined.stellar.sub.brigadier.world.LocationType
+import com.undefined.stellar.sub.brigadier.world.*
+import net.minecraft.commands.CommandBuildContext
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.arguments.EntityArgument
 import net.minecraft.commands.arguments.GameProfileArgument
 import net.minecraft.commands.arguments.ResourceLocationArgument
+import net.minecraft.commands.arguments.blocks.BlockPredicateArgument
 import net.minecraft.commands.arguments.blocks.BlockStateParser
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument
 import net.minecraft.commands.arguments.coordinates.ColumnPosArgument
@@ -26,11 +27,24 @@ import net.minecraft.core.BlockPos
 import net.minecraft.core.registries.Registries
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ColumnPos
+import net.minecraft.world.level.block.state.pattern.BlockInWorld
 import net.minecraft.world.phys.Vec2
 import net.minecraft.world.phys.Vec3
 import org.bukkit.*
+import org.bukkit.block.Block
+import org.bukkit.craftbukkit.CraftServer
+import java.util.function.Predicate
 
 object ArgumentHelper {
+
+    val COMMAND_BUILD_CONTEXT by lazy {
+        val server = Bukkit.getServer()
+        if (server !is CraftServer) throw ServerTypeMismatchException()
+        CommandBuildContext.simple(
+            server.server.registryAccess(),
+            server.server.worldData.dataConfiguration.enabledFeatures()
+        )
+    }
 
     fun <T : NativeTypeSubCommand<*>> nativeSubCommandToArgument(subCommand: T): RequiredArgumentBuilder<CommandSourceStack, *> =
         when (subCommand) {
@@ -53,6 +67,7 @@ object ArgumentHelper {
             is BlockSubCommand -> RequiredArgumentBuilder.argument<CommandSourceStack, ResourceLocation>(subCommand.name, ResourceLocationArgument.id()).suggests { context, suggestionsBuilder ->
                 BlockStateParser.fillSuggestions(context.source.level.registryAccess().lookupOrThrow(Registries.BLOCK), suggestionsBuilder, false, true)
             }
+            is BlockPredicateSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, BlockPredicateArgument.blockPredicate(COMMAND_BUILD_CONTEXT))
             else -> throw UnsupportedSubCommandException()
         }
 
@@ -85,6 +100,17 @@ object ArgumentHelper {
                     it.run(context.source.bukkitSender, state.bukkitMaterial)
                 }
             }
+            is BlockPredicateSubCommand -> {
+                subCommand.customExecutions.forEach {
+                    val bukkitPredicate = Predicate<Block> { block: Block ->
+                        BlockPredicateArgument.getBlockPredicate(context, subCommand.name).test(BlockInWorld(
+                            context.source.level,
+                            BlockPos(block.x, block.y, block.z), true)
+                        )
+                    }
+                    it.run(context.source.bukkitSender, bukkitPredicate)
+                }
+            }
             else -> throw UnsupportedSubCommandException()
         }
 
@@ -115,6 +141,17 @@ object ArgumentHelper {
                     val id = ResourceLocationArgument.getId(context, subCommand.name)
                     val state = BlockStateParser.parseForBlock(context.source.level.registryAccess().lookupOrThrow(Registries.BLOCK), id.toString(), true).blockState
                     if (!it.run(context.source.bukkitSender, state.bukkitMaterial)) return false
+                }
+            }
+            is BlockPredicateSubCommand -> {
+                subCommand.customRunnables.forEach {
+                    val bukkitPredicate = Predicate<Block> { block: Block ->
+                        BlockPredicateArgument.getBlockPredicate(context, subCommand.name).test(BlockInWorld(
+                            context.source.level,
+                            BlockPos(block.x, block.y, block.z), true)
+                        )
+                    }
+                    if (!it.run(context.source.bukkitSender, bukkitPredicate)) return false
                 }
             }
             else -> throw UnsupportedSubCommandException()

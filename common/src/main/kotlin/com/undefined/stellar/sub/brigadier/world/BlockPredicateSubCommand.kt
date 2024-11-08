@@ -4,17 +4,18 @@ import com.undefined.stellar.BaseStellarCommand
 import com.undefined.stellar.data.execution.CustomStellarExecution
 import com.undefined.stellar.data.execution.CustomStellarRunnable
 import com.undefined.stellar.sub.brigadier.NativeTypeSubCommand
-import org.bukkit.Material
+import org.bukkit.block.Block
 import org.bukkit.command.CommandSender
+import java.util.function.Predicate
 
 @Suppress("UNCHECKED_CAST")
-class BlockSubCommand(parent: BaseStellarCommand<*>, name: String) : NativeTypeSubCommand<BlockSubCommand>(parent, name) {
-    inline fun <reified T : CommandSender> addBlockExecution(noinline execution: T.(Material) -> Unit): BlockSubCommand {
+class BlockPredicateSubCommand(parent: BaseStellarCommand<*>, name: String) : NativeTypeSubCommand<BlockPredicateSubCommand>(parent, name) {
+    inline fun <reified T : CommandSender> addBlockPredicateExecution(noinline execution: T.(Predicate<Block>) -> Unit): BlockPredicateSubCommand {
         customExecutions.add(CustomStellarExecution(T::class, execution) as CustomStellarExecution<*, Any>)
         return this
     }
 
-    inline fun <reified T : CommandSender> alwaysRunBlock(noinline execution: T.(Material) -> Boolean): BlockSubCommand {
+    inline fun <reified T : CommandSender> alwaysRunBlockPredicate(noinline execution: T.(Predicate<Block>) -> Boolean): BlockPredicateSubCommand {
         customRunnables.add(CustomStellarRunnable(T::class, execution) as CustomStellarRunnable<*, Any>)
         return this
     }
