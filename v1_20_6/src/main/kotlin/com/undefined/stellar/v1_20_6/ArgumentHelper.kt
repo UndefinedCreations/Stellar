@@ -11,12 +11,9 @@ import com.undefined.stellar.sub.brigadier.entity.EntityDisplayType
 import com.undefined.stellar.sub.brigadier.entity.EntitySubCommand
 import com.undefined.stellar.sub.brigadier.item.ItemPredicateSubCommand
 import com.undefined.stellar.sub.brigadier.item.ItemSubCommand
-import com.undefined.stellar.sub.brigadier.text.ColorSubCommand
 import com.undefined.stellar.sub.brigadier.player.GameProfileSubCommand
 import com.undefined.stellar.sub.brigadier.primitive.*
-import com.undefined.stellar.sub.brigadier.text.ComponentSubCommand
-import com.undefined.stellar.sub.brigadier.text.MessageSubCommand
-import com.undefined.stellar.sub.brigadier.text.StyleSubCommand
+import com.undefined.stellar.sub.brigadier.text.*
 import com.undefined.stellar.sub.brigadier.world.*
 import com.undefined.stellar.sub.custom.EnumSubCommand
 import com.undefined.stellar.sub.custom.ListSubCommand
@@ -31,6 +28,7 @@ import net.minecraft.commands.arguments.ComponentArgument
 import net.minecraft.commands.arguments.EntityArgument
 import net.minecraft.commands.arguments.GameProfileArgument
 import net.minecraft.commands.arguments.MessageArgument
+import net.minecraft.commands.arguments.ObjectiveArgument
 import net.minecraft.commands.arguments.StyleArgument
 import net.minecraft.commands.arguments.blocks.BlockPredicateArgument
 import net.minecraft.commands.arguments.blocks.BlockStateArgument
@@ -51,6 +49,7 @@ import org.bukkit.craftbukkit.CraftServer
 import org.bukkit.craftbukkit.block.data.CraftBlockData
 import org.bukkit.craftbukkit.inventory.CraftItemStack
 import org.bukkit.inventory.ItemStack
+import org.bukkit.scoreboard.Objective
 import java.util.function.Predicate
 
 object ArgumentHelper {
@@ -90,6 +89,7 @@ object ArgumentHelper {
             is ComponentSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, ComponentArgument.textComponent(COMMAND_BUILD_CONTEXT))
             is StyleSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, StyleArgument.style(COMMAND_BUILD_CONTEXT))
             is MessageSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, MessageArgument.message())
+            is ObjectiveSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, ObjectiveArgument.objective())
             else -> throw UnsupportedSubCommandException()
         }
 
@@ -137,6 +137,7 @@ object ArgumentHelper {
             is ComponentSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, GsonComponentSerializer.gson().deserialize(net.minecraft.network.chat.Component.Serializer.toJson(ComponentArgument.getComponent(context, subCommand.name), COMMAND_BUILD_CONTEXT))) }
             is StyleSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, GsonComponentSerializer.gson().deserialize(context.input.substringAfter(' ')).style()) }
             is MessageSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, GsonComponentSerializer.gson().deserialize(net.minecraft.network.chat.Component.Serializer.toJson(MessageArgument.getMessage(context, subCommand.name), COMMAND_BUILD_CONTEXT))) }
+            is ObjectiveSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, Bukkit.getScoreboardManager().mainScoreboard.getObjective(ObjectiveArgument.getObjective(context, subCommand.name).name) ?: return@forEach) }
             else -> throw UnsupportedSubCommandException()
         }
 
@@ -192,6 +193,7 @@ object ArgumentHelper {
             is ComponentSubCommand -> subCommand.customRunnables.forEach { runnable -> if (!runnable.run(context.source.bukkitSender, GsonComponentSerializer.gson().deserialize(net.minecraft.network.chat.Component.Serializer.toJson(ComponentArgument.getComponent(context, subCommand.name), COMMAND_BUILD_CONTEXT)))) return false }
             is StyleSubCommand -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, GsonComponentSerializer.gson().deserialize(context.input.substringAfter(' ')).style())) return false }
             is MessageSubCommand -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, GsonComponentSerializer.gson().deserialize(net.minecraft.network.chat.Component.Serializer.toJson(MessageArgument.getMessage(context, subCommand.name), COMMAND_BUILD_CONTEXT)))) return false }
+            is ObjectiveSubCommand -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, Bukkit.getScoreboardManager().mainScoreboard.getObjective(ObjectiveArgument.getObjective(context, subCommand.name).name) ?: return false)) return false }
             else -> throw UnsupportedSubCommandException()
         }
         return true

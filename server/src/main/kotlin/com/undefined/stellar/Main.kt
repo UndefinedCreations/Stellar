@@ -1,7 +1,6 @@
 package com.undefined.stellar
 
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
-import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
 
@@ -12,10 +11,9 @@ class Main : JavaPlugin() {
         val adventure = BukkitAudiences.create(this);
 
         StellarCommand("test")
-            .addMessageSubCommand("message")
-            .addMessageExecution<Player> { component ->
-                println(component)
-                adventure.player(this).sendMessage(component)
+            .addObjectiveSubCommand("objective")
+            .addObjectiveExecution<Player> { component ->
+                sendMessage(component.name)
             }
             .register()
     }
