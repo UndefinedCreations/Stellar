@@ -1,17 +1,27 @@
 package com.undefined.stellar
 
-import org.bukkit.Material
+import net.kyori.adventure.audience.Audience
+import net.kyori.adventure.identity.Identity
+import net.kyori.adventure.platform.bukkit.BukkitAudiences
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.format.Style
+import net.kyori.adventure.text.format.TextColor
+import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.entity.Player
-import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
+
 
 class Main : JavaPlugin() {
 
     override fun onEnable() {
+        val adventure = BukkitAudiences.create(this);
+
         StellarCommand("test")
-            .addItemPredicateSubCommand("item")
-            .addItemPredicateExecution<Player> {
-                println(it.test(ItemStack(Material.PAPER)))
+            .addColorSubCommand("color")
+            .addColorExecution<Player> { color ->
+                println(color)
+                adventure.player(this).sendMessage(Component.text("text").color(TextColor.color(0xFF0000)).style(color))
             }
             .register()
     }
