@@ -9,6 +9,7 @@ import com.undefined.stellar.sub.brigadier.text.ColorSubCommand
 import com.undefined.stellar.sub.brigadier.player.GameProfileSubCommand
 import com.undefined.stellar.sub.brigadier.primitive.*
 import com.undefined.stellar.sub.brigadier.text.ComponentSubCommand
+import com.undefined.stellar.sub.brigadier.text.MessageSubCommand
 import com.undefined.stellar.sub.brigadier.text.StyleSubCommand
 import com.undefined.stellar.sub.brigadier.world.BlockPredicateSubCommand
 import com.undefined.stellar.sub.brigadier.world.BlockDataSubCommand
@@ -156,6 +157,12 @@ open class SubCommandHandler {
 
     fun addStyleSubCommand(name: String): StyleSubCommand {
         val subCommand = StyleSubCommand(getBase()!!, name)
+        subCommands.add(subCommand)
+        return subCommand
+    }
+
+    fun addMessageSubCommand(name: String): MessageSubCommand {
+        val subCommand = MessageSubCommand(getBase()!!, name)
         subCommands.add(subCommand)
         return subCommand
     }

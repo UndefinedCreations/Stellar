@@ -12,10 +12,10 @@ class Main : JavaPlugin() {
         val adventure = BukkitAudiences.create(this);
 
         StellarCommand("test")
-            .addStyleSubCommand("color")
-            .addStyleExecution<Player> { component ->
+            .addMessageSubCommand("message")
+            .addMessageExecution<Player> { component ->
                 println(component)
-                adventure.player(this).sendMessage(Component.text("test").style(component))
+                adventure.player(this).sendMessage(component)
             }
             .register()
     }
