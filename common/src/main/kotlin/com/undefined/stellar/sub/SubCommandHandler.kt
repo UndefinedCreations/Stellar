@@ -170,4 +170,10 @@ open class SubCommandHandler {
         return subCommand
     }
 
+    fun addObjectiveCriteriaSubCommand(name: String): ObjectiveCriteriaSubCommand {
+        val subCommand = ObjectiveCriteriaSubCommand(getBase()!!, name)
+        subCommands.add(subCommand)
+        return subCommand
+    }
+
 }

@@ -11,9 +11,9 @@ class Main : JavaPlugin() {
         val adventure = BukkitAudiences.create(this);
 
         StellarCommand("test")
-            .addObjectiveSubCommand("objective")
+            .addObjectiveCriteriaSubCommand("objective")
             .addObjectiveExecution<Player> { component ->
-                sendMessage(component.name)
+                sendMessage(component)
             }
             .register()
     }
