@@ -4,7 +4,6 @@ import com.mojang.brigadier.arguments.*
 import com.mojang.brigadier.builder.RequiredArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.suggestion.SuggestionsBuilder
-import com.undefined.stellar.data.ColorData
 import com.undefined.stellar.exception.ServerTypeMismatchException
 import com.undefined.stellar.exception.UnsupportedSubCommandException
 import com.undefined.stellar.sub.brigadier.BrigadierTypeSubCommand
@@ -12,19 +11,21 @@ import com.undefined.stellar.sub.brigadier.entity.EntityDisplayType
 import com.undefined.stellar.sub.brigadier.entity.EntitySubCommand
 import com.undefined.stellar.sub.brigadier.item.ItemPredicateSubCommand
 import com.undefined.stellar.sub.brigadier.item.ItemSubCommand
-import com.undefined.stellar.sub.brigadier.misc.ColorSubCommand
+import com.undefined.stellar.sub.brigadier.text.ColorSubCommand
 import com.undefined.stellar.sub.brigadier.player.GameProfileSubCommand
 import com.undefined.stellar.sub.brigadier.primitive.*
+import com.undefined.stellar.sub.brigadier.text.ComponentSubCommand
 import com.undefined.stellar.sub.brigadier.world.*
 import com.undefined.stellar.sub.custom.EnumSubCommand
 import com.undefined.stellar.sub.custom.ListSubCommand
-import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.Style
 import net.kyori.adventure.text.format.TextColor
-import net.kyori.adventure.text.format.TextDecoration
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import net.minecraft.commands.CommandBuildContext
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.arguments.ColorArgument
+import net.minecraft.commands.arguments.ComponentArgument
 import net.minecraft.commands.arguments.EntityArgument
 import net.minecraft.commands.arguments.GameProfileArgument
 import net.minecraft.commands.arguments.blocks.BlockPredicateArgument
@@ -82,6 +83,7 @@ object ArgumentHelper {
             is ItemSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, ItemArgument.item(COMMAND_BUILD_CONTEXT))
             is ItemPredicateSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, ItemPredicateArgument.itemPredicate(COMMAND_BUILD_CONTEXT))
             is ColorSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, ColorArgument.color())
+            is ComponentSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, ComponentArgument.textComponent(COMMAND_BUILD_CONTEXT))
             else -> throw UnsupportedSubCommandException()
         }
 
@@ -125,6 +127,10 @@ object ArgumentHelper {
             is ColorSubCommand -> subCommand.customExecutions.forEach { execution ->
                 val color = ColorArgument.getColor(context, subCommand.name)
                 execution.run(context.source.bukkitSender, color.color?.let { Style.style(TextColor.color(it)) } ?: Style.empty())
+            }
+            is ComponentSubCommand -> subCommand.customExecutions.forEach {
+                val component = ComponentArgument.getComponent(context, subCommand.name)
+                it.run(context.source.bukkitSender, GsonComponentSerializer.gson().deserialize(net.minecraft.network.chat.Component.Serializer.toJson(component, COMMAND_BUILD_CONTEXT)))
             }
             else -> throw UnsupportedSubCommandException()
         }
@@ -177,6 +183,10 @@ object ArgumentHelper {
             is ColorSubCommand -> subCommand.customRunnables.forEach { runnable ->
                 val color = ColorArgument.getColor(context, subCommand.name)
                 if (!runnable.run(context.source.bukkitSender, color.color?.let { Style.style(TextColor.color(it)) } ?: Style.empty())) return false
+            }
+            is ComponentSubCommand -> subCommand.customRunnables.forEach { runnable ->
+                val component = ComponentArgument.getComponent(context, subCommand.name)
+                if (!runnable.run(context.source.bukkitSender, GsonComponentSerializer.gson().deserialize(net.minecraft.network.chat.Component.Serializer.toJson(component  , COMMAND_BUILD_CONTEXT)))) return false
             }
             else -> throw UnsupportedSubCommandException()
         }

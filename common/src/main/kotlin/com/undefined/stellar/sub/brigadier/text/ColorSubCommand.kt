@@ -1,14 +1,11 @@
-package com.undefined.stellar.sub.brigadier.misc
+package com.undefined.stellar.sub.brigadier.text
 
 import com.undefined.stellar.BaseStellarCommand
-import com.undefined.stellar.data.ColorData
 import com.undefined.stellar.data.execution.CustomStellarExecution
 import com.undefined.stellar.data.execution.CustomStellarRunnable
 import com.undefined.stellar.sub.brigadier.BrigadierTypeSubCommand
-import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.Style
 import org.bukkit.command.CommandSender
-import org.bukkit.inventory.ItemStack
 
 @Suppress("UNCHECKED_CAST")
 class ColorSubCommand(parent: BaseStellarCommand<*>, name: String) : BrigadierTypeSubCommand<ColorSubCommand>(parent, name) {
