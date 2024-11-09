@@ -3,6 +3,7 @@ package com.undefined.stellar.sub
 import com.undefined.stellar.BaseStellarCommand
 import com.undefined.stellar.sub.brigadier.entity.EntityDisplayType
 import com.undefined.stellar.sub.brigadier.entity.EntitySubCommand
+import com.undefined.stellar.sub.brigadier.item.ItemPredicateSubCommand
 import com.undefined.stellar.sub.brigadier.item.ItemSubCommand
 import com.undefined.stellar.sub.brigadier.player.GameProfileSubCommand
 import com.undefined.stellar.sub.brigadier.primitive.*
@@ -128,6 +129,12 @@ open class SubCommandHandler {
 
     fun addItemSubCommand(name: String): ItemSubCommand {
         val subCommand = ItemSubCommand(getBase()!!, name)
+        subCommands.add(subCommand)
+        return subCommand
+    }
+
+    fun addItemPredicateSubCommand(name: String): ItemPredicateSubCommand {
+        val subCommand = ItemPredicateSubCommand(getBase()!!, name)
         subCommands.add(subCommand)
         return subCommand
     }

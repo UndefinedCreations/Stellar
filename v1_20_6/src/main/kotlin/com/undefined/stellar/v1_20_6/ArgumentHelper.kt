@@ -9,6 +9,7 @@ import com.undefined.stellar.exception.UnsupportedSubCommandException
 import com.undefined.stellar.sub.brigadier.BrigadierTypeSubCommand
 import com.undefined.stellar.sub.brigadier.entity.EntityDisplayType
 import com.undefined.stellar.sub.brigadier.entity.EntitySubCommand
+import com.undefined.stellar.sub.brigadier.item.ItemPredicateSubCommand
 import com.undefined.stellar.sub.brigadier.item.ItemSubCommand
 import com.undefined.stellar.sub.brigadier.player.GameProfileSubCommand
 import com.undefined.stellar.sub.brigadier.primitive.*
@@ -26,6 +27,7 @@ import net.minecraft.commands.arguments.coordinates.ColumnPosArgument
 import net.minecraft.commands.arguments.coordinates.Vec2Argument
 import net.minecraft.commands.arguments.coordinates.Vec3Argument
 import net.minecraft.commands.arguments.item.ItemArgument
+import net.minecraft.commands.arguments.item.ItemPredicateArgument
 import net.minecraft.core.BlockPos
 import net.minecraft.server.level.ColumnPos
 import net.minecraft.world.level.block.state.pattern.BlockInWorld
@@ -36,6 +38,7 @@ import org.bukkit.block.Block
 import org.bukkit.craftbukkit.CraftServer
 import org.bukkit.craftbukkit.block.data.CraftBlockData
 import org.bukkit.craftbukkit.inventory.CraftItemStack
+import org.bukkit.inventory.ItemStack
 import java.util.function.Predicate
 
 object ArgumentHelper {
@@ -70,6 +73,7 @@ object ArgumentHelper {
             is BlockDataSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, BlockStateArgument.block(COMMAND_BUILD_CONTEXT))
             is BlockPredicateSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, BlockPredicateArgument.blockPredicate(COMMAND_BUILD_CONTEXT))
             is ItemSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, ItemArgument.item(COMMAND_BUILD_CONTEXT))
+            is ItemPredicateSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, ItemPredicateArgument.itemPredicate(COMMAND_BUILD_CONTEXT))
             else -> throw UnsupportedSubCommandException()
         }
 
@@ -100,11 +104,16 @@ object ArgumentHelper {
                 it.run(context.source.bukkitSender, Predicate<Block> { block: Block ->
                     BlockPredicateArgument.getBlockPredicate(context, subCommand.name).test(BlockInWorld(
                         context.source.level,
-                        BlockPos(block.x, block.y, block.z), true)
-                    )
+                        BlockPos(block.x, block.y, block.z), true
+                    ))
                 })
             }
             is ItemSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, CraftItemStack.asBukkitCopy(ItemArgument.getItem(context, subCommand.name).createItemStack(1, false))) }
+            is ItemPredicateSubCommand -> subCommand.customExecutions.forEach {
+                it.run(context.source.bukkitSender, Predicate<ItemStack> { item: ItemStack ->
+                    ItemPredicateArgument.getItemPredicate(context, subCommand.name).test(CraftItemStack.asNMSCopy(item))
+                })
+            }
             else -> throw UnsupportedSubCommandException()
         }
 
@@ -148,6 +157,11 @@ object ArgumentHelper {
                 }
             }
             is ItemSubCommand -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, CraftItemStack.asBukkitCopy(ItemArgument.getItem(context, subCommand.name).createItemStack(1, false)))) return false }
+            is ItemPredicateSubCommand -> subCommand.customRunnables.forEach {
+                if (!it.run(context.source.bukkitSender, Predicate<ItemStack> { item: ItemStack ->
+                    ItemPredicateArgument.getItemPredicate(context, subCommand.name).test(CraftItemStack.asNMSCopy(item))
+                })) return false
+            }
             else -> throw UnsupportedSubCommandException()
         }
         return true
