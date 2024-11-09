@@ -15,6 +15,7 @@ import com.undefined.stellar.sub.brigadier.text.ColorSubCommand
 import com.undefined.stellar.sub.brigadier.player.GameProfileSubCommand
 import com.undefined.stellar.sub.brigadier.primitive.*
 import com.undefined.stellar.sub.brigadier.text.ComponentSubCommand
+import com.undefined.stellar.sub.brigadier.text.StyleSubCommand
 import com.undefined.stellar.sub.brigadier.world.*
 import com.undefined.stellar.sub.custom.EnumSubCommand
 import com.undefined.stellar.sub.custom.ListSubCommand
@@ -28,6 +29,7 @@ import net.minecraft.commands.arguments.ColorArgument
 import net.minecraft.commands.arguments.ComponentArgument
 import net.minecraft.commands.arguments.EntityArgument
 import net.minecraft.commands.arguments.GameProfileArgument
+import net.minecraft.commands.arguments.StyleArgument
 import net.minecraft.commands.arguments.blocks.BlockPredicateArgument
 import net.minecraft.commands.arguments.blocks.BlockStateArgument
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument
@@ -84,6 +86,7 @@ object ArgumentHelper {
             is ItemPredicateSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, ItemPredicateArgument.itemPredicate(COMMAND_BUILD_CONTEXT))
             is ColorSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, ColorArgument.color())
             is ComponentSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, ComponentArgument.textComponent(COMMAND_BUILD_CONTEXT))
+            is StyleSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, StyleArgument.style(COMMAND_BUILD_CONTEXT))
             else -> throw UnsupportedSubCommandException()
         }
 
@@ -131,6 +134,10 @@ object ArgumentHelper {
             is ComponentSubCommand -> subCommand.customExecutions.forEach {
                 val component = ComponentArgument.getComponent(context, subCommand.name)
                 it.run(context.source.bukkitSender, GsonComponentSerializer.gson().deserialize(net.minecraft.network.chat.Component.Serializer.toJson(component, COMMAND_BUILD_CONTEXT)))
+            }
+            is StyleSubCommand -> subCommand.customExecutions.forEach {
+                val string = context.input.substringAfter(' ')
+                it.run(context.source.bukkitSender, GsonComponentSerializer.gson().deserialize(string).style())
             }
             else -> throw UnsupportedSubCommandException()
         }
@@ -187,6 +194,10 @@ object ArgumentHelper {
             is ComponentSubCommand -> subCommand.customRunnables.forEach { runnable ->
                 val component = ComponentArgument.getComponent(context, subCommand.name)
                 if (!runnable.run(context.source.bukkitSender, GsonComponentSerializer.gson().deserialize(net.minecraft.network.chat.Component.Serializer.toJson(component  , COMMAND_BUILD_CONTEXT)))) return false
+            }
+            is StyleSubCommand -> subCommand.customRunnables.forEach {
+                val string = context.input.substringAfter(' ')
+                if (!it.run(context.source.bukkitSender, GsonComponentSerializer.gson().deserialize(string).style())) return false
             }
             else -> throw UnsupportedSubCommandException()
         }
