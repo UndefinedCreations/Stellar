@@ -73,204 +73,129 @@ object ArgumentHelper {
 
     fun <T : BrigadierTypeSubCommand<*>> nativeSubCommandToArgument(subCommand: T): RequiredArgumentBuilder<CommandSourceStack, *> =
         when (subCommand) {
-            is StringSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, subCommand.type.brigadier())
-            is IntegerSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, IntegerArgumentType.integer(subCommand.min, subCommand.max))
-            is LongSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, LongArgumentType.longArg(subCommand.min, subCommand.max))
-            is FloatSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, FloatArgumentType.floatArg(subCommand.min, subCommand.max))
-            is DoubleSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, DoubleArgumentType.doubleArg(subCommand.min, subCommand.max))
-            is BooleanSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, BoolArgumentType.bool())
             is ListSubCommand<*> -> RequiredArgumentBuilder.argument<CommandSourceStack, String>(subCommand.name, StringArgumentType.word()).suggestStringList(subCommand.getStringList())
             is EnumSubCommand<*> -> RequiredArgumentBuilder.argument<CommandSourceStack, String>(subCommand.name, StringArgumentType.word()).suggestStringList(subCommand.getStringList())
-            is EntitySubCommand -> RequiredArgumentBuilder.argument(subCommand.name, subCommand.type.brigadier())
-            is GameProfileSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, GameProfileArgument.gameProfile())
-            is LocationSubCommand -> when (subCommand.type) {
-                    LocationType.LOCATION3D -> RequiredArgumentBuilder.argument(subCommand.name, BlockPosArgument.blockPos())
-                    LocationType.LOCATION2D -> RequiredArgumentBuilder.argument(subCommand.name, ColumnPosArgument.columnPos())
-                    LocationType.DOUBLE_LOCATION_3D -> RequiredArgumentBuilder.argument(subCommand.name, Vec3Argument.vec3())
-                    LocationType.DOUBLE_LOCATION_2D -> RequiredArgumentBuilder.argument(subCommand.name, Vec2Argument.vec2())
-            }
-            is BlockDataSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, BlockStateArgument.block(COMMAND_BUILD_CONTEXT))
-            is BlockPredicateSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, BlockPredicateArgument.blockPredicate(COMMAND_BUILD_CONTEXT))
-            is ItemSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, ItemArgument.item(COMMAND_BUILD_CONTEXT))
-            is ItemPredicateSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, ItemPredicateArgument.itemPredicate(COMMAND_BUILD_CONTEXT))
-            is ColorSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, ColorArgument.color())
-            is ComponentSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, ComponentArgument.textComponent(COMMAND_BUILD_CONTEXT))
-            is StyleSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, StyleArgument.style(COMMAND_BUILD_CONTEXT))
-            is MessageSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, MessageArgument.message())
-            is ObjectiveSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, ObjectiveArgument.objective())
-            is ObjectiveCriteriaSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, ObjectiveCriteriaArgument.criteria())
-            is OperationSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, OperationArgument.operation())
-            is ParticleSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, ParticleArgument.particle(COMMAND_BUILD_CONTEXT))
-            is AngleSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, AngleArgument.angle())
-            is RotationSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, RotationArgument.rotation())
-            is DisplaySlotSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, ScoreboardSlotArgument.displaySlot())
-            is ScoreHolderSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, ScoreHolderArgument.scoreHolder())
-            is ScoreHoldersSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, ScoreHolderArgument.scoreHolders())
-            is AxisSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, SwizzleArgument.swizzle())
-            is TeamSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, TeamArgument.team())
-            is ItemSlotSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, SlotArgument.slot())
-            else -> throw UnsupportedSubCommandException()
+            else -> RequiredArgumentBuilder.argument(subCommand.name, getArgumentTypeFromBrigadierSubCommand(subCommand))
         }
 
     fun <T : BrigadierTypeSubCommand<*>> handleNativeSubCommandExecutors(subCommand: T, context: CommandContext<CommandSourceStack>) =
         when (subCommand) {
-            is StringSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, StringArgumentType.getString(context, subCommand.name)) }
-            is IntegerSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, IntegerArgumentType.getInteger(context, subCommand.name)) }
-            is FloatSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, FloatArgumentType.getFloat(context, subCommand.name)) }
-            is DoubleSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, DoubleArgumentType.getDouble(context, subCommand.name)) }
-            is BooleanSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, BoolArgumentType.getBool(context, subCommand.name)) }
             is ListSubCommand<*> -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, subCommand.parse.invoke(StringArgumentType.getString(context, subCommand.name))!!) }
             is EnumSubCommand<*> -> subCommand.customExecutions.forEach { execution ->
                 val enum = subCommand.parse(StringArgumentType.getString(context, subCommand.name))
                 enum?.let { execution.run(context.source.bukkitSender, enum) }
             }
-            is EntitySubCommand -> {
-                subCommand.pluralEntitiesExecutions.forEach {
-                    it.run(context.source.bukkitSender, EntityArgument.getEntities(context, subCommand.name).map { it.bukkitEntity })
-                }
-                subCommand.singularEntityExecutions.forEach {
-                    it.run(context.source.bukkitSender, EntityArgument.getEntity(context, subCommand.name).bukkitEntity)
+            else -> {
+                val argument = getArgumentFromBrigadierSubCommand(context, subCommand)
+                subCommand.customExecutions.forEach {
+                    it.run(context.source.bukkitSender, argument ?: return)
                 }
             }
-            is GameProfileSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, GameProfileArgument.getGameProfiles(context, subCommand.name)) }
-            is LocationSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, getLocation(context, subCommand)) }
-            is BlockDataSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, CraftBlockData.fromData(BlockStateArgument.getBlock(context, subCommand.name).state)) }
-            is BlockPredicateSubCommand -> subCommand.customExecutions.forEach {
-                it.run(context.source.bukkitSender, Predicate<Block> { block: Block ->
-                    BlockPredicateArgument.getBlockPredicate(context, subCommand.name).test(BlockInWorld(
-                        context.source.level,
-                        BlockPos(block.x, block.y, block.z), true
-                    ))
-                })
-            }
-            is ItemSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, CraftItemStack.asBukkitCopy(ItemArgument.getItem(context, subCommand.name).createItemStack(1, false))) }
-            is ItemPredicateSubCommand -> subCommand.customExecutions.forEach {
-                it.run(context.source.bukkitSender, Predicate<ItemStack> { item: ItemStack ->
-                    ItemPredicateArgument.getItemPredicate(context, subCommand.name).test(CraftItemStack.asNMSCopy(item))
-                })
-            }
-            is ColorSubCommand -> subCommand.customExecutions.forEach { execution ->
-                val color = ColorArgument.getColor(context, subCommand.name)
-                execution.run(context.source.bukkitSender, color.color?.let { Style.style(TextColor.color(it)) } ?: Style.empty())
-            }
-            is ComponentSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, GsonComponentSerializer.gson().deserialize(net.minecraft.network.chat.Component.Serializer.toJson(ComponentArgument.getComponent(context, subCommand.name), COMMAND_BUILD_CONTEXT))) }
-            is StyleSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, GsonComponentSerializer.gson().deserialize(context.input.substringAfter(' ')).style()) } // TODO("Broken")
-            is MessageSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, GsonComponentSerializer.gson().deserialize(net.minecraft.network.chat.Component.Serializer.toJson(MessageArgument.getMessage(context, subCommand.name), COMMAND_BUILD_CONTEXT))) }
-            is ObjectiveSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, Bukkit.getScoreboardManager().mainScoreboard.getObjective(ObjectiveArgument.getObjective(context, subCommand.name).name) ?: return@forEach) }
-            is ObjectiveCriteriaSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, ObjectiveCriteriaArgument.getCriteria(context, subCommand.name).name) }
-            is OperationSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, Operation.getOperation(getArgumentInput(context, subCommand.name)) ?: return) }
-            is ParticleSubCommand -> subCommand.customExecutions.forEach {
-                val particleOptions = ParticleArgument.getParticle(context, subCommand.name)
-                val particle = CraftParticle.minecraftToBukkit(particleOptions.type)
-                it.run(context.source.bukkitSender, getParticleData(context, particle, particleOptions))
-            }
-            is AngleSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, AngleArgument.getAngle(context, subCommand.name)) }
-            is RotationSubCommand -> subCommand.customExecutions.forEach { // TODO Remove variables and stuff outside of forEach
-                val rotation = RotationArgument.getRotation(context, subCommand.name).getPosition(context.source)
-                it.run(context.source.bukkitSender, Location(context.source.bukkitWorld, rotation.x, rotation.y, rotation.z))
-            }
-            is DisplaySlotSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, getBukkitDisplaySlot(ScoreboardSlotArgument.getDisplaySlot(context, subCommand.name))) }
-            is ScoreHolderSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, ScoreHolderArgument.getName(context, subCommand.name).scoreboardName) }
-            is ScoreHoldersSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, ScoreHolderArgument.getNames(context, subCommand.name).map { scoreholder -> scoreholder.scoreboardName }) }
-            is AxisSubCommand -> {
-                val axis = getBukkitAxis(SwizzleArgument.getSwizzle(context, subCommand.name))
-                subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, axis) }
-            }
-            is TeamSubCommand -> {
-                val team = Bukkit.getScoreboardManager().mainScoreboard.getTeam(TeamArgument.getTeam(context, subCommand.name).name)
-                subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, team ?: return) }
-            }
-            is ItemSlotSubCommand -> {
-                val slot = SlotArgument.getSlot(context, subCommand.name)
-                subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, slot) }
-            }
-            else -> throw UnsupportedSubCommandException()
         }
 
     fun <T : BrigadierTypeSubCommand<*>> handleNativeSubCommandRunnables(subCommand: T, context: CommandContext<CommandSourceStack>): Boolean {
         when (subCommand) {
-            is StringSubCommand -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, StringArgumentType.getString(context, subCommand.name))) return false }
-            is IntegerSubCommand -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, IntegerArgumentType.getInteger(context, subCommand.name))) return false }
-            is FloatSubCommand -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, FloatArgumentType.getFloat(context, subCommand.name))) return false }
-            is DoubleSubCommand -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, DoubleArgumentType.getDouble(context, subCommand.name))) return false }
-            is BooleanSubCommand -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, BoolArgumentType.getBool(context, subCommand.name))) return false }
             is ListSubCommand<*> -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, subCommand.parse.invoke(StringArgumentType.getString(context, subCommand.name))!!)) return false }
             is EnumSubCommand<*> -> subCommand.customRunnables.forEach { runnable ->
                 val enum = subCommand.parse(StringArgumentType.getString(context, subCommand.name))
                 enum?.let { if (!runnable.run(context.source.bukkitSender, enum)) return false }
             }
-            is EntitySubCommand -> {
-                subCommand.pluralEntitiesRunnables.forEach { runnable ->
-                    if (!runnable.run(context.source.bukkitSender, EntityArgument.getEntities(context, subCommand.name).map { it.bukkitEntity })) return false
-                }
-                subCommand.singularEntityRunnables.forEach { runnable ->
-                    if (!runnable.run(context.source.bukkitSender, EntityArgument.getEntity(context, subCommand.name).bukkitEntity)) return false
-                }
+            else -> {
+                val argument = getArgumentFromBrigadierSubCommand(context, subCommand) ?: return true
+                subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, argument)) return false }
             }
-            is GameProfileSubCommand -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, GameProfileArgument.getGameProfiles(context, subCommand.name))) return false }
-            is LocationSubCommand -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, getLocation(context, subCommand))) return false }
-            is BlockDataSubCommand -> {
-                subCommand.customRunnables.forEach {
-                    val state = BlockStateArgument.getBlock(context, subCommand.name).state
-                    if (!it.run(context.source.bukkitSender, CraftBlockData.fromData(state))) return false
-                }
-            }
-            is BlockPredicateSubCommand -> {
-                subCommand.customRunnables.forEach {
-                    val continueOtherExecutions = it.run(context.source.bukkitSender, Predicate<Block> { block: Block ->
-                            BlockPredicateArgument.getBlockPredicate(context, subCommand.name).test(BlockInWorld(
-                                context.source.level,
-                                BlockPos(block.x, block.y, block.z), true)
-                            )
-                        })
-                    if (!continueOtherExecutions) return false
-                }
-            }
-            is ItemSubCommand -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, CraftItemStack.asBukkitCopy(ItemArgument.getItem(context, subCommand.name).createItemStack(1, false)))) return false }
-            is ItemPredicateSubCommand -> subCommand.customRunnables.forEach {
-                if (!it.run(context.source.bukkitSender, Predicate<ItemStack> { item: ItemStack ->
-                    ItemPredicateArgument.getItemPredicate(context, subCommand.name).test(CraftItemStack.asNMSCopy(item))
-                })) return false
-            }
-            is ColorSubCommand -> subCommand.customRunnables.forEach { runnable ->
-                val color = ColorArgument.getColor(context, subCommand.name)
-                if (!runnable.run(context.source.bukkitSender, color.color?.let { Style.style(TextColor.color(it)) } ?: Style.empty())) return false
-            }
-            is ComponentSubCommand -> subCommand.customRunnables.forEach { runnable -> if (!runnable.run(context.source.bukkitSender, GsonComponentSerializer.gson().deserialize(net.minecraft.network.chat.Component.Serializer.toJson(ComponentArgument.getComponent(context, subCommand.name), COMMAND_BUILD_CONTEXT)))) return false }
-            is StyleSubCommand -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, GsonComponentSerializer.gson().deserialize(context.input.substringAfter(' ')).style())) return false }
-            is MessageSubCommand -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, GsonComponentSerializer.gson().deserialize(net.minecraft.network.chat.Component.Serializer.toJson(MessageArgument.getMessage(context, subCommand.name), COMMAND_BUILD_CONTEXT)))) return false }
-            is ObjectiveSubCommand -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, Bukkit.getScoreboardManager().mainScoreboard.getObjective(ObjectiveArgument.getObjective(context, subCommand.name).name) ?: return true)) return false }
-            is ObjectiveCriteriaSubCommand -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, ObjectiveCriteriaArgument.getCriteria(context, subCommand.name).name)) return false }
-            is OperationSubCommand -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, Operation.getOperation(getArgumentInput(context, subCommand.name)) ?: return true)) return false }
-            is ParticleSubCommand -> subCommand.customRunnables.forEach {
-                val particleOptions = ParticleArgument.getParticle(context, subCommand.name)
-                val particle = CraftParticle.minecraftToBukkit(particleOptions.type)
-                if (!it.run(context.source.bukkitSender, getParticleData(context, particle, particleOptions))) return false
-            }
-            is AngleSubCommand -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, AngleArgument.getAngle(context, subCommand.name))) return false }
-            is RotationSubCommand -> subCommand.customRunnables.forEach {
-                val rotation = RotationArgument.getRotation(context, subCommand.name).getPosition(context.source)
-                if (!it.run(context.source.bukkitSender, Location(context.source.bukkitWorld, rotation.x, rotation.y, rotation.z))) return false
-            }
-            is DisplaySlotSubCommand -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, getBukkitDisplaySlot(ScoreboardSlotArgument.getDisplaySlot(context, subCommand.name)))) return false }
-            is ScoreHolderSubCommand -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, ScoreHolderArgument.getName(context, subCommand.name).scoreboardName)) return false }
-            is ScoreHoldersSubCommand -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, ScoreHolderArgument.getNames(context, subCommand.name).map { scoreholder -> scoreholder.scoreboardName })) return false }
-            is AxisSubCommand -> {
-                val axis = getBukkitAxis(SwizzleArgument.getSwizzle(context, subCommand.name))
-                subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, axis)) return false }
-            }
-            is TeamSubCommand -> {
-                val team = Bukkit.getScoreboardManager().mainScoreboard.getTeam(TeamArgument.getTeam(context, subCommand.name).name)
-                subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, team ?: return true)) return false }
-            }
-            is ItemSlotSubCommand -> {
-                val slot = SlotArgument.getSlot(context, subCommand.name)
-                subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, slot)) return false }
-            }
-            else -> throw UnsupportedSubCommandException()
         }
         return true
     }
+
+    private fun <T : BrigadierTypeSubCommand<*>> getArgumentTypeFromBrigadierSubCommand(subCommand: T): ArgumentType<*> =
+        when (subCommand) {
+            is StringSubCommand -> subCommand.type.brigadier()
+            is IntegerSubCommand -> IntegerArgumentType.integer(subCommand.min, subCommand.max)
+            is LongSubCommand -> LongArgumentType.longArg(subCommand.min, subCommand.max)
+            is FloatSubCommand -> FloatArgumentType.floatArg(subCommand.min, subCommand.max)
+            is DoubleSubCommand -> DoubleArgumentType.doubleArg(subCommand.min, subCommand.max)
+            is BooleanSubCommand -> BoolArgumentType.bool()
+            is EntitySubCommand -> subCommand.type.brigadier()
+            is GameProfileSubCommand -> GameProfileArgument.gameProfile()
+            is LocationSubCommand -> when (subCommand.type) {
+                LocationType.LOCATION3D -> BlockPosArgument.blockPos()
+                LocationType.LOCATION2D -> ColumnPosArgument.columnPos()
+                LocationType.DOUBLE_LOCATION_3D -> Vec3Argument.vec3()
+                LocationType.DOUBLE_LOCATION_2D -> Vec2Argument.vec2()
+            }
+            is BlockDataSubCommand -> BlockStateArgument.block(COMMAND_BUILD_CONTEXT)
+            is BlockPredicateSubCommand -> BlockPredicateArgument.blockPredicate(COMMAND_BUILD_CONTEXT)
+            is ItemSubCommand -> ItemArgument.item(COMMAND_BUILD_CONTEXT)
+            is ItemPredicateSubCommand -> ItemPredicateArgument.itemPredicate(COMMAND_BUILD_CONTEXT)
+            is ColorSubCommand -> ColorArgument.color()
+            is ComponentSubCommand -> ComponentArgument.textComponent(COMMAND_BUILD_CONTEXT)
+            is StyleSubCommand -> StyleArgument.style(COMMAND_BUILD_CONTEXT)
+            is MessageSubCommand -> MessageArgument.message()
+            is ObjectiveSubCommand -> ObjectiveArgument.objective()
+            is ObjectiveCriteriaSubCommand -> ObjectiveCriteriaArgument.criteria()
+            is OperationSubCommand -> OperationArgument.operation()
+            is ParticleSubCommand -> ParticleArgument.particle(COMMAND_BUILD_CONTEXT)
+            is AngleSubCommand -> AngleArgument.angle()
+            is RotationSubCommand -> RotationArgument.rotation()
+            is DisplaySlotSubCommand -> ScoreboardSlotArgument.displaySlot()
+            is ScoreHolderSubCommand -> ScoreHolderArgument.scoreHolder()
+            is ScoreHoldersSubCommand -> ScoreHolderArgument.scoreHolders()
+            is AxisSubCommand -> SwizzleArgument.swizzle()
+            is TeamSubCommand -> TeamArgument.team()
+            is ItemSlotSubCommand -> SlotArgument.slot()
+            else -> throw UnsupportedSubCommandException()
+        }
+
+    private fun <T : BrigadierTypeSubCommand<*>> getArgumentFromBrigadierSubCommand(context: CommandContext<CommandSourceStack>, subCommand: T): Any? =
+        when (subCommand) {
+            is StringSubCommand -> StringArgumentType.getString(context, subCommand.name)
+            is IntegerSubCommand -> IntegerArgumentType.getInteger(context, subCommand.name)
+            is FloatSubCommand -> FloatArgumentType.getFloat(context, subCommand.name)
+            is DoubleSubCommand -> DoubleArgumentType.getDouble(context, subCommand.name)
+            is BooleanSubCommand -> BoolArgumentType.getBool(context, subCommand.name)
+            is ListSubCommand<*> -> subCommand.parse(StringArgumentType.getString(context, subCommand.name))
+            is EnumSubCommand<*> -> subCommand.parse(StringArgumentType.getString(context, subCommand.name))
+            is EntitySubCommand -> EntityArgument.getEntities(context, subCommand.name)
+                .map { it.bukkitEntity }.toMutableList()
+                .addAll(listOf(EntityArgument.getEntity(context, subCommand.name).bukkitEntity))
+            is GameProfileSubCommand -> GameProfileArgument.getGameProfiles(context, subCommand.name)
+            is LocationSubCommand -> getLocation(context, subCommand)
+            is BlockDataSubCommand -> CraftBlockData.fromData(BlockStateArgument.getBlock(context, subCommand.name).state)
+            is BlockPredicateSubCommand -> Predicate<Block> { block: Block ->
+                BlockPredicateArgument.getBlockPredicate(context, subCommand.name).test(BlockInWorld(
+                    context.source.level,
+                    BlockPos(block.x, block.y, block.z), true
+                ))
+            }
+            is ItemSubCommand -> CraftItemStack.asBukkitCopy(ItemArgument.getItem(context, subCommand.name).createItemStack(1, false))
+            is ItemPredicateSubCommand -> Predicate<ItemStack> { item: ItemStack ->
+                ItemPredicateArgument.getItemPredicate(context, subCommand.name).test(CraftItemStack.asNMSCopy(item))
+            }
+            is ColorSubCommand -> ColorArgument.getColor(context, subCommand.name).color?.let { Style.style(TextColor.color(it)) } ?: Style.empty()
+            is ComponentSubCommand ->  GsonComponentSerializer.gson().deserialize(net.minecraft.network.chat.Component.Serializer.toJson(ComponentArgument.getComponent(context, subCommand.name), COMMAND_BUILD_CONTEXT))
+            is StyleSubCommand ->  GsonComponentSerializer.gson().deserialize(getArgumentInput(context, subCommand.name)).style()
+            is MessageSubCommand ->  GsonComponentSerializer.gson().deserialize(net.minecraft.network.chat.Component.Serializer.toJson(MessageArgument.getMessage(context, subCommand.name), COMMAND_BUILD_CONTEXT))
+            is ObjectiveSubCommand ->  Bukkit.getScoreboardManager().mainScoreboard.getObjective(ObjectiveArgument.getObjective(context, subCommand.name).name)
+            is ObjectiveCriteriaSubCommand ->  ObjectiveCriteriaArgument.getCriteria(context, subCommand.name).name
+            is OperationSubCommand ->  Operation.getOperation(getArgumentInput(context, subCommand.name))
+            is ParticleSubCommand ->  {
+                val particleOptions = ParticleArgument.getParticle(context, subCommand.name)
+                getParticleData(context, CraftParticle.minecraftToBukkit(particleOptions.type), particleOptions)
+            }
+            is AngleSubCommand -> AngleArgument.getAngle(context, subCommand.name)
+            is RotationSubCommand -> {
+                val rotation = RotationArgument.getRotation(context, subCommand.name).getPosition(context.source)
+                Location(context.source.bukkitWorld, rotation.x, rotation.y, rotation.z)
+            }
+            is DisplaySlotSubCommand -> getBukkitDisplaySlot(ScoreboardSlotArgument.getDisplaySlot(context, subCommand.name))
+            is ScoreHolderSubCommand -> ScoreHolderArgument.getName(context, subCommand.name).scoreboardName
+            is ScoreHoldersSubCommand -> ScoreHolderArgument.getNames(context, subCommand.name).map { scoreholder -> scoreholder.scoreboardName }
+            is AxisSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, getBukkitAxis(SwizzleArgument.getSwizzle(context, subCommand.name))) }
+            is TeamSubCommand -> Bukkit.getScoreboardManager().mainScoreboard.getTeam(TeamArgument.getTeam(context, subCommand.name).name)
+            is ItemSlotSubCommand -> SlotArgument.getSlot(context, subCommand.name)
+            else -> throw UnsupportedSubCommandException()
+        }
 
     private fun getArgumentInput(context: CommandContext<CommandSourceStack>, name: String): String {
         val field = CommandContext::class.java.getDeclaredField("arguments")
