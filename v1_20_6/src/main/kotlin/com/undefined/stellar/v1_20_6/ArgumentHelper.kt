@@ -20,6 +20,7 @@ import com.undefined.stellar.sub.brigadier.math.OperationSubCommand
 import com.undefined.stellar.sub.brigadier.math.RotationSubCommand
 import com.undefined.stellar.sub.brigadier.player.GameProfileSubCommand
 import com.undefined.stellar.sub.brigadier.primitive.*
+import com.undefined.stellar.sub.brigadier.scoreboard.DisplaySlotSubCommand
 import com.undefined.stellar.sub.brigadier.scoreboard.ObjectiveCriteriaSubCommand
 import com.undefined.stellar.sub.brigadier.scoreboard.ObjectiveSubCommand
 import com.undefined.stellar.sub.brigadier.text.*
@@ -58,6 +59,7 @@ import org.bukkit.craftbukkit.CraftServer
 import org.bukkit.craftbukkit.block.data.CraftBlockData
 import org.bukkit.craftbukkit.inventory.CraftItemStack
 import org.bukkit.inventory.ItemStack
+import org.bukkit.scoreboard.DisplaySlot
 import java.util.function.Predicate
 
 object ArgumentHelper {
@@ -103,6 +105,7 @@ object ArgumentHelper {
             is ParticleSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, ParticleArgument.particle(COMMAND_BUILD_CONTEXT))
             is AngleSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, AngleArgument.angle())
             is RotationSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, RotationArgument.rotation())
+            is DisplaySlotSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, ScoreboardSlotArgument.displaySlot())
             else -> throw UnsupportedSubCommandException()
         }
 
@@ -161,11 +164,9 @@ object ArgumentHelper {
             is AngleSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, AngleArgument.getAngle(context, subCommand.name)) }
             is RotationSubCommand -> subCommand.customExecutions.forEach {
                 val rotation = RotationArgument.getRotation(context, subCommand.name).getPosition(context.source)
-                it.run(
-                    context.source.bukkitSender,
-                    Location(context.source.bukkitWorld, rotation.x, rotation.y, rotation.z)
-                )
+                it.run(context.source.bukkitSender, Location(context.source.bukkitWorld, rotation.x, rotation.y, rotation.z))
             }
+            is DisplaySlotSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, getBukkitDisplaySlot(ScoreboardSlotArgument.getDisplaySlot(context, subCommand.name))) }
             else -> throw UnsupportedSubCommandException()
         }
 
@@ -232,11 +233,9 @@ object ArgumentHelper {
             is AngleSubCommand -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, AngleArgument.getAngle(context, subCommand.name))) return false }
             is RotationSubCommand -> subCommand.customRunnables.forEach {
                 val rotation = RotationArgument.getRotation(context, subCommand.name).getPosition(context.source)
-                if (!it.run(
-                    context.source.bukkitSender,
-                    Location(context.source.bukkitWorld, rotation.x, rotation.y, rotation.z)
-                )) return false
+                if (!it.run(context.source.bukkitSender, Location(context.source.bukkitWorld, rotation.x, rotation.y, rotation.z))) return false
             }
+            is DisplaySlotSubCommand -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, getBukkitDisplaySlot(ScoreboardSlotArgument.getDisplaySlot(context, subCommand.name)))) return false }
             else -> throw UnsupportedSubCommandException()
         }
         return true
@@ -269,6 +268,29 @@ object ArgumentHelper {
             list.filter { it.startsWith(suggestionsBuilder.remaining) }.forEach { suggestionsBuilder.suggest(it) }
             return@suggests suggestionsBuilder.buildFuture()
         }
+
+    private fun getBukkitDisplaySlot(slot: net.minecraft.world.scores.DisplaySlot): DisplaySlot = when (slot) {
+        net.minecraft.world.scores.DisplaySlot.LIST -> DisplaySlot.PLAYER_LIST
+        net.minecraft.world.scores.DisplaySlot.SIDEBAR -> DisplaySlot.SIDEBAR
+        net.minecraft.world.scores.DisplaySlot.BELOW_NAME -> DisplaySlot.BELOW_NAME
+        net.minecraft.world.scores.DisplaySlot.TEAM_BLACK -> DisplaySlot.SIDEBAR_TEAM_BLACK
+        net.minecraft.world.scores.DisplaySlot.TEAM_DARK_BLUE -> DisplaySlot.SIDEBAR_TEAM_DARK_BLUE
+        net.minecraft.world.scores.DisplaySlot.TEAM_DARK_GREEN -> DisplaySlot.SIDEBAR_TEAM_DARK_GREEN
+        net.minecraft.world.scores.DisplaySlot.TEAM_DARK_AQUA -> DisplaySlot.SIDEBAR_TEAM_DARK_AQUA
+        net.minecraft.world.scores.DisplaySlot.TEAM_DARK_RED -> DisplaySlot.SIDEBAR_TEAM_DARK_RED
+        net.minecraft.world.scores.DisplaySlot.TEAM_DARK_PURPLE -> DisplaySlot.SIDEBAR_TEAM_DARK_PURPLE
+        net.minecraft.world.scores.DisplaySlot.TEAM_GOLD -> DisplaySlot.SIDEBAR_TEAM_GOLD
+        net.minecraft.world.scores.DisplaySlot.TEAM_GRAY -> DisplaySlot.SIDEBAR_TEAM_GRAY
+        net.minecraft.world.scores.DisplaySlot.TEAM_DARK_GRAY -> DisplaySlot.SIDEBAR_TEAM_DARK_GRAY
+        net.minecraft.world.scores.DisplaySlot.TEAM_BLUE -> DisplaySlot.SIDEBAR_TEAM_BLUE
+        net.minecraft.world.scores.DisplaySlot.TEAM_GREEN -> DisplaySlot.SIDEBAR_TEAM_GREEN
+        net.minecraft.world.scores.DisplaySlot.TEAM_AQUA -> DisplaySlot.SIDEBAR_TEAM_AQUA
+        net.minecraft.world.scores.DisplaySlot.TEAM_RED -> DisplaySlot.SIDEBAR_TEAM_RED
+        net.minecraft.world.scores.DisplaySlot.TEAM_LIGHT_PURPLE -> DisplaySlot.SIDEBAR_TEAM_LIGHT_PURPLE
+        net.minecraft.world.scores.DisplaySlot.TEAM_YELLOW -> DisplaySlot.SIDEBAR_TEAM_YELLOW
+        net.minecraft.world.scores.DisplaySlot.TEAM_WHITE -> DisplaySlot.SIDEBAR_TEAM_WHITE
+        else -> DisplaySlot.SIDEBAR
+    }
 
     private fun getParticleData(context: CommandContext<CommandSourceStack>, particle: Particle, particleOptions: ParticleOptions): ParticleData<*> = when (particleOptions) {
         is SimpleParticleType -> ParticleData(particle, null)
