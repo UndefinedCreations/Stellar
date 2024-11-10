@@ -7,9 +7,9 @@ class Main : JavaPlugin() {
 
     override fun onEnable() {
         StellarCommand("test")
-            .addItemSlotSubCommand("dfafd")
-            .addItemSlotExecution<Player> {
-                sendMessage(it.toString())
+            .addItemSlotsSubCommand("test")
+            .addItemSlotsExecution<Player> {
+                sendMessage(it.joinToString())
             }
             .register()
     }

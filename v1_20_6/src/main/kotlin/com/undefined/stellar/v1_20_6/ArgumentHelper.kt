@@ -15,6 +15,7 @@ import com.undefined.stellar.sub.brigadier.entity.EntityDisplayType
 import com.undefined.stellar.sub.brigadier.entity.EntitySubCommand
 import com.undefined.stellar.sub.brigadier.item.ItemPredicateSubCommand
 import com.undefined.stellar.sub.brigadier.item.ItemSlotSubCommand
+import com.undefined.stellar.sub.brigadier.item.ItemSlotsSubCommand
 import com.undefined.stellar.sub.brigadier.item.ItemSubCommand
 import com.undefined.stellar.sub.brigadier.math.AngleSubCommand
 import com.undefined.stellar.sub.brigadier.math.AxisSubCommand
@@ -144,6 +145,7 @@ object ArgumentHelper {
             is AxisSubCommand -> SwizzleArgument.swizzle()
             is TeamSubCommand -> TeamArgument.team()
             is ItemSlotSubCommand -> SlotArgument.slot()
+            is ItemSlotsSubCommand -> SlotsArgument.slots()
             else -> throw UnsupportedSubCommandException()
         }
 
@@ -194,6 +196,7 @@ object ArgumentHelper {
             is AxisSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, getBukkitAxis(SwizzleArgument.getSwizzle(context, subCommand.name))) }
             is TeamSubCommand -> Bukkit.getScoreboardManager().mainScoreboard.getTeam(TeamArgument.getTeam(context, subCommand.name).name)
             is ItemSlotSubCommand -> SlotArgument.getSlot(context, subCommand.name)
+            is ItemSlotsSubCommand -> SlotsArgument.getSlots(context, subCommand.name).slots().toList()
             else -> throw UnsupportedSubCommandException()
         }
 
