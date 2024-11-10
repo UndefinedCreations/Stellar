@@ -21,6 +21,7 @@ import com.undefined.stellar.sub.brigadier.math.AngleSubCommand
 import com.undefined.stellar.sub.brigadier.math.AxisSubCommand
 import com.undefined.stellar.sub.brigadier.math.OperationSubCommand
 import com.undefined.stellar.sub.brigadier.math.RotationSubCommand
+import com.undefined.stellar.sub.brigadier.misc.NamespacedKeySubCommand
 import com.undefined.stellar.sub.brigadier.player.GameProfileSubCommand
 import com.undefined.stellar.sub.brigadier.primitive.*
 import com.undefined.stellar.sub.brigadier.scoreboard.*
@@ -42,6 +43,7 @@ import net.minecraft.commands.arguments.item.ItemPredicateArgument
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.core.particles.*
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ColumnPos
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.pattern.BlockInWorld
@@ -146,6 +148,7 @@ object ArgumentHelper {
             is TeamSubCommand -> TeamArgument.team()
             is ItemSlotSubCommand -> SlotArgument.slot()
             is ItemSlotsSubCommand -> SlotsArgument.slots()
+            is NamespacedKeySubCommand -> ResourceLocationArgument.id()
             else -> throw UnsupportedSubCommandException()
         }
 
@@ -197,6 +200,7 @@ object ArgumentHelper {
             is TeamSubCommand -> Bukkit.getScoreboardManager().mainScoreboard.getTeam(TeamArgument.getTeam(context, subCommand.name).name)
             is ItemSlotSubCommand -> SlotArgument.getSlot(context, subCommand.name)
             is ItemSlotsSubCommand -> SlotsArgument.getSlots(context, subCommand.name).slots().toList()
+            is NamespacedKeySubCommand -> NamespacedKey(ResourceLocationArgument.getId(context, subCommand.name).namespace, ResourceLocationArgument.getId(context, subCommand.name).path)
             else -> throw UnsupportedSubCommandException()
         }
 

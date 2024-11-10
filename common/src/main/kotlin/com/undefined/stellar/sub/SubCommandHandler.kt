@@ -11,6 +11,7 @@ import com.undefined.stellar.sub.brigadier.math.AngleSubCommand
 import com.undefined.stellar.sub.brigadier.math.AxisSubCommand
 import com.undefined.stellar.sub.brigadier.math.OperationSubCommand
 import com.undefined.stellar.sub.brigadier.math.RotationSubCommand
+import com.undefined.stellar.sub.brigadier.misc.NamespacedKeySubCommand
 import com.undefined.stellar.sub.brigadier.player.GameProfileSubCommand
 import com.undefined.stellar.sub.brigadier.primitive.*
 import com.undefined.stellar.sub.brigadier.scoreboard.*
@@ -242,6 +243,12 @@ open class SubCommandHandler {
 
     fun addItemSlotsSubCommand(name: String): ItemSlotsSubCommand {
         val subCommand = ItemSlotsSubCommand(getBase()!!, name)
+        subCommands.add(subCommand)
+        return subCommand
+    }
+
+    fun addNamespacedKeySubCommand(name: String): NamespacedKeySubCommand {
+        val subCommand = NamespacedKeySubCommand(getBase()!!, name)
         subCommands.add(subCommand)
         return subCommand
     }
