@@ -10,9 +10,7 @@ import com.undefined.stellar.sub.brigadier.math.OperationSubCommand
 import com.undefined.stellar.sub.brigadier.math.RotationSubCommand
 import com.undefined.stellar.sub.brigadier.player.GameProfileSubCommand
 import com.undefined.stellar.sub.brigadier.primitive.*
-import com.undefined.stellar.sub.brigadier.scoreboard.DisplaySlotSubCommand
-import com.undefined.stellar.sub.brigadier.scoreboard.ObjectiveCriteriaSubCommand
-import com.undefined.stellar.sub.brigadier.scoreboard.ObjectiveSubCommand
+import com.undefined.stellar.sub.brigadier.scoreboard.*
 import com.undefined.stellar.sub.brigadier.text.*
 import com.undefined.stellar.sub.brigadier.world.*
 import com.undefined.stellar.sub.custom.EnumSubCommand
@@ -205,6 +203,18 @@ open class SubCommandHandler {
 
     fun addDisplaySlotSubCommand(name: String): DisplaySlotSubCommand {
         val subCommand = DisplaySlotSubCommand(getBase()!!, name)
+        subCommands.add(subCommand)
+        return subCommand
+    }
+
+    fun addScoreHolderSubCommand(name: String): ScoreHolderSubCommand {
+        val subCommand = ScoreHolderSubCommand(getBase()!!, name)
+        subCommands.add(subCommand)
+        return subCommand
+    }
+
+    fun addScoreHoldersSubCommand(name: String): ScoreHoldersSubCommand {
+        val subCommand = ScoreHoldersSubCommand(getBase()!!, name)
         subCommands.add(subCommand)
         return subCommand
     }

@@ -20,9 +20,7 @@ import com.undefined.stellar.sub.brigadier.math.OperationSubCommand
 import com.undefined.stellar.sub.brigadier.math.RotationSubCommand
 import com.undefined.stellar.sub.brigadier.player.GameProfileSubCommand
 import com.undefined.stellar.sub.brigadier.primitive.*
-import com.undefined.stellar.sub.brigadier.scoreboard.DisplaySlotSubCommand
-import com.undefined.stellar.sub.brigadier.scoreboard.ObjectiveCriteriaSubCommand
-import com.undefined.stellar.sub.brigadier.scoreboard.ObjectiveSubCommand
+import com.undefined.stellar.sub.brigadier.scoreboard.*
 import com.undefined.stellar.sub.brigadier.text.*
 import com.undefined.stellar.sub.brigadier.world.*
 import com.undefined.stellar.sub.custom.EnumSubCommand
@@ -31,7 +29,6 @@ import net.kyori.adventure.text.format.Style
 import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import net.minecraft.commands.CommandBuildContext
-import net.minecraft.commands.CommandSource
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.arguments.*
 import net.minecraft.commands.arguments.blocks.BlockPredicateArgument
@@ -106,6 +103,8 @@ object ArgumentHelper {
             is AngleSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, AngleArgument.angle())
             is RotationSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, RotationArgument.rotation())
             is DisplaySlotSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, ScoreboardSlotArgument.displaySlot())
+            is ScoreHolderSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, ScoreHolderArgument.scoreHolder())
+            is ScoreHoldersSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, ScoreHolderArgument.scoreHolders())
             else -> throw UnsupportedSubCommandException()
         }
 
@@ -167,6 +166,8 @@ object ArgumentHelper {
                 it.run(context.source.bukkitSender, Location(context.source.bukkitWorld, rotation.x, rotation.y, rotation.z))
             }
             is DisplaySlotSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, getBukkitDisplaySlot(ScoreboardSlotArgument.getDisplaySlot(context, subCommand.name))) }
+            is ScoreHolderSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, ScoreHolderArgument.getName(context, subCommand.name).scoreboardName) }
+            is ScoreHoldersSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, ScoreHolderArgument.getNames(context, subCommand.name).map { scoreholder -> scoreholder.scoreboardName }) }
             else -> throw UnsupportedSubCommandException()
         }
 
@@ -236,6 +237,8 @@ object ArgumentHelper {
                 if (!it.run(context.source.bukkitSender, Location(context.source.bukkitWorld, rotation.x, rotation.y, rotation.z))) return false
             }
             is DisplaySlotSubCommand -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, getBukkitDisplaySlot(ScoreboardSlotArgument.getDisplaySlot(context, subCommand.name)))) return false }
+            is ScoreHolderSubCommand -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, ScoreHolderArgument.getName(context, subCommand.name).scoreboardName)) return false }
+            is ScoreHoldersSubCommand -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, ScoreHolderArgument.getNames(context, subCommand.name).map { scoreholder -> scoreholder.scoreboardName })) return false }
             else -> throw UnsupportedSubCommandException()
         }
         return true

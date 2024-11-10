@@ -7,10 +7,14 @@ class Main : JavaPlugin() {
 
     override fun onEnable() {
         StellarCommand("test")
-            .addDisplaySlotSubCommand("display")
-            .addDisplaySlotExecution<Player> {
-                sendMessage(it.name)
+            .addScoreHolderSubCommand("display")
+            .addScoreHolderExecution<Player> {
+                sendMessage(it)
             }
+//            .addScoreHoldersSubCommand("multiple")
+//            .addScoreHoldersExecution<Player> {
+//                sendMessage(it.joinToString())
+//            }
             .register()
     }
 
