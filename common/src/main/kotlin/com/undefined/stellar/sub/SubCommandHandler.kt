@@ -7,11 +7,10 @@ import com.undefined.stellar.sub.brigadier.item.ItemPredicateSubCommand
 import com.undefined.stellar.sub.brigadier.item.ItemSubCommand
 import com.undefined.stellar.sub.brigadier.player.GameProfileSubCommand
 import com.undefined.stellar.sub.brigadier.primitive.*
+import com.undefined.stellar.sub.brigadier.scoreboard.ObjectiveCriteriaSubCommand
+import com.undefined.stellar.sub.brigadier.scoreboard.ObjectiveSubCommand
 import com.undefined.stellar.sub.brigadier.text.*
-import com.undefined.stellar.sub.brigadier.world.BlockPredicateSubCommand
-import com.undefined.stellar.sub.brigadier.world.BlockDataSubCommand
-import com.undefined.stellar.sub.brigadier.world.LocationSubCommand
-import com.undefined.stellar.sub.brigadier.world.LocationType
+import com.undefined.stellar.sub.brigadier.world.*
 import com.undefined.stellar.sub.custom.EnumSubCommand
 import com.undefined.stellar.sub.custom.ListSubCommand
 import java.util.UUID
@@ -172,6 +171,12 @@ open class SubCommandHandler {
 
     fun addObjectiveCriteriaSubCommand(name: String): ObjectiveCriteriaSubCommand {
         val subCommand = ObjectiveCriteriaSubCommand(getBase()!!, name)
+        subCommands.add(subCommand)
+        return subCommand
+    }
+
+    fun addParticleSubCommand(name: String): ParticleSubCommand {
+        val subCommand = ParticleSubCommand(getBase()!!, name)
         subCommands.add(subCommand)
         return subCommand
     }

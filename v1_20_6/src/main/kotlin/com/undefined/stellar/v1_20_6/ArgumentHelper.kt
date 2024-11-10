@@ -3,7 +3,10 @@ package com.undefined.stellar.v1_20_6
 import com.mojang.brigadier.arguments.*
 import com.mojang.brigadier.builder.RequiredArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
+import com.mojang.brigadier.context.ParsedArgument
+import com.mojang.brigadier.context.StringRange
 import com.mojang.brigadier.suggestion.SuggestionsBuilder
+import com.undefined.stellar.data.ParticleData
 import com.undefined.stellar.exception.ServerTypeMismatchException
 import com.undefined.stellar.exception.UnsupportedSubCommandException
 import com.undefined.stellar.sub.brigadier.BrigadierTypeSubCommand
@@ -13,24 +16,18 @@ import com.undefined.stellar.sub.brigadier.item.ItemPredicateSubCommand
 import com.undefined.stellar.sub.brigadier.item.ItemSubCommand
 import com.undefined.stellar.sub.brigadier.player.GameProfileSubCommand
 import com.undefined.stellar.sub.brigadier.primitive.*
+import com.undefined.stellar.sub.brigadier.scoreboard.ObjectiveCriteriaSubCommand
+import com.undefined.stellar.sub.brigadier.scoreboard.ObjectiveSubCommand
 import com.undefined.stellar.sub.brigadier.text.*
 import com.undefined.stellar.sub.brigadier.world.*
 import com.undefined.stellar.sub.custom.EnumSubCommand
 import com.undefined.stellar.sub.custom.ListSubCommand
-import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.Style
 import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import net.minecraft.commands.CommandBuildContext
 import net.minecraft.commands.CommandSourceStack
-import net.minecraft.commands.arguments.ColorArgument
-import net.minecraft.commands.arguments.ComponentArgument
-import net.minecraft.commands.arguments.EntityArgument
-import net.minecraft.commands.arguments.GameProfileArgument
-import net.minecraft.commands.arguments.MessageArgument
-import net.minecraft.commands.arguments.ObjectiveArgument
-import net.minecraft.commands.arguments.ObjectiveCriteriaArgument
-import net.minecraft.commands.arguments.StyleArgument
+import net.minecraft.commands.arguments.*
 import net.minecraft.commands.arguments.blocks.BlockPredicateArgument
 import net.minecraft.commands.arguments.blocks.BlockStateArgument
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument
@@ -40,17 +37,21 @@ import net.minecraft.commands.arguments.coordinates.Vec3Argument
 import net.minecraft.commands.arguments.item.ItemArgument
 import net.minecraft.commands.arguments.item.ItemPredicateArgument
 import net.minecraft.core.BlockPos
+import net.minecraft.core.particles.*
 import net.minecraft.server.level.ColumnPos
+import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.pattern.BlockInWorld
+import net.minecraft.world.level.gameevent.BlockPositionSource
 import net.minecraft.world.phys.Vec2
 import net.minecraft.world.phys.Vec3
 import org.bukkit.*
 import org.bukkit.block.Block
+import org.bukkit.block.data.BlockData
+import org.bukkit.craftbukkit.CraftParticle
 import org.bukkit.craftbukkit.CraftServer
 import org.bukkit.craftbukkit.block.data.CraftBlockData
 import org.bukkit.craftbukkit.inventory.CraftItemStack
 import org.bukkit.inventory.ItemStack
-import org.bukkit.scoreboard.Objective
 import java.util.function.Predicate
 
 object ArgumentHelper {
@@ -92,6 +93,7 @@ object ArgumentHelper {
             is MessageSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, MessageArgument.message())
             is ObjectiveSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, ObjectiveArgument.objective())
             is ObjectiveCriteriaSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, ObjectiveCriteriaArgument.criteria())
+            is ParticleSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, ParticleArgument.particle(COMMAND_BUILD_CONTEXT))
             else -> throw UnsupportedSubCommandException()
         }
 
@@ -137,10 +139,69 @@ object ArgumentHelper {
                 execution.run(context.source.bukkitSender, color.color?.let { Style.style(TextColor.color(it)) } ?: Style.empty())
             }
             is ComponentSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, GsonComponentSerializer.gson().deserialize(net.minecraft.network.chat.Component.Serializer.toJson(ComponentArgument.getComponent(context, subCommand.name), COMMAND_BUILD_CONTEXT))) }
-            is StyleSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, GsonComponentSerializer.gson().deserialize(context.input.substringAfter(' ')).style()) }
+            is StyleSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, GsonComponentSerializer.gson().deserialize(context.input.substringAfter(' ')).style()) } // TODO("Broken")
             is MessageSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, GsonComponentSerializer.gson().deserialize(net.minecraft.network.chat.Component.Serializer.toJson(MessageArgument.getMessage(context, subCommand.name), COMMAND_BUILD_CONTEXT))) }
             is ObjectiveSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, Bukkit.getScoreboardManager().mainScoreboard.getObjective(ObjectiveArgument.getObjective(context, subCommand.name).name) ?: return@forEach) }
             is ObjectiveCriteriaSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, ObjectiveCriteriaArgument.getCriteria(context, subCommand.name).name) }
+            is ParticleSubCommand -> subCommand.customExecutions.forEach {
+                val particleOptions = ParticleArgument.getParticle(context, subCommand.name)
+                val particle = CraftParticle.minecraftToBukkit(particleOptions.type)
+
+                val finalParticle = when (particleOptions) {
+                    is SimpleParticleType -> ParticleData(particle, null)
+                    is BlockParticleOption -> ParticleData<BlockData>(particle, CraftBlockData.fromData(particleOptions.state))
+                    is DustColorTransitionOptions -> {
+                        val fromColor = Color.fromRGB(
+                            (particleOptions.fromColor.x() * 255.0f).toInt(),
+                            (particleOptions.fromColor.y() * 255.0f).toInt(),
+                            (particleOptions.fromColor.z() * 255.0f).toInt()
+                        )
+                        val toColor = Color.fromRGB(
+                            (particleOptions.toColor.x() * 255.0f).toInt(),
+                            (particleOptions.toColor.y() * 255.0f).toInt(),
+                            (particleOptions.toColor.z() * 255.0f).toInt()
+                        )
+                        ParticleData(particle, Particle.DustTransition(fromColor, toColor, particleOptions.scale))
+                    }
+                    is DustParticleOptions -> ParticleData(
+                        particle,
+                        Particle.DustOptions(Color.fromRGB(
+                            (particleOptions.color.x() * 255.0f).toInt(),
+                            (particleOptions.color.y() * 255.0f).toInt(), (particleOptions.color.z() * 255.0f).toInt()
+                        ), particleOptions.scale)
+                    )
+                    is ItemParticleOption -> ParticleData<ItemStack>(
+                        particle,
+                        CraftItemStack.asBukkitCopy(particleOptions.item)
+                    )
+                    is VibrationParticleOption -> {
+                        val origin: Vec3 = context.source.position
+                        val level: Level = context.source.level
+                        val from = Location(level.world, origin.x, origin.y, origin.z)
+                        val destination: Vibration.Destination
+
+                        if (particleOptions.destination is BlockPositionSource) {
+                            val to: Vec3 = particleOptions.destination.getPosition(level).get()
+                            destination = Vibration.Destination.BlockDestination(Location(level.world, to.x(), to.y(), to.z()))
+                            ParticleData(particle, Vibration(destination, particleOptions.arrivalInTicks))
+                        } else {
+                            ParticleData(particle, null)
+                        }
+                    }
+                    is ShriekParticleOption -> ParticleData(particle, particleOptions.delay)
+                    is SculkChargeParticleOptions -> ParticleData(particle, particleOptions.roll())
+                    is ColorParticleOption -> {
+                        val color = Color.fromARGB(
+                            (particleOptions.alpha * 255.0f).toInt(),
+                            (particleOptions.red * 255.0f).toInt(),
+                            (particleOptions.green * 255.0f).toInt(),
+                            (particleOptions.blue * 255.0f).toInt())
+                        ParticleData(particle, color)
+                    }
+                    else -> ParticleData(particle, null)
+                }
+                it.run(context.source.bukkitSender, finalParticle)
+            }
             else -> throw UnsupportedSubCommandException()
         }
 
@@ -198,11 +259,20 @@ object ArgumentHelper {
             is MessageSubCommand -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, GsonComponentSerializer.gson().deserialize(net.minecraft.network.chat.Component.Serializer.toJson(MessageArgument.getMessage(context, subCommand.name), COMMAND_BUILD_CONTEXT)))) return false }
             is ObjectiveSubCommand -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, Bukkit.getScoreboardManager().mainScoreboard.getObjective(ObjectiveArgument.getObjective(context, subCommand.name).name) ?: return false)) return false }
             is ObjectiveCriteriaSubCommand -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, ObjectiveCriteriaArgument.getCriteria(context, subCommand.name).name)) return false }
+            is ParticleSubCommand -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, Particle.valueOf(getArgumentInput(context, subCommand.name).uppercase()))) return false }
             else -> throw UnsupportedSubCommandException()
         }
         return true
     }
 
+    private fun getArgumentInput(context: CommandContext<CommandSourceStack>, name: String): String {
+        val field = CommandContext::class.java.getDeclaredField("arguments")
+        field.isAccessible = true
+        val arguments: Map<String, ParsedArgument<CommandSourceStack, *>> = field.get(context) as Map<String, ParsedArgument<CommandSourceStack, *>>
+        val argument = arguments[name] ?: return ""
+        val range = StringRange.between(argument.range.start, context.input.length)
+        return range.get(context.input)
+    }
 
     private fun StringType.brigadier(): StringArgumentType = when (this) {
         StringType.SINGLE_WORD -> StringArgumentType.word()
