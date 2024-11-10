@@ -17,6 +17,7 @@ import com.undefined.stellar.sub.brigadier.item.ItemPredicateSubCommand
 import com.undefined.stellar.sub.brigadier.item.ItemSubCommand
 import com.undefined.stellar.sub.brigadier.math.AngleSubCommand
 import com.undefined.stellar.sub.brigadier.math.OperationSubCommand
+import com.undefined.stellar.sub.brigadier.math.RotationSubCommand
 import com.undefined.stellar.sub.brigadier.player.GameProfileSubCommand
 import com.undefined.stellar.sub.brigadier.primitive.*
 import com.undefined.stellar.sub.brigadier.scoreboard.ObjectiveCriteriaSubCommand
@@ -36,6 +37,7 @@ import net.minecraft.commands.arguments.blocks.BlockPredicateArgument
 import net.minecraft.commands.arguments.blocks.BlockStateArgument
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument
 import net.minecraft.commands.arguments.coordinates.ColumnPosArgument
+import net.minecraft.commands.arguments.coordinates.RotationArgument
 import net.minecraft.commands.arguments.coordinates.Vec2Argument
 import net.minecraft.commands.arguments.coordinates.Vec3Argument
 import net.minecraft.commands.arguments.item.ItemArgument
@@ -100,6 +102,7 @@ object ArgumentHelper {
             is OperationSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, OperationArgument.operation())
             is ParticleSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, ParticleArgument.particle(COMMAND_BUILD_CONTEXT))
             is AngleSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, AngleArgument.angle())
+            is RotationSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, RotationArgument.rotation())
             else -> throw UnsupportedSubCommandException()
         }
 
@@ -156,6 +159,13 @@ object ArgumentHelper {
                 it.run(context.source.bukkitSender, getParticleData(context, particle, particleOptions))
             }
             is AngleSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, AngleArgument.getAngle(context, subCommand.name)) }
+            is RotationSubCommand -> subCommand.customExecutions.forEach {
+                val rotation = RotationArgument.getRotation(context, subCommand.name).getPosition(context.source)
+                it.run(
+                    context.source.bukkitSender,
+                    Location(context.source.bukkitWorld, rotation.x, rotation.y, rotation.z)
+                )
+            }
             else -> throw UnsupportedSubCommandException()
         }
 
@@ -220,6 +230,13 @@ object ArgumentHelper {
                 if (!it.run(context.source.bukkitSender, getParticleData(context, particle, particleOptions))) return false
             }
             is AngleSubCommand -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, AngleArgument.getAngle(context, subCommand.name))) return false }
+            is RotationSubCommand -> subCommand.customRunnables.forEach {
+                val rotation = RotationArgument.getRotation(context, subCommand.name).getPosition(context.source)
+                if (!it.run(
+                    context.source.bukkitSender,
+                    Location(context.source.bukkitWorld, rotation.x, rotation.y, rotation.z)
+                )) return false
+            }
             else -> throw UnsupportedSubCommandException()
         }
         return true

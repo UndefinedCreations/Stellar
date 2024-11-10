@@ -11,8 +11,11 @@ class Main : JavaPlugin() {
 
     override fun onEnable() {
         StellarCommand("test")
-            .addAngleSubCommand("angle")
-            .addAngleExecution<Player> {
+            .addRotationSubCommand("rotation")
+            .addRotationExecution<Player> {
+                location.pitch = it.pitch
+                location.yaw = it.yaw
+                sendMessage(location.toString())
                 sendMessage(it.toString())
             }
             .register()

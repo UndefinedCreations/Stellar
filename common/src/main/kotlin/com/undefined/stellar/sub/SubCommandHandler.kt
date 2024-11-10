@@ -7,6 +7,7 @@ import com.undefined.stellar.sub.brigadier.item.ItemPredicateSubCommand
 import com.undefined.stellar.sub.brigadier.item.ItemSubCommand
 import com.undefined.stellar.sub.brigadier.math.AngleSubCommand
 import com.undefined.stellar.sub.brigadier.math.OperationSubCommand
+import com.undefined.stellar.sub.brigadier.math.RotationSubCommand
 import com.undefined.stellar.sub.brigadier.player.GameProfileSubCommand
 import com.undefined.stellar.sub.brigadier.primitive.*
 import com.undefined.stellar.sub.brigadier.scoreboard.ObjectiveCriteriaSubCommand
@@ -191,6 +192,12 @@ open class SubCommandHandler {
 
     fun addAngleSubCommand(name: String): AngleSubCommand {
         val subCommand = AngleSubCommand(getBase()!!, name)
+        subCommands.add(subCommand)
+        return subCommand
+    }
+
+    fun addRotationSubCommand(name: String): RotationSubCommand {
+        val subCommand = RotationSubCommand(getBase()!!, name)
         subCommands.add(subCommand)
         return subCommand
     }
