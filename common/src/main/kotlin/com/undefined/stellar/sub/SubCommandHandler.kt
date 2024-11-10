@@ -4,6 +4,7 @@ import com.undefined.stellar.BaseStellarCommand
 import com.undefined.stellar.sub.brigadier.entity.EntityDisplayType
 import com.undefined.stellar.sub.brigadier.entity.EntitySubCommand
 import com.undefined.stellar.sub.brigadier.item.ItemPredicateSubCommand
+import com.undefined.stellar.sub.brigadier.item.ItemSlotSubCommand
 import com.undefined.stellar.sub.brigadier.item.ItemSubCommand
 import com.undefined.stellar.sub.brigadier.math.AngleSubCommand
 import com.undefined.stellar.sub.brigadier.math.AxisSubCommand
@@ -228,6 +229,12 @@ open class SubCommandHandler {
 
     fun addTeamSubCommand(name: String): TeamSubCommand {
         val subCommand = TeamSubCommand(getBase()!!, name)
+        subCommands.add(subCommand)
+        return subCommand
+    }
+
+    fun addItemSlotSubCommand(name: String): ItemSlotSubCommand {
+        val subCommand = ItemSlotSubCommand(getBase()!!, name)
         subCommands.add(subCommand)
         return subCommand
     }

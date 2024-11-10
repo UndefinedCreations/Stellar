@@ -14,6 +14,7 @@ import com.undefined.stellar.sub.brigadier.BrigadierTypeSubCommand
 import com.undefined.stellar.sub.brigadier.entity.EntityDisplayType
 import com.undefined.stellar.sub.brigadier.entity.EntitySubCommand
 import com.undefined.stellar.sub.brigadier.item.ItemPredicateSubCommand
+import com.undefined.stellar.sub.brigadier.item.ItemSlotSubCommand
 import com.undefined.stellar.sub.brigadier.item.ItemSubCommand
 import com.undefined.stellar.sub.brigadier.math.AngleSubCommand
 import com.undefined.stellar.sub.brigadier.math.AxisSubCommand
@@ -107,6 +108,7 @@ object ArgumentHelper {
             is ScoreHoldersSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, ScoreHolderArgument.scoreHolders())
             is AxisSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, SwizzleArgument.swizzle())
             is TeamSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, TeamArgument.team())
+            is ItemSlotSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, SlotArgument.slot())
             else -> throw UnsupportedSubCommandException()
         }
 
@@ -177,6 +179,10 @@ object ArgumentHelper {
             is TeamSubCommand -> {
                 val team = Bukkit.getScoreboardManager().mainScoreboard.getTeam(TeamArgument.getTeam(context, subCommand.name).name)
                 subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, team ?: return) }
+            }
+            is ItemSlotSubCommand -> {
+                val slot = SlotArgument.getSlot(context, subCommand.name)
+                subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, slot) }
             }
             else -> throw UnsupportedSubCommandException()
         }
@@ -256,6 +262,10 @@ object ArgumentHelper {
             is TeamSubCommand -> {
                 val team = Bukkit.getScoreboardManager().mainScoreboard.getTeam(TeamArgument.getTeam(context, subCommand.name).name)
                 subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, team ?: return true)) return false }
+            }
+            is ItemSlotSubCommand -> {
+                val slot = SlotArgument.getSlot(context, subCommand.name)
+                subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, slot)) return false }
             }
             else -> throw UnsupportedSubCommandException()
         }
