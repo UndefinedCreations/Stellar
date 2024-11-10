@@ -6,6 +6,7 @@ import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.context.ParsedArgument
 import com.mojang.brigadier.context.StringRange
 import com.mojang.brigadier.suggestion.SuggestionsBuilder
+import com.undefined.stellar.data.Operation
 import com.undefined.stellar.data.ParticleData
 import com.undefined.stellar.exception.ServerTypeMismatchException
 import com.undefined.stellar.exception.UnsupportedSubCommandException
@@ -14,6 +15,7 @@ import com.undefined.stellar.sub.brigadier.entity.EntityDisplayType
 import com.undefined.stellar.sub.brigadier.entity.EntitySubCommand
 import com.undefined.stellar.sub.brigadier.item.ItemPredicateSubCommand
 import com.undefined.stellar.sub.brigadier.item.ItemSubCommand
+import com.undefined.stellar.sub.brigadier.math.OperationSubCommand
 import com.undefined.stellar.sub.brigadier.player.GameProfileSubCommand
 import com.undefined.stellar.sub.brigadier.primitive.*
 import com.undefined.stellar.sub.brigadier.scoreboard.ObjectiveCriteriaSubCommand
@@ -26,6 +28,7 @@ import net.kyori.adventure.text.format.Style
 import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import net.minecraft.commands.CommandBuildContext
+import net.minecraft.commands.CommandSource
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.arguments.*
 import net.minecraft.commands.arguments.blocks.BlockPredicateArgument
@@ -93,6 +96,7 @@ object ArgumentHelper {
             is MessageSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, MessageArgument.message())
             is ObjectiveSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, ObjectiveArgument.objective())
             is ObjectiveCriteriaSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, ObjectiveCriteriaArgument.criteria())
+            is OperationSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, OperationArgument.operation())
             is ParticleSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, ParticleArgument.particle(COMMAND_BUILD_CONTEXT))
             else -> throw UnsupportedSubCommandException()
         }
@@ -143,64 +147,11 @@ object ArgumentHelper {
             is MessageSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, GsonComponentSerializer.gson().deserialize(net.minecraft.network.chat.Component.Serializer.toJson(MessageArgument.getMessage(context, subCommand.name), COMMAND_BUILD_CONTEXT))) }
             is ObjectiveSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, Bukkit.getScoreboardManager().mainScoreboard.getObjective(ObjectiveArgument.getObjective(context, subCommand.name).name) ?: return@forEach) }
             is ObjectiveCriteriaSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, ObjectiveCriteriaArgument.getCriteria(context, subCommand.name).name) }
+            is OperationSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, Operation.getOperation(getArgumentInput(context, subCommand.name)) ?: return) }
             is ParticleSubCommand -> subCommand.customExecutions.forEach {
                 val particleOptions = ParticleArgument.getParticle(context, subCommand.name)
                 val particle = CraftParticle.minecraftToBukkit(particleOptions.type)
-
-                val finalParticle = when (particleOptions) {
-                    is SimpleParticleType -> ParticleData(particle, null)
-                    is BlockParticleOption -> ParticleData<BlockData>(particle, CraftBlockData.fromData(particleOptions.state))
-                    is DustColorTransitionOptions -> {
-                        val fromColor = Color.fromRGB(
-                            (particleOptions.fromColor.x() * 255.0f).toInt(),
-                            (particleOptions.fromColor.y() * 255.0f).toInt(),
-                            (particleOptions.fromColor.z() * 255.0f).toInt()
-                        )
-                        val toColor = Color.fromRGB(
-                            (particleOptions.toColor.x() * 255.0f).toInt(),
-                            (particleOptions.toColor.y() * 255.0f).toInt(),
-                            (particleOptions.toColor.z() * 255.0f).toInt()
-                        )
-                        ParticleData(particle, Particle.DustTransition(fromColor, toColor, particleOptions.scale))
-                    }
-                    is DustParticleOptions -> ParticleData(
-                        particle,
-                        Particle.DustOptions(Color.fromRGB(
-                            (particleOptions.color.x() * 255.0f).toInt(),
-                            (particleOptions.color.y() * 255.0f).toInt(), (particleOptions.color.z() * 255.0f).toInt()
-                        ), particleOptions.scale)
-                    )
-                    is ItemParticleOption -> ParticleData<ItemStack>(
-                        particle,
-                        CraftItemStack.asBukkitCopy(particleOptions.item)
-                    )
-                    is VibrationParticleOption -> {
-                        val origin: Vec3 = context.source.position
-                        val level: Level = context.source.level
-                        val from = Location(level.world, origin.x, origin.y, origin.z)
-                        val destination: Vibration.Destination
-
-                        if (particleOptions.destination is BlockPositionSource) {
-                            val to: Vec3 = particleOptions.destination.getPosition(level).get()
-                            destination = Vibration.Destination.BlockDestination(Location(level.world, to.x(), to.y(), to.z()))
-                            ParticleData(particle, Vibration(destination, particleOptions.arrivalInTicks))
-                        } else {
-                            ParticleData(particle, null)
-                        }
-                    }
-                    is ShriekParticleOption -> ParticleData(particle, particleOptions.delay)
-                    is SculkChargeParticleOptions -> ParticleData(particle, particleOptions.roll())
-                    is ColorParticleOption -> {
-                        val color = Color.fromARGB(
-                            (particleOptions.alpha * 255.0f).toInt(),
-                            (particleOptions.red * 255.0f).toInt(),
-                            (particleOptions.green * 255.0f).toInt(),
-                            (particleOptions.blue * 255.0f).toInt())
-                        ParticleData(particle, color)
-                    }
-                    else -> ParticleData(particle, null)
-                }
-                it.run(context.source.bukkitSender, finalParticle)
+                it.run(context.source.bukkitSender, getParticleData(context, particle, particleOptions))
             }
             else -> throw UnsupportedSubCommandException()
         }
@@ -259,7 +210,12 @@ object ArgumentHelper {
             is MessageSubCommand -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, GsonComponentSerializer.gson().deserialize(net.minecraft.network.chat.Component.Serializer.toJson(MessageArgument.getMessage(context, subCommand.name), COMMAND_BUILD_CONTEXT)))) return false }
             is ObjectiveSubCommand -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, Bukkit.getScoreboardManager().mainScoreboard.getObjective(ObjectiveArgument.getObjective(context, subCommand.name).name) ?: return false)) return false }
             is ObjectiveCriteriaSubCommand -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, ObjectiveCriteriaArgument.getCriteria(context, subCommand.name).name)) return false }
-            is ParticleSubCommand -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, Particle.valueOf(getArgumentInput(context, subCommand.name).uppercase()))) return false }
+            is OperationSubCommand -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, Operation.getOperation(getArgumentInput(context, subCommand.name)) ?: return false)) return false }
+            is ParticleSubCommand -> subCommand.customRunnables.forEach {
+                val particleOptions = ParticleArgument.getParticle(context, subCommand.name)
+                val particle = CraftParticle.minecraftToBukkit(particleOptions.type)
+                if (!it.run(context.source.bukkitSender, getParticleData(context, particle, particleOptions))) return false
+            }
             else -> throw UnsupportedSubCommandException()
         }
         return true
@@ -292,6 +248,60 @@ object ArgumentHelper {
             list.filter { it.startsWith(suggestionsBuilder.remaining) }.forEach { suggestionsBuilder.suggest(it) }
             return@suggests suggestionsBuilder.buildFuture()
         }
+
+    private fun getParticleData(context: CommandContext<CommandSourceStack>, particle: Particle, particleOptions: ParticleOptions): ParticleData<*> = when (particleOptions) {
+        is SimpleParticleType -> ParticleData(particle, null)
+        is BlockParticleOption -> ParticleData<BlockData>(particle, CraftBlockData.fromData(particleOptions.state))
+        is DustColorTransitionOptions -> {
+            val fromColor = Color.fromRGB(
+                (particleOptions.fromColor.x() * 255.0f).toInt(),
+                (particleOptions.fromColor.y() * 255.0f).toInt(),
+                (particleOptions.fromColor.z() * 255.0f).toInt()
+            )
+            val toColor = Color.fromRGB(
+                (particleOptions.toColor.x() * 255.0f).toInt(),
+                (particleOptions.toColor.y() * 255.0f).toInt(),
+                (particleOptions.toColor.z() * 255.0f).toInt()
+            )
+            ParticleData(particle, Particle.DustTransition(fromColor, toColor, particleOptions.scale))
+        }
+        is DustParticleOptions -> ParticleData(
+            particle,
+            Particle.DustOptions(Color.fromRGB(
+                (particleOptions.color.x() * 255.0f).toInt(),
+                (particleOptions.color.y() * 255.0f).toInt(), (particleOptions.color.z() * 255.0f).toInt()
+            ), particleOptions.scale)
+        )
+        is ItemParticleOption -> ParticleData<ItemStack>(
+            particle,
+            CraftItemStack.asBukkitCopy(particleOptions.item)
+        )
+        is VibrationParticleOption -> {
+            val origin: Vec3 = context.source.position
+            val level: Level = context.source.level
+            val from = Location(level.world, origin.x, origin.y, origin.z)
+            val destination: Vibration.Destination
+
+            if (particleOptions.destination is BlockPositionSource) {
+                val to: Vec3 = particleOptions.destination.getPosition(level).get()
+                destination = Vibration.Destination.BlockDestination(Location(level.world, to.x(), to.y(), to.z()))
+                ParticleData(particle, Vibration(destination, particleOptions.arrivalInTicks))
+            } else {
+                ParticleData(particle, null)
+            }
+        }
+        is ShriekParticleOption -> ParticleData(particle, particleOptions.delay)
+        is SculkChargeParticleOptions -> ParticleData(particle, particleOptions.roll())
+        is ColorParticleOption -> {
+            val color = Color.fromARGB(
+                (particleOptions.alpha * 255.0f).toInt(),
+                (particleOptions.red * 255.0f).toInt(),
+                (particleOptions.green * 255.0f).toInt(),
+                (particleOptions.blue * 255.0f).toInt())
+            ParticleData(particle, color)
+        }
+        else -> ParticleData(particle, null)
+    }
 
     private fun getLocation(context: CommandContext<CommandSourceStack>, command: LocationSubCommand): Location {
         val world = context.source.bukkitWorld

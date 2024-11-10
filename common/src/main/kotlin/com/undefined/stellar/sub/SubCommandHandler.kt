@@ -5,6 +5,7 @@ import com.undefined.stellar.sub.brigadier.entity.EntityDisplayType
 import com.undefined.stellar.sub.brigadier.entity.EntitySubCommand
 import com.undefined.stellar.sub.brigadier.item.ItemPredicateSubCommand
 import com.undefined.stellar.sub.brigadier.item.ItemSubCommand
+import com.undefined.stellar.sub.brigadier.math.OperationSubCommand
 import com.undefined.stellar.sub.brigadier.player.GameProfileSubCommand
 import com.undefined.stellar.sub.brigadier.primitive.*
 import com.undefined.stellar.sub.brigadier.scoreboard.ObjectiveCriteriaSubCommand
@@ -171,6 +172,12 @@ open class SubCommandHandler {
 
     fun addObjectiveCriteriaSubCommand(name: String): ObjectiveCriteriaSubCommand {
         val subCommand = ObjectiveCriteriaSubCommand(getBase()!!, name)
+        subCommands.add(subCommand)
+        return subCommand
+    }
+
+    fun addOperationSubCommand(name: String): OperationSubCommand {
+        val subCommand = OperationSubCommand(getBase()!!, name)
         subCommands.add(subCommand)
         return subCommand
     }
