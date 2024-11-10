@@ -226,4 +226,10 @@ open class SubCommandHandler {
         return subCommand
     }
 
+    fun addTeamSubCommand(name: String): TeamSubCommand {
+        val subCommand = TeamSubCommand(getBase()!!, name)
+        subCommands.add(subCommand)
+        return subCommand
+    }
+
 }

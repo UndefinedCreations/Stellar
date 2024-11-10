@@ -55,6 +55,7 @@ import org.bukkit.craftbukkit.block.data.CraftBlockData
 import org.bukkit.craftbukkit.inventory.CraftItemStack
 import org.bukkit.inventory.ItemStack
 import org.bukkit.scoreboard.DisplaySlot
+import org.bukkit.scoreboard.Team
 import java.util.*
 import java.util.function.Predicate
 
@@ -105,6 +106,7 @@ object ArgumentHelper {
             is ScoreHolderSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, ScoreHolderArgument.scoreHolder())
             is ScoreHoldersSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, ScoreHolderArgument.scoreHolders())
             is AxisSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, SwizzleArgument.swizzle())
+            is TeamSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, TeamArgument.team())
             else -> throw UnsupportedSubCommandException()
         }
 
@@ -172,6 +174,10 @@ object ArgumentHelper {
                 val axis = getBukkitAxis(SwizzleArgument.getSwizzle(context, subCommand.name))
                 subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, axis) }
             }
+            is TeamSubCommand -> {
+                val team = Bukkit.getScoreboardManager().mainScoreboard.getTeam(TeamArgument.getTeam(context, subCommand.name).name)
+                subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, team ?: return) }
+            }
             else -> throw UnsupportedSubCommandException()
         }
 
@@ -227,9 +233,9 @@ object ArgumentHelper {
             is ComponentSubCommand -> subCommand.customRunnables.forEach { runnable -> if (!runnable.run(context.source.bukkitSender, GsonComponentSerializer.gson().deserialize(net.minecraft.network.chat.Component.Serializer.toJson(ComponentArgument.getComponent(context, subCommand.name), COMMAND_BUILD_CONTEXT)))) return false }
             is StyleSubCommand -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, GsonComponentSerializer.gson().deserialize(context.input.substringAfter(' ')).style())) return false }
             is MessageSubCommand -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, GsonComponentSerializer.gson().deserialize(net.minecraft.network.chat.Component.Serializer.toJson(MessageArgument.getMessage(context, subCommand.name), COMMAND_BUILD_CONTEXT)))) return false }
-            is ObjectiveSubCommand -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, Bukkit.getScoreboardManager().mainScoreboard.getObjective(ObjectiveArgument.getObjective(context, subCommand.name).name) ?: return false)) return false }
+            is ObjectiveSubCommand -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, Bukkit.getScoreboardManager().mainScoreboard.getObjective(ObjectiveArgument.getObjective(context, subCommand.name).name) ?: return true)) return false }
             is ObjectiveCriteriaSubCommand -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, ObjectiveCriteriaArgument.getCriteria(context, subCommand.name).name)) return false }
-            is OperationSubCommand -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, Operation.getOperation(getArgumentInput(context, subCommand.name)) ?: return false)) return false }
+            is OperationSubCommand -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, Operation.getOperation(getArgumentInput(context, subCommand.name)) ?: return true)) return false }
             is ParticleSubCommand -> subCommand.customRunnables.forEach {
                 val particleOptions = ParticleArgument.getParticle(context, subCommand.name)
                 val particle = CraftParticle.minecraftToBukkit(particleOptions.type)
@@ -246,6 +252,10 @@ object ArgumentHelper {
             is AxisSubCommand -> {
                 val axis = getBukkitAxis(SwizzleArgument.getSwizzle(context, subCommand.name))
                 subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, axis)) return false }
+            }
+            is TeamSubCommand -> {
+                val team = Bukkit.getScoreboardManager().mainScoreboard.getTeam(TeamArgument.getTeam(context, subCommand.name).name)
+                subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, team ?: return true)) return false }
             }
             else -> throw UnsupportedSubCommandException()
         }
