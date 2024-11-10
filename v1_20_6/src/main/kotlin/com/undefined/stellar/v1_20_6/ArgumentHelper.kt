@@ -15,6 +15,7 @@ import com.undefined.stellar.sub.brigadier.entity.EntityDisplayType
 import com.undefined.stellar.sub.brigadier.entity.EntitySubCommand
 import com.undefined.stellar.sub.brigadier.item.ItemPredicateSubCommand
 import com.undefined.stellar.sub.brigadier.item.ItemSubCommand
+import com.undefined.stellar.sub.brigadier.math.AngleSubCommand
 import com.undefined.stellar.sub.brigadier.math.OperationSubCommand
 import com.undefined.stellar.sub.brigadier.player.GameProfileSubCommand
 import com.undefined.stellar.sub.brigadier.primitive.*
@@ -98,6 +99,7 @@ object ArgumentHelper {
             is ObjectiveCriteriaSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, ObjectiveCriteriaArgument.criteria())
             is OperationSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, OperationArgument.operation())
             is ParticleSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, ParticleArgument.particle(COMMAND_BUILD_CONTEXT))
+            is AngleSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, AngleArgument.angle())
             else -> throw UnsupportedSubCommandException()
         }
 
@@ -153,6 +155,7 @@ object ArgumentHelper {
                 val particle = CraftParticle.minecraftToBukkit(particleOptions.type)
                 it.run(context.source.bukkitSender, getParticleData(context, particle, particleOptions))
             }
+            is AngleSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, AngleArgument.getAngle(context, subCommand.name)) }
             else -> throw UnsupportedSubCommandException()
         }
 
@@ -216,6 +219,7 @@ object ArgumentHelper {
                 val particle = CraftParticle.minecraftToBukkit(particleOptions.type)
                 if (!it.run(context.source.bukkitSender, getParticleData(context, particle, particleOptions))) return false
             }
+            is AngleSubCommand -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, AngleArgument.getAngle(context, subCommand.name))) return false }
             else -> throw UnsupportedSubCommandException()
         }
         return true

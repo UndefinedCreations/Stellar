@@ -5,6 +5,7 @@ import com.undefined.stellar.sub.brigadier.entity.EntityDisplayType
 import com.undefined.stellar.sub.brigadier.entity.EntitySubCommand
 import com.undefined.stellar.sub.brigadier.item.ItemPredicateSubCommand
 import com.undefined.stellar.sub.brigadier.item.ItemSubCommand
+import com.undefined.stellar.sub.brigadier.math.AngleSubCommand
 import com.undefined.stellar.sub.brigadier.math.OperationSubCommand
 import com.undefined.stellar.sub.brigadier.player.GameProfileSubCommand
 import com.undefined.stellar.sub.brigadier.primitive.*
@@ -184,6 +185,12 @@ open class SubCommandHandler {
 
     fun addParticleSubCommand(name: String): ParticleSubCommand {
         val subCommand = ParticleSubCommand(getBase()!!, name)
+        subCommands.add(subCommand)
+        return subCommand
+    }
+
+    fun addAngleSubCommand(name: String): AngleSubCommand {
+        val subCommand = AngleSubCommand(getBase()!!, name)
         subCommands.add(subCommand)
         return subCommand
     }

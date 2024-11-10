@@ -11,9 +11,9 @@ class Main : JavaPlugin() {
 
     override fun onEnable() {
         StellarCommand("test")
-            .addOperationSubCommand("operation")
-            .addObjectiveExecution<Player> {
-                sendMessage(it.apply(1, 2).toString())
+            .addAngleSubCommand("angle")
+            .addAngleExecution<Player> {
+                sendMessage(it.toString())
             }
             .register()
     }
