@@ -16,6 +16,7 @@ import com.undefined.stellar.sub.brigadier.entity.EntitySubCommand
 import com.undefined.stellar.sub.brigadier.item.ItemPredicateSubCommand
 import com.undefined.stellar.sub.brigadier.item.ItemSubCommand
 import com.undefined.stellar.sub.brigadier.math.AngleSubCommand
+import com.undefined.stellar.sub.brigadier.math.AxisSubCommand
 import com.undefined.stellar.sub.brigadier.math.OperationSubCommand
 import com.undefined.stellar.sub.brigadier.math.RotationSubCommand
 import com.undefined.stellar.sub.brigadier.player.GameProfileSubCommand
@@ -33,14 +34,11 @@ import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.arguments.*
 import net.minecraft.commands.arguments.blocks.BlockPredicateArgument
 import net.minecraft.commands.arguments.blocks.BlockStateArgument
-import net.minecraft.commands.arguments.coordinates.BlockPosArgument
-import net.minecraft.commands.arguments.coordinates.ColumnPosArgument
-import net.minecraft.commands.arguments.coordinates.RotationArgument
-import net.minecraft.commands.arguments.coordinates.Vec2Argument
-import net.minecraft.commands.arguments.coordinates.Vec3Argument
+import net.minecraft.commands.arguments.coordinates.*
 import net.minecraft.commands.arguments.item.ItemArgument
 import net.minecraft.commands.arguments.item.ItemPredicateArgument
 import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
 import net.minecraft.core.particles.*
 import net.minecraft.server.level.ColumnPos
 import net.minecraft.world.level.Level
@@ -57,6 +55,7 @@ import org.bukkit.craftbukkit.block.data.CraftBlockData
 import org.bukkit.craftbukkit.inventory.CraftItemStack
 import org.bukkit.inventory.ItemStack
 import org.bukkit.scoreboard.DisplaySlot
+import java.util.*
 import java.util.function.Predicate
 
 object ArgumentHelper {
@@ -105,6 +104,7 @@ object ArgumentHelper {
             is DisplaySlotSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, ScoreboardSlotArgument.displaySlot())
             is ScoreHolderSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, ScoreHolderArgument.scoreHolder())
             is ScoreHoldersSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, ScoreHolderArgument.scoreHolders())
+            is AxisSubCommand -> RequiredArgumentBuilder.argument(subCommand.name, SwizzleArgument.swizzle())
             else -> throw UnsupportedSubCommandException()
         }
 
@@ -161,13 +161,17 @@ object ArgumentHelper {
                 it.run(context.source.bukkitSender, getParticleData(context, particle, particleOptions))
             }
             is AngleSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, AngleArgument.getAngle(context, subCommand.name)) }
-            is RotationSubCommand -> subCommand.customExecutions.forEach {
+            is RotationSubCommand -> subCommand.customExecutions.forEach { // TODO Remove variables and stuff outside of forEach
                 val rotation = RotationArgument.getRotation(context, subCommand.name).getPosition(context.source)
                 it.run(context.source.bukkitSender, Location(context.source.bukkitWorld, rotation.x, rotation.y, rotation.z))
             }
             is DisplaySlotSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, getBukkitDisplaySlot(ScoreboardSlotArgument.getDisplaySlot(context, subCommand.name))) }
             is ScoreHolderSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, ScoreHolderArgument.getName(context, subCommand.name).scoreboardName) }
             is ScoreHoldersSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, ScoreHolderArgument.getNames(context, subCommand.name).map { scoreholder -> scoreholder.scoreboardName }) }
+            is AxisSubCommand -> {
+                val axis = getBukkitAxis(SwizzleArgument.getSwizzle(context, subCommand.name))
+                subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, axis) }
+            }
             else -> throw UnsupportedSubCommandException()
         }
 
@@ -239,6 +243,10 @@ object ArgumentHelper {
             is DisplaySlotSubCommand -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, getBukkitDisplaySlot(ScoreboardSlotArgument.getDisplaySlot(context, subCommand.name)))) return false }
             is ScoreHolderSubCommand -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, ScoreHolderArgument.getName(context, subCommand.name).scoreboardName)) return false }
             is ScoreHoldersSubCommand -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, ScoreHolderArgument.getNames(context, subCommand.name).map { scoreholder -> scoreholder.scoreboardName })) return false }
+            is AxisSubCommand -> {
+                val axis = getBukkitAxis(SwizzleArgument.getSwizzle(context, subCommand.name))
+                subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, axis)) return false }
+            }
             else -> throw UnsupportedSubCommandException()
         }
         return true
@@ -270,6 +278,16 @@ object ArgumentHelper {
         suggests { _: CommandContext<CommandSourceStack>, suggestionsBuilder: SuggestionsBuilder ->
             list.filter { it.startsWith(suggestionsBuilder.remaining) }.forEach { suggestionsBuilder.suggest(it) }
             return@suggests suggestionsBuilder.buildFuture()
+        }
+
+    private fun getBukkitAxis(argument: EnumSet<Direction.Axis>): EnumSet<Axis> =
+        argument.mapTo(EnumSet.noneOf(Axis::class.java)) {
+            when (it) {
+                Direction.Axis.X -> Axis.X
+                Direction.Axis.Y -> Axis.Y
+                Direction.Axis.Z -> Axis.Z
+                null -> Axis.X
+            }
         }
 
     private fun getBukkitDisplaySlot(slot: net.minecraft.world.scores.DisplaySlot): DisplaySlot = when (slot) {

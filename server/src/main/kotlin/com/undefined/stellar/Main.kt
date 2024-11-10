@@ -7,14 +7,10 @@ class Main : JavaPlugin() {
 
     override fun onEnable() {
         StellarCommand("test")
-            .addScoreHolderSubCommand("display")
-            .addScoreHolderExecution<Player> {
-                sendMessage(it)
+            .addAxisSubCommand("axis")
+            .addAxisExecution<Player> {
+                sendMessage(it.joinToString())
             }
-//            .addScoreHoldersSubCommand("multiple")
-//            .addScoreHoldersExecution<Player> {
-//                sendMessage(it.joinToString())
-//            }
             .register()
     }
 
