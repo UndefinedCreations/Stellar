@@ -6,11 +6,13 @@ import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.context.ParsedArgument
 import com.mojang.brigadier.context.StringRange
 import com.mojang.brigadier.suggestion.SuggestionsBuilder
-import com.undefined.stellar.data.Operation
-import com.undefined.stellar.data.ParticleData
+import com.undefined.stellar.data.arguments.Anchor
+import com.undefined.stellar.data.arguments.Operation
+import com.undefined.stellar.data.arguments.ParticleData
 import com.undefined.stellar.exception.ServerTypeMismatchException
 import com.undefined.stellar.exception.UnsupportedSubCommandException
 import com.undefined.stellar.sub.brigadier.BrigadierTypeSubCommand
+import com.undefined.stellar.sub.brigadier.entity.EntityAnchorSubCommand
 import com.undefined.stellar.sub.brigadier.entity.EntityDisplayType
 import com.undefined.stellar.sub.brigadier.entity.EntitySubCommand
 import com.undefined.stellar.sub.brigadier.item.ItemPredicateSubCommand
@@ -43,7 +45,6 @@ import net.minecraft.commands.arguments.item.ItemPredicateArgument
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.core.particles.*
-import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ColumnPos
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.pattern.BlockInWorld
@@ -59,7 +60,6 @@ import org.bukkit.craftbukkit.block.data.CraftBlockData
 import org.bukkit.craftbukkit.inventory.CraftItemStack
 import org.bukkit.inventory.ItemStack
 import org.bukkit.scoreboard.DisplaySlot
-import org.bukkit.scoreboard.Team
 import java.util.*
 import java.util.function.Predicate
 
@@ -149,6 +149,7 @@ object ArgumentHelper {
             is ItemSlotSubCommand -> SlotArgument.slot()
             is ItemSlotsSubCommand -> SlotsArgument.slots()
             is NamespacedKeySubCommand -> ResourceLocationArgument.id()
+            is EntityAnchorSubCommand -> EntityAnchorArgument.anchor()
             else -> throw UnsupportedSubCommandException()
         }
 
@@ -201,6 +202,7 @@ object ArgumentHelper {
             is ItemSlotSubCommand -> SlotArgument.getSlot(context, subCommand.name)
             is ItemSlotsSubCommand -> SlotsArgument.getSlots(context, subCommand.name).slots().toList()
             is NamespacedKeySubCommand -> NamespacedKey(ResourceLocationArgument.getId(context, subCommand.name).namespace, ResourceLocationArgument.getId(context, subCommand.name).path)
+            is EntityAnchorSubCommand -> Anchor.getFromName(getArgumentInput(context, subCommand.name))
             else -> throw UnsupportedSubCommandException()
         }
 

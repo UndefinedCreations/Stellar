@@ -7,9 +7,11 @@ class Main : JavaPlugin() {
 
     override fun onEnable() {
         StellarCommand("test")
-            .addNamespacedKeySubCommand("test")
-            .addNamespacedKeyExecution<Player> {
+            .addEntityAnchorSubCommand("test")
+            .addEntityAnchorSubCommand<Player> {
                 sendMessage(it.toString())
+                sendMessage(it.anchorName)
+                sendMessage(it.apply(this).toString())
             }
             .register()
     }

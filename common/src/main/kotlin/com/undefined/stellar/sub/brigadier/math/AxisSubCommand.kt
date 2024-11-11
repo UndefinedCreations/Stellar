@@ -1,7 +1,6 @@
 package com.undefined.stellar.sub.brigadier.math
 
 import com.undefined.stellar.BaseStellarCommand
-import com.undefined.stellar.data.Operation
 import com.undefined.stellar.data.execution.CustomStellarExecution
 import com.undefined.stellar.data.execution.CustomStellarRunnable
 import com.undefined.stellar.sub.brigadier.BrigadierTypeSubCommand

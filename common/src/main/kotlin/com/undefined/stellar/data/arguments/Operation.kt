@@ -1,4 +1,4 @@
-package com.undefined.stellar.data
+package com.undefined.stellar.data.arguments
 
 import kotlin.math.max
 import kotlin.math.min

@@ -1,6 +1,7 @@
 package com.undefined.stellar.sub
 
 import com.undefined.stellar.BaseStellarCommand
+import com.undefined.stellar.sub.brigadier.entity.EntityAnchorSubCommand
 import com.undefined.stellar.sub.brigadier.entity.EntityDisplayType
 import com.undefined.stellar.sub.brigadier.entity.EntitySubCommand
 import com.undefined.stellar.sub.brigadier.item.ItemPredicateSubCommand
@@ -249,6 +250,12 @@ open class SubCommandHandler {
 
     fun addNamespacedKeySubCommand(name: String): NamespacedKeySubCommand {
         val subCommand = NamespacedKeySubCommand(getBase()!!, name)
+        subCommands.add(subCommand)
+        return subCommand
+    }
+
+    fun addEntityAnchorSubCommand(name: String): EntityAnchorSubCommand {
+        val subCommand = EntityAnchorSubCommand(getBase()!!, name)
         subCommands.add(subCommand)
         return subCommand
     }
