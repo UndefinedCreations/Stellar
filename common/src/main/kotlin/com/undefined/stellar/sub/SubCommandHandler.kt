@@ -276,4 +276,10 @@ open class SubCommandHandler {
         return subCommand
     }
 
+    fun addTimeSubCommand(name: String, minimum: Int = 0): TimeSubCommand {
+        val subCommand = TimeSubCommand(getBase()!!, name, minimum)
+        subCommands.add(subCommand)
+        return subCommand
+    }
+
 }

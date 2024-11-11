@@ -25,7 +25,10 @@ import com.undefined.stellar.sub.brigadier.player.GameModeSubCommand
 import com.undefined.stellar.sub.brigadier.player.GameProfileSubCommand
 import com.undefined.stellar.sub.brigadier.primitive.*
 import com.undefined.stellar.sub.brigadier.scoreboard.*
-import com.undefined.stellar.sub.brigadier.text.*
+import com.undefined.stellar.sub.brigadier.text.ColorSubCommand
+import com.undefined.stellar.sub.brigadier.text.ComponentSubCommand
+import com.undefined.stellar.sub.brigadier.text.MessageSubCommand
+import com.undefined.stellar.sub.brigadier.text.StyleSubCommand
 import com.undefined.stellar.sub.brigadier.world.*
 import com.undefined.stellar.sub.custom.EnumSubCommand
 import com.undefined.stellar.sub.custom.ListSubCommand
@@ -46,7 +49,6 @@ import net.minecraft.core.particles.*
 import net.minecraft.server.level.ColumnPos
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.pattern.BlockInWorld
-import net.minecraft.world.level.dimension.DimensionType
 import net.minecraft.world.level.gameevent.BlockPositionSource
 import net.minecraft.world.phys.Vec2
 import net.minecraft.world.phys.Vec3
@@ -59,6 +61,9 @@ import org.bukkit.craftbukkit.block.data.CraftBlockData
 import org.bukkit.craftbukkit.inventory.CraftItemStack
 import org.bukkit.inventory.ItemStack
 import org.bukkit.scoreboard.DisplaySlot
+import java.time.Duration
+import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.*
 import java.util.function.Predicate
 
@@ -152,6 +157,7 @@ object ArgumentHelper {
             is RangeSubCommand -> RangeArgument.intRange()
             is DimensionSubCommand -> DimensionArgument.dimension()
             is GameModeSubCommand -> GameModeArgument.gameMode()
+            is TimeSubCommand -> TimeArgument.time(subCommand.minimum)
             else -> throw UnsupportedSubCommandException()
         }
 
@@ -211,6 +217,7 @@ object ArgumentHelper {
             }
             is DimensionSubCommand -> DimensionArgument.getDimension(context, subCommand.name).world.environment
             is GameModeSubCommand -> GameMode.getByValue(GameModeArgument.getGameMode(context, subCommand.name).id)
+            is TimeSubCommand -> Duration.ofSeconds(IntegerArgumentType.getInteger(context, subCommand.name).toLong() / 20)
             else -> throw UnsupportedSubCommandException()
         }
 

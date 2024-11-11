@@ -7,9 +7,9 @@ class Main : JavaPlugin() {
 
     override fun onEnable() {
         StellarCommand("test")
-            .addGameModeSubCommand("test")
-            .addGameModeExecution<Player> {
-                sendMessage(it.name)
+            .addTimeSubCommand("test")
+            .addTimeExecution<Player> {
+                sendMessage(it.seconds.toString())
             }
             .register()
     }
