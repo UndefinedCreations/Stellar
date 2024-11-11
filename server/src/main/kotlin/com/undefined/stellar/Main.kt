@@ -7,11 +7,11 @@ class Main : JavaPlugin() {
 
     override fun onEnable() {
         StellarCommand("test")
-            .addEntityAnchorSubCommand("test")
-            .addEntityAnchorSubCommand<Player> {
+            .addRangeSubCommand("test")
+            .addRangeExecution<Player> {
                 sendMessage(it.toString())
-                sendMessage(it.anchorName)
-                sendMessage(it.apply(this).toString())
+                sendMessage(it.first.toString())
+                sendMessage(it.last.toString())
             }
             .register()
     }

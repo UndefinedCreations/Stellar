@@ -19,10 +19,7 @@ import com.undefined.stellar.sub.brigadier.item.ItemPredicateSubCommand
 import com.undefined.stellar.sub.brigadier.item.ItemSlotSubCommand
 import com.undefined.stellar.sub.brigadier.item.ItemSlotsSubCommand
 import com.undefined.stellar.sub.brigadier.item.ItemSubCommand
-import com.undefined.stellar.sub.brigadier.math.AngleSubCommand
-import com.undefined.stellar.sub.brigadier.math.AxisSubCommand
-import com.undefined.stellar.sub.brigadier.math.OperationSubCommand
-import com.undefined.stellar.sub.brigadier.math.RotationSubCommand
+import com.undefined.stellar.sub.brigadier.math.*
 import com.undefined.stellar.sub.brigadier.misc.NamespacedKeySubCommand
 import com.undefined.stellar.sub.brigadier.player.GameProfileSubCommand
 import com.undefined.stellar.sub.brigadier.primitive.*
@@ -150,6 +147,7 @@ object ArgumentHelper {
             is ItemSlotsSubCommand -> SlotsArgument.slots()
             is NamespacedKeySubCommand -> ResourceLocationArgument.id()
             is EntityAnchorSubCommand -> EntityAnchorArgument.anchor()
+            is RangeSubCommand -> RangeArgument.intRange()
             else -> throw UnsupportedSubCommandException()
         }
 
@@ -203,6 +201,10 @@ object ArgumentHelper {
             is ItemSlotsSubCommand -> SlotsArgument.getSlots(context, subCommand.name).slots().toList()
             is NamespacedKeySubCommand -> NamespacedKey(ResourceLocationArgument.getId(context, subCommand.name).namespace, ResourceLocationArgument.getId(context, subCommand.name).path)
             is EntityAnchorSubCommand -> Anchor.getFromName(getArgumentInput(context, subCommand.name))
+            is RangeSubCommand -> {
+                val range = RangeArgument.Ints.getRange(context, subCommand.name)
+                IntRange(range.min.orElse(1), range.max.orElse(2))
+            }
             else -> throw UnsupportedSubCommandException()
         }
 

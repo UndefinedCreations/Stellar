@@ -8,10 +8,7 @@ import com.undefined.stellar.sub.brigadier.item.ItemPredicateSubCommand
 import com.undefined.stellar.sub.brigadier.item.ItemSlotSubCommand
 import com.undefined.stellar.sub.brigadier.item.ItemSlotsSubCommand
 import com.undefined.stellar.sub.brigadier.item.ItemSubCommand
-import com.undefined.stellar.sub.brigadier.math.AngleSubCommand
-import com.undefined.stellar.sub.brigadier.math.AxisSubCommand
-import com.undefined.stellar.sub.brigadier.math.OperationSubCommand
-import com.undefined.stellar.sub.brigadier.math.RotationSubCommand
+import com.undefined.stellar.sub.brigadier.math.*
 import com.undefined.stellar.sub.brigadier.misc.NamespacedKeySubCommand
 import com.undefined.stellar.sub.brigadier.player.GameProfileSubCommand
 import com.undefined.stellar.sub.brigadier.primitive.*
@@ -256,6 +253,12 @@ open class SubCommandHandler {
 
     fun addEntityAnchorSubCommand(name: String): EntityAnchorSubCommand {
         val subCommand = EntityAnchorSubCommand(getBase()!!, name)
+        subCommands.add(subCommand)
+        return subCommand
+    }
+
+    fun addRangeSubCommand(name: String): RangeSubCommand {
+        val subCommand = RangeSubCommand(getBase()!!, name)
         subCommands.add(subCommand)
         return subCommand
     }
