@@ -45,6 +45,7 @@ import net.minecraft.core.particles.*
 import net.minecraft.server.level.ColumnPos
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.pattern.BlockInWorld
+import net.minecraft.world.level.dimension.DimensionType
 import net.minecraft.world.level.gameevent.BlockPositionSource
 import net.minecraft.world.phys.Vec2
 import net.minecraft.world.phys.Vec3
@@ -148,6 +149,7 @@ object ArgumentHelper {
             is NamespacedKeySubCommand -> ResourceLocationArgument.id()
             is EntityAnchorSubCommand -> EntityAnchorArgument.anchor()
             is RangeSubCommand -> RangeArgument.intRange()
+            is DimensionSubCommand -> DimensionArgument.dimension()
             else -> throw UnsupportedSubCommandException()
         }
 
@@ -205,6 +207,7 @@ object ArgumentHelper {
                 val range = RangeArgument.Ints.getRange(context, subCommand.name)
                 IntRange(range.min.orElse(1), range.max.orElse(2))
             }
+            is DimensionSubCommand -> DimensionArgument.getDimension(context, subCommand.name).world.environment
             else -> throw UnsupportedSubCommandException()
         }
 

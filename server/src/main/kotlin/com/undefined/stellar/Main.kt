@@ -7,11 +7,9 @@ class Main : JavaPlugin() {
 
     override fun onEnable() {
         StellarCommand("test")
-            .addRangeSubCommand("test")
-            .addRangeExecution<Player> {
-                sendMessage(it.toString())
-                sendMessage(it.first.toString())
-                sendMessage(it.last.toString())
+            .addDimensionSubCommand("test")
+            .addDimensionExecution<Player> {
+                sendMessage(it.name)
             }
             .register()
     }

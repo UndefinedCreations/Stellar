@@ -263,4 +263,10 @@ open class SubCommandHandler {
         return subCommand
     }
 
+    fun addDimensionSubCommand(name: String): DimensionSubCommand {
+        val subCommand = DimensionSubCommand(getBase()!!, name)
+        subCommands.add(subCommand)
+        return subCommand
+    }
+
 }
