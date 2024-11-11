@@ -7,8 +7,8 @@ class Main : JavaPlugin() {
 
     override fun onEnable() {
         StellarCommand("test")
-            .addDimensionSubCommand("test")
-            .addDimensionExecution<Player> {
+            .addGameModeSubCommand("test")
+            .addGameModeExecution<Player> {
                 sendMessage(it.name)
             }
             .register()

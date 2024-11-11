@@ -21,6 +21,7 @@ import com.undefined.stellar.sub.brigadier.item.ItemSlotsSubCommand
 import com.undefined.stellar.sub.brigadier.item.ItemSubCommand
 import com.undefined.stellar.sub.brigadier.math.*
 import com.undefined.stellar.sub.brigadier.misc.NamespacedKeySubCommand
+import com.undefined.stellar.sub.brigadier.player.GameModeSubCommand
 import com.undefined.stellar.sub.brigadier.player.GameProfileSubCommand
 import com.undefined.stellar.sub.brigadier.primitive.*
 import com.undefined.stellar.sub.brigadier.scoreboard.*
@@ -150,6 +151,7 @@ object ArgumentHelper {
             is EntityAnchorSubCommand -> EntityAnchorArgument.anchor()
             is RangeSubCommand -> RangeArgument.intRange()
             is DimensionSubCommand -> DimensionArgument.dimension()
+            is GameModeSubCommand -> GameModeArgument.gameMode()
             else -> throw UnsupportedSubCommandException()
         }
 
@@ -208,6 +210,7 @@ object ArgumentHelper {
                 IntRange(range.min.orElse(1), range.max.orElse(2))
             }
             is DimensionSubCommand -> DimensionArgument.getDimension(context, subCommand.name).world.environment
+            is GameModeSubCommand -> GameMode.getByValue(GameModeArgument.getGameMode(context, subCommand.name).id)
             else -> throw UnsupportedSubCommandException()
         }
 

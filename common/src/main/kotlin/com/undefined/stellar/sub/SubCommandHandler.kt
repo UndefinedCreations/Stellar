@@ -10,6 +10,7 @@ import com.undefined.stellar.sub.brigadier.item.ItemSlotsSubCommand
 import com.undefined.stellar.sub.brigadier.item.ItemSubCommand
 import com.undefined.stellar.sub.brigadier.math.*
 import com.undefined.stellar.sub.brigadier.misc.NamespacedKeySubCommand
+import com.undefined.stellar.sub.brigadier.player.GameModeSubCommand
 import com.undefined.stellar.sub.brigadier.player.GameProfileSubCommand
 import com.undefined.stellar.sub.brigadier.primitive.*
 import com.undefined.stellar.sub.brigadier.scoreboard.*
@@ -259,6 +260,12 @@ open class SubCommandHandler {
 
     fun addRangeSubCommand(name: String): RangeSubCommand {
         val subCommand = RangeSubCommand(getBase()!!, name)
+        subCommands.add(subCommand)
+        return subCommand
+    }
+
+    fun addGameModeSubCommand(name: String): GameModeSubCommand {
+        val subCommand = GameModeSubCommand(getBase()!!, name)
         subCommands.add(subCommand)
         return subCommand
     }
