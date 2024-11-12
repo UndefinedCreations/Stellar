@@ -1,4 +1,4 @@
-package com.undefined.stellar.sub.brigadier.structure
+package com.undefined.stellar.sub.brigadier.world
 
 import com.undefined.stellar.BaseStellarCommand
 import com.undefined.stellar.data.execution.CustomStellarExecution

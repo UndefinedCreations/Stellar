@@ -1,10 +1,9 @@
-package com.undefined.stellar.sub.brigadier.structure
+package com.undefined.stellar.sub.brigadier.world
 
 import com.undefined.stellar.BaseStellarCommand
 import com.undefined.stellar.data.execution.CustomStellarExecution
 import com.undefined.stellar.data.execution.CustomStellarRunnable
 import com.undefined.stellar.sub.brigadier.BrigadierTypeSubCommand
-import org.bukkit.Rotation
 import org.bukkit.block.structure.StructureRotation
 import org.bukkit.command.CommandSender
 

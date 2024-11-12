@@ -25,8 +25,8 @@ import com.undefined.stellar.sub.brigadier.player.GameModeSubCommand
 import com.undefined.stellar.sub.brigadier.player.GameProfileSubCommand
 import com.undefined.stellar.sub.brigadier.primitive.*
 import com.undefined.stellar.sub.brigadier.scoreboard.*
-import com.undefined.stellar.sub.brigadier.structure.MirrorSubCommand
-import com.undefined.stellar.sub.brigadier.structure.StructureRotationSubCommand
+import com.undefined.stellar.sub.brigadier.world.MirrorSubCommand
+import com.undefined.stellar.sub.brigadier.world.StructureRotationSubCommand
 import com.undefined.stellar.sub.brigadier.text.ColorSubCommand
 import com.undefined.stellar.sub.brigadier.text.ComponentSubCommand
 import com.undefined.stellar.sub.brigadier.text.MessageSubCommand
@@ -66,8 +66,6 @@ import org.bukkit.craftbukkit.inventory.CraftItemStack
 import org.bukkit.inventory.ItemStack
 import org.bukkit.scoreboard.DisplaySlot
 import java.time.Duration
-import java.time.LocalDate
-import java.time.LocalDateTime
 import java.util.*
 import java.util.function.Predicate
 
@@ -164,6 +162,7 @@ object ArgumentHelper {
             is TimeSubCommand -> TimeArgument.time(subCommand.minimum)
             is MirrorSubCommand -> TemplateMirrorArgument.templateMirror()
             is StructureRotationSubCommand -> TemplateRotationArgument.templateRotation()
+            is HeightMapSubCommand -> HeightmapTypeArgument.heightmap()
             else -> throw UnsupportedSubCommandException()
         }
 
@@ -226,6 +225,7 @@ object ArgumentHelper {
             is TimeSubCommand -> Duration.ofSeconds(IntegerArgumentType.getInteger(context, subCommand.name).toLong() / 20)
             is MirrorSubCommand -> Mirror.valueOf(TemplateMirrorArgument.getMirror(context, subCommand.name).name)
             is StructureRotationSubCommand -> StructureRotation.valueOf(TemplateRotationArgument.getRotation(context, subCommand.name).name)
+            is HeightMapSubCommand -> HeightMap.valueOf(HeightmapTypeArgument.getHeightmap(context, subCommand.name).name)
             else -> throw UnsupportedSubCommandException()
         }
 

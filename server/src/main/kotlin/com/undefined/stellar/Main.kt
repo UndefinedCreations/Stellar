@@ -7,8 +7,8 @@ class Main : JavaPlugin() {
 
     override fun onEnable() {
         StellarCommand("test")
-            .addStructureRotationSubCommand("test")
-            .addStructureRotationExecution<Player> {
+            .addHeightMapSubCommand("test")
+            .addHeightMapExecution<Player> {
                 sendMessage(it.name)
             }
             .register()
