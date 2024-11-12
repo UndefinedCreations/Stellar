@@ -14,8 +14,9 @@ import com.undefined.stellar.sub.brigadier.player.GameModeSubCommand
 import com.undefined.stellar.sub.brigadier.player.GameProfileSubCommand
 import com.undefined.stellar.sub.brigadier.primitive.*
 import com.undefined.stellar.sub.brigadier.scoreboard.*
-import com.undefined.stellar.sub.brigadier.world.MirrorSubCommand
-import com.undefined.stellar.sub.brigadier.world.StructureRotationSubCommand
+import com.undefined.stellar.sub.brigadier.structure.LootTableSubCommand
+import com.undefined.stellar.sub.brigadier.structure.MirrorSubCommand
+import com.undefined.stellar.sub.brigadier.structure.StructureRotationSubCommand
 import com.undefined.stellar.sub.brigadier.text.*
 import com.undefined.stellar.sub.brigadier.world.*
 import com.undefined.stellar.sub.custom.EnumSubCommand
@@ -298,6 +299,12 @@ open class SubCommandHandler {
 
     fun addHeightMapSubCommand(name: String): HeightMapSubCommand {
         val subCommand = HeightMapSubCommand(getBase()!!, name)
+        subCommands.add(subCommand)
+        return subCommand
+    }
+
+    fun addLootTableSubCommand(name: String): LootTableSubCommand {
+        val subCommand = LootTableSubCommand(getBase()!!, name)
         subCommands.add(subCommand)
         return subCommand
     }

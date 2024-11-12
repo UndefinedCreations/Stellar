@@ -25,8 +25,9 @@ import com.undefined.stellar.sub.brigadier.player.GameModeSubCommand
 import com.undefined.stellar.sub.brigadier.player.GameProfileSubCommand
 import com.undefined.stellar.sub.brigadier.primitive.*
 import com.undefined.stellar.sub.brigadier.scoreboard.*
-import com.undefined.stellar.sub.brigadier.world.MirrorSubCommand
-import com.undefined.stellar.sub.brigadier.world.StructureRotationSubCommand
+import com.undefined.stellar.sub.brigadier.structure.LootTableSubCommand
+import com.undefined.stellar.sub.brigadier.structure.MirrorSubCommand
+import com.undefined.stellar.sub.brigadier.structure.StructureRotationSubCommand
 import com.undefined.stellar.sub.brigadier.text.ColorSubCommand
 import com.undefined.stellar.sub.brigadier.text.ComponentSubCommand
 import com.undefined.stellar.sub.brigadier.text.MessageSubCommand
@@ -40,6 +41,7 @@ import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import net.minecraft.commands.CommandBuildContext
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.arguments.*
+import net.minecraft.commands.arguments.ResourceOrIdArgument.LootTableArgument
 import net.minecraft.commands.arguments.blocks.BlockPredicateArgument
 import net.minecraft.commands.arguments.blocks.BlockStateArgument
 import net.minecraft.commands.arguments.coordinates.*
@@ -59,6 +61,7 @@ import org.bukkit.block.Block
 import org.bukkit.block.data.BlockData
 import org.bukkit.block.structure.Mirror
 import org.bukkit.block.structure.StructureRotation
+import org.bukkit.craftbukkit.CraftLootTable
 import org.bukkit.craftbukkit.CraftParticle
 import org.bukkit.craftbukkit.CraftServer
 import org.bukkit.craftbukkit.block.data.CraftBlockData
@@ -163,6 +166,7 @@ object ArgumentHelper {
             is MirrorSubCommand -> TemplateMirrorArgument.templateMirror()
             is StructureRotationSubCommand -> TemplateRotationArgument.templateRotation()
             is HeightMapSubCommand -> HeightmapTypeArgument.heightmap()
+            is LootTableSubCommand -> LootTableArgument.lootTable(COMMAND_BUILD_CONTEXT)
             else -> throw UnsupportedSubCommandException()
         }
 
@@ -226,6 +230,7 @@ object ArgumentHelper {
             is MirrorSubCommand -> Mirror.valueOf(TemplateMirrorArgument.getMirror(context, subCommand.name).name)
             is StructureRotationSubCommand -> StructureRotation.valueOf(TemplateRotationArgument.getRotation(context, subCommand.name).name)
             is HeightMapSubCommand -> HeightMap.valueOf(HeightmapTypeArgument.getHeightmap(context, subCommand.name).name)
+            is LootTableSubCommand -> LootTableArgument.getLootTable(context, subCommand.name).value().craftLootTable
             else -> throw UnsupportedSubCommandException()
         }
 
