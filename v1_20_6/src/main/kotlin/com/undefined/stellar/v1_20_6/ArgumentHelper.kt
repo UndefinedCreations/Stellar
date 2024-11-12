@@ -25,6 +25,7 @@ import com.undefined.stellar.sub.brigadier.player.GameModeSubCommand
 import com.undefined.stellar.sub.brigadier.player.GameProfileSubCommand
 import com.undefined.stellar.sub.brigadier.primitive.*
 import com.undefined.stellar.sub.brigadier.scoreboard.*
+import com.undefined.stellar.sub.brigadier.structure.MirrorSubCommand
 import com.undefined.stellar.sub.brigadier.text.ColorSubCommand
 import com.undefined.stellar.sub.brigadier.text.ComponentSubCommand
 import com.undefined.stellar.sub.brigadier.text.MessageSubCommand
@@ -55,6 +56,7 @@ import net.minecraft.world.phys.Vec3
 import org.bukkit.*
 import org.bukkit.block.Block
 import org.bukkit.block.data.BlockData
+import org.bukkit.block.structure.Mirror
 import org.bukkit.craftbukkit.CraftParticle
 import org.bukkit.craftbukkit.CraftServer
 import org.bukkit.craftbukkit.block.data.CraftBlockData
@@ -158,6 +160,7 @@ object ArgumentHelper {
             is DimensionSubCommand -> DimensionArgument.dimension()
             is GameModeSubCommand -> GameModeArgument.gameMode()
             is TimeSubCommand -> TimeArgument.time(subCommand.minimum)
+            is MirrorSubCommand -> TemplateMirrorArgument.templateMirror()
             else -> throw UnsupportedSubCommandException()
         }
 
@@ -218,6 +221,7 @@ object ArgumentHelper {
             is DimensionSubCommand -> DimensionArgument.getDimension(context, subCommand.name).world.environment
             is GameModeSubCommand -> GameMode.getByValue(GameModeArgument.getGameMode(context, subCommand.name).id)
             is TimeSubCommand -> Duration.ofSeconds(IntegerArgumentType.getInteger(context, subCommand.name).toLong() / 20)
+            is MirrorSubCommand -> Mirror.valueOf(TemplateMirrorArgument.getMirror(context, subCommand.name).name)
             else -> throw UnsupportedSubCommandException()
         }
 

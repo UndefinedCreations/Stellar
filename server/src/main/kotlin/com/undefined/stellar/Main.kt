@@ -7,9 +7,9 @@ class Main : JavaPlugin() {
 
     override fun onEnable() {
         StellarCommand("test")
-            .addTimeSubCommand("test")
-            .addTimeExecution<Player> {
-                sendMessage(it.seconds.toString())
+            .addMirrorSubCommand("test")
+            .addMirrorExecution<Player> {
+                sendMessage(it.name)
             }
             .register()
     }

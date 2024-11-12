@@ -14,10 +14,12 @@ import com.undefined.stellar.sub.brigadier.player.GameModeSubCommand
 import com.undefined.stellar.sub.brigadier.player.GameProfileSubCommand
 import com.undefined.stellar.sub.brigadier.primitive.*
 import com.undefined.stellar.sub.brigadier.scoreboard.*
+import com.undefined.stellar.sub.brigadier.structure.MirrorSubCommand
 import com.undefined.stellar.sub.brigadier.text.*
 import com.undefined.stellar.sub.brigadier.world.*
 import com.undefined.stellar.sub.custom.EnumSubCommand
 import com.undefined.stellar.sub.custom.ListSubCommand
+import org.bukkit.Registry
 import java.util.UUID
 
 open class SubCommandHandler {
@@ -278,6 +280,12 @@ open class SubCommandHandler {
 
     fun addTimeSubCommand(name: String, minimum: Int = 0): TimeSubCommand {
         val subCommand = TimeSubCommand(getBase()!!, name, minimum)
+        subCommands.add(subCommand)
+        return subCommand
+    }
+
+    fun addMirrorSubCommand(name: String): MirrorSubCommand {
+        val subCommand = MirrorSubCommand(getBase()!!, name)
         subCommands.add(subCommand)
         return subCommand
     }
