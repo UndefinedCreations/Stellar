@@ -21,6 +21,7 @@ import com.undefined.stellar.sub.brigadier.item.ItemSlotsSubCommand
 import com.undefined.stellar.sub.brigadier.item.ItemSubCommand
 import com.undefined.stellar.sub.brigadier.math.*
 import com.undefined.stellar.sub.brigadier.misc.NamespacedKeySubCommand
+import com.undefined.stellar.sub.brigadier.misc.UUIDSubCommand
 import com.undefined.stellar.sub.brigadier.player.GameModeSubCommand
 import com.undefined.stellar.sub.brigadier.player.GameProfileSubCommand
 import com.undefined.stellar.sub.brigadier.primitive.*
@@ -167,6 +168,7 @@ object ArgumentHelper {
             is StructureRotationSubCommand -> TemplateRotationArgument.templateRotation()
             is HeightMapSubCommand -> HeightmapTypeArgument.heightmap()
             is LootTableSubCommand -> LootTableArgument.lootTable(COMMAND_BUILD_CONTEXT)
+            is UUIDSubCommand -> UuidArgument.uuid()
             else -> throw UnsupportedSubCommandException()
         }
 
@@ -231,6 +233,7 @@ object ArgumentHelper {
             is StructureRotationSubCommand -> StructureRotation.valueOf(TemplateRotationArgument.getRotation(context, subCommand.name).name)
             is HeightMapSubCommand -> HeightMap.valueOf(HeightmapTypeArgument.getHeightmap(context, subCommand.name).name)
             is LootTableSubCommand -> LootTableArgument.getLootTable(context, subCommand.name).value().craftLootTable
+            is UUIDSubCommand -> UuidArgument.getUuid(context, subCommand.name)
             else -> throw UnsupportedSubCommandException()
         }
 

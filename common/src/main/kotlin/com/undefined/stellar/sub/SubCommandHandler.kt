@@ -10,6 +10,7 @@ import com.undefined.stellar.sub.brigadier.item.ItemSlotsSubCommand
 import com.undefined.stellar.sub.brigadier.item.ItemSubCommand
 import com.undefined.stellar.sub.brigadier.math.*
 import com.undefined.stellar.sub.brigadier.misc.NamespacedKeySubCommand
+import com.undefined.stellar.sub.brigadier.misc.UUIDSubCommand
 import com.undefined.stellar.sub.brigadier.player.GameModeSubCommand
 import com.undefined.stellar.sub.brigadier.player.GameProfileSubCommand
 import com.undefined.stellar.sub.brigadier.primitive.*
@@ -305,6 +306,12 @@ open class SubCommandHandler {
 
     fun addLootTableSubCommand(name: String): LootTableSubCommand {
         val subCommand = LootTableSubCommand(getBase()!!, name)
+        subCommands.add(subCommand)
+        return subCommand
+    }
+
+    fun addUUIDSubCommand(name: String): UUIDSubCommand {
+        val subCommand = UUIDSubCommand(getBase()!!, name)
         subCommands.add(subCommand)
         return subCommand
     }
