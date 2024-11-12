@@ -7,8 +7,8 @@ class Main : JavaPlugin() {
 
     override fun onEnable() {
         StellarCommand("test")
-            .addMirrorSubCommand("test")
-            .addMirrorExecution<Player> {
+            .addStructureRotationSubCommand("test")
+            .addStructureRotationExecution<Player> {
                 sendMessage(it.name)
             }
             .register()
