@@ -22,6 +22,9 @@ import com.undefined.stellar.sub.brigadier.text.*
 import com.undefined.stellar.sub.brigadier.world.*
 import com.undefined.stellar.sub.custom.EnumSubCommand
 import com.undefined.stellar.sub.custom.ListSubCommand
+import com.undefined.stellar.sub.custom.OnlinePlayersSubCommand
+import org.bukkit.Bukkit
+import org.bukkit.entity.Player
 import java.util.UUID
 
 open class SubCommandHandler {
@@ -312,6 +315,16 @@ open class SubCommandHandler {
 
     fun addUUIDSubCommand(name: String): UUIDSubCommand {
         val subCommand = UUIDSubCommand(getBase()!!, name)
+        subCommands.add(subCommand)
+        return subCommand
+    }
+
+    fun addOnlinePlayersSubCommand(name: String): OnlinePlayersSubCommand {
+        println("addOnlinePlayersSubCommand: ${Bukkit.getOnlinePlayers().toList()}")
+        val subCommand = OnlinePlayersSubCommand(getBase()!!, name) {
+            println("a: ${Bukkit.getOnlinePlayers().toList()}")
+            Bukkit.getOnlinePlayers().toList()
+        }
         subCommands.add(subCommand)
         return subCommand
     }

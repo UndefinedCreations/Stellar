@@ -7,8 +7,8 @@ class Main : JavaPlugin() {
 
     override fun onEnable() {
         StellarCommand("test")
-            .addUUIDSubCommand("test")
-            .addUUIDExecution<Player> {
+            .addOnlinePlayersSubCommand("test")
+            .addOnlinePlayersExecution<Player> {
                 sendMessage(it.toString())
             }
             .register()

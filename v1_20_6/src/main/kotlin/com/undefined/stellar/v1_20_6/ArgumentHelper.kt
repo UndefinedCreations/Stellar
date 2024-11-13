@@ -36,6 +36,7 @@ import com.undefined.stellar.sub.brigadier.text.StyleSubCommand
 import com.undefined.stellar.sub.brigadier.world.*
 import com.undefined.stellar.sub.custom.EnumSubCommand
 import com.undefined.stellar.sub.custom.ListSubCommand
+import com.undefined.stellar.sub.custom.OnlinePlayersSubCommand
 import net.kyori.adventure.text.format.Style
 import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
@@ -76,8 +77,7 @@ import java.util.function.Predicate
 object ArgumentHelper {
 
     val COMMAND_BUILD_CONTEXT by lazy {
-        val server = Bukkit.getServer()
-        if (server !is CraftServer) throw ServerTypeMismatchException()
+        val server = Bukkit.getServer() as? CraftServer ?: throw ServerTypeMismatchException()
         CommandBuildContext.simple(
             server.server.registryAccess(),
             server.server.worldData.dataConfiguration.enabledFeatures()
@@ -86,14 +86,16 @@ object ArgumentHelper {
 
     fun <T : BrigadierTypeSubCommand<*>> nativeSubCommandToArgument(subCommand: T): RequiredArgumentBuilder<CommandSourceStack, *> =
         when (subCommand) {
-            is ListSubCommand<*> -> RequiredArgumentBuilder.argument<CommandSourceStack, String>(subCommand.name, StringArgumentType.word()).suggestStringList(subCommand.getStringList())
-            is EnumSubCommand<*> -> RequiredArgumentBuilder.argument<CommandSourceStack, String>(subCommand.name, StringArgumentType.word()).suggestStringList(subCommand.getStringList())
+            is ListSubCommand<*> -> RequiredArgumentBuilder.argument<CommandSourceStack, String>(subCommand.name, StringArgumentType.word()).suggestStringList { subCommand.getStringList() }
+            is EnumSubCommand<*> -> RequiredArgumentBuilder.argument<CommandSourceStack, String>(subCommand.name, StringArgumentType.word()).suggestStringList { subCommand.getStringList() }
             else -> RequiredArgumentBuilder.argument(subCommand.name, getArgumentTypeFromBrigadierSubCommand(subCommand))
         }
 
     fun <T : BrigadierTypeSubCommand<*>> handleNativeSubCommandExecutors(subCommand: T, context: CommandContext<CommandSourceStack>) =
         when (subCommand) {
-            is ListSubCommand<*> -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, subCommand.parse.invoke(StringArgumentType.getString(context, subCommand.name))!!) }
+            is ListSubCommand<*> -> subCommand.customExecutions.forEach {
+                it.run(context.source.bukkitSender, subCommand.parse(StringArgumentType.getString(context, subCommand.name)) ?: return@forEach)
+            }
             is EnumSubCommand<*> -> subCommand.customExecutions.forEach { execution ->
                 val enum = subCommand.parse(StringArgumentType.getString(context, subCommand.name))
                 enum?.let { execution.run(context.source.bukkitSender, enum) }
@@ -108,7 +110,9 @@ object ArgumentHelper {
 
     fun <T : BrigadierTypeSubCommand<*>> handleNativeSubCommandRunnables(subCommand: T, context: CommandContext<CommandSourceStack>): Boolean {
         when (subCommand) {
-            is ListSubCommand<*> -> subCommand.customRunnables.forEach { if (!it.run(context.source.bukkitSender, subCommand.parse.invoke(StringArgumentType.getString(context, subCommand.name))!!)) return false }
+            is ListSubCommand<*> -> subCommand.customRunnables.forEach {
+                if (!it.run(context.source.bukkitSender, subCommand.parse(StringArgumentType.getString(context, subCommand.name)) ?: return@forEach)) return false
+            }
             is EnumSubCommand<*> -> subCommand.customRunnables.forEach { runnable ->
                 val enum = subCommand.parse(StringArgumentType.getString(context, subCommand.name))
                 enum?.let { if (!runnable.run(context.source.bukkitSender, enum)) return false }
@@ -259,9 +263,10 @@ object ArgumentHelper {
         EntityDisplayType.PLAYERS -> EntityArgument.players()
     }
 
-    private fun RequiredArgumentBuilder<CommandSourceStack, *>.suggestStringList(list: List<String>) =
+    private fun RequiredArgumentBuilder<CommandSourceStack, *>.suggestStringList(list: () -> List<String>) =
         suggests { _: CommandContext<CommandSourceStack>, suggestionsBuilder: SuggestionsBuilder ->
-            list.filter { it.startsWith(suggestionsBuilder.remaining) }.forEach { suggestionsBuilder.suggest(it) }
+            println("list: ${list()}")
+            list().filter { it.startsWith(suggestionsBuilder.remaining, true) }.forEach { suggestionsBuilder.suggest(it) }
             return@suggests suggestionsBuilder.buildFuture()
         }
 
