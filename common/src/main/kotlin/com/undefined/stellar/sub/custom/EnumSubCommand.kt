@@ -1,6 +1,6 @@
 package com.undefined.stellar.sub.custom
 
-import com.undefined.stellar.BaseStellarCommand
+import com.undefined.stellar.AbstractStellarCommand
 import com.undefined.stellar.data.execution.CustomStellarExecution
 import com.undefined.stellar.data.execution.CustomStellarRunnable
 import com.undefined.stellar.sub.brigadier.BrigadierTypeSubCommand
@@ -10,7 +10,7 @@ import kotlin.reflect.KClass
 
 @Suppress("UNCHECKED_CAST")
 class EnumSubCommand<T : Enum<T>>(
-    parent: BaseStellarCommand<*>,
+    parent: AbstractStellarCommand<*>,
     name: String,
     val enum: KClass<out Enum<*>>,
     val stringifier: (Enum<*>) -> String = { it.name },

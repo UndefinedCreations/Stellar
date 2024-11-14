@@ -6,6 +6,7 @@ import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.context.ParsedArgument
 import com.mojang.brigadier.context.StringRange
 import com.mojang.brigadier.suggestion.SuggestionsBuilder
+import com.mojang.brigadier.tree.CommandNode
 import com.undefined.stellar.data.arguments.Anchor
 import com.undefined.stellar.data.arguments.Operation
 import com.undefined.stellar.data.arguments.ParticleData
@@ -36,7 +37,6 @@ import com.undefined.stellar.sub.brigadier.text.StyleSubCommand
 import com.undefined.stellar.sub.brigadier.world.*
 import com.undefined.stellar.sub.custom.EnumSubCommand
 import com.undefined.stellar.sub.custom.ListSubCommand
-import com.undefined.stellar.sub.custom.OnlinePlayersSubCommand
 import net.kyori.adventure.text.format.Style
 import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
@@ -63,7 +63,6 @@ import org.bukkit.block.Block
 import org.bukkit.block.data.BlockData
 import org.bukkit.block.structure.Mirror
 import org.bukkit.block.structure.StructureRotation
-import org.bukkit.craftbukkit.CraftLootTable
 import org.bukkit.craftbukkit.CraftParticle
 import org.bukkit.craftbukkit.CraftServer
 import org.bukkit.craftbukkit.block.data.CraftBlockData
@@ -76,7 +75,7 @@ import java.util.function.Predicate
 
 object ArgumentHelper {
 
-    val COMMAND_BUILD_CONTEXT by lazy {
+    private val COMMAND_BUILD_CONTEXT: CommandBuildContext by lazy {
         val server = Bukkit.getServer() as? CraftServer ?: throw ServerTypeMismatchException()
         CommandBuildContext.simple(
             server.server.registryAccess(),
@@ -91,31 +90,33 @@ object ArgumentHelper {
             else -> RequiredArgumentBuilder.argument(subCommand.name, getArgumentTypeFromBrigadierSubCommand(subCommand))
         }
 
-    fun <T : BrigadierTypeSubCommand<*>> handleNativeSubCommandExecutors(subCommand: T, context: CommandContext<CommandSourceStack>) =
+    fun <T : BrigadierTypeSubCommand<*>> handleNativeSubCommandExecutors(subCommand: T, context: CommandContext<CommandSourceStack>) {
         when (subCommand) {
-            is ListSubCommand<*> -> subCommand.customExecutions.forEach {
-                it.run(context.source.bukkitSender, subCommand.parse(StringArgumentType.getString(context, subCommand.name)) ?: return@forEach)
+            is ListSubCommand<*> -> {
+                val input = subCommand.parse(StringArgumentType.getString(context, subCommand.name)) ?: return
+                for (execution in subCommand.customExecutions) execution.run(context.source.bukkitSender, input)
             }
-            is EnumSubCommand<*> -> subCommand.customExecutions.forEach { execution ->
+            is EnumSubCommand<*> -> {
                 val enum = subCommand.parse(StringArgumentType.getString(context, subCommand.name))
-                enum?.let { execution.run(context.source.bukkitSender, enum) }
+                for (execution in subCommand.customExecutions) enum?.let { execution.run(context.source.bukkitSender, enum) }
             }
             else -> {
                 val argument = getArgumentFromBrigadierSubCommand(context, subCommand)
-                subCommand.customExecutions.forEach {
-                    it.run(context.source.bukkitSender, argument ?: return)
-                }
+                for (execution in subCommand.customExecutions) execution.run(context.source.bukkitSender, argument ?: break)
             }
         }
+    }
 
     fun <T : BrigadierTypeSubCommand<*>> handleNativeSubCommandRunnables(subCommand: T, context: CommandContext<CommandSourceStack>): Boolean {
         when (subCommand) {
-            is ListSubCommand<*> -> subCommand.customRunnables.forEach {
-                if (!it.run(context.source.bukkitSender, subCommand.parse(StringArgumentType.getString(context, subCommand.name)) ?: return@forEach)) return false
+            is ListSubCommand<*> -> {
+                val input = subCommand.parse(StringArgumentType.getString(context, subCommand.name)) ?: return true
+                for (runnable in subCommand.customRunnables)
+                    if (!runnable.run(context.source.bukkitSender, input)) return false
             }
-            is EnumSubCommand<*> -> subCommand.customRunnables.forEach { runnable ->
+            is EnumSubCommand<*> -> {
                 val enum = subCommand.parse(StringArgumentType.getString(context, subCommand.name))
-                enum?.let { if (!runnable.run(context.source.bukkitSender, enum)) return false }
+                for (runnable in subCommand.customRunnables) enum?.let { runnable.run(context.source.bukkitSender, enum) }
             }
             else -> {
                 val argument = getArgumentFromBrigadierSubCommand(context, subCommand) ?: return true
@@ -176,8 +177,8 @@ object ArgumentHelper {
             else -> throw UnsupportedSubCommandException()
         }
 
-    private fun <T : BrigadierTypeSubCommand<*>> getArgumentFromBrigadierSubCommand(context: CommandContext<CommandSourceStack>, subCommand: T): Any? =
-        when (subCommand) {
+    private fun <T : BrigadierTypeSubCommand<*>> getArgumentFromBrigadierSubCommand(context: CommandContext<CommandSourceStack>, subCommand: T): Any? {
+        return when (subCommand) {
             is StringSubCommand -> StringArgumentType.getString(context, subCommand.name)
             is IntegerSubCommand -> IntegerArgumentType.getInteger(context, subCommand.name)
             is FloatSubCommand -> FloatArgumentType.getFloat(context, subCommand.name)
@@ -203,11 +204,11 @@ object ArgumentHelper {
             }
             is ColorSubCommand -> ColorArgument.getColor(context, subCommand.name).color?.let { Style.style(TextColor.color(it)) } ?: Style.empty()
             is ComponentSubCommand ->  GsonComponentSerializer.gson().deserialize(net.minecraft.network.chat.Component.Serializer.toJson(ComponentArgument.getComponent(context, subCommand.name), COMMAND_BUILD_CONTEXT))
-            is StyleSubCommand ->  GsonComponentSerializer.gson().deserialize(getArgumentInput(context, subCommand.name)).style()
+            is StyleSubCommand ->  GsonComponentSerializer.gson().deserialize(getArgumentInput(context, subCommand.name) ?: return null).style()
             is MessageSubCommand ->  GsonComponentSerializer.gson().deserialize(net.minecraft.network.chat.Component.Serializer.toJson(MessageArgument.getMessage(context, subCommand.name), COMMAND_BUILD_CONTEXT))
             is ObjectiveSubCommand ->  Bukkit.getScoreboardManager().mainScoreboard.getObjective(ObjectiveArgument.getObjective(context, subCommand.name).name)
             is ObjectiveCriteriaSubCommand ->  ObjectiveCriteriaArgument.getCriteria(context, subCommand.name).name
-            is OperationSubCommand ->  Operation.getOperation(getArgumentInput(context, subCommand.name))
+            is OperationSubCommand ->  Operation.getOperation(getArgumentInput(context, subCommand.name) ?: return null)
             is ParticleSubCommand ->  {
                 val particleOptions = ParticleArgument.getParticle(context, subCommand.name)
                 getParticleData(context, CraftParticle.minecraftToBukkit(particleOptions.type), particleOptions)
@@ -225,7 +226,7 @@ object ArgumentHelper {
             is ItemSlotSubCommand -> SlotArgument.getSlot(context, subCommand.name)
             is ItemSlotsSubCommand -> SlotsArgument.getSlots(context, subCommand.name).slots().toList()
             is NamespacedKeySubCommand -> NamespacedKey(ResourceLocationArgument.getId(context, subCommand.name).namespace, ResourceLocationArgument.getId(context, subCommand.name).path)
-            is EntityAnchorSubCommand -> Anchor.getFromName(getArgumentInput(context, subCommand.name))
+            is EntityAnchorSubCommand -> Anchor.getFromName(getArgumentInput(context, subCommand.name) ?: return null)
             is RangeSubCommand -> {
                 val range = RangeArgument.Ints.getRange(context, subCommand.name)
                 IntRange(range.min.orElse(1), range.max.orElse(2))
@@ -240,12 +241,13 @@ object ArgumentHelper {
             is UUIDSubCommand -> UuidArgument.getUuid(context, subCommand.name)
             else -> throw UnsupportedSubCommandException()
         }
+    }
 
-    private fun getArgumentInput(context: CommandContext<CommandSourceStack>, name: String): String {
+    fun getArgumentInput(context: CommandContext<CommandSourceStack>, name: String): String? {
         val field = CommandContext::class.java.getDeclaredField("arguments")
         field.isAccessible = true
         val arguments: Map<String, ParsedArgument<CommandSourceStack, *>> = field.get(context) as Map<String, ParsedArgument<CommandSourceStack, *>>
-        val argument = arguments[name] ?: return ""
+        val argument = arguments[name] ?: return null
         val range = StringRange.between(argument.range.start, context.input.length)
         return range.get(context.input)
     }
@@ -265,7 +267,6 @@ object ArgumentHelper {
 
     private fun RequiredArgumentBuilder<CommandSourceStack, *>.suggestStringList(list: () -> List<String>) =
         suggests { _: CommandContext<CommandSourceStack>, suggestionsBuilder: SuggestionsBuilder ->
-            println("list: ${list()}")
             list().filter { it.startsWith(suggestionsBuilder.remaining, true) }.forEach { suggestionsBuilder.suggest(it) }
             return@suggests suggestionsBuilder.buildFuture()
         }

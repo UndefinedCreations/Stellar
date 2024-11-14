@@ -1,17 +1,21 @@
 package com.undefined.stellar
 
-import org.bukkit.entity.Player
+import org.bukkit.event.player.PlayerCommandPreprocessEvent
 import org.bukkit.plugin.java.JavaPlugin
 
 class Main : JavaPlugin() {
 
+    companion object {
+        lateinit var INSTANCE: Main
+    }
+
     override fun onEnable() {
+        INSTANCE = this
+
         StellarCommand("test")
-            .addOnlinePlayersSubCommand("test")
-            .addOnlinePlayersExecution<Player> {
-                sendMessage(it.toString())
-            }
-            .register()
+            .addSubCommand("abc")
+            .addFailureMessage("testing!")
+            .register(this)
     }
 
 }

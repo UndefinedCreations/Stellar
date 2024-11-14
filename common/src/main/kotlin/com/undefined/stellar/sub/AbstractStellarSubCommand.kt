@@ -1,10 +1,11 @@
 package com.undefined.stellar.sub
 
-import com.undefined.stellar.BaseStellarCommand
+import com.undefined.stellar.AbstractStellarCommand
 import com.undefined.stellar.data.StellarSuggestion
 import org.bukkit.command.CommandSender
+import org.bukkit.plugin.java.JavaPlugin
 
-abstract class AbstractStellarSubCommand<T>(val parent: BaseStellarCommand<*>, name: String) : BaseStellarCommand<AbstractStellarSubCommand<*>>(name) {
+abstract class AbstractStellarSubCommand<T>(val parent: AbstractStellarCommand<*>, name: String) : AbstractStellarCommand<AbstractStellarSubCommand<*>>(name) {
     val suggestions: MutableList<StellarSuggestion<*>> = mutableListOf()
 
     fun addSuggestion(list: List<String>): T {
@@ -22,6 +23,6 @@ abstract class AbstractStellarSubCommand<T>(val parent: BaseStellarCommand<*>, n
         return this as T
     }
 
-    override fun getBase(): BaseStellarCommand<*> = parent.getBase()
-    override fun register() = parent.register()
+    override fun getBase(): AbstractStellarCommand<*> = parent.getBase()
+    override fun register(plugin: JavaPlugin) = parent.register(plugin)
 }

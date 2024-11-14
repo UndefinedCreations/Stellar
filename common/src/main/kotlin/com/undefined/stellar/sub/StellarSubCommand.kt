@@ -1,5 +1,5 @@
 package com.undefined.stellar.sub
 
-import com.undefined.stellar.BaseStellarCommand
+import com.undefined.stellar.AbstractStellarCommand
 
-class StellarSubCommand(parent: BaseStellarCommand<*>, name: String) : AbstractStellarSubCommand<StellarSubCommand>(parent, name)
+class StellarSubCommand(parent: AbstractStellarCommand<*>, name: String) : AbstractStellarSubCommand<StellarSubCommand>(parent, name)

@@ -1,13 +1,13 @@
 package com.undefined.stellar.sub.brigadier.primitive
 
-import com.undefined.stellar.BaseStellarCommand
+import com.undefined.stellar.AbstractStellarCommand
 import com.undefined.stellar.data.execution.CustomStellarExecution
 import com.undefined.stellar.data.execution.CustomStellarRunnable
 import com.undefined.stellar.sub.brigadier.BrigadierTypeSubCommand
 import org.bukkit.command.CommandSender
 
 @Suppress("UNCHECKED_CAST")
-class BooleanSubCommand(parent: BaseStellarCommand<*>, name: String) : BrigadierTypeSubCommand<BooleanSubCommand>(parent, name) {
+class BooleanSubCommand(parent: AbstractStellarCommand<*>, name: String) : BrigadierTypeSubCommand<BooleanSubCommand>(parent, name) {
     inline fun <reified T : CommandSender> addBooleanExecution(noinline execution: T.(Boolean) -> Unit): BooleanSubCommand {
         customExecutions.add(CustomStellarExecution(T::class, execution) as CustomStellarExecution<*, Any>)
         return this

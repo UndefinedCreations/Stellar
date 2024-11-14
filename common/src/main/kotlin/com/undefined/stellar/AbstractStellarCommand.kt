@@ -1,20 +1,23 @@
 package com.undefined.stellar
 
-import com.undefined.stellar.data.execution.CustomStellarRunnable
 import com.undefined.stellar.data.requirement.PermissionStellarRequirement
 import com.undefined.stellar.data.execution.StellarExecution
 import com.undefined.stellar.data.execution.StellarRunnable
 import com.undefined.stellar.data.requirement.StellarRequirement
 import com.undefined.stellar.sub.SubCommandHandler
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.command.CommandSender
+import org.bukkit.plugin.java.JavaPlugin
 
 @Suppress("UNCHECKED_CAST")
-abstract class BaseStellarCommand<T>(val name: String) : SubCommandHandler() {
+abstract class AbstractStellarCommand<T>(val name: String) : SubCommandHandler() {
 
-    override fun getBase(): BaseStellarCommand<*> = this
+    override fun getBase(): AbstractStellarCommand<*> = this
 
     val aliases: MutableList<String> = mutableListOf()
     val requirements: MutableList<StellarRequirement<*>> = mutableListOf()
+    val failureMessages: MutableList<Component> = mutableListOf()
     val permissionRequirements: MutableList<PermissionStellarRequirement> = mutableListOf()
     val executions: MutableList<StellarExecution<*>> = mutableListOf()
     val runnables: MutableList<StellarRunnable<*>> = mutableListOf()
@@ -39,6 +42,16 @@ abstract class BaseStellarCommand<T>(val name: String) : SubCommandHandler() {
         return this as T
     }
 
+    fun addFailureMessage(message: String): T {
+        failureMessages.add(MiniMessage.miniMessage().deserialize(message))
+        return this as T
+    }
+
+    fun addFailureMessage(message: Component): T {
+        failureMessages.add(message)
+        return this as T
+    }
+
     inline fun <reified C : CommandSender> addExecution(noinline execution: C.() -> Unit): T {
         executions.add(StellarExecution(C::class, execution))
         return this as T
@@ -49,6 +62,6 @@ abstract class BaseStellarCommand<T>(val name: String) : SubCommandHandler() {
         return this as T
     }
 
-    abstract fun register()
+    abstract fun register(plugin: JavaPlugin)
 
 }

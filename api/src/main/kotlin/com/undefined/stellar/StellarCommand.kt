@@ -1,19 +1,33 @@
 package com.undefined.stellar
 
 import com.undefined.stellar.exception.UnsupportedVersionException
+import com.undefined.stellar.listener.StellarListener
 import com.undefined.stellar.util.NMSVersion
+import org.bukkit.Bukkit
+import org.bukkit.entity.Player
+import org.bukkit.plugin.java.JavaPlugin
 
-private val registrars = mapOf(
+val registrars = mapOf(
     "1.20.6" to com.undefined.stellar.v1_20_6.BrigadierCommandRegistrar
 )
 
-class StellarCommand(name: String, vararg aliases: String) : BaseStellarCommand<StellarCommand>(name) {
+class StellarCommand(name: String, vararg aliases: String) : AbstractStellarCommand<StellarCommand>(name) {
     init {
         this.aliases.addAll(aliases)
     }
 
-    override fun register() {
+    override fun register(plugin: JavaPlugin) {
         val registrar = registrars[NMSVersion.version] ?: throw UnsupportedVersionException()
         registrar.register(this)
+        Bukkit.getPluginManager().registerEvents(StellarListener(), plugin)
+        StellarCommands.initialize(plugin)
+        StellarCommands.commands.add(this)
+    }
+
+    companion object {
+        fun parse(player: Player, input: String) {
+            val registrar = registrars[NMSVersion.version] ?: throw UnsupportedVersionException()
+            registrar.parse(player, input)
+        }
     }
 }

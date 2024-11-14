@@ -1,6 +1,6 @@
 package com.undefined.stellar.sub
 
-import com.undefined.stellar.BaseStellarCommand
+import com.undefined.stellar.AbstractStellarCommand
 import com.undefined.stellar.sub.brigadier.entity.EntityAnchorSubCommand
 import com.undefined.stellar.sub.brigadier.entity.EntityDisplayType
 import com.undefined.stellar.sub.brigadier.entity.EntitySubCommand
@@ -24,12 +24,11 @@ import com.undefined.stellar.sub.custom.EnumSubCommand
 import com.undefined.stellar.sub.custom.ListSubCommand
 import com.undefined.stellar.sub.custom.OnlinePlayersSubCommand
 import org.bukkit.Bukkit
-import org.bukkit.entity.Player
 import java.util.UUID
 
 open class SubCommandHandler {
 
-    open fun getBase(): BaseStellarCommand<*>? = null
+    open fun getBase(): AbstractStellarCommand<*>? = null
     val subCommands: MutableList<AbstractStellarSubCommand<*>> = mutableListOf()
     val optionalSubCommands: MutableList<AbstractStellarSubCommand<*>> = mutableListOf()
 
@@ -320,11 +319,7 @@ open class SubCommandHandler {
     }
 
     fun addOnlinePlayersSubCommand(name: String): OnlinePlayersSubCommand {
-        println("addOnlinePlayersSubCommand: ${Bukkit.getOnlinePlayers().toList()}")
-        val subCommand = OnlinePlayersSubCommand(getBase()!!, name) {
-            println("a: ${Bukkit.getOnlinePlayers().toList()}")
-            Bukkit.getOnlinePlayers().toList()
-        }
+        val subCommand = OnlinePlayersSubCommand(getBase()!!, name) { Bukkit.getOnlinePlayers().toList() }
         subCommands.add(subCommand)
         return subCommand
     }
