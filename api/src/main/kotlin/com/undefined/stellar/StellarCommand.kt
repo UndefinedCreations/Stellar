@@ -4,7 +4,7 @@ import com.undefined.stellar.exception.UnsupportedVersionException
 import com.undefined.stellar.listener.StellarListener
 import com.undefined.stellar.util.NMSVersion
 import org.bukkit.Bukkit
-import org.bukkit.entity.Player
+import org.bukkit.event.player.PlayerCommandPreprocessEvent
 import org.bukkit.plugin.java.JavaPlugin
 
 val registrars = mapOf(
@@ -25,9 +25,9 @@ class StellarCommand(name: String, vararg aliases: String) : AbstractStellarComm
     }
 
     companion object {
-        fun parse(player: Player, input: String) {
+        fun parseAndReturnCancelled(event: PlayerCommandPreprocessEvent): Boolean {
             val registrar = registrars[NMSVersion.version] ?: throw UnsupportedVersionException()
-            registrar.parse(player, input)
+            return registrar.parseAndReturnCancelled(event)
         }
     }
 }

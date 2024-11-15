@@ -17,8 +17,9 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.server.MinecraftServer
 import org.bukkit.Bukkit
+import org.bukkit.command.CommandSender
 import org.bukkit.craftbukkit.CraftServer
-import org.bukkit.entity.Player
+import org.bukkit.event.player.PlayerCommandPreprocessEvent
 
 object BrigadierCommandRegistrar {
 
@@ -26,16 +27,36 @@ object BrigadierCommandRegistrar {
         MinecraftServer.getServer().createCommandSourceStack()
     }
 
-    fun parse(player: Player, input: String) {
-        val parsedInput = input.removePrefix("/")
-        val results = commandDispatcher().parse(parsedInput, COMMAND_SOURCE)
-        val context = results.context.build(parsedInput)
+    fun parseAndReturnCancelled(event: PlayerCommandPreprocessEvent): Boolean {
+        val input = event.message.removePrefix("/")
+        val results = commandDispatcher().parse(input, COMMAND_SOURCE)
+        println(results.reader.remainingLength)
+        if (results.reader.remainingLength == 0) return false
+        val context = results.context.build(input)
 
-        val baseCommand: StellarCommand = StellarCommands.getStellarCommand(input.substring(input.indexOf('/') + 1, input.indexOf(' '))) ?: return
-        val subCommand = getSubCommands(baseCommand, context).lastOrNull() ?: return
+        val baseCommand: StellarCommand = StellarCommands.getStellarCommand(input.substring(input.indexOf('/') + 1, input.indexOf(' '))) ?: return false
+        val subCommand = getSubCommands(baseCommand, context).lastOrNull()
+        subCommand?.let {
+            val subCommand = getSubCommands(baseCommand, context).lastOrNull() ?: return false
+            handleFailureMessageAndExecutions(event.player, subCommand, input)
+            if (subCommand.hideDefaultFailureMessages.hide) return true
+        } ?: run {
+            handleFailureMessageAndExecutions(event.player, baseCommand, input)
+            if (baseCommand.hideDefaultFailureMessages.hide) return true
+        }
+//        if (baseCommand.subCommands.isEmpty()) {
+//            println("baseCommand")
+//            handleFailureMessageAndExecutions(event.player, baseCommand, input)
+//            if (baseCommand.hideDefaultMessages.hide) return true
+//        } else {
+//            println("subCommand")
+//            val subCommand = getSubCommands(baseCommand, context).lastOrNull() ?: return false
+//            handleFailureMessageAndExecutions(event.player, subCommand, input)
+//            if (subCommand.hideDefaultMessages.hide) return true
+//            println("hide default messages")
+//        }
 
-        for (message in subCommand.failureMessages) player.sendRichMessage(LegacyComponentSerializer.legacyAmpersand().serialize(message))
-        for (execution in subCommand.failureExecutions) execution.run(player, parsedInput)
+        return baseCommand.hasGlobalDefaultMessages()
     }
 
     private fun getSubCommands(
@@ -49,6 +70,12 @@ object BrigadierCommandRegistrar {
             if (subCommand.name == context.nodes[currentIndex].node.name)
                 return getSubCommands(baseCommand, context, currentIndex + 1, listOfSubCommands + subCommand)
         return emptyList()
+    }
+
+    private fun <T : CommandSender> handleFailureMessageAndExecutions(sender: T, command: AbstractStellarCommand<*>, input: String) {
+        println("${command.name}: ${command.failureMessages}")
+        for (message in command.failureMessages) sender.sendRichMessage(LegacyComponentSerializer.legacyAmpersand().serialize(message))
+        for (execution in command.failureExecutions) execution.run(sender, input)
     }
 
     fun register(stellarCommand: AbstractStellarCommand<*>) {

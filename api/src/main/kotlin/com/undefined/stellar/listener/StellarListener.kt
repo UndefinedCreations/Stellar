@@ -9,7 +9,9 @@ object StellarListener : Listener {
 
     @EventHandler
     fun onPlayerCommandPreprocess(event: PlayerCommandPreprocessEvent) {
-        StellarCommand.parse(event.player, event.message)
+        val isCancelled: Boolean = StellarCommand.parseAndReturnCancelled(event)
+        println("is cancelled: $isCancelled")
+        event.isCancelled = isCancelled
     }
 
 }
