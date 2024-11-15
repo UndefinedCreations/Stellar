@@ -19,7 +19,7 @@ class StellarCommand(name: String, vararg aliases: String) : AbstractStellarComm
     override fun register(plugin: JavaPlugin) {
         val registrar = registrars[NMSVersion.version] ?: throw UnsupportedVersionException()
         registrar.register(this)
-        Bukkit.getPluginManager().registerEvents(StellarListener(), plugin)
+        Bukkit.getPluginManager().registerEvents(StellarListener, plugin)
         StellarCommands.initialize(plugin)
         StellarCommands.commands.add(this)
     }

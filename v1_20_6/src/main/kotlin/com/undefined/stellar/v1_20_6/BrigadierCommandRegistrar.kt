@@ -27,13 +27,15 @@ object BrigadierCommandRegistrar {
     }
 
     fun parse(player: Player, input: String) {
-        val results = commandDispatcher().parse(input.removePrefix("/"), COMMAND_SOURCE)
-        val context = results.context.build(input.removePrefix("/"))
+        val parsedInput = input.removePrefix("/")
+        val results = commandDispatcher().parse(parsedInput, COMMAND_SOURCE)
+        val context = results.context.build(parsedInput)
 
         val baseCommand: StellarCommand = StellarCommands.getStellarCommand(input.substring(input.indexOf('/') + 1, input.indexOf(' '))) ?: return
-        val subCommand = getSubCommands(baseCommand, context).last()
-        for (message in subCommand.failureMessages)
-            player.sendRichMessage(LegacyComponentSerializer.legacyAmpersand().serialize(message))
+        val subCommand = getSubCommands(baseCommand, context).lastOrNull() ?: return
+
+        for (message in subCommand.failureMessages) player.sendRichMessage(LegacyComponentSerializer.legacyAmpersand().serialize(message))
+        for (execution in subCommand.failureExecutions) execution.run(player, parsedInput)
     }
 
     private fun getSubCommands(
@@ -50,26 +52,7 @@ object BrigadierCommandRegistrar {
     }
 
     fun register(stellarCommand: AbstractStellarCommand<*>) {
-//        try {
-//            val main = LiteralArgumentBuilder.literal<CommandSourceStack>("test")
-//            main.then(
-//                LiteralArgumentBuilder.literal<CommandSourceStack>("test")
-//                    .then(LiteralArgumentBuilder.literal("test"))
-//            )
-//            commandDispatcher().register(main)
-//        } catch (e: CommandSyntaxException) {
-//            println("test!")
-//            println("Command syntax exception!")
-//        }
-
         val mainArgumentBuilder = LiteralArgumentBuilder.literal<CommandSourceStack>(stellarCommand.name)
-//        mainArgumentBuilder.then(
-//            LiteralArgumentBuilder.literal<CommandSourceStack?>("test")
-//                .executes { context ->
-//                    context.source.player!!.sendSystemMessage(Component.literal("Success!"), true)
-//                    Command.SINGLE_SUCCESS
-//                }
-//        )
         mainArgumentBuilder.handleCommand(stellarCommand)
         val node = commandDispatcher().register(mainArgumentBuilder)
         for (alias in stellarCommand.aliases) {
