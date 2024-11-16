@@ -28,35 +28,27 @@ object BrigadierCommandRegistrar {
     }
 
     fun parseAndReturnCancelled(event: PlayerCommandPreprocessEvent): Boolean {
+        println("parse called 2")
         val input = event.message.removePrefix("/")
         val results = commandDispatcher().parse(input, COMMAND_SOURCE)
-        println(results.reader.remainingLength)
-        if (results.reader.remainingLength == 0) return false
         val context = results.context.build(input)
+
+        if (results.reader.remainingLength == 0) return false
 
         val baseCommand: StellarCommand = StellarCommands.getStellarCommand(input.substring(input.indexOf('/') + 1, input.indexOf(' '))) ?: return false
         val subCommand = getSubCommands(baseCommand, context).lastOrNull()
         subCommand?.let {
-            val subCommand = getSubCommands(baseCommand, context).lastOrNull() ?: return false
             handleFailureMessageAndExecutions(event.player, subCommand, input)
             if (subCommand.hideDefaultFailureMessages.hide) return true
+            println(2)
         } ?: run {
             handleFailureMessageAndExecutions(event.player, baseCommand, input)
             if (baseCommand.hideDefaultFailureMessages.hide) return true
+            println(3)
         }
-//        if (baseCommand.subCommands.isEmpty()) {
-//            println("baseCommand")
-//            handleFailureMessageAndExecutions(event.player, baseCommand, input)
-//            if (baseCommand.hideDefaultMessages.hide) return true
-//        } else {
-//            println("subCommand")
-//            val subCommand = getSubCommands(baseCommand, context).lastOrNull() ?: return false
-//            handleFailureMessageAndExecutions(event.player, subCommand, input)
-//            if (subCommand.hideDefaultMessages.hide) return true
-//            println("hide default messages")
-//        }
+        println(4)
 
-        return baseCommand.hasGlobalDefaultMessages()
+        return baseCommand.hasGlobalHiddenDefaultFailureMessages()
     }
 
     private fun getSubCommands(
@@ -73,9 +65,11 @@ object BrigadierCommandRegistrar {
     }
 
     private fun <T : CommandSender> handleFailureMessageAndExecutions(sender: T, command: AbstractStellarCommand<*>, input: String) {
-        println("${command.name}: ${command.failureMessages}")
         for (message in command.failureMessages) sender.sendRichMessage(LegacyComponentSerializer.legacyAmpersand().serialize(message))
+        println("HI")
+        for (message in command.globalFailureMessages) sender.sendRichMessage(LegacyComponentSerializer.legacyAmpersand().serialize(message))
         for (execution in command.failureExecutions) execution.run(sender, input)
+        println(1)
     }
 
     fun register(stellarCommand: AbstractStellarCommand<*>) {

@@ -13,12 +13,12 @@ class Main : JavaPlugin() {
         INSTANCE = this
 
         StellarCommand("test")
-            .addFailureMessage("testing!")
+            .addGlobalFailureMessage("testing!")
             .addFailureExecution<Player> {
                 sendMessage(it)
             }
             .addSubCommand("abc")
-            .hideDefaultFailureMessages()
+            .addSubCommand("test")
             .register(this)
     }
 

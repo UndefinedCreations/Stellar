@@ -20,6 +20,7 @@ abstract class AbstractStellarCommand<T>(val name: String) : SubCommandHandler()
     val aliases: MutableList<String> = mutableListOf()
     val requirements: MutableList<StellarRequirement<*>> = mutableListOf()
     val failureMessages: MutableList<Component> = mutableListOf()
+    val globalFailureMessages: MutableList<Component> = mutableListOf()
     val failureExecutions: MutableList<CustomStellarExecution<*, Any>> = mutableListOf()
     var hideDefaultFailureMessages: HideDefaultFailureMessages = HideDefaultFailureMessages(false, false)
     val permissionRequirements: MutableList<PermissionStellarRequirement> = mutableListOf()
@@ -56,6 +57,16 @@ abstract class AbstractStellarCommand<T>(val name: String) : SubCommandHandler()
         return this as T
     }
 
+    fun addGlobalFailureMessage(message: String): T {
+        globalFailureMessages.add(MiniMessage.miniMessage().deserialize(message))
+        return this as T
+    }
+
+    fun addGlobalFailureMessage(message: Component): T {
+        globalFailureMessages.add(message)
+        return this as T
+    }
+
     @Suppress("UNCHECKED_CAST")
     inline fun <reified C : CommandSender> addFailureExecution(noinline execution: C.(String) -> Unit): T {
         failureExecutions.add(CustomStellarExecution(C::class, execution) as CustomStellarExecution<*, Any>)
@@ -77,10 +88,9 @@ abstract class AbstractStellarCommand<T>(val name: String) : SubCommandHandler()
         return this as T
     }
 
-    tailrec fun hasGlobalDefaultMessages(): Boolean {
-        for (subCommand in subCommands) return hasGlobalDefaultMessages()
-        println("hideDefaultMessages.hide && hideDefaultMessages.global ${hideDefaultFailureMessages.hide && hideDefaultFailureMessages.global}")
-        return hideDefaultFailureMessages.hide && hideDefaultFailureMessages.global
+    fun hasGlobalHiddenDefaultFailureMessages(): Boolean {
+        val base = getBase()
+        return base.hideDefaultFailureMessages.hide && base.hideDefaultFailureMessages.global
     }
 
     abstract fun register(plugin: JavaPlugin)

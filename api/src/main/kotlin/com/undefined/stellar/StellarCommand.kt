@@ -26,6 +26,7 @@ class StellarCommand(name: String, vararg aliases: String) : AbstractStellarComm
 
     companion object {
         fun parseAndReturnCancelled(event: PlayerCommandPreprocessEvent): Boolean {
+            println("parse called 1")
             val registrar = registrars[NMSVersion.version] ?: throw UnsupportedVersionException()
             return registrar.parseAndReturnCancelled(event)
         }
