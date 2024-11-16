@@ -1,5 +1,6 @@
 package com.undefined.stellar
 
+import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
 
@@ -14,8 +15,11 @@ class Main : JavaPlugin() {
 
         StellarCommand("test")
             .addGlobalFailureMessage("testing!")
+            .addFailureExecution<CommandSender> {
+                sendMessage("sender")
+            }
             .addFailureExecution<Player> {
-                sendMessage(it)
+                sendMessage("player")
             }
             .addSubCommand("abc")
             .addSubCommand("test")

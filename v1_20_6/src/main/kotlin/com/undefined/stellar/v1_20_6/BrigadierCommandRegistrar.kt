@@ -20,6 +20,7 @@ import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.craftbukkit.CraftServer
 import org.bukkit.event.player.PlayerCommandPreprocessEvent
+import org.bukkit.event.server.ServerCommandEvent
 
 object BrigadierCommandRegistrar {
 
@@ -27,9 +28,7 @@ object BrigadierCommandRegistrar {
         MinecraftServer.getServer().createCommandSourceStack()
     }
 
-    fun parseAndReturnCancelled(event: PlayerCommandPreprocessEvent): Boolean {
-        println("parse called 2")
-        val input = event.message.removePrefix("/")
+    fun parseAndReturnCancelled(sender: CommandSender, input: String): Boolean {
         val results = commandDispatcher().parse(input, COMMAND_SOURCE)
         val context = results.context.build(input)
 
@@ -38,11 +37,11 @@ object BrigadierCommandRegistrar {
         val baseCommand: StellarCommand = StellarCommands.getStellarCommand(input.substring(input.indexOf('/') + 1, input.indexOf(' '))) ?: return false
         val subCommand = getSubCommands(baseCommand, context).lastOrNull()
         subCommand?.let {
-            handleFailureMessageAndExecutions(event.player, subCommand, input)
+            handleFailureMessageAndExecutions(sender, subCommand, input)
             if (subCommand.hideDefaultFailureMessages.hide) return true
             println(2)
         } ?: run {
-            handleFailureMessageAndExecutions(event.player, baseCommand, input)
+            handleFailureMessageAndExecutions(sender, baseCommand, input)
             if (baseCommand.hideDefaultFailureMessages.hide) return true
             println(3)
         }
@@ -65,9 +64,9 @@ object BrigadierCommandRegistrar {
     }
 
     private fun <T : CommandSender> handleFailureMessageAndExecutions(sender: T, command: AbstractStellarCommand<*>, input: String) {
-        for (message in command.failureMessages) sender.sendRichMessage(LegacyComponentSerializer.legacyAmpersand().serialize(message))
+        for (message in command.failureMessages) sender.sendMessage(LegacyComponentSerializer.legacyAmpersand().serialize(message))
         println("HI")
-        for (message in command.globalFailureMessages) sender.sendRichMessage(LegacyComponentSerializer.legacyAmpersand().serialize(message))
+        for (message in command.globalFailureMessages) sender.sendMessage(LegacyComponentSerializer.legacyAmpersand().serialize(message))
         for (execution in command.failureExecutions) execution.run(sender, input)
         println(1)
     }
