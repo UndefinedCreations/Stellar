@@ -6,13 +6,12 @@ import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.context.ParsedArgument
 import com.mojang.brigadier.context.StringRange
 import com.mojang.brigadier.suggestion.SuggestionsBuilder
-import com.mojang.brigadier.tree.CommandNode
 import com.undefined.stellar.data.arguments.Anchor
 import com.undefined.stellar.data.arguments.Operation
 import com.undefined.stellar.data.arguments.ParticleData
 import com.undefined.stellar.exception.ServerTypeMismatchException
 import com.undefined.stellar.exception.UnsupportedSubCommandException
-import com.undefined.stellar.sub.brigadier.BrigadierTypeSubCommand
+import com.undefined.stellar.sub.BaseStellarSubCommand
 import com.undefined.stellar.sub.brigadier.entity.EntityAnchorSubCommand
 import com.undefined.stellar.sub.brigadier.entity.EntityDisplayType
 import com.undefined.stellar.sub.brigadier.entity.EntitySubCommand
@@ -35,6 +34,8 @@ import com.undefined.stellar.sub.brigadier.text.ComponentSubCommand
 import com.undefined.stellar.sub.brigadier.text.MessageSubCommand
 import com.undefined.stellar.sub.brigadier.text.StyleSubCommand
 import com.undefined.stellar.sub.brigadier.world.*
+import com.undefined.stellar.sub.custom.CustomSubCommand
+import com.undefined.stellar.sub.custom.CustomSubCommandInfo
 import com.undefined.stellar.sub.custom.EnumSubCommand
 import com.undefined.stellar.sub.custom.ListSubCommand
 import net.kyori.adventure.text.format.Style
@@ -83,14 +84,15 @@ object ArgumentHelper {
         )
     }
 
-    fun <T : BrigadierTypeSubCommand<*>> nativeSubCommandToArgument(subCommand: T): RequiredArgumentBuilder<CommandSourceStack, *> =
+    fun <T : BaseStellarSubCommand<*>> nativeSubCommandToArgument(subCommand: T): RequiredArgumentBuilder<CommandSourceStack, *> =
         when (subCommand) {
             is ListSubCommand<*> -> RequiredArgumentBuilder.argument<CommandSourceStack, String>(subCommand.name, StringArgumentType.word()).suggestStringList { subCommand.getStringList() }
             is EnumSubCommand<*> -> RequiredArgumentBuilder.argument<CommandSourceStack, String>(subCommand.name, StringArgumentType.word()).suggestStringList { subCommand.getStringList() }
+//            is CustomSubCommand<*> -> RequiredArgumentBuilder.argument(subCommand.name, getArgumentTypeFromBrigadierSubCommand(subCommand.type)).suggestStringList { subCommand.listSuggestions() }
             else -> RequiredArgumentBuilder.argument(subCommand.name, getArgumentTypeFromBrigadierSubCommand(subCommand))
         }
 
-    fun <T : BrigadierTypeSubCommand<*>> handleNativeSubCommandExecutors(subCommand: T, context: CommandContext<CommandSourceStack>) {
+    fun <T : BaseStellarSubCommand<*>> handleNativeSubCommandExecutors(subCommand: T, context: CommandContext<CommandSourceStack>) {
         when (subCommand) {
             is ListSubCommand<*> -> {
                 val input = subCommand.parse(StringArgumentType.getString(context, subCommand.name)) ?: return
@@ -100,6 +102,11 @@ object ArgumentHelper {
                 val enum = subCommand.parse(StringArgumentType.getString(context, subCommand.name))
                 for (execution in subCommand.customExecutions) enum?.let { execution.run(context.source.bukkitSender, enum) }
             }
+//            is CustomSubCommand<*> -> {
+//                val value = subCommand.parse(context.source.bukkitSender, StringArgumentType.getString(context, subCommand.name))
+//                subCommand.execution(CustomSubCommandInfo(context.source.bukkitSender, StringArgumentType.getString(context, subCommand.name), subCommand.parse(context.source.bukkitSender, StringArgumentType.getString(context, subCommand.name))))
+//                for (execution in subCommand.customExecutions) execution.run(context.source.bukkitSender, value)
+//            }
             else -> {
                 val argument = getArgumentFromBrigadierSubCommand(context, subCommand)
                 for (execution in subCommand.customExecutions) execution.run(context.source.bukkitSender, argument ?: break)
@@ -107,7 +114,7 @@ object ArgumentHelper {
         }
     }
 
-    fun <T : BrigadierTypeSubCommand<*>> handleNativeSubCommandRunnables(subCommand: T, context: CommandContext<CommandSourceStack>): Boolean {
+    fun <T : BaseStellarSubCommand<*>> handleNativeSubCommandRunnables(subCommand: T, context: CommandContext<CommandSourceStack>): Boolean {
         when (subCommand) {
             is ListSubCommand<*> -> {
                 val input = subCommand.parse(StringArgumentType.getString(context, subCommand.name)) ?: return true
@@ -126,7 +133,7 @@ object ArgumentHelper {
         return true
     }
 
-    private fun <T : BrigadierTypeSubCommand<*>> getArgumentTypeFromBrigadierSubCommand(subCommand: T): ArgumentType<*> =
+    fun <T : BaseStellarSubCommand<*>> getArgumentTypeFromBrigadierSubCommand(subCommand: T): ArgumentType<*> =
         when (subCommand) {
             is StringSubCommand -> subCommand.type.brigadier()
             is IntegerSubCommand -> IntegerArgumentType.integer(subCommand.min, subCommand.max)
@@ -177,7 +184,7 @@ object ArgumentHelper {
             else -> throw UnsupportedSubCommandException()
         }
 
-    private fun <T : BrigadierTypeSubCommand<*>> getArgumentFromBrigadierSubCommand(context: CommandContext<CommandSourceStack>, subCommand: T): Any? {
+    private fun <T : BaseStellarSubCommand<*>> getArgumentFromBrigadierSubCommand(context: CommandContext<CommandSourceStack>, subCommand: T): Any? {
         return when (subCommand) {
             is StringSubCommand -> StringArgumentType.getString(context, subCommand.name)
             is IntegerSubCommand -> IntegerArgumentType.getInteger(context, subCommand.name)
@@ -266,7 +273,7 @@ object ArgumentHelper {
     }
 
     private fun RequiredArgumentBuilder<CommandSourceStack, *>.suggestStringList(list: () -> List<String>) =
-        suggests { _: CommandContext<CommandSourceStack>, suggestionsBuilder: SuggestionsBuilder ->
+        suggests { context, suggestionsBuilder ->
             list().filter { it.startsWith(suggestionsBuilder.remaining, true) }.forEach { suggestionsBuilder.suggest(it) }
             return@suggests suggestionsBuilder.buildFuture()
         }

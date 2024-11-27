@@ -3,7 +3,7 @@ package com.undefined.stellar.sub.custom
 import com.undefined.stellar.AbstractStellarCommand
 import com.undefined.stellar.data.execution.CustomStellarExecution
 import com.undefined.stellar.data.execution.CustomStellarRunnable
-import com.undefined.stellar.sub.brigadier.BrigadierTypeSubCommand
+import com.undefined.stellar.sub.BaseStellarSubCommand
 import org.bukkit.command.CommandSender
 import java.lang.Enum.valueOf
 import kotlin.reflect.KClass
@@ -21,7 +21,7 @@ class EnumSubCommand<T : Enum<T>>(
             null
         }
     }
-) : BrigadierTypeSubCommand<EnumSubCommand<T>>(parent, name) {
+) : BaseStellarSubCommand<EnumSubCommand<T>>(parent, name) {
     fun getStringList(): List<String> = enum.java.enumConstants.map(stringifier)
     fun valueOf(name: String): Enum<T>? =
         try {
@@ -31,12 +31,12 @@ class EnumSubCommand<T : Enum<T>>(
         }
 
     inline fun <reified C : CommandSender> addEnumExecution(noinline execution: C.(T) -> Unit): EnumSubCommand<T> {
-        customExecutions.add(CustomStellarExecution(C::class, execution) as CustomStellarExecution<*, Any>)
+        customExecutions.add(CustomStellarExecution(C::class, execution) as CustomStellarExecution<*, Any?>)
         return this
     }
 
     inline fun <reified C : CommandSender> alwaysRunEnum(noinline execution: C.(T) -> Boolean): EnumSubCommand<T> {
-        customRunnables.add(CustomStellarRunnable(C::class, execution) as CustomStellarRunnable<*, Any>)
+        customRunnables.add(CustomStellarRunnable(C::class, execution) as CustomStellarRunnable<*, Any?>)
         return this
     }
 }

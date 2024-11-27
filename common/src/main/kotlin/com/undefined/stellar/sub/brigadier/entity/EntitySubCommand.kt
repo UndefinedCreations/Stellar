@@ -3,11 +3,11 @@ package com.undefined.stellar.sub.brigadier.entity
 import com.undefined.stellar.AbstractStellarCommand
 import com.undefined.stellar.data.execution.CustomStellarExecution
 import com.undefined.stellar.data.execution.CustomStellarRunnable
-import com.undefined.stellar.sub.brigadier.BrigadierTypeSubCommand
+import com.undefined.stellar.sub.BaseStellarSubCommand
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Entity
 @Suppress("UNCHECKED_CAST")
-class EntitySubCommand(parent: AbstractStellarCommand<*>, name: String, val type: EntityDisplayType) : BrigadierTypeSubCommand<EntitySubCommand>(parent, name) {
+class EntitySubCommand(parent: AbstractStellarCommand<*>, name: String, val type: EntityDisplayType) : BaseStellarSubCommand<EntitySubCommand>(parent, name) {
     val pluralEntitiesExecutions: MutableList<CustomStellarExecution<*, Any>> = mutableListOf()
     val singularEntityExecutions: MutableList<CustomStellarExecution<*, Any>> = mutableListOf()
     val pluralEntitiesRunnables: MutableList<CustomStellarRunnable<*, Any>> = mutableListOf()

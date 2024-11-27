@@ -7,6 +7,7 @@ import com.undefined.stellar.data.execution.StellarExecution
 import com.undefined.stellar.data.execution.StellarRunnable
 import com.undefined.stellar.data.requirement.StellarRequirement
 import com.undefined.stellar.sub.SubCommandHandler
+import com.undefined.stellar.sub.custom.CustomSubCommand
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.command.CommandSender
@@ -18,11 +19,19 @@ abstract class AbstractStellarCommand<T>(val name: String) : SubCommandHandler()
     override fun getBase(): AbstractStellarCommand<*> = this
 
     val aliases: MutableList<String> = mutableListOf()
-    val requirements: MutableList<StellarRequirement<*>> = mutableListOf()
     val failureMessages: MutableList<Component> = mutableListOf()
     val globalFailureMessages: MutableList<Component> = mutableListOf()
     val failureExecutions: MutableList<CustomStellarExecution<*, Any>> = mutableListOf()
     var hideDefaultFailureMessages: HideDefaultFailureMessages = HideDefaultFailureMessages(false, false)
+    private val _requirements: MutableList<StellarRequirement<*>> = mutableListOf()
+    val requirements: List<StellarRequirement<*>>
+        get() {
+            if (this is CustomSubCommand<*>)
+                _requirements.addFirst(
+                    StellarRequirement(CommandSender::class) { this@AbstractStellarCommand.requirement() }
+                )
+            return _requirements
+        }
     val permissionRequirements: MutableList<PermissionStellarRequirement> = mutableListOf()
     val executions: MutableList<StellarExecution<*>> = mutableListOf()
     val runnables: MutableList<StellarRunnable<*>> = mutableListOf()
@@ -43,8 +52,12 @@ abstract class AbstractStellarCommand<T>(val name: String) : SubCommandHandler()
     }
 
     inline fun <reified C : CommandSender> addRequirement(noinline requirement: C.() -> Boolean): T {
-        requirements.add(StellarRequirement(C::class, requirement))
+        addRequirement(StellarRequirement(C::class, requirement))
         return this as T
+    }
+
+    fun addRequirement(requirement: StellarRequirement<*>) {
+        _requirements.add(requirement)
     }
 
     fun addFailureMessage(message: String): T {
