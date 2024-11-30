@@ -74,14 +74,6 @@ object BrigadierCommandRegistrar {
     }
 
     fun register(stellarCommand: AbstractStellarCommand<*>) {
-//        val helpTopic = object : HelpTopic() {
-//            init {
-//                name = "test"
-//                shortText = "shortText"
-//                fullText = "fullText"
-//            }
-//            override fun canSee(player: CommandSender): Boolean = true
-//        }
         val information: SortedMap<String, String> = sortedMapOf()
         if (stellarCommand.description != "") information["Description"] = stellarCommand.description
         if (stellarCommand.usage != "") information["Usage"] = stellarCommand.usage
