@@ -1,5 +1,6 @@
 package com.undefined.stellar
 
+import com.undefined.stellar.data.suggestion.Suggestion
 import org.bukkit.plugin.java.JavaPlugin
 
 class Main : JavaPlugin() {
@@ -15,6 +16,7 @@ class Main : JavaPlugin() {
             .setDescription("This is a description")
             .setUsageText("/test <string>")
             .addStringSubCommand("test")
+            .addSuggestion("Text", "Tooltip")
             .register(this)
     }
 

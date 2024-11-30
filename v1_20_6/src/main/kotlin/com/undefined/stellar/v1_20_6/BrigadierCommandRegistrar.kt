@@ -2,6 +2,7 @@ package com.undefined.stellar.v1_20_6
 
 import com.mojang.brigadier.Command
 import com.mojang.brigadier.CommandDispatcher
+import com.mojang.brigadier.Message
 import com.mojang.brigadier.builder.ArgumentBuilder
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.builder.RequiredArgumentBuilder
@@ -9,6 +10,7 @@ import com.mojang.brigadier.context.CommandContext
 import com.undefined.stellar.AbstractStellarCommand
 import com.undefined.stellar.StellarCommands
 import com.undefined.stellar.data.help.CustomCommandHelpTopic
+import com.undefined.stellar.data.suggestion.Suggestion
 import com.undefined.stellar.exception.UnsupportedSubCommandException
 import com.undefined.stellar.sub.AbstractStellarSubCommand
 import com.undefined.stellar.sub.BaseStellarSubCommand
@@ -82,10 +84,8 @@ object BrigadierCommandRegistrar {
             val context = MinecraftServer.getServer().createCommandSourceStack()
             val requirements = stellarCommand.requirements.all { it.run(this) }
             val permissionRequirements = stellarCommand.permissionRequirements.all {
-                if (it.permission.isEmpty()) context.hasPermission(it.permissionLevel) else context.hasPermission(
-                    it.permissionLevel,
-                    it.permission
-                )
+                if (it.permission.isEmpty()) context.hasPermission(it.permissionLevel)
+                else context.hasPermission(it.permissionLevel, it.permission)
             }
             requirements.and(permissionRequirements)
         }
@@ -155,7 +155,8 @@ object BrigadierCommandRegistrar {
     private fun RequiredArgumentBuilder<CommandSourceStack, *>.handleSuggestions(command: BaseStellarSubCommand<*>): RequiredArgumentBuilder<CommandSourceStack, *> {
         if (command.suggestions.isEmpty()) return this
         return suggests { context, suggestionBuilder ->
-            for (suggestion in command.suggestions) { suggestion.get(context.source.bukkitSender, suggestionBuilder.remaining).forEach { suggestionBuilder.suggest(it) } }
+            for (suggestion in command.suggestions)
+                suggestion.get(context.source.bukkitSender, suggestionBuilder.remaining).forEach { suggestionBuilder.suggest(it.text) { it.tooltip } }
             return@suggests suggestionBuilder.buildFuture()
         }
     }
