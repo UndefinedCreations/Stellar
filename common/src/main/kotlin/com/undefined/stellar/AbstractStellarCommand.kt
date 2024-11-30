@@ -11,6 +11,7 @@ import com.undefined.stellar.sub.custom.CustomSubCommand
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.command.CommandSender
+import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
 
 @Suppress("UNCHECKED_CAST")
@@ -19,6 +20,8 @@ abstract class AbstractStellarCommand<T>(val name: String) : SubCommandHandler()
     override fun getBase(): AbstractStellarCommand<*> = this
 
     val aliases: MutableList<String> = mutableListOf()
+    var description: String = ""
+    var usage: String = ""
     val failureMessages: MutableList<Component> = mutableListOf()
     val globalFailureMessages: MutableList<Component> = mutableListOf()
     val failureExecutions: MutableList<CustomStellarExecution<*, Any>> = mutableListOf()
@@ -38,6 +41,16 @@ abstract class AbstractStellarCommand<T>(val name: String) : SubCommandHandler()
 
     fun addAlias(name: String): T {
         aliases.add(name)
+        return this as T
+    }
+
+    fun setDescription(description: String): T {
+        this.description = description
+        return this as T
+    }
+
+    fun setUsageText(text: String): T {
+        usage = text
         return this as T
     }
 

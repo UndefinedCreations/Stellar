@@ -2,13 +2,13 @@ package com.undefined.stellar.v1_20_6
 
 import com.mojang.brigadier.Command
 import com.mojang.brigadier.CommandDispatcher
-import com.mojang.brigadier.arguments.ArgumentType
 import com.mojang.brigadier.builder.ArgumentBuilder
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.builder.RequiredArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
 import com.undefined.stellar.AbstractStellarCommand
 import com.undefined.stellar.StellarCommands
+import com.undefined.stellar.data.help.CustomCommandHelpTopic
 import com.undefined.stellar.exception.UnsupportedSubCommandException
 import com.undefined.stellar.sub.AbstractStellarSubCommand
 import com.undefined.stellar.sub.BaseStellarSubCommand
@@ -19,8 +19,14 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.server.MinecraftServer
 import org.bukkit.Bukkit
+import org.bukkit.Server
+import org.bukkit.command.CommandMap
 import org.bukkit.command.CommandSender
 import org.bukkit.craftbukkit.CraftServer
+import org.bukkit.craftbukkit.help.CustomHelpTopic
+import org.bukkit.help.GenericCommandHelpTopic
+import org.bukkit.help.HelpTopic
+import java.util.SortedMap
 
 object BrigadierCommandRegistrar {
 
@@ -68,6 +74,31 @@ object BrigadierCommandRegistrar {
     }
 
     fun register(stellarCommand: AbstractStellarCommand<*>) {
+//        val helpTopic = object : HelpTopic() {
+//            init {
+//                name = "test"
+//                shortText = "shortText"
+//                fullText = "fullText"
+//            }
+//            override fun canSee(player: CommandSender): Boolean = true
+//        }
+        val information: SortedMap<String, String> = sortedMapOf()
+        if (stellarCommand.description != "") information["Description"] = stellarCommand.description
+        if (stellarCommand.usage != "") information["Usage"] = stellarCommand.usage
+        if (stellarCommand.aliases.isNotEmpty()) information["Aliases"] = stellarCommand.aliases.joinToString(", ")
+        val helpTopic = CustomCommandHelpTopic(stellarCommand.name, stellarCommand.description, information) {
+            val context = MinecraftServer.getServer().createCommandSourceStack()
+            val requirements = stellarCommand.requirements.all { it.run(this) }
+            val permissionRequirements = stellarCommand.permissionRequirements.all {
+                if (it.permission.isEmpty()) context.hasPermission(it.permissionLevel) else context.hasPermission(
+                    it.permissionLevel,
+                    it.permission
+                )
+            }
+            requirements.and(permissionRequirements)
+        }
+        Bukkit.getServer().helpMap.addTopic(helpTopic)
+
         val mainArgumentBuilder = LiteralArgumentBuilder.literal<CommandSourceStack>(stellarCommand.name)
         mainArgumentBuilder.handleCommand(stellarCommand)
         val node = commandDispatcher().register(mainArgumentBuilder)

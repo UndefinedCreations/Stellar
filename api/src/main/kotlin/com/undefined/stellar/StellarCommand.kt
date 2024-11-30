@@ -2,6 +2,7 @@ package com.undefined.stellar
 
 import com.undefined.stellar.exception.UnsupportedVersionException
 import com.undefined.stellar.listener.StellarListener
+import com.undefined.stellar.manager.CommandManager
 import com.undefined.stellar.util.NMSVersion
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
@@ -19,7 +20,7 @@ class StellarCommand(name: String, vararg aliases: String) : AbstractStellarComm
     override fun register(plugin: JavaPlugin) {
         val registrar = registrars[NMSVersion.version] ?: throw UnsupportedVersionException()
         registrar.register(this)
-        Bukkit.getPluginManager().registerEvents(StellarListener, plugin)
+        CommandManager.initialize(plugin)
         StellarCommands.commands.add(this)
     }
 
