@@ -15,13 +15,11 @@ import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
 
 @Suppress("UNCHECKED_CAST")
-abstract class AbstractStellarCommand<T>(val name: String) : SubCommandHandler() {
+abstract class AbstractStellarCommand<T>(val name: String, var description: String = "", var usage: String = "") : SubCommandHandler() {
 
     override fun getBase(): AbstractStellarCommand<*> = this
 
     val aliases: MutableList<String> = mutableListOf()
-    var description: String = ""
-    var usage: String = ""
     val failureMessages: MutableList<Component> = mutableListOf()
     val globalFailureMessages: MutableList<Component> = mutableListOf()
     val failureExecutions: MutableList<CustomStellarExecution<*, Any>> = mutableListOf()

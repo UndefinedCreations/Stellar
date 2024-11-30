@@ -12,7 +12,11 @@ val registrars = mapOf(
     "1.20.6" to com.undefined.stellar.v1_20_6.BrigadierCommandRegistrar
 )
 
-class StellarCommand(name: String, vararg aliases: String) : AbstractStellarCommand<StellarCommand>(name) {
+class StellarCommand(name: String, description: String = "", vararg aliases: String = arrayOf()) : AbstractStellarCommand<StellarCommand>(name, description) {
+
+    constructor(name: String, vararg aliases: String) : this(name, "", aliases = aliases)
+    constructor(name: String, aliases: List<String>) : this(name, "", aliases = aliases.toTypedArray())
+
     init {
         this.aliases.addAll(aliases)
     }
@@ -30,4 +34,5 @@ class StellarCommand(name: String, vararg aliases: String) : AbstractStellarComm
             return registrar.parseAndReturnCancelled(sender, input)
         }
     }
+
 }
