@@ -19,5 +19,4 @@ abstract class CustomSubCommand<T>(parent: AbstractStellarCommand<*>, name: Stri
 
     override fun getBase(): AbstractStellarCommand<*> = parent.getBase()
     override fun register(plugin: JavaPlugin) = parent.register(plugin)
-
 }

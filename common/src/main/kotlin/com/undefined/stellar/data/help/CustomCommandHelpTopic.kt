@@ -14,11 +14,9 @@ class CustomCommandHelpTopic(
     init {
         super.name = name
         super.shortText = description
-        // Build full text
         val fullDescription = StringBuilder()
-        for ((key, value) in information) {
-            fullDescription.append("${ChatColor.GOLD}$key: ${ChatColor.WHITE}$value").append("\n")
-        }
+        for ((key, value) in information)
+            fullDescription.append("${ChatColor.GOLD}$key: ${ChatColor.WHITE}$value\n")
         fullText = fullDescription.toString()
     }
 

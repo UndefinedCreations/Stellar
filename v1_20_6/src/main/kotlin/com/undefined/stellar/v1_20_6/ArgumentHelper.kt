@@ -88,7 +88,6 @@ object ArgumentHelper {
         when (subCommand) {
             is ListSubCommand<*> -> RequiredArgumentBuilder.argument<CommandSourceStack, String>(subCommand.name, StringArgumentType.word()).suggestStringList { subCommand.getStringList() }
             is EnumSubCommand<*> -> RequiredArgumentBuilder.argument<CommandSourceStack, String>(subCommand.name, StringArgumentType.word()).suggestStringList { subCommand.getStringList() }
-//            is CustomSubCommand<*> -> RequiredArgumentBuilder.argument(subCommand.name, getArgumentTypeFromBrigadierSubCommand(subCommand.type)).suggestStringList { subCommand.listSuggestions() }
             else -> RequiredArgumentBuilder.argument(subCommand.name, getArgumentTypeFromBrigadierSubCommand(subCommand))
         }
 
@@ -102,11 +101,6 @@ object ArgumentHelper {
                 val enum = subCommand.parse(StringArgumentType.getString(context, subCommand.name))
                 for (execution in subCommand.customExecutions) enum?.let { execution.run(context.source.bukkitSender, enum) }
             }
-//            is CustomSubCommand<*> -> {
-//                val value = subCommand.parse(context.source.bukkitSender, StringArgumentType.getString(context, subCommand.name))
-//                subCommand.execution(CustomSubCommandInfo(context.source.bukkitSender, StringArgumentType.getString(context, subCommand.name), subCommand.parse(context.source.bukkitSender, StringArgumentType.getString(context, subCommand.name))))
-//                for (execution in subCommand.customExecutions) execution.run(context.source.bukkitSender, value)
-//            }
             else -> {
                 val argument = getArgumentFromBrigadierSubCommand(context, subCommand)
                 for (execution in subCommand.customExecutions) execution.run(context.source.bukkitSender, argument ?: break)
@@ -376,11 +370,8 @@ object ArgumentHelper {
     }
 
     private fun BlockPos.toLocation(world: World?) = Location(world, x.toDouble(), y.toDouble(), z.toDouble())
-
     private fun ColumnPos.toLocation(world: World?) = Location(world, x.toDouble(), 0.0, z.toDouble())
-
     private fun Vec3.toLocation(world: World?) = Location(world, x, y, z)
-
     private fun Vec2.toLocation(world: World?) = Location(world, x.toDouble(), 0.0, y.toDouble())
 
 }

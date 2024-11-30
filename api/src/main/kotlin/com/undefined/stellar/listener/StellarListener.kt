@@ -5,7 +5,9 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerCommandPreprocessEvent
 import org.bukkit.event.server.ServerCommandEvent
+import org.jetbrains.annotations.ApiStatus
 
+@ApiStatus.Internal
 object StellarListener : Listener {
 
     @EventHandler

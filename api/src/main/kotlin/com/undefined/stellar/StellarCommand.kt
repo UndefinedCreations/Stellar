@@ -8,10 +8,6 @@ import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.plugin.java.JavaPlugin
 
-val registrars = mapOf(
-    "1.20.6" to com.undefined.stellar.v1_20_6.BrigadierCommandRegistrar
-)
-
 class StellarCommand(name: String, description: String = "", vararg aliases: String = arrayOf()) : AbstractStellarCommand<StellarCommand>(name, description) {
 
     constructor(name: String, vararg aliases: String) : this(name, "", aliases = aliases)
@@ -22,7 +18,7 @@ class StellarCommand(name: String, description: String = "", vararg aliases: Str
     }
 
     override fun register(plugin: JavaPlugin) {
-        val registrar = registrars[NMSVersion.version] ?: throw UnsupportedVersionException()
+        val registrar = CommandManager.registrars[NMSVersion.version] ?: throw UnsupportedVersionException()
         registrar.register(this)
         CommandManager.initialize(plugin)
         StellarCommands.commands.add(this)
@@ -30,7 +26,7 @@ class StellarCommand(name: String, description: String = "", vararg aliases: Str
 
     companion object {
         fun parseAndReturnCancelled(sender: CommandSender, input: String): Boolean {
-            val registrar = registrars[NMSVersion.version] ?: throw UnsupportedVersionException()
+            val registrar = CommandManager.registrars[NMSVersion.version] ?: throw UnsupportedVersionException()
             return registrar.parseAndReturnCancelled(sender, input)
         }
     }
