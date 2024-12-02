@@ -2,7 +2,6 @@ package com.undefined.stellar.v1_20_6
 
 import com.mojang.brigadier.Command
 import com.mojang.brigadier.CommandDispatcher
-import com.mojang.brigadier.Message
 import com.mojang.brigadier.builder.ArgumentBuilder
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.builder.RequiredArgumentBuilder
@@ -10,7 +9,6 @@ import com.mojang.brigadier.context.CommandContext
 import com.undefined.stellar.AbstractStellarCommand
 import com.undefined.stellar.StellarCommands
 import com.undefined.stellar.data.help.CustomCommandHelpTopic
-import com.undefined.stellar.data.suggestion.Suggestion
 import com.undefined.stellar.exception.UnsupportedSubCommandException
 import com.undefined.stellar.sub.AbstractStellarSubCommand
 import com.undefined.stellar.sub.BaseStellarSubCommand
@@ -21,13 +19,7 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.server.MinecraftServer
 import org.bukkit.Bukkit
-import org.bukkit.Server
-import org.bukkit.command.CommandMap
 import org.bukkit.command.CommandSender
-import org.bukkit.craftbukkit.CraftServer
-import org.bukkit.craftbukkit.help.CustomHelpTopic
-import org.bukkit.help.GenericCommandHelpTopic
-import org.bukkit.help.HelpTopic
 import java.util.SortedMap
 
 object BrigadierCommandRegistrar {
@@ -56,7 +48,7 @@ object BrigadierCommandRegistrar {
         return baseCommand.hasGlobalHiddenDefaultFailureMessages()
     }
 
-    private fun getSubCommands(
+    fun getSubCommands(
         baseCommand: AbstractStellarCommand<*>,
         context: CommandContext<CommandSourceStack>,
         currentIndex: Int = 1,
@@ -111,11 +103,9 @@ object BrigadierCommandRegistrar {
 
     private fun BaseStellarSubCommand<*>.handleExecutions(context: CommandContext<CommandSourceStack>) {
         for (subCommand in this.getBase().subCommands) if (subCommand is BaseStellarSubCommand && !handleSubCommandRunnables(subCommand, context)) return
-        when (this) {
-            is StellarSubCommand -> for (execution in executions) { execution.run(context.source.bukkitSender) }
-            is BaseStellarSubCommand -> ArgumentHelper.handleNativeSubCommandExecutors(this, context)
-            else -> throw UnsupportedSubCommandException()
-        }
+
+        if (this is StellarSubCommand) for (execution in executions) execution.run(context.source.bukkitSender)
+        else ArgumentHelper.handleNativeSubCommandExecutors(this, context)
     }
 
     private fun ArgumentBuilder<CommandSourceStack, *>.handleCommand(stellarCommand: AbstractStellarCommand<*>) {
@@ -135,7 +125,7 @@ object BrigadierCommandRegistrar {
     private fun ArgumentBuilder<CommandSourceStack, *>.handleSubCommands(stellarCommand: AbstractStellarCommand<*>) {
         for (subCommand in stellarCommand.subCommands) {
             if (subCommand is CustomSubCommand<*>) {
-                val type = ArgumentHelper.getArgumentTypeFromBrigadierSubCommand(subCommand.type)
+                val type = ArgumentHelper.getArgumentTypeFromSubCommand(subCommand.type)
                 val argument: RequiredArgumentBuilder<CommandSourceStack, *> = RequiredArgumentBuilder.argument(subCommand.name, type)
                 argument.requires { subCommand.requirement() }
                 argument.suggests { context, builder ->
@@ -183,6 +173,6 @@ object BrigadierCommandRegistrar {
         return ArgumentHelper.handleNativeSubCommandRunnables(subCommand, context)
     }
 
-    private fun commandDispatcher(): CommandDispatcher<CommandSourceStack> = (Bukkit.getServer() as CraftServer).server.functions.dispatcher
+    private fun commandDispatcher(): CommandDispatcher<CommandSourceStack> = MinecraftServer.getServer().functions.dispatcher
 
 }

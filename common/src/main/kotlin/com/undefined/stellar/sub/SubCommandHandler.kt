@@ -37,7 +37,6 @@ open class SubCommandHandler {
             if (base is CustomSubCommand<*>) return _subCommands + base.getSubCommandsList()
             return _subCommands
         }
-    val optionalSubCommands: MutableList<BaseStellarSubCommand<*>> = mutableListOf()
 
     fun addSubCommand(subCommand: AbstractStellarSubCommand<*>): AbstractStellarSubCommand<*> {
         _subCommands.add(subCommand)

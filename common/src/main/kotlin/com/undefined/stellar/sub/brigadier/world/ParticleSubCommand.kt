@@ -1,7 +1,7 @@
 package com.undefined.stellar.sub.brigadier.world
 
 import com.undefined.stellar.AbstractStellarCommand
-import com.undefined.stellar.data.arguments.ParticleData
+import com.undefined.stellar.data.argument.ParticleData
 import com.undefined.stellar.data.execution.CustomStellarExecution
 import com.undefined.stellar.data.execution.CustomStellarRunnable
 import com.undefined.stellar.sub.BaseStellarSubCommand

@@ -1,4 +1,4 @@
-package com.undefined.stellar.data.arguments
+package com.undefined.stellar.data.argument
 
 import org.bukkit.Location
 import org.bukkit.entity.LivingEntity

@@ -13,18 +13,19 @@ import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
+import org.jetbrains.annotations.ApiStatus
 
 @Suppress("UNCHECKED_CAST")
 abstract class AbstractStellarCommand<T>(val name: String, var description: String = "", var usage: String = "") : SubCommandHandler() {
 
     override fun getBase(): AbstractStellarCommand<*> = this
 
-    val aliases: MutableList<String> = mutableListOf()
-    val failureMessages: MutableList<Component> = mutableListOf()
-    val globalFailureMessages: MutableList<Component> = mutableListOf()
-    val failureExecutions: MutableList<CustomStellarExecution<*, Any>> = mutableListOf()
-    var hideDefaultFailureMessages: HideDefaultFailureMessages = HideDefaultFailureMessages(false, false)
-    private val _requirements: MutableList<StellarRequirement<*>> = mutableListOf()
+    @ApiStatus.Internal val aliases: MutableList<String> = mutableListOf()
+    @ApiStatus.Internal val failureMessages: MutableList<Component> = mutableListOf()
+    @ApiStatus.Internal val globalFailureMessages: MutableList<Component> = mutableListOf()
+    @ApiStatus.Internal val failureExecutions: MutableList<CustomStellarExecution<*, Any>> = mutableListOf()
+    @ApiStatus.Internal var hideDefaultFailureMessages: HideDefaultFailureMessages = HideDefaultFailureMessages(false, false)
+    @ApiStatus.Internal private val _requirements: MutableList<StellarRequirement<*>> = mutableListOf()
     val requirements: List<StellarRequirement<*>>
         get() {
             if (this is CustomSubCommand<*>)
@@ -33,9 +34,9 @@ abstract class AbstractStellarCommand<T>(val name: String, var description: Stri
                 )
             return _requirements
         }
-    val permissionRequirements: MutableList<PermissionStellarRequirement> = mutableListOf()
-    val executions: MutableList<StellarExecution<*>> = mutableListOf()
-    val runnables: MutableList<StellarRunnable<*>> = mutableListOf()
+    @ApiStatus.Internal val permissionRequirements: MutableList<PermissionStellarRequirement> = mutableListOf()
+    @ApiStatus.Internal val executions: MutableList<StellarExecution<*>> = mutableListOf()
+    @ApiStatus.Internal val runnables: MutableList<StellarRunnable<*>> = mutableListOf()
 
     fun addAlias(name: String): T {
         aliases.add(name)
