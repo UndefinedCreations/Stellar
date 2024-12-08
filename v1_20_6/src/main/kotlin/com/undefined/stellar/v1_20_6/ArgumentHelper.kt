@@ -1,6 +1,8 @@
 package com.undefined.stellar.v1_20_6
 
 import com.mojang.brigadier.arguments.*
+import com.mojang.brigadier.builder.ArgumentBuilder
+import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.builder.RequiredArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.context.ParsedArgument
@@ -8,34 +10,36 @@ import com.mojang.brigadier.context.StringRange
 import com.undefined.stellar.data.argument.Anchor
 import com.undefined.stellar.data.argument.Operation
 import com.undefined.stellar.data.argument.ParticleData
+import com.undefined.stellar.exception.LiteralArgumentMismatchException
 import com.undefined.stellar.exception.ServerTypeMismatchException
 import com.undefined.stellar.exception.UnsupportedSubCommandException
 import com.undefined.stellar.sub.AbstractStellarSubCommand
-import com.undefined.stellar.sub.BaseStellarSubCommand
-import com.undefined.stellar.sub.brigadier.entity.EntityAnchorSubCommand
-import com.undefined.stellar.sub.brigadier.entity.EntityDisplayType
-import com.undefined.stellar.sub.brigadier.entity.EntitySubCommand
-import com.undefined.stellar.sub.brigadier.item.ItemPredicateSubCommand
-import com.undefined.stellar.sub.brigadier.item.ItemSlotSubCommand
-import com.undefined.stellar.sub.brigadier.item.ItemSlotsSubCommand
-import com.undefined.stellar.sub.brigadier.item.ItemSubCommand
-import com.undefined.stellar.sub.brigadier.math.*
-import com.undefined.stellar.sub.brigadier.misc.NamespacedKeySubCommand
-import com.undefined.stellar.sub.brigadier.misc.UUIDSubCommand
-import com.undefined.stellar.sub.brigadier.player.GameModeSubCommand
-import com.undefined.stellar.sub.brigadier.player.GameProfileSubCommand
-import com.undefined.stellar.sub.brigadier.primitive.*
-import com.undefined.stellar.sub.brigadier.scoreboard.*
-import com.undefined.stellar.sub.brigadier.structure.LootTableSubCommand
-import com.undefined.stellar.sub.brigadier.structure.MirrorSubCommand
-import com.undefined.stellar.sub.brigadier.structure.StructureRotationSubCommand
-import com.undefined.stellar.sub.brigadier.text.ColorSubCommand
-import com.undefined.stellar.sub.brigadier.text.ComponentSubCommand
-import com.undefined.stellar.sub.brigadier.text.MessageSubCommand
-import com.undefined.stellar.sub.brigadier.text.StyleSubCommand
-import com.undefined.stellar.sub.brigadier.world.*
-import com.undefined.stellar.sub.custom.EnumSubCommand
-import com.undefined.stellar.sub.custom.ListSubCommand
+import com.undefined.stellar.sub.LiteralStellarSubCommand
+import com.undefined.stellar.sub.arguments.custom.CustomSubCommand
+import com.undefined.stellar.sub.arguments.custom.EnumSubCommand
+import com.undefined.stellar.sub.arguments.custom.ListSubCommand
+import com.undefined.stellar.sub.arguments.entity.EntityAnchorSubCommand
+import com.undefined.stellar.sub.arguments.entity.EntityDisplayType
+import com.undefined.stellar.sub.arguments.entity.EntitySubCommand
+import com.undefined.stellar.sub.arguments.item.ItemPredicateSubCommand
+import com.undefined.stellar.sub.arguments.item.ItemSlotSubCommand
+import com.undefined.stellar.sub.arguments.item.ItemSlotsSubCommand
+import com.undefined.stellar.sub.arguments.item.ItemSubCommand
+import com.undefined.stellar.sub.arguments.math.*
+import com.undefined.stellar.sub.arguments.misc.NamespacedKeySubCommand
+import com.undefined.stellar.sub.arguments.misc.UUIDSubCommand
+import com.undefined.stellar.sub.arguments.player.GameModeSubCommand
+import com.undefined.stellar.sub.arguments.player.GameProfileSubCommand
+import com.undefined.stellar.sub.arguments.primitive.*
+import com.undefined.stellar.sub.arguments.scoreboard.*
+import com.undefined.stellar.sub.arguments.structure.LootTableSubCommand
+import com.undefined.stellar.sub.arguments.structure.MirrorSubCommand
+import com.undefined.stellar.sub.arguments.structure.StructureRotationSubCommand
+import com.undefined.stellar.sub.arguments.text.ColorSubCommand
+import com.undefined.stellar.sub.arguments.text.ComponentSubCommand
+import com.undefined.stellar.sub.arguments.text.MessageSubCommand
+import com.undefined.stellar.sub.arguments.text.StyleSubCommand
+import com.undefined.stellar.sub.arguments.world.*
 import net.kyori.adventure.text.format.Style
 import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
@@ -82,54 +86,24 @@ object ArgumentHelper {
         )
     }
 
-    fun <T : BaseStellarSubCommand<*>> nativeSubCommandToArgument(subCommand: T): RequiredArgumentBuilder<CommandSourceStack, *> =
+    fun getLiteralArguments(argument: AbstractStellarSubCommand<*>): List<ArgumentBuilder<CommandSourceStack, *>> {
+        val arguments: MutableList<ArgumentBuilder<CommandSourceStack, *>> = mutableListOf()
+        for (name in argument.aliases + argument.name)
+            arguments.add(LiteralArgumentBuilder.literal(name))
+        return arguments
+    }
+
+    fun getRequiredArgumentBuilder(argument: AbstractStellarSubCommand<*>): RequiredArgumentBuilder<CommandSourceStack, *> =
+        RequiredArgumentBuilder.argument(argument.name, getArgumentType(argument))
+
+    fun <T : AbstractStellarSubCommand<*>> nativeSubCommandToArgument(subCommand: T): RequiredArgumentBuilder<CommandSourceStack, *> =
         when (subCommand) {
             is ListSubCommand<*> -> RequiredArgumentBuilder.argument<CommandSourceStack, String>(subCommand.name, StringArgumentType.word()).suggestStringList { subCommand.getStringList() }
             is EnumSubCommand<*> -> RequiredArgumentBuilder.argument<CommandSourceStack, String>(subCommand.name, StringArgumentType.word()).suggestStringList { subCommand.getStringList() }
-            else -> RequiredArgumentBuilder.argument(subCommand.name, getArgumentTypeFromSubCommand(subCommand))
+            else -> RequiredArgumentBuilder.argument(subCommand.name, getArgumentType(subCommand))
         }
 
-    fun <T : BaseStellarSubCommand<*>> handleNativeSubCommandExecutors(subCommand: T, context: CommandContext<CommandSourceStack>) {
-        when (subCommand) {
-            is ListSubCommand<*> -> {
-                val input = subCommand.parse(StringArgumentType.getString(context, subCommand.name)) ?: return
-                for (execution in subCommand.customExecutions) execution.run(context.source.bukkitSender, input)
-            }
-            is EnumSubCommand<*> -> {
-                val enum = subCommand.parse(StringArgumentType.getString(context, subCommand.name))
-                for (execution in subCommand.customExecutions) enum?.let { execution.run(context.source.bukkitSender, enum) }
-            }
-            else -> {
-                val stellarContext = CommandContextAdapter(context).getStellarCommandContext()
-//                val argument = getParsedArgumentFromBrigadier(context, subCommand)
-                for (execution in subCommand.customExecutions) execution.run(context.source.bukkitSender, stellarContext)
-            }
-        }
-    }
-
-    fun <T : BaseStellarSubCommand<*>> handleNativeSubCommandRunnables(subCommand: T, context: CommandContext<CommandSourceStack>): Boolean {
-        when (subCommand) {
-            is ListSubCommand<*> -> {
-                val input = subCommand.parse(StringArgumentType.getString(context, subCommand.name)) ?: return true
-                for (runnable in subCommand.customRunnables)
-                    if (!runnable.run(context.source.bukkitSender, input)) return false
-            }
-            is EnumSubCommand<*> -> {
-                val enum = subCommand.parse(StringArgumentType.getString(context, subCommand.name))
-                for (runnable in subCommand.customRunnables)
-                    enum?.let { runnable.run(context.source.bukkitSender, enum) }
-            }
-            else -> {
-//                val argument = getParsedArgumentFromBrigadier(context, subCommand) ?: return true
-                val stellarContext = CommandContextAdapter(context).getStellarCommandContext()
-                for (runnable in subCommand.customRunnables)
-                    if (!runnable.run(context.source.bukkitSender, stellarContext)) return false
-            }
-        }
-        return true
-    }
-
-    fun <T : AbstractStellarSubCommand<*>> getArgumentTypeFromSubCommand(subCommand: T): ArgumentType<*> =
+    fun <T : AbstractStellarSubCommand<*>> getArgumentType(subCommand: T): ArgumentType<*> =
         when (subCommand) {
             is ListSubCommand<*> -> StringArgumentType.string()
             is StringSubCommand -> subCommand.type.brigadier()
@@ -181,8 +155,10 @@ object ArgumentHelper {
             else -> throw UnsupportedSubCommandException()
         }
 
-    fun <T : AbstractStellarSubCommand<*>> getParsedArgumentFromSubCommand(context: CommandContext<CommandSourceStack>, subCommand: T): Any? {
+    fun <T : AbstractStellarSubCommand<*>> getParsedArgument(context: CommandContext<CommandSourceStack>, subCommand: T): Any? {
         return when (subCommand) {
+            is LiteralStellarSubCommand -> throw LiteralArgumentMismatchException()
+            is CustomSubCommand<*> -> subCommand.parse(CommandContextAdapter.getStellarCommandContext(context))
             is StringSubCommand -> StringArgumentType.getString(context, subCommand.name)
             is IntegerSubCommand -> IntegerArgumentType.getInteger(context, subCommand.name)
             is FloatSubCommand -> FloatArgumentType.getFloat(context, subCommand.name)
@@ -225,7 +201,7 @@ object ArgumentHelper {
             is DisplaySlotSubCommand -> getBukkitDisplaySlot(ScoreboardSlotArgument.getDisplaySlot(context, subCommand.name))
             is ScoreHolderSubCommand -> ScoreHolderArgument.getName(context, subCommand.name).scoreboardName
             is ScoreHoldersSubCommand -> ScoreHolderArgument.getNames(context, subCommand.name).map { scoreholder -> scoreholder.scoreboardName }
-            is AxisSubCommand -> subCommand.customExecutions.forEach { it.run(context.source.bukkitSender, getBukkitAxis(SwizzleArgument.getSwizzle(context, subCommand.name))) }
+            is AxisSubCommand -> getBukkitAxis(SwizzleArgument.getSwizzle(context, subCommand.name))
             is TeamSubCommand -> Bukkit.getScoreboardManager().mainScoreboard.getTeam(TeamArgument.getTeam(context, subCommand.name).name)
             is ItemSlotSubCommand -> SlotArgument.getSlot(context, subCommand.name)
             is ItemSlotsSubCommand -> SlotsArgument.getSlots(context, subCommand.name).slots().toList()

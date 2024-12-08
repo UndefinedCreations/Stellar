@@ -1,31 +1,34 @@
 package com.undefined.stellar.sub
 
 import com.undefined.stellar.AbstractStellarCommand
-import com.undefined.stellar.sub.brigadier.entity.EntityAnchorSubCommand
-import com.undefined.stellar.sub.brigadier.entity.EntityDisplayType
-import com.undefined.stellar.sub.brigadier.entity.EntitySubCommand
-import com.undefined.stellar.sub.brigadier.item.ItemPredicateSubCommand
-import com.undefined.stellar.sub.brigadier.item.ItemSlotSubCommand
-import com.undefined.stellar.sub.brigadier.item.ItemSlotsSubCommand
-import com.undefined.stellar.sub.brigadier.item.ItemSubCommand
-import com.undefined.stellar.sub.brigadier.math.*
-import com.undefined.stellar.sub.brigadier.misc.NamespacedKeySubCommand
-import com.undefined.stellar.sub.brigadier.misc.UUIDSubCommand
-import com.undefined.stellar.sub.brigadier.player.GameModeSubCommand
-import com.undefined.stellar.sub.brigadier.player.GameProfileSubCommand
-import com.undefined.stellar.sub.brigadier.primitive.*
-import com.undefined.stellar.sub.brigadier.scoreboard.*
-import com.undefined.stellar.sub.brigadier.structure.LootTableSubCommand
-import com.undefined.stellar.sub.brigadier.structure.MirrorSubCommand
-import com.undefined.stellar.sub.brigadier.structure.StructureRotationSubCommand
-import com.undefined.stellar.sub.brigadier.text.*
-import com.undefined.stellar.sub.brigadier.world.*
-import com.undefined.stellar.sub.custom.CustomSubCommand
-import com.undefined.stellar.sub.custom.EnumSubCommand
-import com.undefined.stellar.sub.custom.ListSubCommand
-import com.undefined.stellar.sub.custom.OnlinePlayersSubCommand
+import com.undefined.stellar.sub.arguments.custom.CustomSubCommand
+import com.undefined.stellar.sub.arguments.custom.EnumSubCommand
+import com.undefined.stellar.sub.arguments.custom.ListSubCommand
+import com.undefined.stellar.sub.arguments.custom.OnlinePlayersSubCommand
+import com.undefined.stellar.sub.arguments.entity.EntityAnchorSubCommand
+import com.undefined.stellar.sub.arguments.entity.EntityDisplayType
+import com.undefined.stellar.sub.arguments.entity.EntitySubCommand
+import com.undefined.stellar.sub.arguments.item.ItemPredicateSubCommand
+import com.undefined.stellar.sub.arguments.item.ItemSlotSubCommand
+import com.undefined.stellar.sub.arguments.item.ItemSlotsSubCommand
+import com.undefined.stellar.sub.arguments.item.ItemSubCommand
+import com.undefined.stellar.sub.arguments.math.*
+import com.undefined.stellar.sub.arguments.misc.NamespacedKeySubCommand
+import com.undefined.stellar.sub.arguments.misc.UUIDSubCommand
+import com.undefined.stellar.sub.arguments.player.GameModeSubCommand
+import com.undefined.stellar.sub.arguments.player.GameProfileSubCommand
+import com.undefined.stellar.sub.arguments.primitive.*
+import com.undefined.stellar.sub.arguments.scoreboard.*
+import com.undefined.stellar.sub.arguments.structure.LootTableSubCommand
+import com.undefined.stellar.sub.arguments.structure.MirrorSubCommand
+import com.undefined.stellar.sub.arguments.structure.StructureRotationSubCommand
+import com.undefined.stellar.sub.arguments.text.ColorSubCommand
+import com.undefined.stellar.sub.arguments.text.ComponentSubCommand
+import com.undefined.stellar.sub.arguments.text.MessageSubCommand
+import com.undefined.stellar.sub.arguments.text.StyleSubCommand
+import com.undefined.stellar.sub.arguments.world.*
 import org.bukkit.Bukkit
-import java.util.UUID
+import java.util.*
 
 open class SubCommandHandler {
 
@@ -43,8 +46,8 @@ open class SubCommandHandler {
         return subCommand
     }
 
-    fun addSubCommand(name: String): StellarSubCommand {
-        val subCommand = StellarSubCommand(getBase()!!, name)
+    fun addSubCommand(name: String): LiteralStellarSubCommand {
+        val subCommand = LiteralStellarSubCommand(getBase()!!, name)
         addSubCommand(subCommand)
         return subCommand
     }

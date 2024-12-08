@@ -7,7 +7,7 @@ paperweight.reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArt
 
 dependencies {
     paperweight.paperDevBundle("1.20.6-R0.1-SNAPSHOT")
-    implementation("com.mojang:brigadier:1.0.18")
+    implementation("com.mojang:brigadier:1.2.9")
     compileOnly(project(":common"))
 }
 

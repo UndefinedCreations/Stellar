@@ -1,17 +1,15 @@
 package com.undefined.stellar
 
 import com.undefined.stellar.data.HideDefaultFailureMessages
-import com.undefined.stellar.data.execution.CustomStellarExecution
-import com.undefined.stellar.data.requirement.PermissionStellarRequirement
+import com.undefined.stellar.data.argument.CommandContext
 import com.undefined.stellar.data.execution.StellarExecution
 import com.undefined.stellar.data.execution.StellarRunnable
+import com.undefined.stellar.data.requirement.PermissionStellarRequirement
 import com.undefined.stellar.data.requirement.StellarRequirement
 import com.undefined.stellar.sub.SubCommandHandler
-import com.undefined.stellar.sub.custom.CustomSubCommand
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.command.CommandSender
-import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
 import org.jetbrains.annotations.ApiStatus
 
@@ -21,22 +19,14 @@ abstract class AbstractStellarCommand<T>(val name: String, var description: Stri
     override fun getBase(): AbstractStellarCommand<*> = this
 
     @ApiStatus.Internal val aliases: MutableList<String> = mutableListOf()
-    @ApiStatus.Internal val failureMessages: MutableList<Component> = mutableListOf()
-    @ApiStatus.Internal val globalFailureMessages: MutableList<Component> = mutableListOf()
-    @ApiStatus.Internal val failureExecutions: MutableList<CustomStellarExecution<*, Any>> = mutableListOf()
-    @ApiStatus.Internal var hideDefaultFailureMessages: HideDefaultFailureMessages = HideDefaultFailureMessages(false, false)
-    @ApiStatus.Internal private val _requirements: MutableList<StellarRequirement<*>> = mutableListOf()
-    val requirements: List<StellarRequirement<*>>
-        get() {
-            if (this is CustomSubCommand<*>)
-                _requirements.addFirst(
-                    StellarRequirement(CommandSender::class) { this@AbstractStellarCommand.requirement() }
-                )
-            return _requirements
-        }
-    @ApiStatus.Internal val permissionRequirements: MutableList<PermissionStellarRequirement> = mutableListOf()
-    @ApiStatus.Internal val executions: MutableList<StellarExecution<*>> = mutableListOf()
-    @ApiStatus.Internal val runnables: MutableList<StellarRunnable<*>> = mutableListOf()
+    @ApiStatus.Internal open val failureMessages: MutableList<Component> = mutableListOf()
+    @ApiStatus.Internal open val globalFailureMessages: MutableList<Component> = mutableListOf()
+    @ApiStatus.Internal open val failureExecutions: MutableList<StellarExecution<*>> = mutableListOf()
+    @ApiStatus.Internal open var hideDefaultFailureMessages: HideDefaultFailureMessages = HideDefaultFailureMessages(false, false)
+    @ApiStatus.Internal open val requirements: MutableList<StellarRequirement<*>> = mutableListOf()
+    @ApiStatus.Internal open val permissionRequirements: MutableList<PermissionStellarRequirement> = mutableListOf()
+    @ApiStatus.Internal open val executions: MutableList<StellarExecution<*>> = mutableListOf()
+    @ApiStatus.Internal open val runnables: MutableList<StellarRunnable<*>> = mutableListOf()
 
     fun addAlias(name: String): T {
         aliases.add(name)
@@ -64,12 +54,13 @@ abstract class AbstractStellarCommand<T>(val name: String, var description: Stri
     }
 
     inline fun <reified C : CommandSender> addRequirement(noinline requirement: C.() -> Boolean): T {
-        addRequirement(StellarRequirement(C::class, requirement))
+        addRequirement(StellarRequirement(requirement))
         return this as T
     }
 
-    fun addRequirement(requirement: StellarRequirement<*>) {
-        _requirements.add(requirement)
+    fun addRequirement(requirement: StellarRequirement<*>): T {
+        requirements.add(requirement)
+        return this as T
     }
 
     fun addFailureMessage(message: String): T {
@@ -92,9 +83,8 @@ abstract class AbstractStellarCommand<T>(val name: String, var description: Stri
         return this as T
     }
 
-    @Suppress("UNCHECKED_CAST")
-    inline fun <reified C : CommandSender> addFailureExecution(noinline execution: C.(String) -> Unit): T {
-        failureExecutions.add(CustomStellarExecution(C::class, execution) as CustomStellarExecution<*, Any>)
+    inline fun <reified C : CommandSender> addFailureExecution(noinline execution: CommandContext<C>.() -> Unit): T {
+        failureExecutions.add(StellarExecution(execution))
         return this as T
     }
 
@@ -103,13 +93,13 @@ abstract class AbstractStellarCommand<T>(val name: String, var description: Stri
         return this as T
     }
 
-    inline fun <reified C : CommandSender> addExecution(noinline execution: C.() -> Unit): T {
-        executions.add(StellarExecution(C::class, execution))
+    inline fun <reified C : CommandSender> addExecution(noinline execution: CommandContext<C>.() -> Unit): T {
+        executions.add(StellarExecution(execution))
         return this as T
     }
 
-    inline fun <reified C : CommandSender> alwaysRun(noinline execution: C.() -> Boolean): T {
-        runnables.add(StellarRunnable(C::class, execution))
+    inline fun <reified C : CommandSender> addRunnable(noinline execution: CommandContext<C>.() -> Boolean): T {
+        runnables.add(StellarRunnable(execution))
         return this as T
     }
 

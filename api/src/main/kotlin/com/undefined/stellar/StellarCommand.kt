@@ -1,12 +1,11 @@
 package com.undefined.stellar
 
 import com.undefined.stellar.exception.UnsupportedVersionException
-import com.undefined.stellar.listener.StellarListener
 import com.undefined.stellar.manager.CommandManager
 import com.undefined.stellar.util.NMSVersion
-import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.plugin.java.JavaPlugin
+import org.jetbrains.annotations.ApiStatus
 
 class StellarCommand(name: String, description: String = "", vararg aliases: String = arrayOf()) : AbstractStellarCommand<StellarCommand>(name, description) {
 
@@ -18,16 +17,17 @@ class StellarCommand(name: String, description: String = "", vararg aliases: Str
     }
 
     override fun register(plugin: JavaPlugin) {
+        StellarCommands.commands.add(this)
+        CommandManager.initialize(plugin)
         val registrar = CommandManager.registrars[NMSVersion.version] ?: throw UnsupportedVersionException()
         registrar.register(this)
-        CommandManager.initialize(plugin)
-        StellarCommands.commands.add(this)
     }
 
     companion object {
+        @ApiStatus.Internal
         fun parseAndReturnCancelled(sender: CommandSender, input: String): Boolean {
             val registrar = CommandManager.registrars[NMSVersion.version] ?: throw UnsupportedVersionException()
-            return registrar.parseAndReturnCancelled(sender, input)
+            return registrar.handleCommandFailure(sender, input)
         }
     }
 

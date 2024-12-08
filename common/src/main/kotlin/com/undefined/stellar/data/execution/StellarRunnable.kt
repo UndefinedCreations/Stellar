@@ -1,11 +1,10 @@
 package com.undefined.stellar.data.execution
 
+import com.undefined.stellar.data.argument.CommandContext
 import org.bukkit.command.CommandSender
-import kotlin.reflect.KClass
-import kotlin.reflect.safeCast
 
-data class StellarRunnable<T : CommandSender>(val kClass: KClass<T>, val execution: T.() -> Boolean) {
-    fun run(sender: CommandSender): Boolean {
-        return execution.invoke(kClass.safeCast(sender) ?: return false)
+data class StellarRunnable<C : CommandSender>(val execution: CommandContext<C>.() -> Boolean) {
+    fun run(context: CommandContext<CommandSender>): Boolean {
+        return execution(context as? CommandContext<C> ?: return true)
     }
 }

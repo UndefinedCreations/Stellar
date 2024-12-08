@@ -1,11 +1,10 @@
 package com.undefined.stellar.data.execution
 
+import com.undefined.stellar.data.argument.CommandContext
 import org.bukkit.command.CommandSender
-import kotlin.reflect.KClass
-import kotlin.reflect.safeCast
 
-data class StellarExecution<T : CommandSender>(val kClass: KClass<T>, val execution: T.() -> Unit) {
-    fun run(sender: CommandSender) {
-        execution.invoke(kClass.safeCast(sender) ?: return)
+data class StellarExecution<T : CommandSender>(val execution: CommandContext<T>.() -> Unit) {
+    operator fun invoke(context: CommandContext<CommandSender>) {
+        execution(context as? CommandContext<T> ?: return)
     }
 }
