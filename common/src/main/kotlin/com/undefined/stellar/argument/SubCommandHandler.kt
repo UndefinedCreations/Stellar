@@ -201,4 +201,7 @@ open class ArgumentHandler {
     fun addOnlinePlayersArgument(name: String): OnlinePlayersArgument =
         addArgument { OnlinePlayersArgument(base, name) { Bukkit.getOnlinePlayers().toList() } }
 
+    fun addGameEventArgument(name: String): GameEventArgument =
+        addArgument { GameEventArgument(base, name) }
+
 }

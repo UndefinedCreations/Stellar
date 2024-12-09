@@ -7,6 +7,8 @@ import com.mojang.brigadier.builder.RequiredArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.context.ParsedArgument
 import com.mojang.brigadier.context.StringRange
+import com.mojang.brigadier.exceptions.CommandSyntaxException
+import com.mojang.brigadier.exceptions.DynamicCommandExceptionType
 import com.undefined.stellar.argument.AbstractStellarArgument
 import com.undefined.stellar.argument.LiteralStellarArgument
 import com.undefined.stellar.argument.types.custom.CustomArgument
@@ -23,10 +25,7 @@ import com.undefined.stellar.argument.types.scoreboard.DisplaySlotArgument
 import com.undefined.stellar.argument.types.scoreboard.ScoreHoldersArgument
 import com.undefined.stellar.argument.types.structure.MirrorArgument
 import com.undefined.stellar.argument.types.structure.StructureRotationArgument
-import com.undefined.stellar.argument.types.world.BlockDataArgument
-import com.undefined.stellar.argument.types.world.HeightMapArgument
-import com.undefined.stellar.argument.types.world.LocationArgument
-import com.undefined.stellar.argument.types.world.LocationType
+import com.undefined.stellar.argument.types.world.*
 import com.undefined.stellar.data.argument.Anchor
 import com.undefined.stellar.data.argument.Operation
 import com.undefined.stellar.data.argument.ParticleData
@@ -39,6 +38,8 @@ import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import net.minecraft.commands.CommandBuildContext
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.arguments.*
+import net.minecraft.commands.arguments.DimensionArgument
+import net.minecraft.commands.arguments.ParticleArgument
 import net.minecraft.commands.arguments.ResourceOrIdArgument.LootTableArgument
 import net.minecraft.commands.arguments.blocks.BlockPredicateArgument
 import net.minecraft.commands.arguments.blocks.BlockStateArgument
@@ -47,7 +48,12 @@ import net.minecraft.commands.arguments.item.ItemArgument
 import net.minecraft.commands.arguments.item.ItemPredicateArgument
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
+import net.minecraft.core.Holder
+import net.minecraft.core.Registry
 import net.minecraft.core.particles.*
+import net.minecraft.core.registries.Registries
+import net.minecraft.network.chat.Component
+import net.minecraft.resources.ResourceKey
 import net.minecraft.server.level.ColumnPos
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.pattern.BlockInWorld
@@ -139,6 +145,7 @@ object ArgumentHelper {
             is HeightMapArgument -> HeightmapTypeArgument.heightmap()
             is com.undefined.stellar.argument.types.structure.LootTableArgument -> LootTableArgument.lootTable(COMMAND_BUILD_CONTEXT)
             is UUIDArgument -> UuidArgument.uuid()
+            is GameEventArgument -> ResourceKeyArgument.key(Registries.GAME_EVENT)
             else -> throw UnsupportedArgumentException()
         }
 
@@ -206,6 +213,10 @@ object ArgumentHelper {
             is HeightMapArgument -> HeightMap.valueOf(HeightmapTypeArgument.getHeightmap(context, Argument.name).name)
             is com.undefined.stellar.argument.types.structure.LootTableArgument -> LootTableArgument.getLootTable(context, Argument.name).value().craftLootTable
             is UUIDArgument -> UuidArgument.getUuid(context, Argument.name)
+            is GameEventArgument -> {
+                val key = resolveKey(context, Argument.name, Registries.GAME_EVENT).key().location()
+                org.bukkit.Registry.GAME_EVENT.get(NamespacedKey(key.namespace, key.path))
+            }
             else -> throw UnsupportedArgumentException()
         }
     }
@@ -217,6 +228,40 @@ object ArgumentHelper {
         val argument = arguments[name] ?: return null
         val range = StringRange.between(argument.range.start, context.input.length)
         return range.get(context.input)
+    }
+
+    @Throws(CommandSyntaxException::class)
+    private fun <T> getRegistryKey(
+        context: CommandContext<CommandSourceStack>,
+        name: String,
+        registryRef: ResourceKey<Registry<T>>,
+        invalidException: DynamicCommandExceptionType
+    ): ResourceKey<T> {
+        val resourceKey = context.getArgument(name, ResourceKey::class.java)
+        val optional = resourceKey.cast(registryRef)
+        return optional.orElseThrow {
+            invalidException.create(resourceKey)
+        }
+    }
+
+    private fun <T> getRegistry(
+        context: CommandContext<CommandSourceStack>,
+        registryRef: ResourceKey<out Registry<T>>
+    ): Registry<T> {
+        return context.source.server.registryAccess().registryOrThrow(registryRef)
+    }
+
+    @Throws(CommandSyntaxException::class)
+    private fun <T> resolveKey(
+        context: CommandContext<CommandSourceStack>,
+        name: String,
+        registryRef: ResourceKey<Registry<T>>
+    ): Holder.Reference<T> {
+        val invalidException = DynamicCommandExceptionType { argument ->
+            Component.translatableEscape("argument.resource_or_id.invalid", argument)
+        }
+        val resourceKey = getRegistryKey(context, name, registryRef, invalidException)
+        return getRegistry(context, registryRef).getHolder(resourceKey).orElseThrow { invalidException.create(resourceKey.location()) }
     }
 
     private fun brigadier(type: StringType): StringArgumentType = when (type) {
