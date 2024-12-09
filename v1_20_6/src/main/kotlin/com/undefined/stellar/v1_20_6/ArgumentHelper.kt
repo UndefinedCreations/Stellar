@@ -15,6 +15,7 @@ import com.undefined.stellar.argument.types.custom.CustomArgument
 import com.undefined.stellar.argument.types.custom.EnumArgument
 import com.undefined.stellar.argument.types.custom.ListArgument
 import com.undefined.stellar.argument.types.entity.EntityDisplayType
+import com.undefined.stellar.argument.types.entity.PotionEffectTypeArgument
 import com.undefined.stellar.argument.types.item.ItemSlotArgument
 import com.undefined.stellar.argument.types.item.ItemSlotsArgument
 import com.undefined.stellar.argument.types.math.AxisArgument
@@ -148,6 +149,7 @@ object ArgumentHelper {
             is UUIDArgument -> UuidArgument.uuid()
             is GameEventArgument -> ResourceKeyArgument.key(Registries.GAME_EVENT)
             is StructureTypeArgument -> ResourceKeyArgument.key(Registries.STRUCTURE_TYPE)
+            is PotionEffectTypeArgument -> ResourceKeyArgument.key(Registries.MOB_EFFECT)
             else -> throw UnsupportedArgumentException()
         }
 
@@ -217,6 +219,7 @@ object ArgumentHelper {
             is UUIDArgument -> UuidArgument.getUuid(context, argument.name)
             is GameEventArgument -> org.bukkit.Registry.GAME_EVENT.get(getId(context, argument.name, Registries.GAME_EVENT))
             is StructureTypeArgument -> org.bukkit.Registry.STRUCTURE_TYPE.get(getId(context, argument.name, Registries.STRUCTURE_TYPE))
+            is PotionEffectTypeArgument -> org.bukkit.Registry.POTION_EFFECT_TYPE.get(getId(context, argument.name, Registries.MOB_EFFECT))
             else -> throw UnsupportedArgumentException()
         }
     }

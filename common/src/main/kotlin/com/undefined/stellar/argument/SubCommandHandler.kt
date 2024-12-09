@@ -8,6 +8,7 @@ import com.undefined.stellar.argument.types.custom.OnlinePlayersArgument
 import com.undefined.stellar.argument.types.entity.EntityAnchorArgument
 import com.undefined.stellar.argument.types.entity.EntityArgument
 import com.undefined.stellar.argument.types.entity.EntityDisplayType
+import com.undefined.stellar.argument.types.entity.PotionEffectTypeArgument
 import com.undefined.stellar.argument.types.item.ItemArgument
 import com.undefined.stellar.argument.types.item.ItemPredicateArgument
 import com.undefined.stellar.argument.types.item.ItemSlotArgument
@@ -207,5 +208,8 @@ open class ArgumentHandler {
 
     fun addStructureTypeArgument(name: String): StructureTypeArgument =
         addArgument { StructureTypeArgument(base, name) }
+
+    fun addPotionEffectTypeArgument(name: String): PotionEffectTypeArgument =
+        addArgument { PotionEffectTypeArgument(base, name) }
 
 }
