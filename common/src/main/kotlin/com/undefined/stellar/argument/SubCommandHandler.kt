@@ -73,14 +73,19 @@ open class ArgumentHandler {
     fun addBooleanArgument(name: String): BooleanArgument =
         addArgument { BooleanArgument(base, name) }
 
-    fun <T> addListArgument(name: String, list: List<T>, parse: (String) -> T): ListArgument<T> =
-        addArgument { ListArgument(base, name, list, parse = parse) }
+    fun <T> addListArgument(
+        name: String,
+        list: List<T>,
+        stringifier: (T) -> String,
+        parse: (String) -> T,
+        type: AbstractStellarArgument<*> = StringArgument(base, name, StringType.SINGLE_WORD)
+    ): ListArgument<T> = addArgument { ListArgument(base, name, list, stringifier, parse, type) }
 
-    fun addStringListArgument(name: String, list: List<String>): ListArgument<String> =
-        addArgument { ListArgument(base, name, list) { it } }
+    fun addStringListArgument(name: String, list: List<String>, type: StringType): ListArgument<String> =
+        addArgument { ListArgument(base, name, list, { it }, { it }, StringArgument(base, name, type)) }
 
     fun addUUIDListArgument(name: String, list: List<UUID>): ListArgument<UUID> =
-        addArgument { ListArgument(base, name, list) { UUID.fromString(it) } }
+        addArgument { ListArgument(base, name, list, parse = { UUID.fromString(it) }, type = UUIDArgument(base, name) ) }
 
     inline fun <reified T : Enum<T>> addEnumArgument(name: String): EnumArgument<T> =
         addArgument { EnumArgument<T>(base, name, T::class) }

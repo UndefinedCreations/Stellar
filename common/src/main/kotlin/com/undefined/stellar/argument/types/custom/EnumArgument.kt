@@ -19,6 +19,7 @@ class EnumArgument<T : Enum<T>>(
         }
     }
 ) : AbstractStellarArgument<EnumArgument<T>>(parent, name) {
+
     fun getStringList(): List<String> = enum.java.enumConstants.map(stringifier)
     fun valueOf(name: String): Enum<T>? =
         try {

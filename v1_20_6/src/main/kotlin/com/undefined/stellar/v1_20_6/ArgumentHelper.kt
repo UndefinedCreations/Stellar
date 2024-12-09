@@ -111,7 +111,8 @@ object ArgumentHelper {
 
     fun <T : AbstractStellarArgument<*>> getArgumentType(argument: T): ArgumentType<*> =
         when (argument) {
-            is ListArgument<*> -> StringArgumentType.string()
+            is ListArgument<*> -> getArgumentType(argument.type)
+            is EnumArgument<*> -> StringArgumentType.word()
             is CustomArgument<*> -> getArgumentType(argument.type)
             is StringArgument -> brigadier(argument.type)
             is IntegerArgument -> IntegerArgumentType.integer(argument.min, argument.max)
