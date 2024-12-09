@@ -5,7 +5,6 @@ import com.undefined.stellar.argument.types.block.*
 import com.undefined.stellar.argument.types.custom.CustomArgument
 import com.undefined.stellar.argument.types.custom.EnumArgument
 import com.undefined.stellar.argument.types.custom.ListArgument
-import com.undefined.stellar.argument.types.custom.OnlinePlayersArgument
 import com.undefined.stellar.argument.types.entity.*
 import com.undefined.stellar.argument.types.item.*
 import com.undefined.stellar.argument.types.math.*
@@ -26,6 +25,7 @@ import com.undefined.stellar.argument.types.text.MessageArgument
 import com.undefined.stellar.argument.types.text.StyleArgument
 import com.undefined.stellar.argument.types.world.*
 import org.bukkit.Bukkit
+import org.bukkit.entity.Player
 import java.util.*
 
 open class ArgumentHandler {
@@ -201,8 +201,17 @@ open class ArgumentHandler {
     fun addUUIDArgument(name: String): UUIDArgument =
         addArgument { UUIDArgument(base, name) }
 
-    fun addOnlinePlayersArgument(name: String): OnlinePlayersArgument =
-        addArgument { OnlinePlayersArgument(base, name) { Bukkit.getOnlinePlayers().toList() } }
+    fun addOnlinePlayersArgument(name: String): ListArgument<Player> =
+        addArgument {
+            ListArgument(
+                base,
+                name,
+                Bukkit.getOnlinePlayers().toList(),
+                { it.name },
+                { Bukkit.getPlayer(it) },
+                StringArgument(base, name, StringType.SINGLE_WORD)
+            )
+        }
 
     fun addGameEventArgument(name: String): GameEventArgument =
         addArgument { GameEventArgument(base, name) }
