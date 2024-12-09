@@ -8,6 +8,7 @@ import org.bukkit.command.CommandSender
 import org.bukkit.plugin.java.JavaPlugin
 import org.jetbrains.annotations.ApiStatus
 
+@Suppress("UNCHECKED_CAST")
 abstract class AbstractStellarArgument<T>(val parent: AbstractStellarCommand<*>, name: String) : AbstractStellarCommand<T>(name) {
 
     @ApiStatus.Internal open val suggestions: MutableList<StellarSuggestion<*>> = mutableListOf()

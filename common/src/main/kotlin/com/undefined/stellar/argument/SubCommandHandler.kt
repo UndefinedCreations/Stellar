@@ -9,10 +9,7 @@ import com.undefined.stellar.argument.types.entity.EntityAnchorArgument
 import com.undefined.stellar.argument.types.entity.EntityArgument
 import com.undefined.stellar.argument.types.entity.EntityDisplayType
 import com.undefined.stellar.argument.types.entity.PotionEffectTypeArgument
-import com.undefined.stellar.argument.types.item.ItemArgument
-import com.undefined.stellar.argument.types.item.ItemPredicateArgument
-import com.undefined.stellar.argument.types.item.ItemSlotArgument
-import com.undefined.stellar.argument.types.item.ItemSlotsArgument
+import com.undefined.stellar.argument.types.item.*
 import com.undefined.stellar.argument.types.math.*
 import com.undefined.stellar.argument.types.misc.NamespacedKeyArgument
 import com.undefined.stellar.argument.types.misc.UUIDArgument
@@ -214,5 +211,8 @@ open class ArgumentHandler {
 
     fun addBlockTypeArgument(name: String): BlockTypeArgument =
         addArgument { BlockTypeArgument(base, name) }
+
+    fun addItemTypeArgument(name: String): ItemTypeArgument =
+        addArgument { ItemTypeArgument(base, name) }
 
 }
