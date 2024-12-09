@@ -25,6 +25,7 @@ import com.undefined.stellar.argument.types.text.MessageArgument
 import com.undefined.stellar.argument.types.text.StyleArgument
 import com.undefined.stellar.argument.types.world.*
 import org.bukkit.Bukkit
+import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Player
 import java.util.*
 
@@ -209,6 +210,18 @@ open class ArgumentHandler {
                 Bukkit.getOnlinePlayers().toList(),
                 { it.name },
                 { Bukkit.getPlayer(it) },
+                StringArgument(base, name, StringType.SINGLE_WORD)
+            )
+        }
+
+    fun addOfflinePlayersArgument(name: String): ListArgument<OfflinePlayer> =
+        addArgument {
+            ListArgument(
+                base,
+                name,
+                Bukkit.getOfflinePlayers().toList(),
+                { it.name!! },
+                { Bukkit.getOfflinePlayer(it) },
                 StringArgument(base, name, StringType.SINGLE_WORD)
             )
         }
