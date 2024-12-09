@@ -1,6 +1,7 @@
 package com.undefined.stellar.argument
 
 import com.undefined.stellar.AbstractStellarCommand
+import com.undefined.stellar.argument.types.block.*
 import com.undefined.stellar.argument.types.custom.CustomArgument
 import com.undefined.stellar.argument.types.custom.EnumArgument
 import com.undefined.stellar.argument.types.custom.ListArgument
@@ -8,16 +9,17 @@ import com.undefined.stellar.argument.types.custom.OnlinePlayersArgument
 import com.undefined.stellar.argument.types.entity.*
 import com.undefined.stellar.argument.types.item.*
 import com.undefined.stellar.argument.types.math.*
+import com.undefined.stellar.argument.types.misc.AttributeArgument
 import com.undefined.stellar.argument.types.misc.NamespacedKeyArgument
 import com.undefined.stellar.argument.types.misc.UUIDArgument
 import com.undefined.stellar.argument.types.player.GameModeArgument
 import com.undefined.stellar.argument.types.player.GameProfileArgument
+import com.undefined.stellar.argument.types.player.InventoryTypeArgument
 import com.undefined.stellar.argument.types.primitive.*
 import com.undefined.stellar.argument.types.scoreboard.*
-import com.undefined.stellar.argument.types.structure.LootTableArgument
-import com.undefined.stellar.argument.types.structure.MirrorArgument
-import com.undefined.stellar.argument.types.structure.StructureRotationArgument
-import com.undefined.stellar.argument.types.structure.StructureTypeArgument
+import com.undefined.stellar.argument.types.sound.InstrumentArgument
+import com.undefined.stellar.argument.types.sound.SoundArgument
+import com.undefined.stellar.argument.types.structure.*
 import com.undefined.stellar.argument.types.text.ColorArgument
 import com.undefined.stellar.argument.types.text.ComponentArgument
 import com.undefined.stellar.argument.types.text.MessageArgument
@@ -217,5 +219,62 @@ open class ArgumentHandler {
 
     fun addFrogVariantArgument(name: String): FrogVariantArgument =
         addArgument { FrogVariantArgument(base, name) }
+
+    fun addVillagerProfessionArgument(name: String): VillagerProfessionArgument =
+        addArgument { VillagerProfessionArgument(base, name) }
+
+    fun addVillagerTypeArgument(name: String): VillagerTypeArgument =
+        addArgument { VillagerTypeArgument(base, name) }
+
+    fun addMapDecorationType(name: String): MapDecorationTypeArgument =
+        addArgument { MapDecorationTypeArgument(base, name) }
+
+    fun addInventoryTypeArgument(name: String): InventoryTypeArgument =
+        addArgument { InventoryTypeArgument(base, name) }
+
+    fun addAttributeArgument(name: String): AttributeArgument =
+        addArgument { AttributeArgument(base, name) }
+
+    fun addFluidArgument(name: String): FluidArgument =
+        addArgument { FluidArgument(base, name) }
+
+    fun addSoundArgument(name: String): SoundArgument =
+        addArgument { SoundArgument(base, name) }
+
+    fun addBiomeArgument(name: String): BiomeArgument =
+        addArgument { BiomeArgument(base, name) }
+
+    fun addStructureArgument(name: String): StructureArgument =
+        addArgument { StructureArgument(base, name) }
+
+    fun addTrimMaterialArgument(name: String): TrimMaterialArgument =
+        addArgument { TrimMaterialArgument(base, name) }
+
+    fun addTrimPatternArgument(name: String): TrimPatternArgument =
+        addArgument { TrimPatternArgument(base, name) }
+
+    fun addDamageTypeArgument(name: String): DamageTypeArgument =
+        addArgument { DamageTypeArgument(base, name) }
+
+    fun addWolfVariantArgument(name: String): WolfVariantArgument =
+        addArgument { WolfVariantArgument(base, name) }
+
+    fun addPatternTypeArgument(name: String): PatternTypeArgument =
+        addArgument { PatternTypeArgument(base, name) }
+
+    fun addArtArgument(name: String): ArtArgument =
+        addArgument { ArtArgument(base, name) }
+
+    fun addInstrumentArgument(name: String): InstrumentArgument =
+        addArgument { InstrumentArgument(base, name) }
+
+    fun addEntityTypeArgument(name: String): EntityTypeArgument =
+        addArgument { EntityTypeArgument(base, name) }
+
+    fun addPotionArgument(name: String): PotionArgument =
+        addArgument { PotionArgument(base, name) }
+
+    fun addMemoryKeyArgument(name: String): MemoryKeyArgument =
+        addArgument { MemoryKeyArgument(base, name) }
 
 }
