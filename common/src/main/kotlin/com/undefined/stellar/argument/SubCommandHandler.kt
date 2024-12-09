@@ -31,7 +31,7 @@ import java.util.*
 
 open class ArgumentHandler {
 
-    open val base: AbstractStellarCommand<*> get() = throw IllegalStateException("Cannot access the getter from the property base when it hasn't been overrided!")
+    open val base: AbstractStellarCommand<*> get() = throw IllegalStateException("Cannot access the getter from the property base when it hasn't been overridden!")
     open val arguments: MutableList<AbstractStellarArgument<*>> = mutableListOf()
 
     fun addArgument(argument: AbstractStellarArgument<*>): AbstractStellarArgument<*> {
@@ -51,13 +51,16 @@ open class ArgumentHandler {
         return parsedArgument as T
     }
 
-    fun <T> addCustomArgument(Argument: CustomArgument<T>): CustomArgument<T> {
-        addArgument(Argument)
-        return Argument
+    fun <T> addCustomArgument(argument: CustomArgument<T>): CustomArgument<T> {
+        addArgument(argument)
+        return argument
     }
 
     fun addStringArgument(name: String, type: StringType = StringType.SINGLE_WORD): StringArgument =
-        addArgument { StringArgument(base, name, type) }
+        addArgument { StringArgument(base, name, type)  }
+
+    fun addGreedyStringArgument(name: String): GreedyStringArgument =
+        addArgument { GreedyStringArgument(base, name) }
 
     fun addIntegerArgument(name: String, min: Int = Int.MIN_VALUE, max: Int = Int.MAX_VALUE): IntegerArgument =
         addArgument { IntegerArgument(base, name, min, max) }
@@ -214,6 +217,7 @@ open class ArgumentHandler {
             )
         }
 
+    @Suppress("DEPRECATION")
     fun addOfflinePlayersArgument(name: String): ListArgument<OfflinePlayer> =
         addArgument {
             ListArgument(

@@ -1,10 +1,10 @@
 package com.undefined.stellar
 
 import com.undefined.stellar.argument.ArgumentHandler
-import com.undefined.stellar.data.HideDefaultFailureMessages
 import com.undefined.stellar.data.argument.CommandContext
 import com.undefined.stellar.data.execution.StellarExecution
 import com.undefined.stellar.data.execution.StellarRunnable
+import com.undefined.stellar.data.failure.HideDefaultFailureMessages
 import com.undefined.stellar.data.requirement.PermissionStellarRequirement
 import com.undefined.stellar.data.requirement.StellarRequirement
 import net.kyori.adventure.text.Component
@@ -93,13 +93,23 @@ abstract class AbstractStellarCommand<T>(val name: String, var description: Stri
         return this as T
     }
 
+    inline fun <reified C : CommandSender> setExecution(noinline execution: CommandContext<C>.() -> Unit): T {
+        executions.clear()
+        return addExecution<C>(execution)
+    }
+
     inline fun <reified C : CommandSender> addExecution(noinline execution: CommandContext<C>.() -> Unit): T {
         executions.add(StellarExecution(execution))
         return this as T
     }
 
-    inline fun <reified C : CommandSender> addRunnable(noinline execution: CommandContext<C>.() -> Boolean): T {
-        runnables.add(StellarRunnable(execution))
+    inline fun <reified C : CommandSender> setRunnable(noinline runnable: CommandContext<C>.() -> Boolean): T {
+        runnables.clear()
+        return addRunnable<C>(runnable)
+    }
+
+    inline fun <reified C : CommandSender> addRunnable(noinline runnable: CommandContext<C>.() -> Boolean): T {
+        runnables.add(StellarRunnable(runnable))
         return this as T
     }
 

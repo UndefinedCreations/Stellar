@@ -22,9 +22,9 @@ object BrigadierCommandHelper {
     fun handleExecutions(command: AbstractStellarCommand<*>, context: CommandContext<CommandSourceStack>) {
         val stellarContext = CommandContextAdapter.getStellarCommandContext(context)
 
-        for (runnable in command.base.runnables) runnable.run(stellarContext)
+        for (runnable in command.base.runnables) runnable(stellarContext)
         val arguments = getArguments(command.base, context)
-        for (argument in arguments) for (runnable in argument.runnables) runnable.run(stellarContext)
+        for (argument in arguments) for (runnable in argument.runnables) runnable(stellarContext)
         for (execution in command.executions) execution(stellarContext)
     }
 

@@ -6,6 +6,7 @@ import com.undefined.stellar.StellarCommands
 import com.undefined.stellar.argument.LiteralStellarArgument
 import com.undefined.stellar.argument.types.custom.CustomArgument
 import com.undefined.stellar.data.argument.CommandNode
+import com.undefined.stellar.data.argument.GreedyCommandContext
 import com.undefined.stellar.exception.DuplicateArgumentNameException
 import com.undefined.stellar.exception.LiteralArgumentMismatchException
 import io.papermc.paper.adventure.PaperAdventure
@@ -43,6 +44,19 @@ object CommandContextAdapter {
         )
     }
 
+    fun getGreedyCommandContext(context: CommandContext<CommandSourceStack>): GreedyCommandContext<CommandSender> {
+        val input = context.input.removePrefix("/")
+        val words = input.split(' ').toMutableList()
+
+        val totalOtherArguments = context.nodes.size - 1
+        for (i in (1..totalOtherArguments)) words.removeFirst()
+        return GreedyCommandContext(
+            words,
+            context.source.bukkitSender,
+            input
+        )
+    }
+
     fun getCommandSourceStack(sender: CommandSender): CommandSourceStack {
         val overworld = MinecraftServer.getServer().overworld()
         return CommandSourceStack(
@@ -59,6 +73,7 @@ object CommandContextAdapter {
     }
 
     @JvmRecord
+    @Suppress("DEPRECATION")
     private data class Source(val sender: CommandSender) : CommandSource {
         override fun sendSystemMessage(message: Component) {
             sender.sendMessage(Identity.nil(), PaperAdventure.asAdventure(message))

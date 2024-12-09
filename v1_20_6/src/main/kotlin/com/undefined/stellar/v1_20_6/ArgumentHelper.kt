@@ -88,7 +88,7 @@ import java.time.Duration
 import java.util.*
 import java.util.function.Predicate
 
-@Suppress("DEPRECATED")
+@Suppress("DEPRECATION", "UNCHECKED_CAST")
 object ArgumentHelper {
 
     private val COMMAND_BUILD_CONTEXT: CommandBuildContext by lazy {
@@ -115,6 +115,7 @@ object ArgumentHelper {
             is EnumArgument<*> -> StringArgumentType.word()
             is CustomArgument<*> -> getArgumentType(argument.type)
             is StringArgument -> brigadier(argument.type)
+            is GreedyStringArgument -> brigadier(StringType.GREEDY_PHRASE)
             is IntegerArgument -> IntegerArgumentType.integer(argument.min, argument.max)
             is LongArgument -> LongArgumentType.longArg(argument.min, argument.max)
             is FloatArgument -> FloatArgumentType.floatArg(argument.min, argument.max)
@@ -377,7 +378,7 @@ object ArgumentHelper {
     }
 
     private fun RequiredArgumentBuilder<CommandSourceStack, *>.suggestStringList(list: () -> List<String>) =
-        suggests { context, suggestionsBuilder ->
+        suggests { _, suggestionsBuilder ->
             list().filter { it.startsWith(suggestionsBuilder.remaining, true) }.forEach { suggestionsBuilder.suggest(it) }
             return@suggests suggestionsBuilder.buildFuture()
         }
@@ -443,7 +444,6 @@ object ArgumentHelper {
             CraftItemStack.asBukkitCopy(particleOptions.item)
         )
         is VibrationParticleOption -> {
-            val origin: Vec3 = context.source.position
             val level: Level = context.source.level
             val destination: Vibration.Destination
 
