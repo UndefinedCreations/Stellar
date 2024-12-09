@@ -5,6 +5,7 @@ import com.undefined.stellar.argument.AbstractStellarArgument
 import java.lang.Enum.valueOf
 import kotlin.reflect.KClass
 
+@Suppress("UNCHECKED_CAST")
 class EnumArgument<T : Enum<T>>(
     parent: AbstractStellarCommand<*>,
     name: String,

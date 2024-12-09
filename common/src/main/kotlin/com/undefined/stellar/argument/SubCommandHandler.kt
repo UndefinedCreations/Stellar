@@ -215,4 +215,7 @@ open class ArgumentHandler {
     fun addCatTypeArgument(name: String): CatTypeArgument =
         addArgument { CatTypeArgument(base, name) }
 
+    fun addFrogVariantArgument(name: String): FrogVariantArgument =
+        addArgument { FrogVariantArgument(base, name) }
+
 }
