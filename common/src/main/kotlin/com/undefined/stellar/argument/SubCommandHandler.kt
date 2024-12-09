@@ -22,6 +22,7 @@ import com.undefined.stellar.argument.types.scoreboard.*
 import com.undefined.stellar.argument.types.structure.LootTableArgument
 import com.undefined.stellar.argument.types.structure.MirrorArgument
 import com.undefined.stellar.argument.types.structure.StructureRotationArgument
+import com.undefined.stellar.argument.types.structure.StructureTypeArgument
 import com.undefined.stellar.argument.types.text.ColorArgument
 import com.undefined.stellar.argument.types.text.ComponentArgument
 import com.undefined.stellar.argument.types.text.MessageArgument
@@ -203,5 +204,8 @@ open class ArgumentHandler {
 
     fun addGameEventArgument(name: String): GameEventArgument =
         addArgument { GameEventArgument(base, name) }
+
+    fun addStructureTypeArgument(name: String): StructureTypeArgument =
+        addArgument { StructureTypeArgument(base, name) }
 
 }

@@ -25,6 +25,7 @@ import com.undefined.stellar.argument.types.scoreboard.DisplaySlotArgument
 import com.undefined.stellar.argument.types.scoreboard.ScoreHoldersArgument
 import com.undefined.stellar.argument.types.structure.MirrorArgument
 import com.undefined.stellar.argument.types.structure.StructureRotationArgument
+import com.undefined.stellar.argument.types.structure.StructureTypeArgument
 import com.undefined.stellar.argument.types.world.*
 import com.undefined.stellar.data.argument.Anchor
 import com.undefined.stellar.data.argument.Operation
@@ -146,77 +147,76 @@ object ArgumentHelper {
             is com.undefined.stellar.argument.types.structure.LootTableArgument -> LootTableArgument.lootTable(COMMAND_BUILD_CONTEXT)
             is UUIDArgument -> UuidArgument.uuid()
             is GameEventArgument -> ResourceKeyArgument.key(Registries.GAME_EVENT)
+            is StructureTypeArgument -> ResourceKeyArgument.key(Registries.STRUCTURE_TYPE)
             else -> throw UnsupportedArgumentException()
         }
 
-    fun <T : AbstractStellarArgument<*>> getParsedArgument(context: CommandContext<CommandSourceStack>, Argument: T): Any? {
-        return when (Argument) {
+    fun <T : AbstractStellarArgument<*>> getParsedArgument(context: CommandContext<CommandSourceStack>, argument: T): Any? {
+        return when (argument) {
             is LiteralStellarArgument -> throw LiteralArgumentMismatchException()
-            is CustomArgument<*> -> Argument.parse(CommandContextAdapter.getStellarCommandContext(context))
-            is StringArgument -> StringArgumentType.getString(context, Argument.name)
-            is IntegerArgument -> IntegerArgumentType.getInteger(context, Argument.name)
-            is FloatArgument -> FloatArgumentType.getFloat(context, Argument.name)
-            is DoubleArgument -> DoubleArgumentType.getDouble(context, Argument.name)
-            is BooleanArgument -> BoolArgumentType.getBool(context, Argument.name)
-            is ListArgument<*> -> Argument.parse(StringArgumentType.getString(context, Argument.name))
-            is EnumArgument<*> -> Argument.parse(StringArgumentType.getString(context, Argument.name))
-            is com.undefined.stellar.argument.types.entity.EntityArgument -> EntityArgument.getEntities(context, Argument.name)
+            is CustomArgument<*> -> argument.parse(CommandContextAdapter.getStellarCommandContext(context))
+            is StringArgument -> StringArgumentType.getString(context, argument.name)
+            is IntegerArgument -> IntegerArgumentType.getInteger(context, argument.name)
+            is FloatArgument -> FloatArgumentType.getFloat(context, argument.name)
+            is DoubleArgument -> DoubleArgumentType.getDouble(context, argument.name)
+            is BooleanArgument -> BoolArgumentType.getBool(context, argument.name)
+            is ListArgument<*> -> argument.parse(StringArgumentType.getString(context, argument.name))
+            is EnumArgument<*> -> argument.parse(StringArgumentType.getString(context, argument.name))
+            is com.undefined.stellar.argument.types.entity.EntityArgument -> EntityArgument.getEntities(context, argument.name)
                 .map { it.bukkitEntity }.toMutableList()
-                .addAll(listOf(EntityArgument.getEntity(context, Argument.name).bukkitEntity))
-            is com.undefined.stellar.argument.types.player.GameProfileArgument -> GameProfileArgument.getGameProfiles(context, Argument.name)
-            is LocationArgument -> getLocation(context, Argument)
-            is BlockDataArgument -> CraftBlockData.fromData(BlockStateArgument.getBlock(context, Argument.name).state)
+                .addAll(listOf(EntityArgument.getEntity(context, argument.name).bukkitEntity))
+            is com.undefined.stellar.argument.types.player.GameProfileArgument -> GameProfileArgument.getGameProfiles(context, argument.name)
+            is LocationArgument -> getLocation(context, argument)
+            is BlockDataArgument -> CraftBlockData.fromData(BlockStateArgument.getBlock(context, argument.name).state)
             is com.undefined.stellar.argument.types.world.BlockPredicateArgument -> Predicate<Block> { block: Block ->
-                BlockPredicateArgument.getBlockPredicate(context, Argument.name).test(BlockInWorld(
+                BlockPredicateArgument.getBlockPredicate(context, argument.name).test(BlockInWorld(
                     context.source.level,
                     BlockPos(block.x, block.y, block.z), true
                 ))
             }
-            is com.undefined.stellar.argument.types.item.ItemArgument -> CraftItemStack.asBukkitCopy(ItemArgument.getItem(context, Argument.name).createItemStack(1, false))
+            is com.undefined.stellar.argument.types.item.ItemArgument -> CraftItemStack.asBukkitCopy(ItemArgument.getItem(context, argument.name).createItemStack(1, false))
             is com.undefined.stellar.argument.types.item.ItemPredicateArgument -> Predicate<ItemStack> { item: ItemStack ->
-                ItemPredicateArgument.getItemPredicate(context, Argument.name).test(CraftItemStack.asNMSCopy(item))
+                ItemPredicateArgument.getItemPredicate(context, argument.name).test(CraftItemStack.asNMSCopy(item))
             }
-            is com.undefined.stellar.argument.types.text.ColorArgument -> ColorArgument.getColor(context, Argument.name).color?.let { Style.style(TextColor.color(it)) } ?: Style.empty()
-            is com.undefined.stellar.argument.types.text.ComponentArgument ->  GsonComponentSerializer.gson().deserialize(net.minecraft.network.chat.Component.Serializer.toJson(ComponentArgument.getComponent(context, Argument.name), COMMAND_BUILD_CONTEXT))
-            is com.undefined.stellar.argument.types.text.StyleArgument ->  GsonComponentSerializer.gson().deserialize(getArgumentInput(context, Argument.name) ?: return null).style()
-            is com.undefined.stellar.argument.types.text.MessageArgument ->  GsonComponentSerializer.gson().deserialize(net.minecraft.network.chat.Component.Serializer.toJson(MessageArgument.getMessage(context, Argument.name), COMMAND_BUILD_CONTEXT))
-            is com.undefined.stellar.argument.types.scoreboard.ObjectiveArgument ->  Bukkit.getScoreboardManager().mainScoreboard.getObjective(ObjectiveArgument.getObjective(context, Argument.name).name)
-            is com.undefined.stellar.argument.types.scoreboard.ObjectiveCriteriaArgument ->  ObjectiveCriteriaArgument.getCriteria(context, Argument.name).name
-            is com.undefined.stellar.argument.types.math.OperationArgument ->  Operation.getOperation(getArgumentInput(context, Argument.name) ?: return null)
+            is com.undefined.stellar.argument.types.text.ColorArgument -> ColorArgument.getColor(context, argument.name).color?.let { Style.style(TextColor.color(it)) } ?: Style.empty()
+            is com.undefined.stellar.argument.types.text.ComponentArgument ->  GsonComponentSerializer.gson().deserialize(net.minecraft.network.chat.Component.Serializer.toJson(ComponentArgument.getComponent(context, argument.name), COMMAND_BUILD_CONTEXT))
+            is com.undefined.stellar.argument.types.text.StyleArgument ->  GsonComponentSerializer.gson().deserialize(getArgumentInput(context, argument.name) ?: return null).style()
+            is com.undefined.stellar.argument.types.text.MessageArgument ->  GsonComponentSerializer.gson().deserialize(net.minecraft.network.chat.Component.Serializer.toJson(MessageArgument.getMessage(context, argument.name), COMMAND_BUILD_CONTEXT))
+            is com.undefined.stellar.argument.types.scoreboard.ObjectiveArgument ->  Bukkit.getScoreboardManager().mainScoreboard.getObjective(ObjectiveArgument.getObjective(context, argument.name).name)
+            is com.undefined.stellar.argument.types.scoreboard.ObjectiveCriteriaArgument ->  ObjectiveCriteriaArgument.getCriteria(context, argument.name).name
+            is com.undefined.stellar.argument.types.math.OperationArgument -> Operation.getOperation(getArgumentInput(context, argument.name) ?: return null)
             is com.undefined.stellar.argument.types.world.ParticleArgument ->  {
-                val particleOptions = ParticleArgument.getParticle(context, Argument.name)
+                val particleOptions = ParticleArgument.getParticle(context, argument.name)
                 getParticleData(context, CraftParticle.minecraftToBukkit(particleOptions.type), particleOptions)
             }
-            is com.undefined.stellar.argument.types.math.AngleArgument -> AngleArgument.getAngle(context, Argument.name)
+            is com.undefined.stellar.argument.types.math.AngleArgument -> AngleArgument.getAngle(context, argument.name)
             is com.undefined.stellar.argument.types.math.RotationArgument -> {
-                val rotation = RotationArgument.getRotation(context, Argument.name).getPosition(context.source)
+                val rotation = RotationArgument.getRotation(context, argument.name).getPosition(context.source)
                 Location(context.source.bukkitWorld, rotation.x, rotation.y, rotation.z)
             }
-            is DisplaySlotArgument -> getBukkitDisplaySlot(ScoreboardSlotArgument.getDisplaySlot(context, Argument.name))
-            is com.undefined.stellar.argument.types.scoreboard.ScoreHolderArgument -> ScoreHolderArgument.getName(context, Argument.name).scoreboardName
-            is ScoreHoldersArgument -> ScoreHolderArgument.getNames(context, Argument.name).map { scoreholder -> scoreholder.scoreboardName }
-            is AxisArgument -> getBukkitAxis(SwizzleArgument.getSwizzle(context, Argument.name))
-            is com.undefined.stellar.argument.types.scoreboard.TeamArgument -> Bukkit.getScoreboardManager().mainScoreboard.getTeam(TeamArgument.getTeam(context, Argument.name).name)
-            is ItemSlotArgument -> SlotArgument.getSlot(context, Argument.name)
-            is ItemSlotsArgument -> SlotsArgument.getSlots(context, Argument.name).slots().toList()
-            is NamespacedKeyArgument -> NamespacedKey(ResourceLocationArgument.getId(context, Argument.name).namespace, ResourceLocationArgument.getId(context, Argument.name).path)
-            is com.undefined.stellar.argument.types.entity.EntityAnchorArgument -> Anchor.getFromName(getArgumentInput(context, Argument.name) ?: return null)
+            is DisplaySlotArgument -> getBukkitDisplaySlot(ScoreboardSlotArgument.getDisplaySlot(context, argument.name))
+            is com.undefined.stellar.argument.types.scoreboard.ScoreHolderArgument -> ScoreHolderArgument.getName(context, argument.name).scoreboardName
+            is ScoreHoldersArgument -> ScoreHolderArgument.getNames(context, argument.name).map { scoreholder -> scoreholder.scoreboardName }
+            is AxisArgument -> getBukkitAxis(SwizzleArgument.getSwizzle(context, argument.name))
+            is com.undefined.stellar.argument.types.scoreboard.TeamArgument -> Bukkit.getScoreboardManager().mainScoreboard.getTeam(TeamArgument.getTeam(context, argument.name).name)
+            is ItemSlotArgument -> SlotArgument.getSlot(context, argument.name)
+            is ItemSlotsArgument -> SlotsArgument.getSlots(context, argument.name).slots().toList()
+            is NamespacedKeyArgument -> NamespacedKey(ResourceLocationArgument.getId(context, argument.name).namespace, ResourceLocationArgument.getId(context, argument.name).path)
+            is com.undefined.stellar.argument.types.entity.EntityAnchorArgument -> Anchor.getFromName(getArgumentInput(context, argument.name) ?: return null)
             is com.undefined.stellar.argument.types.math.RangeArgument -> {
-                val range = RangeArgument.Ints.getRange(context, Argument.name)
+                val range = RangeArgument.Ints.getRange(context, argument.name)
                 IntRange(range.min.orElse(1), range.max.orElse(2))
             }
-            is com.undefined.stellar.argument.types.world.DimensionArgument -> DimensionArgument.getDimension(context, Argument.name).world.environment
-            is com.undefined.stellar.argument.types.player.GameModeArgument -> GameMode.getByValue(GameModeArgument.getGameMode(context, Argument.name).id)
-            is com.undefined.stellar.argument.types.math.TimeArgument -> Duration.ofSeconds(IntegerArgumentType.getInteger(context, Argument.name).toLong() / 20)
-            is MirrorArgument -> Mirror.valueOf(TemplateMirrorArgument.getMirror(context, Argument.name).name)
-            is StructureRotationArgument -> StructureRotation.valueOf(TemplateRotationArgument.getRotation(context, Argument.name).name)
-            is HeightMapArgument -> HeightMap.valueOf(HeightmapTypeArgument.getHeightmap(context, Argument.name).name)
-            is com.undefined.stellar.argument.types.structure.LootTableArgument -> LootTableArgument.getLootTable(context, Argument.name).value().craftLootTable
-            is UUIDArgument -> UuidArgument.getUuid(context, Argument.name)
-            is GameEventArgument -> {
-                val key = resolveKey(context, Argument.name, Registries.GAME_EVENT).key().location()
-                org.bukkit.Registry.GAME_EVENT.get(NamespacedKey(key.namespace, key.path))
-            }
+            is com.undefined.stellar.argument.types.world.DimensionArgument -> DimensionArgument.getDimension(context, argument.name).world.environment
+            is com.undefined.stellar.argument.types.player.GameModeArgument -> GameMode.getByValue(GameModeArgument.getGameMode(context, argument.name).id)
+            is com.undefined.stellar.argument.types.math.TimeArgument -> Duration.ofSeconds(IntegerArgumentType.getInteger(context, argument.name).toLong() / 20)
+            is MirrorArgument -> Mirror.valueOf(TemplateMirrorArgument.getMirror(context, argument.name).name)
+            is StructureRotationArgument -> StructureRotation.valueOf(TemplateRotationArgument.getRotation(context, argument.name).name)
+            is HeightMapArgument -> HeightMap.valueOf(HeightmapTypeArgument.getHeightmap(context, argument.name).name)
+            is com.undefined.stellar.argument.types.structure.LootTableArgument -> LootTableArgument.getLootTable(context, argument.name).value().craftLootTable
+            is UUIDArgument -> UuidArgument.getUuid(context, argument.name)
+            is GameEventArgument -> org.bukkit.Registry.GAME_EVENT.get(getId(context, argument.name, Registries.GAME_EVENT))
+            is StructureTypeArgument -> org.bukkit.Registry.STRUCTURE_TYPE.get(getId(context, argument.name, Registries.STRUCTURE_TYPE))
             else -> throw UnsupportedArgumentException()
         }
     }
@@ -262,6 +262,16 @@ object ArgumentHelper {
         }
         val resourceKey = getRegistryKey(context, name, registryRef, invalidException)
         return getRegistry(context, registryRef).getHolder(resourceKey).orElseThrow { invalidException.create(resourceKey.location()) }
+    }
+
+    @Throws(CommandSyntaxException::class)
+    private fun <T> getId(
+        context: CommandContext<CommandSourceStack>,
+        name: String,
+        registryRef: ResourceKey<Registry<T>>
+    ): NamespacedKey {
+        val key = resolveKey(context, name, registryRef).key().location()
+        return NamespacedKey(key.namespace, key.path)
     }
 
     private fun brigadier(type: StringType): StringArgumentType = when (type) {
