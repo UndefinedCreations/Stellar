@@ -150,6 +150,7 @@ object ArgumentHelper {
             is GameEventArgument -> ResourceKeyArgument.key(Registries.GAME_EVENT)
             is StructureTypeArgument -> ResourceKeyArgument.key(Registries.STRUCTURE_TYPE)
             is PotionEffectTypeArgument -> ResourceKeyArgument.key(Registries.MOB_EFFECT)
+            is BlockTypeArgument -> ResourceKeyArgument.key(Registries.BLOCK_TYPE)
             else -> throw UnsupportedArgumentException()
         }
 
@@ -220,6 +221,7 @@ object ArgumentHelper {
             is GameEventArgument -> org.bukkit.Registry.GAME_EVENT.get(getId(context, argument.name, Registries.GAME_EVENT))
             is StructureTypeArgument -> org.bukkit.Registry.STRUCTURE_TYPE.get(getId(context, argument.name, Registries.STRUCTURE_TYPE))
             is PotionEffectTypeArgument -> org.bukkit.Registry.POTION_EFFECT_TYPE.get(getId(context, argument.name, Registries.MOB_EFFECT))
+            is BlockTypeArgument -> org.bukkit.Registry.BLOCK.get(getId(context, argument.name, Registries.BLOCK_TYPE))
             else -> throw UnsupportedArgumentException()
         }
     }

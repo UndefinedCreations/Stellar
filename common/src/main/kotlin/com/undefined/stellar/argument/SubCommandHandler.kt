@@ -212,4 +212,7 @@ open class ArgumentHandler {
     fun addPotionEffectTypeArgument(name: String): PotionEffectTypeArgument =
         addArgument { PotionEffectTypeArgument(base, name) }
 
+    fun addBlockTypeArgument(name: String): BlockTypeArgument =
+        addArgument { BlockTypeArgument(base, name) }
+
 }
