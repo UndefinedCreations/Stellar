@@ -7,10 +7,9 @@ import org.bukkit.command.CommandSender
 import org.bukkit.plugin.java.JavaPlugin
 import org.jetbrains.annotations.ApiStatus
 
-class StellarCommand(name: String, description: String = "", vararg aliases: String = arrayOf()) : AbstractStellarCommand<StellarCommand>(name, description) {
+class StellarCommand(name: String, vararg aliases: String = arrayOf()) : AbstractStellarCommand<StellarCommand>(name) {
 
-    constructor(name: String, vararg aliases: String) : this(name, "", aliases = aliases)
-    constructor(name: String, aliases: List<String>) : this(name, "", aliases = aliases.toTypedArray())
+    constructor(name: String, aliases: List<String>) : this(name, aliases = aliases.toTypedArray())
 
     init {
         this.aliases.addAll(aliases)
