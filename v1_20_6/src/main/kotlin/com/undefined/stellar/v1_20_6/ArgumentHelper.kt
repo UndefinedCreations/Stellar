@@ -14,6 +14,7 @@ import com.undefined.stellar.argument.LiteralStellarArgument
 import com.undefined.stellar.argument.types.custom.CustomArgument
 import com.undefined.stellar.argument.types.custom.EnumArgument
 import com.undefined.stellar.argument.types.custom.ListArgument
+import com.undefined.stellar.argument.types.entity.CatTypeArgument
 import com.undefined.stellar.argument.types.entity.EntityDisplayType
 import com.undefined.stellar.argument.types.entity.PotionEffectTypeArgument
 import com.undefined.stellar.argument.types.item.ItemSlotArgument
@@ -153,6 +154,7 @@ object ArgumentHelper {
             is PotionEffectTypeArgument -> ResourceKeyArgument.key(Registries.MOB_EFFECT)
             is BlockTypeArgument -> ResourceKeyArgument.key(Registries.BLOCK_TYPE)
             is ItemTypeArgument -> ResourceKeyArgument.key(Registries.ITEM)
+            is CatTypeArgument -> ResourceKeyArgument.key(Registries.CAT_VARIANT)
             else -> throw UnsupportedArgumentException()
         }
 
@@ -225,6 +227,7 @@ object ArgumentHelper {
             is PotionEffectTypeArgument -> org.bukkit.Registry.POTION_EFFECT_TYPE.get(getId(context, argument.name, Registries.MOB_EFFECT))
             is BlockTypeArgument -> org.bukkit.Registry.BLOCK.get(getId(context, argument.name, Registries.BLOCK_TYPE))
             is ItemTypeArgument -> org.bukkit.Registry.ITEM.get(getId(context, argument.name, Registries.ITEM))
+            is CatTypeArgument -> org.bukkit.Registry.CAT_VARIANT.get(getId(context, argument.name, Registries.CAT_VARIANT))
             else -> throw UnsupportedArgumentException()
         }
     }

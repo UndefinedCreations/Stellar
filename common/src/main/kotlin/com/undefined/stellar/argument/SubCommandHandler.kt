@@ -5,10 +5,7 @@ import com.undefined.stellar.argument.types.custom.CustomArgument
 import com.undefined.stellar.argument.types.custom.EnumArgument
 import com.undefined.stellar.argument.types.custom.ListArgument
 import com.undefined.stellar.argument.types.custom.OnlinePlayersArgument
-import com.undefined.stellar.argument.types.entity.EntityAnchorArgument
-import com.undefined.stellar.argument.types.entity.EntityArgument
-import com.undefined.stellar.argument.types.entity.EntityDisplayType
-import com.undefined.stellar.argument.types.entity.PotionEffectTypeArgument
+import com.undefined.stellar.argument.types.entity.*
 import com.undefined.stellar.argument.types.item.*
 import com.undefined.stellar.argument.types.math.*
 import com.undefined.stellar.argument.types.misc.NamespacedKeyArgument
@@ -214,5 +211,8 @@ open class ArgumentHandler {
 
     fun addItemTypeArgument(name: String): ItemTypeArgument =
         addArgument { ItemTypeArgument(base, name) }
+
+    fun addCatTypeArgument(name: String): CatTypeArgument =
+        addArgument { CatTypeArgument(base, name) }
 
 }
