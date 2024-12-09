@@ -1,6 +1,6 @@
 package com.undefined.stellar
 
-import com.undefined.stellar.sub.arguments.primitive.StringType
+import com.undefined.stellar.argument.types.primitive.StringType
 import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
 
@@ -8,15 +8,15 @@ class Main : JavaPlugin() {
 
     override fun onEnable() {
         val main = StellarCommand("test", description = "this is a description", "othertest")
-        main.addSubCommand("sub")
+        main.addArgument("sub")
             .addRequirement(3)
             .addGlobalFailureMessage("Hi!")
             .addExecution<Player> {
                 source.sendMessage("Hi!")
                 source.sendMessage(getArgument<String>(0))
             }
-        main.addSubCommand("one")
-            .addStringSubCommand("string", StringType.SINGLE_WORD)
+        main.addArgument("one")
+            .addStringArgument("string", StringType.SINGLE_WORD)
             .addRunnable<Player> {
                 source.sendMessage("This will always run!")
                 true
@@ -29,7 +29,7 @@ class Main : JavaPlugin() {
             .addFailureExecution<Player> {
                 source.sendMessage("failure execution")
             }
-            .addIntegerSubCommand("test")
+            .addIntegerArgument("test")
             .addExecution<Player> {
                 source.sendMessage("String!")
                 source.sendMessage(getArgument<Int>(1).toDouble().toString())

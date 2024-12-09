@@ -3,10 +3,10 @@ package com.undefined.stellar.v1_20_6
 import com.mojang.brigadier.context.CommandContext
 import com.undefined.stellar.AbstractStellarCommand
 import com.undefined.stellar.StellarCommands
+import com.undefined.stellar.argument.LiteralStellarArgument
+import com.undefined.stellar.argument.types.custom.CustomArgument
 import com.undefined.stellar.data.argument.CommandNode
 import com.undefined.stellar.exception.LiteralArgumentMismatchException
-import com.undefined.stellar.sub.LiteralStellarSubCommand
-import com.undefined.stellar.sub.arguments.custom.CustomSubCommand
 import io.papermc.paper.adventure.PaperAdventure
 import net.kyori.adventure.identity.Identity
 import net.minecraft.commands.CommandSource
@@ -24,12 +24,12 @@ object CommandContextAdapter {
         val baseCommand: AbstractStellarCommand<*> = StellarCommands.getStellarCommand(context.nodes[0].node.name)!!
         val arguments: CommandNode = CommandNode()
         arguments.putAll(
-            BrigadierCommandHelper.getSubCommands(baseCommand, context)
-                .associate { subCommand ->
-                    if (subCommand is CustomSubCommand) return@associate Pair(subCommand.name) { subCommand.parse(it) }
-                    if (subCommand is LiteralStellarSubCommand) return@associate Pair(subCommand.name) { throw LiteralArgumentMismatchException() }
-                    Pair(subCommand.name) {
-                        ArgumentHelper.getParsedArgument(context, subCommand)
+            BrigadierCommandHelper.getArguments(baseCommand, context)
+                .associate { argument ->
+                    if (argument is CustomArgument) return@associate Pair(argument.name) { argument.parse(it) }
+                    if (argument is LiteralStellarArgument) return@associate Pair(argument.name) { throw LiteralArgumentMismatchException() }
+                    Pair(argument.name) {
+                        ArgumentHelper.getParsedArgument(context, argument)
                     }
                 }
         )

@@ -3,8 +3,8 @@ package com.undefined.stellar.v1_20_6
 import com.mojang.brigadier.builder.ArgumentBuilder
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.undefined.stellar.AbstractStellarCommand
-import com.undefined.stellar.sub.AbstractStellarSubCommand
-import com.undefined.stellar.sub.LiteralStellarSubCommand
+import com.undefined.stellar.argument.AbstractStellarArgument
+import com.undefined.stellar.argument.LiteralStellarArgument
 import net.minecraft.commands.CommandSourceStack
 
 object CommandAdapter {
@@ -27,8 +27,8 @@ object CommandAdapter {
     }
 
     fun handleArguments(command: AbstractStellarCommand<*>, brigadierCommand: ArgumentBuilder<CommandSourceStack, *>) {
-        for (argument in command.subCommands) {
-            if (argument is LiteralStellarSubCommand) {
+        for (argument in command.arguments) {
+            if (argument is LiteralStellarArgument) {
                 handleLiteralArgument(argument, brigadierCommand)
                 continue
             }
@@ -36,7 +36,7 @@ object CommandAdapter {
         }
     }
 
-    private fun handleLiteralArgument(argument: AbstractStellarSubCommand<*>, brigadierCommand: ArgumentBuilder<CommandSourceStack, *>) {
+    private fun handleLiteralArgument(argument: AbstractStellarArgument<*>, brigadierCommand: ArgumentBuilder<CommandSourceStack, *>) {
         for (argumentBuilder in ArgumentHelper.getLiteralArguments(argument)) {
             handleCommandFunctions(argument, argumentBuilder)
             handleArguments(argument, argumentBuilder)
@@ -44,7 +44,7 @@ object CommandAdapter {
         }
     }
 
-    private fun handleRequiredArgument(argument: AbstractStellarSubCommand<*>, brigadierCommand: ArgumentBuilder<CommandSourceStack, *>) {
+    private fun handleRequiredArgument(argument: AbstractStellarArgument<*>, brigadierCommand: ArgumentBuilder<CommandSourceStack, *>) {
         val argumentBuilder = ArgumentHelper.getRequiredArgumentBuilder(argument)
         handleCommandFunctions(argument, argumentBuilder)
         handleArguments(argument, argumentBuilder)

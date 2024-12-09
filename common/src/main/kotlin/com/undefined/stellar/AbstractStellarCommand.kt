@@ -1,12 +1,12 @@
 package com.undefined.stellar
 
+import com.undefined.stellar.argument.ArgumentHandler
 import com.undefined.stellar.data.HideDefaultFailureMessages
 import com.undefined.stellar.data.argument.CommandContext
 import com.undefined.stellar.data.execution.StellarExecution
 import com.undefined.stellar.data.execution.StellarRunnable
 import com.undefined.stellar.data.requirement.PermissionStellarRequirement
 import com.undefined.stellar.data.requirement.StellarRequirement
-import com.undefined.stellar.sub.SubCommandHandler
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.command.CommandSender
@@ -14,10 +14,10 @@ import org.bukkit.plugin.java.JavaPlugin
 import org.jetbrains.annotations.ApiStatus
 
 @Suppress("UNCHECKED_CAST")
-abstract class AbstractStellarCommand<T>(val name: String, var description: String = "", var usage: String = "") : SubCommandHandler() {
+abstract class AbstractStellarCommand<T>(val name: String, var description: String = "", var usage: String = "") : ArgumentHandler() {
 
-    override fun getBase(): AbstractStellarCommand<*> = this
-
+    override val base: AbstractStellarCommand<*>
+        get() = this
     @ApiStatus.Internal val aliases: MutableList<String> = mutableListOf()
     @ApiStatus.Internal open val failureMessages: MutableList<Component> = mutableListOf()
     @ApiStatus.Internal open val globalFailureMessages: MutableList<Component> = mutableListOf()
@@ -103,10 +103,8 @@ abstract class AbstractStellarCommand<T>(val name: String, var description: Stri
         return this as T
     }
 
-    fun hasGlobalHiddenDefaultFailureMessages(): Boolean {
-        val base = getBase()
-        return base.hideDefaultFailureMessages.hide && base.hideDefaultFailureMessages.global
-    }
+    fun hasGlobalHiddenDefaultFailureMessages(): Boolean =
+        base.hideDefaultFailureMessages.hide && base.hideDefaultFailureMessages.global
 
     abstract fun register(plugin: JavaPlugin)
 
