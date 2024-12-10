@@ -30,7 +30,7 @@ object BrigadierCommandHelper {
 
     fun fulfillsRequirements(command: AbstractStellarCommand<*>, source: CommandSourceStack): Boolean {
         val fulfillsExecutionRequirements = command.requirements.all { it(source.bukkitSender) }
-        val fulfillsPermissionRequirements = command.permissionRequirements.all { source.hasPermission(it.permissionLevel, it.permission) }
+        val fulfillsPermissionRequirements = command.permissionRequirements.all { source.hasPermission(it.level, it.permission) }
         return fulfillsExecutionRequirements.and(fulfillsPermissionRequirements)
     }
 

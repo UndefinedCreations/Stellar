@@ -1,3 +1,3 @@
 package com.undefined.stellar.data.requirement
 
-data class PermissionStellarRequirement(val permissionLevel: Int, val permission: String = "")
+data class PermissionStellarRequirement(val level: Int, val permission: String = "")
