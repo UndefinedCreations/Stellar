@@ -1,4 +1,4 @@
-package com.undefined.stellar.v1_21
+package com.undefined.stellar.v1_20_5
 
 import com.mojang.brigadier.arguments.*
 import com.mojang.brigadier.builder.ArgumentBuilder
@@ -350,9 +350,7 @@ object ArgumentHelper {
     private fun <T> getRegistry(
         context: CommandContext<CommandSourceStack>,
         registryRef: ResourceKey<out Registry<T>>
-    ): Registry<T> {
-        return context.source.server.registryAccess().registryOrThrow(registryRef)
-    }
+    ): Registry<T> = context.source.server.registryAccess().registryOrThrow(registryRef)
 
     @Throws(CommandSyntaxException::class)
     private fun <T> resolveKey(

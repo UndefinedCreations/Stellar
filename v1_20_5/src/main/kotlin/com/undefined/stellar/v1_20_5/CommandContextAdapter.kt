@@ -1,4 +1,4 @@
-package com.undefined.stellar.v1_21_3
+package com.undefined.stellar.v1_20_5
 
 import com.mojang.brigadier.context.CommandContext
 import com.undefined.stellar.AbstractStellarCommand
@@ -11,7 +11,6 @@ import com.undefined.stellar.data.argument.GreedyCommandContext
 import com.undefined.stellar.exception.DuplicateArgumentNameException
 import com.undefined.stellar.exception.LiteralArgumentMismatchException
 import io.papermc.paper.adventure.PaperAdventure
-import io.papermc.paper.commands.FeedbackForwardingSender
 import net.kyori.adventure.identity.Identity
 import net.minecraft.commands.CommandSource
 import net.minecraft.commands.CommandSourceStack
