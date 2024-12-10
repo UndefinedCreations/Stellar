@@ -1,4 +1,4 @@
-package com.undefined.stellar.v1_21_3
+package com.undefined.stellar.v1_21
 
 import com.mojang.brigadier.arguments.*
 import com.mojang.brigadier.builder.ArgumentBuilder
@@ -351,7 +351,7 @@ object ArgumentHelper {
         context: CommandContext<CommandSourceStack>,
         registryRef: ResourceKey<out Registry<T>>
     ): Registry<T> {
-        return context.source.server.registryAccess().lookupOrThrow(registryRef)
+        return context.source.server.registryAccess().registryOrThrow(registryRef)
     }
 
     @Throws(CommandSyntaxException::class)
@@ -364,7 +364,7 @@ object ArgumentHelper {
             Component.translatableEscape("argument.resource_or_id.invalid", argument)
         }
         val resourceKey = getRegistryKey(context, name, registryRef, invalidException)
-        return getRegistry(context, registryRef).get(resourceKey).orElseThrow { invalidException.create(resourceKey.location()) }
+        return getRegistry(context, registryRef).getHolder(resourceKey).orElseThrow { invalidException.create(resourceKey.location()) }
     }
 
     @Throws(CommandSyntaxException::class)

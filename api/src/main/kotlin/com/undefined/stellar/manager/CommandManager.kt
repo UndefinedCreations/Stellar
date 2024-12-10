@@ -10,12 +10,13 @@ import org.jetbrains.annotations.ApiStatus
 object CommandManager {
     val registrars: Map<String, AbstractCommandRegistrar> = mapOf(
         "1.20.6" to com.undefined.stellar.v1_20_6.CommandRegistrar,
+        "1.21" to com.undefined.stellar.v1_21.CommandRegistrar,
         "1.21.1" to com.undefined.stellar.v1_21_1.CommandRegistrar,
         "1.21.2" to com.undefined.stellar.v1_21_1.CommandRegistrar,
         "1.21.3" to com.undefined.stellar.v1_21_3.CommandRegistrar,
     )
 
-    val initializedPlugins: MutableList<JavaPlugin> = mutableListOf()
+    private val initializedPlugins: MutableList<JavaPlugin> = mutableListOf()
     fun initialize(plugin: JavaPlugin) {
         if (initializedPlugins.contains(plugin)) return
         initializedPlugins.add(plugin)
