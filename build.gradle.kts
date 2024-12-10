@@ -45,10 +45,24 @@ publishing {
 
 allprojects {
     apply(plugin = "java")
+    apply(plugin = "java-library")
+    apply(plugin = "maven-publish")
 
     repositories {
         mavenCentral()
         maven("https://repo.papermc.io/repository/maven-public/")
+    }
+
+    publishing {
+        publications {
+            register<MavenPublication>("maven") {
+                groupId = projectGroupId
+                artifactId = projectArtifactId
+                version = projectVersion
+
+                from(components["java"])
+            }
+        }
     }
 
     dependencies {
