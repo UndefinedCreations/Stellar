@@ -10,6 +10,7 @@ dependencies {
     compileOnly("org.spigotmc:spigot-api:1.20.6-R0.1-SNAPSHOT")
     compileOnly(project(":common"))
     compileOnly(project(":v1_20_6"))
+    compileOnly(project(":v1_21_1"))
     compileOnly(project(":v1_21_3"))
 }
 

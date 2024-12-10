@@ -1,4 +1,4 @@
-package com.undefined.stellar.v1_20_6
+package com.undefined.stellar.v1_21_1
 
 import com.mojang.brigadier.arguments.*
 import com.mojang.brigadier.builder.ArgumentBuilder
@@ -130,17 +130,25 @@ object ArgumentHelper {
                 LocationType.DOUBLE_LOCATION_2D -> Vec2Argument.vec2()
             }
             is BlockDataArgument -> BlockStateArgument.block(COMMAND_BUILD_CONTEXT)
-            is com.undefined.stellar.argument.types.block.BlockPredicateArgument -> BlockPredicateArgument.blockPredicate(COMMAND_BUILD_CONTEXT)
+            is com.undefined.stellar.argument.types.block.BlockPredicateArgument -> BlockPredicateArgument.blockPredicate(
+                COMMAND_BUILD_CONTEXT
+            )
             is com.undefined.stellar.argument.types.item.ItemArgument -> ItemArgument.item(COMMAND_BUILD_CONTEXT)
-            is com.undefined.stellar.argument.types.item.ItemPredicateArgument -> ItemPredicateArgument.itemPredicate(COMMAND_BUILD_CONTEXT)
+            is com.undefined.stellar.argument.types.item.ItemPredicateArgument -> ItemPredicateArgument.itemPredicate(
+                COMMAND_BUILD_CONTEXT
+            )
             is com.undefined.stellar.argument.types.text.ColorArgument -> ColorArgument.color()
-            is com.undefined.stellar.argument.types.text.ComponentArgument -> ComponentArgument.textComponent(COMMAND_BUILD_CONTEXT)
+            is com.undefined.stellar.argument.types.text.ComponentArgument -> ComponentArgument.textComponent(
+                COMMAND_BUILD_CONTEXT
+            )
             is com.undefined.stellar.argument.types.text.StyleArgument -> StyleArgument.style(COMMAND_BUILD_CONTEXT)
             is com.undefined.stellar.argument.types.text.MessageArgument -> MessageArgument.message()
             is com.undefined.stellar.argument.types.scoreboard.ObjectiveArgument -> ObjectiveArgument.objective()
             is com.undefined.stellar.argument.types.scoreboard.ObjectiveCriteriaArgument -> ObjectiveCriteriaArgument.criteria()
             is com.undefined.stellar.argument.types.math.OperationArgument -> OperationArgument.operation()
-            is com.undefined.stellar.argument.types.item.ParticleArgument -> ParticleArgument.particle(COMMAND_BUILD_CONTEXT)
+            is com.undefined.stellar.argument.types.item.ParticleArgument -> ParticleArgument.particle(
+                COMMAND_BUILD_CONTEXT
+            )
             is com.undefined.stellar.argument.types.math.AngleArgument -> AngleArgument.angle()
             is com.undefined.stellar.argument.types.math.RotationArgument -> RotationArgument.rotation()
             is DisplaySlotArgument -> ScoreboardSlotArgument.displaySlot()
@@ -159,7 +167,9 @@ object ArgumentHelper {
             is MirrorArgument -> TemplateMirrorArgument.templateMirror()
             is StructureRotationArgument -> TemplateRotationArgument.templateRotation()
             is HeightMapArgument -> HeightmapTypeArgument.heightmap()
-            is com.undefined.stellar.argument.types.structure.LootTableArgument -> LootTableArgument.lootTable(COMMAND_BUILD_CONTEXT)
+            is com.undefined.stellar.argument.types.structure.LootTableArgument -> LootTableArgument.lootTable(
+                COMMAND_BUILD_CONTEXT
+            )
             is UUIDArgument -> UuidArgument.uuid()
             is GameEventArgument -> ResourceKeyArgument.key(Registries.GAME_EVENT)
             is StructureTypeArgument -> ResourceKeyArgument.key(Registries.STRUCTURE_TYPE)
@@ -219,7 +229,8 @@ object ArgumentHelper {
             }
             is com.undefined.stellar.argument.types.text.ColorArgument -> ColorArgument.getColor(context, argument.name).color?.let { Style.style(TextColor.color(it)) } ?: Style.empty()
             is com.undefined.stellar.argument.types.text.ComponentArgument ->  GsonComponentSerializer.gson().deserialize(net.minecraft.network.chat.Component.Serializer.toJson(ComponentArgument.getComponent(context, argument.name), COMMAND_BUILD_CONTEXT))
-            is com.undefined.stellar.argument.types.text.StyleArgument ->  GsonComponentSerializer.gson().deserialize(getArgumentInput(context, argument.name) ?: return null).style()
+            is com.undefined.stellar.argument.types.text.StyleArgument ->  GsonComponentSerializer.gson().deserialize(
+                getArgumentInput(context, argument.name) ?: return null).style()
             is com.undefined.stellar.argument.types.text.MessageArgument ->  GsonComponentSerializer.gson().deserialize(net.minecraft.network.chat.Component.Serializer.toJson(MessageArgument.getMessage(context, argument.name), COMMAND_BUILD_CONTEXT))
             is com.undefined.stellar.argument.types.scoreboard.ObjectiveArgument ->  Bukkit.getScoreboardManager().mainScoreboard.getObjective(ObjectiveArgument.getObjective(context, argument.name).name)
             is com.undefined.stellar.argument.types.scoreboard.ObjectiveCriteriaArgument ->  ObjectiveCriteriaArgument.getCriteria(context, argument.name).name
@@ -339,7 +350,9 @@ object ArgumentHelper {
     private fun <T> getRegistry(
         context: CommandContext<CommandSourceStack>,
         registryRef: ResourceKey<out Registry<T>>
-    ): Registry<T> = context.source.server.registryAccess().registryOrThrow(registryRef)
+    ): Registry<T> {
+        return context.source.server.registryAccess().registryOrThrow(registryRef)
+    }
 
     @Throws(CommandSyntaxException::class)
     private fun <T> resolveKey(

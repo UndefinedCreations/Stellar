@@ -22,7 +22,6 @@ import org.bukkit.command.CommandSender
 
 object CommandContextAdapter {
 
-    @Suppress("UNCHECKED_CAST")
     fun getStellarCommandContext(context: CommandContext<CommandSourceStack>): com.undefined.stellar.data.argument.CommandContext<CommandSender> {
         val input = context.input.removePrefix("/")
         val baseCommand: AbstractStellarCommand<*> = StellarCommands.getStellarCommand(context.nodes[0].node.name)!!
