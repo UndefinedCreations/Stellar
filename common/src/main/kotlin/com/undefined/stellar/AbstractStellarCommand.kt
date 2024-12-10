@@ -54,9 +54,9 @@ abstract class AbstractStellarCommand<T>(val name: String, var description: Stri
         return addRequirements(permissions)
     }
 
-    fun setRequirements(permissions: List<PermissionStellarRequirement>): T {
+    fun setPermissionRequirements(permissions: List<PermissionStellarRequirement>): T {
         permissionRequirements.clear()
-        return addRequirements(permissions)
+        return addPermissionRequirements(permissions)
     }
 
     fun setRequirements(vararg permissions: StellarRequirement<*>): T {
@@ -74,7 +74,7 @@ abstract class AbstractStellarCommand<T>(val name: String, var description: Stri
         return this as T
     }
 
-    fun addRequirements(permissions: List<PermissionStellarRequirement>): T {
+    fun addPermissionRequirements(permissions: List<PermissionStellarRequirement>): T {
         for (permission in permissions) permissionRequirements.add(permission)
         return this as T
     }
@@ -83,7 +83,7 @@ abstract class AbstractStellarCommand<T>(val name: String, var description: Stri
         addRequirements(permissions.toList())
 
     fun addRequirements(vararg permissions: PermissionStellarRequirement): T =
-        addRequirements(permissions.toList())
+        addPermissionRequirements(permissions.toList())
 
     fun addRequirements(vararg levels: Int): T {
         for (level in levels) permissionRequirements.add(PermissionStellarRequirement(level))
@@ -103,14 +103,11 @@ abstract class AbstractStellarCommand<T>(val name: String, var description: Stri
         return addFailureMessages(messages)
     }
 
-    fun setFailureMessages(messages: List<String>): T =
-        setFailureMessages(messages.map { MiniMessage.miniMessage().deserialize(it) })
-
     fun setFailureMessages(vararg messages: Component): T =
         setFailureMessages(messages.toList())
 
     fun setFailureMessages(vararg messages: String): T =
-        setFailureMessages(messages.toList())
+        setFailureMessages(messages.map { MiniMessage.miniMessage().deserialize(it) }.toList())
 
     fun setPlainFailureMessages(messages: List<String>): T {
         failureMessages.clear()
@@ -118,7 +115,7 @@ abstract class AbstractStellarCommand<T>(val name: String, var description: Stri
     }
 
     fun setPlainFailureMessages(vararg messages: String): T =
-        setFailureMessages(messages.toList())
+        setFailureMessages(messages.map { Component.text(it) }.toList())
 
     fun setGlobalFailureMessages(messages: List<Component>): T {
         globalFailureMessages.clear()
@@ -126,11 +123,8 @@ abstract class AbstractStellarCommand<T>(val name: String, var description: Stri
         return this as T
     }
 
-    fun setGlobalFailureMessages(messages: List<String>): T =
-        setGlobalFailureMessages(messages.map { MiniMessage.miniMessage().deserialize(it) })
-
     fun setGlobalFailureMessages(vararg messages: String): T =
-        setGlobalFailureMessages(messages.toList())
+        setGlobalFailureMessages(messages.map { MiniMessage.miniMessage().deserialize(it) }.toList())
 
     fun setGlobalFailureMessages(vararg messages: Component): T =
         setGlobalFailureMessages(messages.toList())
@@ -140,11 +134,8 @@ abstract class AbstractStellarCommand<T>(val name: String, var description: Stri
         return this as T
     }
 
-    fun addFailureMessages(messages: List<String>): T =
-        addFailureMessages(messages.map { MiniMessage.miniMessage().deserialize(it) })
-
     fun addFailureMessages(vararg messages: String): T =
-        addFailureMessages(messages.toList())
+        addFailureMessages(messages.map { MiniMessage.miniMessage().deserialize(it) }.toList())
 
     fun addFailureMessages(vararg messages: Component): T =
         addFailureMessages(messages.toList())
@@ -160,11 +151,8 @@ abstract class AbstractStellarCommand<T>(val name: String, var description: Stri
         return this as T
     }
 
-    fun addGlobalFailureMessages(messages: List<String>): T =
-        addGlobalFailureMessages(messages.map { MiniMessage.miniMessage().deserialize(it) })
-
     fun addGlobalFailureMessages(vararg messages: String): T =
-        addGlobalFailureMessages(messages.toList())
+        addGlobalFailureMessages(messages.map { MiniMessage.miniMessage().deserialize(it) }.toList())
 
     fun addGlobalFailureMessages(vararg messages: Component): T =
         addGlobalFailureMessages(messages.toList())

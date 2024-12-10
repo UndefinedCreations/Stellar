@@ -18,8 +18,7 @@ class GreedyStringArgument(parent: AbstractStellarCommand<*>, name: String) : Ab
 
     inline fun <reified C : CommandSender> setWordExecution(index: Int, noinline execution: GreedyCommandContext<C>.() -> Unit): GreedyStringArgument =
         getOrCreateWord(index) {
-            executions.clear()
-            addWordExecution<C>(index, execution)
+            setExecution(execution)
         }
 
     inline fun <reified C : CommandSender> addWordExecution(index: Int, noinline execution: GreedyCommandContext<C>.() -> Unit): GreedyStringArgument =
@@ -27,8 +26,7 @@ class GreedyStringArgument(parent: AbstractStellarCommand<*>, name: String) : Ab
 
     inline fun <reified C : CommandSender> setWordRunnable(index: Int, noinline runnable: GreedyCommandContext<C>.() -> Boolean): GreedyStringArgument =
         getOrCreateWord(index) {
-            runnables.clear()
-            addWordRunnable<C>(index, runnable)
+            setRunnable(runnable)
         }
 
     inline fun <reified C : CommandSender> addWordRunnable(index: Int, noinline runnable: GreedyCommandContext<C>.() -> Boolean): GreedyStringArgument =
