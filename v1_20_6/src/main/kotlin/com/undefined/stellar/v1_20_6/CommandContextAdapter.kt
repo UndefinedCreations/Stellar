@@ -3,6 +3,7 @@ package com.undefined.stellar.v1_20_6
 import com.mojang.brigadier.context.CommandContext
 import com.undefined.stellar.AbstractStellarCommand
 import com.undefined.stellar.StellarCommands
+import com.undefined.stellar.argument.AbstractStellarArgument
 import com.undefined.stellar.argument.LiteralStellarArgument
 import com.undefined.stellar.argument.types.custom.CustomArgument
 import com.undefined.stellar.data.argument.CommandNode
@@ -21,22 +22,21 @@ import org.bukkit.command.CommandSender
 
 object CommandContextAdapter {
 
+    @Suppress("UNCHECKED_CAST")
     fun getStellarCommandContext(context: CommandContext<CommandSourceStack>): com.undefined.stellar.data.argument.CommandContext<CommandSender> {
         val input = context.input.removePrefix("/")
         val baseCommand: AbstractStellarCommand<*> = StellarCommands.getStellarCommand(context.nodes[0].node.name)!!
         val arguments = BrigadierCommandHelper.getArguments(baseCommand, context)
         if (arguments.filter { it !is LiteralStellarArgument }.groupingBy { it.name }.eachCount().any { it.value > 1 }) throw DuplicateArgumentNameException()
-        val parsedArguments: CommandNode = CommandNode()
-        parsedArguments.putAll(
+        val parsedArguments: CommandNode =
             BrigadierCommandHelper.getArguments(baseCommand, context)
-                .associate { argument ->
+                .associate<AbstractStellarArgument<*>, String, (com.undefined.stellar.data.argument.CommandContext<CommandSender>) -> Any?> { argument ->
                     if (argument is CustomArgument) return@associate Pair(argument.name) { argument.parse(it) }
                     if (argument is LiteralStellarArgument) return@associate Pair(argument.name) { throw LiteralArgumentMismatchException() }
                     Pair(argument.name) {
                         ArgumentHelper.getParsedArgument(context, argument)
                     }
-                }
-        )
+                } as CommandNode
         return com.undefined.stellar.data.argument.CommandContext(
             parsedArguments,
             context.source.bukkitSender,
