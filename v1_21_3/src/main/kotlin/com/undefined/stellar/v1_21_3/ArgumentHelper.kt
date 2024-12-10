@@ -115,7 +115,7 @@ object ArgumentHelper {
             is EnumArgument<*> -> StringArgumentType.word()
             is CustomArgument<*> -> getArgumentType(argument.type)
             is StringArgument -> brigadier(argument.type)
-            is GreedyStringArgument -> brigadier(StringType.GREEDY_PHRASE)
+            is GreedyStringArgument -> brigadier(StringType.PHRASE)
             is IntegerArgument -> IntegerArgumentType.integer(argument.min, argument.max)
             is LongArgument -> LongArgumentType.longArg(argument.min, argument.max)
             is FloatArgument -> FloatArgumentType.floatArg(argument.min, argument.max)
@@ -378,9 +378,9 @@ object ArgumentHelper {
     }
 
     private fun brigadier(type: StringType): StringArgumentType = when (type) {
-        StringType.SINGLE_WORD -> StringArgumentType.word()
+        StringType.WORD -> StringArgumentType.word()
         StringType.QUOTABLE_PHRASE -> StringArgumentType.string()
-        StringType.GREEDY_PHRASE -> StringArgumentType.greedyString()
+        StringType.PHRASE -> StringArgumentType.greedyString()
     }
 
     private fun brigadier(type: EntityDisplayType): EntityArgument = when (type) {

@@ -6,7 +6,7 @@ import org.bukkit.command.CommandSender
 typealias CommandNode = HashMap<String, (CommandContext<CommandSender>) -> Any?>
 
 @Suppress("UNCHECKED_CAST", "UNUSED")
-class CommandContext<T : CommandSender>(val arguments: CommandNode, val source: T, val input: String) {
+class CommandContext<T : CommandSender>(val arguments: CommandNode, val sender: T, val input: String) {
 
     inline fun <reified T> getArgument(name: String): T {
         val argument = arguments[name] ?: throw NoSuchElementException("No argument with the name $name")

@@ -1,4 +1,4 @@
-package com.undefined.stellar.regisrar
+package com.undefined.stellar.registrar
 
 import com.undefined.stellar.AbstractStellarCommand
 import org.bukkit.command.CommandSender

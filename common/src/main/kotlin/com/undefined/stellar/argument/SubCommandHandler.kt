@@ -56,7 +56,7 @@ open class ArgumentHandler {
         return argument
     }
 
-    fun addStringArgument(name: String, type: StringType = StringType.SINGLE_WORD): StringArgument =
+    fun addStringArgument(name: String, type: StringType = StringType.WORD): StringArgument =
         addArgument { StringArgument(base, name, type)  }
 
     fun addGreedyStringArgument(name: String): GreedyStringArgument =
@@ -82,7 +82,7 @@ open class ArgumentHandler {
         list: List<T>,
         stringifier: (T) -> String,
         parse: (String) -> T,
-        type: AbstractStellarArgument<*> = StringArgument(base, name, StringType.SINGLE_WORD)
+        type: AbstractStellarArgument<*> = StringArgument(base, name, StringType.WORD)
     ): ListArgument<T> = addArgument { ListArgument(base, name, list, stringifier, parse, type) }
 
     fun addStringListArgument(name: String, list: List<String>, type: StringType): ListArgument<String> =
@@ -213,7 +213,7 @@ open class ArgumentHandler {
                 Bukkit.getOnlinePlayers().toList(),
                 { it.name },
                 { Bukkit.getPlayer(it) },
-                StringArgument(base, name, StringType.SINGLE_WORD)
+                StringArgument(base, name, StringType.WORD)
             )
         }
 
@@ -226,7 +226,7 @@ open class ArgumentHandler {
                 Bukkit.getOfflinePlayers().toList(),
                 { it.name!! },
                 { Bukkit.getOfflinePlayer(it) },
-                StringArgument(base, name, StringType.SINGLE_WORD)
+                StringArgument(base, name, StringType.WORD)
             )
         }
 

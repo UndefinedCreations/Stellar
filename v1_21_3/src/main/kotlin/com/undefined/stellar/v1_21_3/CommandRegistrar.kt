@@ -2,7 +2,7 @@ package com.undefined.stellar.v1_21_3
 
 import com.undefined.stellar.AbstractStellarCommand
 import com.undefined.stellar.StellarCommands
-import com.undefined.stellar.regisrar.AbstractCommandRegistrar
+import com.undefined.stellar.registrar.AbstractCommandRegistrar
 import com.undefined.stellar.v1_21_3.BrigadierCommandHelper.dispatcher
 import org.bukkit.command.CommandSender
 
