@@ -7,6 +7,7 @@ plugins {
     id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
+apply(plugin = "maven-publish")
 val projectGroupId = "com.undefined"
 val projectVersion = "0.0.1"
 val projectArtifactId = "stellar"
@@ -40,16 +41,6 @@ publishing {
             }
         }
     }
-
-    publications {
-        register<MavenPublication>("maven") {
-            groupId = projectGroupId
-            artifactId = projectArtifactId
-            version = projectVersion
-
-            from(components["java"])
-        }
-    }
 }
 
 allprojects {
@@ -72,6 +63,7 @@ allprojects {
 dependencies {
     implementation(project(":api"))
     implementation(project(":common"))
+    implementation(project(":v1_20_6:", "reobf"))
 }
 
 tasks {
@@ -79,8 +71,9 @@ tasks {
         dependsOn(shadowJar)
     }
 
-    shadowJar {
-        archiveFileName.set("${this.project.name}-shadow.jar")
+    jar.configure {
+        dependsOn("shadowJar")
+        archiveClassifier.set("dev")
     }
 
     withType<ShadowJar> {
