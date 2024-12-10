@@ -17,6 +17,7 @@ dependencies {
     implementation(project(":v1_21:", "reobf"))
     implementation(project(":v1_21_1:", "reobf"))
     implementation(project(":v1_21_3:", "reobf"))
+    implementation(project(":v1_21_4:", "reobf"))
     compileOnly(project(":v1_20_6"))
 }
 

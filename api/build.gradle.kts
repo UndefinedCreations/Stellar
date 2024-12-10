@@ -13,6 +13,7 @@ dependencies {
     compileOnly(project(":v1_21"))
     compileOnly(project(":v1_21_1"))
     compileOnly(project(":v1_21_3"))
+    compileOnly(project(":v1_21_4"))
 }
 
 tasks {

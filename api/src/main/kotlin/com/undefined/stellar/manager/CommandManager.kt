@@ -2,6 +2,7 @@ package com.undefined.stellar.manager
 
 import com.undefined.stellar.listener.StellarListener
 import com.undefined.stellar.registrar.AbstractCommandRegistrar
+import com.undefined.stellar.v1_21_4.CommandRegistrar
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
 import org.jetbrains.annotations.ApiStatus
@@ -13,7 +14,8 @@ object CommandManager {
         "1.21" to com.undefined.stellar.v1_21.CommandRegistrar,
         "1.21.1" to com.undefined.stellar.v1_21_1.CommandRegistrar,
         "1.21.2" to com.undefined.stellar.v1_21_1.CommandRegistrar,
-        "1.21.3" to com.undefined.stellar.v1_21_3.CommandRegistrar,
+        "1.21.3" to CommandRegistrar,
+        "1.21.4" to com.undefined.stellar.v1_21_4.CommandRegistrar,
     )
 
     private val initializedPlugins: MutableList<JavaPlugin> = mutableListOf()
