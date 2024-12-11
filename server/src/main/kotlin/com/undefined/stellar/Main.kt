@@ -12,6 +12,9 @@ class Main : JavaPlugin() {
             .addExecution<Player> {
                 sender.sendMessage(arguments.toList().withIndex().joinToString(", ") { "${it.index}: ${it.value.first}" })
             }
+            .addRequirement<Player> {
+                this.hasPlayedBefore()
+            }
             .register(this)
     }
 

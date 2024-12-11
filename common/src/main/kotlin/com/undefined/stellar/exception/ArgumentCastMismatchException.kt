@@ -1,3 +1,3 @@
 package com.undefined.stellar.exception
 
-class ArgumentCastMismatchException(message: String) : RuntimeException()
+class ArgumentCastMismatchException(message: String) : RuntimeException(message)

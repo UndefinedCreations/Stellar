@@ -13,8 +13,8 @@ abstract class AbstractStellarArgument<T>(val parent: AbstractStellarCommand<*>,
 
     @ApiStatus.Internal open val suggestions: MutableList<StellarSuggestion<*>> = mutableListOf()
 
-    fun addSuggestion(text: String, tooltip: String): T {
-        addSuggestion(Suggestion(text, tooltip))
+    fun addSuggestion(title: String, tooltip: String): T {
+        addSuggestion(Suggestion(title, tooltip))
         return this as T
     }
 

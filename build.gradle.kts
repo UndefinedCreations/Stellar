@@ -1,9 +1,7 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-
 plugins {
     java
     kotlin("jvm") version "1.9.22"
-    id("maven-publish")
+    `maven-publish`
     id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
@@ -34,7 +32,7 @@ publishing {
     repositories {
         maven {
             name = "UndefinedCreation"
-            url = uri("https://repo.undefinedcreation.com/stellar")
+            url = uri("https://repo.undefinedcreation.com/releases")
             credentials(PasswordCredentials::class) {
                 username = System.getenv("MAVEN_NAME")
                 password = System.getenv("MAVEN_SECRET")
@@ -77,31 +75,23 @@ allprojects {
 dependencies {
     implementation(project(":api"))
     implementation(project(":common"))
-    implementation(project(":v1_20_6:", "reobf"))
-    implementation(project(":v1_21:", "reobf"))
-    implementation(project(":v1_21_1:", "reobf"))
-    implementation(project(":v1_21_3:", "reobf"))
-    implementation(project(":v1_21_4:", "reobf"))
+    implementation(project(":v1_20_6", "reobf"))
+    implementation(project(":v1_21", "reobf"))
+    implementation(project(":v1_21_1", "reobf"))
+    implementation(project(":v1_21_3", "reobf"))
+    implementation(project(":v1_21_4", "reobf"))
 }
 
 tasks {
-    assemble {
-        dependsOn(shadowJar)
-    }
-
-    jar.configure {
-        dependsOn("shadowJar")
-        archiveClassifier.set("dev")
-    }
-
-    withType<ShadowJar> {
-        archiveClassifier.set("mapped")
-        archiveFileName.set("${project.name}-${project.version}.jar")
-    }
-
     compileKotlin {
         kotlinOptions.jvmTarget = "21"
     }
+}
+
+java {
+    withSourcesJar()
+    withJavadocJar()
+    disableAutoTargetJvm()
 }
 
 kotlin {
