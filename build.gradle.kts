@@ -77,6 +77,7 @@ allprojects {
 dependencies {
     implementation(project(":api"))
     implementation(project(":common"))
+    compileOnly(project(":v1_20_2", "reobf"))
     compileOnly(project(":v1_20_4", "reobf"))
     compileOnly(project(":v1_20_6", "reobf"))
     compileOnly(project(":v1_21", "reobf"))
