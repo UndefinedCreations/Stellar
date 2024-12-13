@@ -96,7 +96,7 @@ abstract class AbstractStellarCommand<T>(val name: String, var description: Stri
     }
 
     inline fun <reified C : CommandSender> addRequirement(noinline requirement: C.() -> Boolean): T =
-        addRequirements(StellarRequirement(requirement))
+        addRequirements(StellarRequirement(C::class, requirement))
 
     fun setFailureMessages(messages: List<Component>): T {
         failureMessages.clear()
@@ -158,7 +158,7 @@ abstract class AbstractStellarCommand<T>(val name: String, var description: Stri
         addGlobalFailureMessages(messages.toList())
 
     inline fun <reified C : CommandSender> addFailureExecution(noinline execution: CommandContext<C>.() -> Unit): T {
-        failureExecutions.add(StellarExecution(execution))
+        failureExecutions.add(StellarExecution(C::class, execution))
         return this as T
     }
 
@@ -173,7 +173,7 @@ abstract class AbstractStellarCommand<T>(val name: String, var description: Stri
     }
 
     inline fun <reified C : CommandSender> addExecution(noinline execution: CommandContext<C>.() -> Unit): T {
-        executions.add(StellarExecution(execution))
+        executions.add(StellarExecution(C::class, execution))
         return this as T
     }
 
@@ -183,7 +183,7 @@ abstract class AbstractStellarCommand<T>(val name: String, var description: Stri
     }
 
     inline fun <reified C : CommandSender> addRunnable(noinline runnable: CommandContext<C>.() -> Boolean): T {
-        runnables.add(StellarRunnable(runnable))
+        runnables.add(StellarRunnable(C::class, runnable))
         return this as T
     }
 

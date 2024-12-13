@@ -1,4 +1,4 @@
-package com.undefined.stellar.v1_20_6
+package com.undefined.stellar.v1_20_4
 
 import com.mojang.brigadier.context.CommandContext
 import com.undefined.stellar.AbstractStellarCommand

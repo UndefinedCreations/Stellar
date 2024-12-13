@@ -1,4 +1,4 @@
-package com.undefined.stellar.v1_20_6
+package com.undefined.stellar.v1_20_4
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
@@ -31,6 +31,7 @@ object BrigadierCommandHelper {
     }
 
     fun fulfillsRequirements(command: AbstractStellarCommand<*>, source: CommandSourceStack): Boolean {
+        println(source.bukkitSender::class.simpleName)
         val fulfillsExecutionRequirements = command.requirements.all { it(source.bukkitSender) }
         val fulfillsPermissionRequirements = command.permissionRequirements.all { source.hasPermission(it.level, it.permission) }
         return fulfillsExecutionRequirements.and(fulfillsPermissionRequirements)

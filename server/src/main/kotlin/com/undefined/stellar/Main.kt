@@ -8,7 +8,7 @@ class Main : JavaPlugin() {
     override fun onEnable() {
         StellarCommand("test")
             .addLocationArgument("location")
-            .addWolfVariantArgument("test")
+            .addStringArgument("string")
             .addExecution<Player> {
                 sender.sendMessage(arguments.toList().withIndex().joinToString(", ") { "${it.index}: ${it.value.first}" })
             }

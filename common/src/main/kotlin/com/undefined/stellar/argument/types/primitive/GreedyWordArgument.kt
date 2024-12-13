@@ -20,56 +20,56 @@ class GreedyWordArgument {
     }
 
     fun addSuggestion(suggestion: Suggestion): GreedyWordArgument {
-        suggestions.add(GreedyStellarSuggestion<CommandSender> { listOf(suggestion) })
+        suggestions.add(GreedyStellarSuggestion(CommandSender::class) { listOf(suggestion) })
         return this
     }
 
     fun addSuggestions(list: List<Suggestion>): GreedyWordArgument {
-        suggestions.add(GreedyStellarSuggestion<CommandSender> { list })
+        suggestions.add(GreedyStellarSuggestion(CommandSender::class) { list })
         return this
     }
 
     fun addSuggestions(vararg list: Suggestion): GreedyWordArgument {
-        suggestions.add(GreedyStellarSuggestion<CommandSender> { list.toList() })
+        suggestions.add(GreedyStellarSuggestion(CommandSender::class) { list.toList() })
         return this
     }
 
-    fun addSuggestionsWithoutGreedyWordArgumentooltip(list: List<String>): GreedyWordArgument {
-        suggestions.add(GreedyStellarSuggestion<CommandSender> { list.map { Suggestion(it, "") } })
+    fun addSuggestionsWithoutGreedyWordArgumenTooltip(list: List<String>): GreedyWordArgument {
+        suggestions.add(GreedyStellarSuggestion(CommandSender::class) { list.map { Suggestion(it, "") } })
         return this
     }
 
     fun addSuggestions(vararg list: String): GreedyWordArgument {
-        suggestions.add(GreedyStellarSuggestion<CommandSender> { list.map { Suggestion(it, "") } })
+        suggestions.add(GreedyStellarSuggestion(CommandSender::class) { list.map { Suggestion(it, "") } })
         return this
     }
 
     fun setSuggestions(vararg suggestion: Suggestion): GreedyWordArgument {
         suggestions.clear()
-        suggestions.add(GreedyStellarSuggestion<CommandSender> { suggestion.toList() })
+        suggestions.add(GreedyStellarSuggestion(CommandSender::class) { suggestion.toList() })
         return this
     }
 
     fun setSuggestions(vararg suggestion: String): GreedyWordArgument {
         suggestions.clear()
-        suggestions.add(GreedyStellarSuggestion<CommandSender> { suggestion.map { Suggestion(it, "") } })
+        suggestions.add(GreedyStellarSuggestion(CommandSender::class) { suggestion.map { Suggestion(it, "") } })
         return this
     }
 
     fun setSuggestions(suggestion: List<Suggestion>): GreedyWordArgument {
         suggestions.clear()
-        suggestions.add(GreedyStellarSuggestion<CommandSender> { suggestion.toList() })
+        suggestions.add(GreedyStellarSuggestion(CommandSender::class) { suggestion.toList() })
         return this
     }
 
     fun setSuggestionsWithoutTooltip(suggestion: List<String>): GreedyWordArgument {
         suggestions.clear()
-        suggestions.add(GreedyStellarSuggestion<CommandSender> { suggestion.map { Suggestion(it, "") } })
+        suggestions.add(GreedyStellarSuggestion(CommandSender::class) { suggestion.map { Suggestion(it, "") } })
         return this
     }
 
     inline fun <reified C : CommandSender> addSuggestion(noinline suggestion: GreedyCommandContext<C>.() -> List<Suggestion>): GreedyWordArgument {
-        suggestions.add(GreedyStellarSuggestion(suggestion))
+        suggestions.add(GreedyStellarSuggestion(C::class, suggestion))
         return this
     }
 
@@ -79,7 +79,7 @@ class GreedyWordArgument {
     }
 
     inline fun <reified C : CommandSender> addExecution(noinline execution: GreedyCommandContext<C>.() -> Unit): GreedyWordArgument {
-        executions.add(GreedyStellarExecution(execution))
+        executions.add(GreedyStellarExecution(C::class, execution))
         return this
     }
 
@@ -89,7 +89,7 @@ class GreedyWordArgument {
     }
 
     inline fun <reified C : CommandSender> addRunnable(noinline runnable: GreedyCommandContext<C>.() -> Boolean): GreedyWordArgument {
-        runnables.add(GreedyStellarRunnable(runnable))
+        runnables.add(GreedyStellarRunnable(C::class, runnable))
         return this
     }
 

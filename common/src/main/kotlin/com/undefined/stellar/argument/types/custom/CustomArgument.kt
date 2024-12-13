@@ -19,21 +19,21 @@ abstract class CustomArgument<T>(
     override val arguments: MutableList<AbstractStellarArgument<*>>
         get() = (super.arguments + getArgumentsList()).toMutableList()
     override val failureExecutions: MutableList<StellarExecution<*>>
-        get() = (super.failureExecutions + StellarExecution {
+        get() = (super.failureExecutions + StellarExecution(CommandSender::class) {
             failureExecution(this, arguments.values.last())
         }).toMutableList()
     override val requirements: MutableList<StellarRequirement<*>>
-        get() = (super.requirements + StellarRequirement<CommandSender> { requirement() }).toMutableList()
+        get() = (super.requirements + StellarRequirement(CommandSender::class) { requirement() }).toMutableList()
     override val executions: MutableList<StellarExecution<*>>
-        get() = (super.executions + StellarExecution {
+        get() = (super.executions + StellarExecution(CommandSender::class) {
             execution(this, this.arguments.values.last())
         }).toMutableList()
     override val runnables: MutableList<StellarRunnable<*>>
-        get() = (super.runnables + StellarRunnable {
+        get() = (super.runnables + StellarRunnable(CommandSender::class) {
             runnable(this, this[name])
         }).toMutableList()
     override val suggestions: MutableList<StellarSuggestion<*>>
-        get() = (super.suggestions + StellarSuggestion {
+        get() = (super.suggestions + StellarSuggestion(CommandSender::class) {
             listSuggestions(this)
         }).toMutableList()
 

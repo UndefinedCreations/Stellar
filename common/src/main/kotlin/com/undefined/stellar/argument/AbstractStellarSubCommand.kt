@@ -19,56 +19,56 @@ abstract class AbstractStellarArgument<T>(val parent: AbstractStellarCommand<*>,
     }
 
     fun addSuggestion(suggestion: Suggestion): T {
-        suggestions.add(StellarSuggestion<CommandSender> { listOf(suggestion) })
+        suggestions.add(StellarSuggestion(CommandSender::class) { listOf(suggestion) })
         return this as T
     }
 
     fun addSuggestions(list: List<Suggestion>): T {
-        suggestions.add(StellarSuggestion<CommandSender> { list })
+        suggestions.add(StellarSuggestion(CommandSender::class) { list })
         return this as T
     }
 
     fun addSuggestions(vararg list: Suggestion): T {
-        suggestions.add(StellarSuggestion<CommandSender> { list.toList() })
+        suggestions.add(StellarSuggestion(CommandSender::class) { list.toList() })
         return this as T
     }
 
     fun addSuggestionsWithoutTooltip(list: List<String>): T {
-        suggestions.add(StellarSuggestion<CommandSender> { list.map { Suggestion(it, "") } })
+        suggestions.add(StellarSuggestion(CommandSender::class) { list.map { Suggestion(it, "") } })
         return this as T
     }
 
     fun addSuggestions(vararg list: String): T {
-        suggestions.add(StellarSuggestion<CommandSender> { list.map { Suggestion(it, "") } })
+        suggestions.add(StellarSuggestion(CommandSender::class) { list.map { Suggestion(it, "") } })
         return this as T
     }
 
     fun setSuggestions(vararg suggestion: Suggestion): T {
         suggestions.clear()
-        suggestions.add(StellarSuggestion<CommandSender> { suggestion.toList() })
+        suggestions.add(StellarSuggestion(CommandSender::class) { suggestion.toList() })
         return this as T
     }
 
     fun setSuggestions(vararg suggestion: String): T {
         suggestions.clear()
-        suggestions.add(StellarSuggestion<CommandSender> { suggestion.map { Suggestion(it, "") } })
+        suggestions.add(StellarSuggestion(CommandSender::class) { suggestion.map { Suggestion(it, "") } })
         return this as T
     }
 
     fun setSuggestions(suggestion: List<Suggestion>): T {
         suggestions.clear()
-        suggestions.add(StellarSuggestion<CommandSender> { suggestion.toList() })
+        suggestions.add(StellarSuggestion(CommandSender::class) { suggestion.toList() })
         return this as T
     }
 
     fun setSuggestionsWithoutTooltip(suggestion: List<String>): T {
         suggestions.clear()
-        suggestions.add(StellarSuggestion<CommandSender> { suggestion.map { Suggestion(it, "") } })
+        suggestions.add(StellarSuggestion(CommandSender::class) { suggestion.map { Suggestion(it, "") } })
         return this as T
     }
 
     inline fun <reified C : CommandSender> addSuggestion(noinline suggestion: CommandContext<C>.() -> List<Suggestion>): T {
-        suggestions.add(StellarSuggestion(suggestion))
+        suggestions.add(StellarSuggestion(C::class, suggestion))
         return this as T
     }
 

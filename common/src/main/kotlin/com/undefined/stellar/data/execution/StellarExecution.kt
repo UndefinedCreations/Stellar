@@ -2,10 +2,13 @@ package com.undefined.stellar.data.execution
 
 import com.undefined.stellar.data.argument.CommandContext
 import org.bukkit.command.CommandSender
+import kotlin.reflect.KClass
+import kotlin.reflect.safeCast
 
 @Suppress("UNCHECKED_CAST")
-data class StellarExecution<T : CommandSender>(val execution: CommandContext<T>.() -> Unit) {
+data class StellarExecution<C : CommandSender>(val clazz: KClass<C>, val execution: CommandContext<C>.() -> Unit) {
     operator fun invoke(context: CommandContext<CommandSender>) {
-        execution(context as? CommandContext<T> ?: return)
+        if (clazz.safeCast(context.sender) == null) return
+        execution(context as? CommandContext<C> ?: return)
     }
 }
