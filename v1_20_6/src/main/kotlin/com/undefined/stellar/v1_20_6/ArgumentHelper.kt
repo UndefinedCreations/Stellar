@@ -65,6 +65,7 @@ import net.minecraft.core.particles.*
 import net.minecraft.core.registries.Registries
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceKey
+import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ColumnPos
 import net.minecraft.world.inventory.MenuType
 import net.minecraft.world.level.Level
@@ -78,7 +79,6 @@ import org.bukkit.block.data.BlockData
 import org.bukkit.block.structure.Mirror
 import org.bukkit.block.structure.StructureRotation
 import org.bukkit.craftbukkit.CraftParticle
-import org.bukkit.craftbukkit.CraftServer
 import org.bukkit.craftbukkit.block.data.CraftBlockData
 import org.bukkit.craftbukkit.inventory.CraftItemStack
 import org.bukkit.event.inventory.InventoryType
@@ -92,10 +92,9 @@ import java.util.function.Predicate
 object ArgumentHelper {
 
     private val COMMAND_BUILD_CONTEXT: CommandBuildContext by lazy {
-        val server = Bukkit.getServer() as? CraftServer ?: throw ServerTypeMismatchException()
         CommandBuildContext.simple(
-            server.server.registryAccess(),
-            server.server.worldData.dataConfiguration.enabledFeatures()
+            MinecraftServer.getServer().registryAccess(),
+            MinecraftServer.getServer().worldData.dataConfiguration.enabledFeatures()
         )
     }
 

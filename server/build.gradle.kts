@@ -13,6 +13,7 @@ dependencies {
 
     implementation(project(":api"))
     implementation(project(":common"))
+    implementation(project(":v1_20_4:", "reobf"))
     implementation(project(":v1_20_6:", "reobf"))
     implementation(project(":v1_21:", "reobf"))
     implementation(project(":v1_21_1:", "reobf"))

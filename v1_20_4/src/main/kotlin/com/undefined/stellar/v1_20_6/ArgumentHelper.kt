@@ -1,4 +1,4 @@
-package com.undefined.stellar.v1_21_1
+package com.undefined.stellar.v1_20_6
 
 import com.mojang.brigadier.arguments.*
 import com.mojang.brigadier.builder.ArgumentBuilder
@@ -38,9 +38,10 @@ import com.undefined.stellar.argument.types.world.*
 import com.undefined.stellar.data.argument.Anchor
 import com.undefined.stellar.data.argument.Operation
 import com.undefined.stellar.data.argument.ParticleData
+import com.undefined.stellar.exception.ArgumentVersionMismatchException
 import com.undefined.stellar.exception.LiteralArgumentMismatchException
-import com.undefined.stellar.exception.ServerTypeMismatchException
 import com.undefined.stellar.exception.UnsupportedArgumentException
+import com.undefined.stellar.v1_20_6.BrigadierCommandHelper.version
 import net.kyori.adventure.text.format.Style
 import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
@@ -51,7 +52,6 @@ import net.minecraft.commands.arguments.DimensionArgument
 import net.minecraft.commands.arguments.EntityAnchorArgument
 import net.minecraft.commands.arguments.EntityArgument
 import net.minecraft.commands.arguments.ParticleArgument
-import net.minecraft.commands.arguments.ResourceOrIdArgument.LootTableArgument
 import net.minecraft.commands.arguments.blocks.BlockPredicateArgument
 import net.minecraft.commands.arguments.blocks.BlockStateArgument
 import net.minecraft.commands.arguments.coordinates.*
@@ -78,10 +78,9 @@ import org.bukkit.block.Block
 import org.bukkit.block.data.BlockData
 import org.bukkit.block.structure.Mirror
 import org.bukkit.block.structure.StructureRotation
-import org.bukkit.craftbukkit.CraftParticle
-import org.bukkit.craftbukkit.CraftServer
-import org.bukkit.craftbukkit.block.data.CraftBlockData
-import org.bukkit.craftbukkit.inventory.CraftItemStack
+import org.bukkit.craftbukkit.v1_20_R3.CraftParticle
+import org.bukkit.craftbukkit.v1_20_R3.block.data.CraftBlockData
+import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack
 import org.bukkit.event.inventory.InventoryType
 import org.bukkit.inventory.ItemStack
 import org.bukkit.scoreboard.DisplaySlot
@@ -89,7 +88,7 @@ import java.time.Duration
 import java.util.*
 import java.util.function.Predicate
 
-@Suppress("DEPRECATION", "UNCHECKED_CAST")
+@Suppress("UNCHECKED_CAST")
 object ArgumentHelper {
 
     private val COMMAND_BUILD_CONTEXT: CommandBuildContext by lazy {
@@ -130,25 +129,17 @@ object ArgumentHelper {
                 LocationType.DOUBLE_LOCATION_2D -> Vec2Argument.vec2()
             }
             is BlockDataArgument -> BlockStateArgument.block(COMMAND_BUILD_CONTEXT)
-            is com.undefined.stellar.argument.types.block.BlockPredicateArgument -> BlockPredicateArgument.blockPredicate(
-                COMMAND_BUILD_CONTEXT
-            )
+            is com.undefined.stellar.argument.types.block.BlockPredicateArgument -> BlockPredicateArgument.blockPredicate(COMMAND_BUILD_CONTEXT)
             is com.undefined.stellar.argument.types.item.ItemArgument -> ItemArgument.item(COMMAND_BUILD_CONTEXT)
-            is com.undefined.stellar.argument.types.item.ItemPredicateArgument -> ItemPredicateArgument.itemPredicate(
-                COMMAND_BUILD_CONTEXT
-            )
+            is com.undefined.stellar.argument.types.item.ItemPredicateArgument -> ItemPredicateArgument.itemPredicate(COMMAND_BUILD_CONTEXT)
             is com.undefined.stellar.argument.types.text.ColorArgument -> ColorArgument.color()
-            is com.undefined.stellar.argument.types.text.ComponentArgument -> ComponentArgument.textComponent(
-                COMMAND_BUILD_CONTEXT
-            )
-            is com.undefined.stellar.argument.types.text.StyleArgument -> StyleArgument.style(COMMAND_BUILD_CONTEXT)
+            is com.undefined.stellar.argument.types.text.ComponentArgument -> ComponentArgument.textComponent()
+            is com.undefined.stellar.argument.types.text.StyleArgument -> StyleArgument.style()
             is com.undefined.stellar.argument.types.text.MessageArgument -> MessageArgument.message()
             is com.undefined.stellar.argument.types.scoreboard.ObjectiveArgument -> ObjectiveArgument.objective()
             is com.undefined.stellar.argument.types.scoreboard.ObjectiveCriteriaArgument -> ObjectiveCriteriaArgument.criteria()
             is com.undefined.stellar.argument.types.math.OperationArgument -> OperationArgument.operation()
-            is com.undefined.stellar.argument.types.item.ParticleArgument -> ParticleArgument.particle(
-                COMMAND_BUILD_CONTEXT
-            )
+            is com.undefined.stellar.argument.types.item.ParticleArgument -> ParticleArgument.particle(COMMAND_BUILD_CONTEXT)
             is com.undefined.stellar.argument.types.math.AngleArgument -> AngleArgument.angle()
             is com.undefined.stellar.argument.types.math.RotationArgument -> RotationArgument.rotation()
             is DisplaySlotArgument -> ScoreboardSlotArgument.displaySlot()
@@ -157,7 +148,7 @@ object ArgumentHelper {
             is AxisArgument -> SwizzleArgument.swizzle()
             is com.undefined.stellar.argument.types.scoreboard.TeamArgument -> TeamArgument.team()
             is ItemSlotArgument -> SlotArgument.slot()
-            is ItemSlotsArgument -> SlotsArgument.slots()
+            is ItemSlotsArgument -> throwArgumentVersionException(argument)
             is NamespacedKeyArgument -> ResourceLocationArgument.id()
             is com.undefined.stellar.argument.types.entity.EntityAnchorArgument -> EntityAnchorArgument.anchor()
             is com.undefined.stellar.argument.types.math.RangeArgument -> RangeArgument.intRange()
@@ -167,9 +158,7 @@ object ArgumentHelper {
             is MirrorArgument -> TemplateMirrorArgument.templateMirror()
             is StructureRotationArgument -> TemplateRotationArgument.templateRotation()
             is HeightMapArgument -> HeightmapTypeArgument.heightmap()
-            is com.undefined.stellar.argument.types.structure.LootTableArgument -> LootTableArgument.lootTable(
-                COMMAND_BUILD_CONTEXT
-            )
+            is com.undefined.stellar.argument.types.structure.LootTableArgument -> throwArgumentVersionException(argument)
             is UUIDArgument -> UuidArgument.uuid()
             is GameEventArgument -> ResourceKeyArgument.key(Registries.GAME_EVENT)
             is StructureTypeArgument -> ResourceKeyArgument.key(Registries.STRUCTURE_TYPE)
@@ -180,7 +169,7 @@ object ArgumentHelper {
             is FrogVariantArgument -> ResourceKeyArgument.key(Registries.FROG_VARIANT)
             is VillagerProfessionArgument -> ResourceKeyArgument.key(Registries.VILLAGER_PROFESSION)
             is VillagerTypeArgument -> ResourceKeyArgument.key(Registries.VILLAGER_TYPE)
-            is MapDecorationTypeArgument -> ResourceKeyArgument.key(Registries.MAP_DECORATION_TYPE)
+            is MapDecorationTypeArgument -> throwArgumentVersionException(argument)
             is InventoryTypeArgument -> ResourceKeyArgument.key(Registries.MENU)
             is AttributeArgument -> ResourceKeyArgument.key(Registries.ATTRIBUTE)
             is FluidArgument -> ResourceKeyArgument.key(Registries.FLUID)
@@ -190,7 +179,7 @@ object ArgumentHelper {
             is TrimMaterialArgument -> ResourceKeyArgument.key(Registries.TRIM_MATERIAL)
             is TrimPatternArgument -> ResourceKeyArgument.key(Registries.TRIM_PATTERN)
             is DamageTypeArgument -> ResourceKeyArgument.key(Registries.DAMAGE_TYPE)
-            is WolfVariantArgument -> ResourceKeyArgument.key(Registries.WOLF_VARIANT)
+            is WolfVariantArgument -> throwArgumentVersionException(argument)
             is PatternTypeArgument -> ResourceKeyArgument.key(Registries.BANNER_PATTERN)
             is ArtArgument -> ResourceKeyArgument.key(Registries.PAINTING_VARIANT)
             is InstrumentArgument -> ResourceKeyArgument.key(Registries.INSTRUMENT)
@@ -228,10 +217,9 @@ object ArgumentHelper {
                 ItemPredicateArgument.getItemPredicate(context, argument.name).test(CraftItemStack.asNMSCopy(item))
             }
             is com.undefined.stellar.argument.types.text.ColorArgument -> ColorArgument.getColor(context, argument.name).color?.let { Style.style(TextColor.color(it)) } ?: Style.empty()
-            is com.undefined.stellar.argument.types.text.ComponentArgument ->  GsonComponentSerializer.gson().deserialize(Component.Serializer.toJson(ComponentArgument.getComponent(context, argument.name), COMMAND_BUILD_CONTEXT))
-            is com.undefined.stellar.argument.types.text.StyleArgument ->  GsonComponentSerializer.gson().deserialize(
-                getArgumentInput(context, argument.name) ?: return null).style()
-            is com.undefined.stellar.argument.types.text.MessageArgument ->  GsonComponentSerializer.gson().deserialize(Component.Serializer.toJson(MessageArgument.getMessage(context, argument.name), COMMAND_BUILD_CONTEXT))
+            is com.undefined.stellar.argument.types.text.ComponentArgument ->  GsonComponentSerializer.gson().deserialize(Component.Serializer.toJson(ComponentArgument.getComponent(context, argument.name)))
+            is com.undefined.stellar.argument.types.text.StyleArgument ->  GsonComponentSerializer.gson().deserialize(getArgumentInput(context, argument.name) ?: return null).style()
+            is com.undefined.stellar.argument.types.text.MessageArgument ->  GsonComponentSerializer.gson().deserialize(Component.Serializer.toJson(MessageArgument.getMessage(context, argument.name)))
             is com.undefined.stellar.argument.types.scoreboard.ObjectiveArgument ->  Bukkit.getScoreboardManager().mainScoreboard.getObjective(ObjectiveArgument.getObjective(context, argument.name).name)
             is com.undefined.stellar.argument.types.scoreboard.ObjectiveCriteriaArgument ->  ObjectiveCriteriaArgument.getCriteria(context, argument.name).name
             is com.undefined.stellar.argument.types.math.OperationArgument -> Operation.getOperation(getArgumentInput(context, argument.name) ?: return null)
@@ -250,7 +238,7 @@ object ArgumentHelper {
             is AxisArgument -> getBukkitAxis(SwizzleArgument.getSwizzle(context, argument.name))
             is com.undefined.stellar.argument.types.scoreboard.TeamArgument -> Bukkit.getScoreboardManager().mainScoreboard.getTeam(TeamArgument.getTeam(context, argument.name).name)
             is ItemSlotArgument -> SlotArgument.getSlot(context, argument.name)
-            is ItemSlotsArgument -> SlotsArgument.getSlots(context, argument.name).slots().toList()
+            is ItemSlotsArgument -> throwArgumentVersionException(argument)
             is NamespacedKeyArgument -> NamespacedKey(ResourceLocationArgument.getId(context, argument.name).namespace, ResourceLocationArgument.getId(context, argument.name).path)
             is com.undefined.stellar.argument.types.entity.EntityAnchorArgument -> Anchor.getFromName(getArgumentInput(context, argument.name) ?: return null)
             is com.undefined.stellar.argument.types.math.RangeArgument -> {
@@ -263,18 +251,18 @@ object ArgumentHelper {
             is MirrorArgument -> Mirror.valueOf(TemplateMirrorArgument.getMirror(context, argument.name).name)
             is StructureRotationArgument -> StructureRotation.valueOf(TemplateRotationArgument.getRotation(context, argument.name).name)
             is HeightMapArgument -> HeightMap.valueOf(HeightmapTypeArgument.getHeightmap(context, argument.name).name)
-            is com.undefined.stellar.argument.types.structure.LootTableArgument -> LootTableArgument.getLootTable(context, argument.name).value().craftLootTable
+            is com.undefined.stellar.argument.types.structure.LootTableArgument -> throwArgumentVersionException(argument)
             is UUIDArgument -> UuidArgument.getUuid(context, argument.name)
             is GameEventArgument -> org.bukkit.Registry.GAME_EVENT.get(getId(context, argument.name, Registries.GAME_EVENT))
             is StructureTypeArgument -> org.bukkit.Registry.STRUCTURE_TYPE.get(getId(context, argument.name, Registries.STRUCTURE_TYPE))
             is PotionEffectTypeArgument -> org.bukkit.Registry.POTION_EFFECT_TYPE.get(getId(context, argument.name, Registries.MOB_EFFECT))
-            is BlockTypeArgument -> org.bukkit.Registry.BLOCK.get(getId(context, argument.name, Registries.BLOCK_TYPE))
-            is ItemTypeArgument -> org.bukkit.Registry.ITEM.get(getId(context, argument.name, Registries.ITEM))
+            is BlockTypeArgument -> throwArgumentVersionException(argument)
+            is ItemTypeArgument -> throwArgumentVersionException(argument)
             is CatTypeArgument -> org.bukkit.Registry.CAT_VARIANT.get(getId(context, argument.name, Registries.CAT_VARIANT))
             is FrogVariantArgument -> org.bukkit.Registry.FROG_VARIANT.get(getId(context, argument.name, Registries.FROG_VARIANT))
             is VillagerProfessionArgument -> org.bukkit.Registry.VILLAGER_PROFESSION.get(getId(context, argument.name, Registries.VILLAGER_PROFESSION))
             is VillagerTypeArgument -> org.bukkit.Registry.VILLAGER_TYPE.get(getId(context, argument.name, Registries.VILLAGER_TYPE))
-            is MapDecorationTypeArgument -> org.bukkit.Registry.MAP_DECORATION_TYPE.get(getId(context, argument.name, Registries.MAP_DECORATION_TYPE))
+            is MapDecorationTypeArgument -> throwArgumentVersionException(argument)
             is InventoryTypeArgument -> getInventoryType(resolveKey(context, argument.name, Registries.MENU).value())
             is AttributeArgument -> org.bukkit.Registry.ATTRIBUTE.get(getId(context, argument.name, Registries.ATTRIBUTE))
             is FluidArgument -> org.bukkit.Registry.FLUID.get(getId(context, argument.name, Registries.FLUID))
@@ -284,7 +272,7 @@ object ArgumentHelper {
             is TrimMaterialArgument -> org.bukkit.Registry.TRIM_MATERIAL.get(getId(context, argument.name, Registries.TRIM_MATERIAL))
             is TrimPatternArgument -> org.bukkit.Registry.TRIM_PATTERN.get(getId(context, argument.name, Registries.TRIM_PATTERN))
             is DamageTypeArgument -> org.bukkit.Registry.DAMAGE_TYPE.get(getId(context, argument.name, Registries.DAMAGE_TYPE))
-            is WolfVariantArgument -> org.bukkit.Registry.WOLF_VARIANT.get(getId(context, argument.name, Registries.WOLF_VARIANT))
+            is WolfVariantArgument -> throwArgumentVersionException(argument)
             is PatternTypeArgument -> org.bukkit.Registry.BANNER_PATTERN.get(getId(context, argument.name, Registries.BANNER_PATTERN))
             is ArtArgument -> org.bukkit.Registry.ART.get(getId(context, argument.name, Registries.PAINTING_VARIANT))
             is InstrumentArgument -> org.bukkit.Registry.INSTRUMENT.get(getId(context, argument.name, Registries.INSTRUMENT))
@@ -295,7 +283,7 @@ object ArgumentHelper {
         }
     }
 
-    fun getArgumentInput(context: CommandContext<CommandSourceStack>, name: String): String? {
+    private fun getArgumentInput(context: CommandContext<CommandSourceStack>, name: String): String? {
         val field = CommandContext::class.java.getDeclaredField("arguments")
         field.isAccessible = true
         val arguments: Map<String, ParsedArgument<CommandSourceStack, *>> = field.get(context) as Map<String, ParsedArgument<CommandSourceStack, *>>
@@ -350,9 +338,7 @@ object ArgumentHelper {
     private fun <T> getRegistry(
         context: CommandContext<CommandSourceStack>,
         registryRef: ResourceKey<out Registry<T>>
-    ): Registry<T> {
-        return context.source.server.registryAccess().registryOrThrow(registryRef)
-    }
+    ): Registry<T> = context.source.server.registryAccess().registryOrThrow(registryRef)
 
     @Throws(CommandSyntaxException::class)
     private fun <T> resolveKey(
@@ -464,14 +450,6 @@ object ArgumentHelper {
         }
         is ShriekParticleOption -> ParticleData(particle, particleOptions.delay)
         is SculkChargeParticleOptions -> ParticleData(particle, particleOptions.roll())
-        is ColorParticleOption -> {
-            val color = Color.fromARGB(
-                (particleOptions.alpha * 255.0f).toInt(),
-                (particleOptions.red * 255.0f).toInt(),
-                (particleOptions.green * 255.0f).toInt(),
-                (particleOptions.blue * 255.0f).toInt())
-            ParticleData(particle, color)
-        }
         else -> ParticleData(particle, null)
     }
 
@@ -489,5 +467,8 @@ object ArgumentHelper {
     private fun ColumnPos.toLocation(world: World?) = Location(world, x.toDouble(), 0.0, z.toDouble())
     private fun Vec3.toLocation(world: World?) = Location(world, x, y, z)
     private fun Vec2.toLocation(world: World?) = Location(world, x.toDouble(), 0.0, y.toDouble())
+
+    private fun throwArgumentVersionException(argument: AbstractStellarArgument<*>): Nothing =
+        throw ArgumentVersionMismatchException(argument, version)
 
 }
