@@ -9,7 +9,7 @@ plugins {
 
 apply(plugin = "maven-publish")
 val projectGroupId = "com.undefined"
-val projectVersion = "0.0.7"
+val projectVersion = "0.0.9"
 val projectArtifactId = "stellar"
 
 group = projectGroupId
@@ -41,41 +41,6 @@ publishing {
             }
         }
     }
-//
-//    publications {
-//        register<MavenPublication>("maven") {
-//            groupId = projectGroupId
-//            artifactId = projectArtifactId
-//            version = projectVersion
-//            from(components["java"])
-//
-////            artifact(tasks["shadowJar"]) // Use the shadow jar artifact
-//
-//            pom {
-//                name.set("Stellar")
-//                description.set("Command API for Spigot.")
-//                url.set("https://undefinedcreation.com")
-//
-//                licenses {
-//                    license {
-//                        name.set("MIT License")
-//                        url.set("https://opensource.org/license/mit")
-//                    }
-//                }
-//            }
-//        }
-//    }
-}
-
-allprojects {
-    apply(plugin = "java")
-    apply(plugin = "java-library")
-    apply(plugin = "maven-publish")
-
-    repositories {
-        mavenCentral()
-        maven("https://repo.papermc.io/repository/maven-public/")
-    }
 
     publishing {
         publications {
@@ -87,6 +52,17 @@ allprojects {
                 from(components["java"])
             }
         }
+    }
+}
+
+allprojects {
+    apply(plugin = "java")
+    apply(plugin = "java-library")
+    apply(plugin = "maven-publish")
+
+    repositories {
+        mavenCentral()
+        maven("https://repo.papermc.io/repository/maven-public/")
     }
 
     dependencies {
@@ -101,24 +77,15 @@ allprojects {
 dependencies {
     implementation(project(":api"))
     implementation(project(":common"))
-    implementation(project(":v1_20_4", "reobf"))
-    implementation(project(":v1_20_6", "reobf"))
-    implementation(project(":v1_21", "reobf"))
-    implementation(project(":v1_21_1", "reobf"))
-    implementation(project(":v1_21_3", "reobf"))
-    implementation(project(":v1_21_4", "reobf"))
+    compileOnly(project(":v1_20_4", "reobf"))
+    compileOnly(project(":v1_20_6", "reobf"))
+    compileOnly(project(":v1_21", "reobf"))
+    compileOnly(project(":v1_21_1", "reobf"))
+    compileOnly(project(":v1_21_3", "reobf"))
+    compileOnly(project(":v1_21_4", "reobf"))
 }
 
 tasks {
-//    assemble {
-//        dependsOn(shadowJar)
-//    }
-
-//    jar.configure {
-//        dependsOn("shadowJar")
-//        archiveClassifier.set("dev")
-//    }
-
     withType<ShadowJar> {
         archiveFileName.set("${project.name}-${project.version}.jar")
         archiveClassifier.set("mapped")
