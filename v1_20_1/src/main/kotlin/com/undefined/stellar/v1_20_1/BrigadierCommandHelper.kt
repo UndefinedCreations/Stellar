@@ -1,4 +1,4 @@
-package com.undefined.stellar.v1_20_2
+package com.undefined.stellar.v1_20_1
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.context.CommandContext

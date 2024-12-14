@@ -1,4 +1,4 @@
-package com.undefined.stellar.v1_20_2
+package com.undefined.stellar.v1_20_1
 
 import com.mojang.brigadier.arguments.*
 import com.mojang.brigadier.builder.ArgumentBuilder
@@ -41,7 +41,7 @@ import com.undefined.stellar.data.argument.ParticleData
 import com.undefined.stellar.exception.ArgumentVersionMismatchException
 import com.undefined.stellar.exception.LiteralArgumentMismatchException
 import com.undefined.stellar.exception.UnsupportedArgumentException
-import com.undefined.stellar.v1_20_2.BrigadierCommandHelper.version
+import com.undefined.stellar.v1_20_1.BrigadierCommandHelper.version
 import net.kyori.adventure.text.format.Style
 import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
@@ -78,9 +78,9 @@ import org.bukkit.block.Block
 import org.bukkit.block.data.BlockData
 import org.bukkit.block.structure.Mirror
 import org.bukkit.block.structure.StructureRotation
-import org.bukkit.craftbukkit.v1_20_R2.CraftParticle
-import org.bukkit.craftbukkit.v1_20_R2.block.data.CraftBlockData
-import org.bukkit.craftbukkit.v1_20_R2.inventory.CraftItemStack
+import org.bukkit.craftbukkit.v1_20_R1.CraftParticle
+import org.bukkit.craftbukkit.v1_20_R1.block.data.CraftBlockData
+import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack
 import org.bukkit.event.inventory.InventoryType
 import org.bukkit.inventory.ItemStack
 import org.bukkit.scoreboard.DisplaySlot
@@ -232,7 +232,7 @@ object ArgumentHelper {
             is com.undefined.stellar.argument.types.math.OperationArgument -> Operation.getOperation(getArgumentInput(context, argument.name) ?: return null)
             is com.undefined.stellar.argument.types.item.ParticleArgument ->  {
                 val particleOptions = ParticleArgument.getParticle(context, argument.name)
-                getParticleData(context, CraftParticle.minecraftToBukkit(particleOptions.type), particleOptions)
+                getParticleData(context, CraftParticle.toBukkit(particleOptions.type), particleOptions)
             }
             is com.undefined.stellar.argument.types.math.AngleArgument -> AngleArgument.getAngle(context, argument.name)
             is com.undefined.stellar.argument.types.math.RotationArgument -> {
@@ -250,7 +250,7 @@ object ArgumentHelper {
             is com.undefined.stellar.argument.types.entity.EntityAnchorArgument -> Anchor.getFromName(getArgumentInput(context, argument.name) ?: return null)
             is com.undefined.stellar.argument.types.math.RangeArgument -> {
                 val range = RangeArgument.Ints.getRange(context, argument.name)
-                IntRange(range.min.orElse(1), range.max.orElse(2))
+                IntRange(range.min ?: 1, range.max ?: 2)
             }
             is com.undefined.stellar.argument.types.world.DimensionArgument -> DimensionArgument.getDimension(context, argument.name).world.environment
             is com.undefined.stellar.argument.types.player.GameModeArgument -> GameMode.getByValue(GameModeArgument.getGameMode(context, argument.name).id)
@@ -284,7 +284,7 @@ object ArgumentHelper {
             is ArtArgument -> org.bukkit.Registry.ART.get(getId(context, argument.name, Registries.PAINTING_VARIANT))
             is InstrumentArgument -> org.bukkit.Registry.INSTRUMENT.get(getId(context, argument.name, Registries.INSTRUMENT))
             is EntityTypeArgument -> org.bukkit.Registry.ENTITY_TYPE.get(getId(context, argument.name, Registries.ENTITY_TYPE))
-            is PotionArgument -> org.bukkit.Registry.POTION.get(getId(context, argument.name, Registries.POTION))
+            is PotionArgument -> throwArgumentVersionException(argument)
             is MemoryKeyArgument -> org.bukkit.Registry.MEMORY_MODULE_TYPE.get(getId(context, argument.name, Registries.MEMORY_MODULE_TYPE))
             else -> throw UnsupportedArgumentException()
         }
@@ -392,26 +392,26 @@ object ArgumentHelper {
             }
         }
 
-    private fun getBukkitDisplaySlot(slot: net.minecraft.world.scores.DisplaySlot): DisplaySlot = when (slot) {
-        net.minecraft.world.scores.DisplaySlot.LIST -> DisplaySlot.PLAYER_LIST
-        net.minecraft.world.scores.DisplaySlot.SIDEBAR -> DisplaySlot.SIDEBAR
-        net.minecraft.world.scores.DisplaySlot.BELOW_NAME -> DisplaySlot.BELOW_NAME
-        net.minecraft.world.scores.DisplaySlot.TEAM_BLACK -> DisplaySlot.SIDEBAR_TEAM_BLACK
-        net.minecraft.world.scores.DisplaySlot.TEAM_DARK_BLUE -> DisplaySlot.SIDEBAR_TEAM_DARK_BLUE
-        net.minecraft.world.scores.DisplaySlot.TEAM_DARK_GREEN -> DisplaySlot.SIDEBAR_TEAM_DARK_GREEN
-        net.minecraft.world.scores.DisplaySlot.TEAM_DARK_AQUA -> DisplaySlot.SIDEBAR_TEAM_DARK_AQUA
-        net.minecraft.world.scores.DisplaySlot.TEAM_DARK_RED -> DisplaySlot.SIDEBAR_TEAM_DARK_RED
-        net.minecraft.world.scores.DisplaySlot.TEAM_DARK_PURPLE -> DisplaySlot.SIDEBAR_TEAM_DARK_PURPLE
-        net.minecraft.world.scores.DisplaySlot.TEAM_GOLD -> DisplaySlot.SIDEBAR_TEAM_GOLD
-        net.minecraft.world.scores.DisplaySlot.TEAM_GRAY -> DisplaySlot.SIDEBAR_TEAM_GRAY
-        net.minecraft.world.scores.DisplaySlot.TEAM_DARK_GRAY -> DisplaySlot.SIDEBAR_TEAM_DARK_GRAY
-        net.minecraft.world.scores.DisplaySlot.TEAM_BLUE -> DisplaySlot.SIDEBAR_TEAM_BLUE
-        net.minecraft.world.scores.DisplaySlot.TEAM_GREEN -> DisplaySlot.SIDEBAR_TEAM_GREEN
-        net.minecraft.world.scores.DisplaySlot.TEAM_AQUA -> DisplaySlot.SIDEBAR_TEAM_AQUA
-        net.minecraft.world.scores.DisplaySlot.TEAM_RED -> DisplaySlot.SIDEBAR_TEAM_RED
-        net.minecraft.world.scores.DisplaySlot.TEAM_LIGHT_PURPLE -> DisplaySlot.SIDEBAR_TEAM_LIGHT_PURPLE
-        net.minecraft.world.scores.DisplaySlot.TEAM_YELLOW -> DisplaySlot.SIDEBAR_TEAM_YELLOW
-        net.minecraft.world.scores.DisplaySlot.TEAM_WHITE -> DisplaySlot.SIDEBAR_TEAM_WHITE
+    private fun getBukkitDisplaySlot(slot: Int): DisplaySlot = when (slot) {
+        0 -> DisplaySlot.PLAYER_LIST
+        1 -> DisplaySlot.SIDEBAR
+        2 -> DisplaySlot.BELOW_NAME
+        3 -> DisplaySlot.SIDEBAR_TEAM_BLACK
+        4 -> DisplaySlot.SIDEBAR_TEAM_DARK_BLUE
+        5 -> DisplaySlot.SIDEBAR_TEAM_DARK_GREEN
+        6 -> DisplaySlot.SIDEBAR_TEAM_DARK_AQUA
+        7 -> DisplaySlot.SIDEBAR_TEAM_DARK_RED
+        8 -> DisplaySlot.SIDEBAR_TEAM_DARK_PURPLE
+        9 -> DisplaySlot.SIDEBAR_TEAM_GOLD
+        10 -> DisplaySlot.SIDEBAR_TEAM_GRAY
+        11 -> DisplaySlot.SIDEBAR_TEAM_DARK_GRAY
+        12 -> DisplaySlot.SIDEBAR_TEAM_BLUE
+        13 -> DisplaySlot.SIDEBAR_TEAM_GREEN
+        14 -> DisplaySlot.SIDEBAR_TEAM_AQUA
+        15 -> DisplaySlot.SIDEBAR_TEAM_RED
+        16 -> DisplaySlot.SIDEBAR_TEAM_LIGHT_PURPLE
+        17 -> DisplaySlot.SIDEBAR_TEAM_YELLOW
+        18 -> DisplaySlot.SIDEBAR_TEAM_WHITE
         else -> DisplaySlot.SIDEBAR
     }
 

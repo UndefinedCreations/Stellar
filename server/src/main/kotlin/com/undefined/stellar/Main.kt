@@ -2,15 +2,16 @@ package com.undefined.stellar
 
 import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
+import org.bukkit.scoreboard.DisplaySlot
 
 class Main : JavaPlugin() {
 
     override fun onEnable() {
         StellarCommand("test")
             .addLocationArgument("location")
-            .addMapDecorationType("string")
+            .addDisplaySlotArgument("string")
             .addExecution<Player> {
-                sender.sendMessage(arguments.toList().withIndex().joinToString(", ") { "${it.index}: ${it.value.first}" })
+                sender.sendMessage(this.getArgument<DisplaySlot>("string").name)
             }
             .addRequirement<Player> {
                 this.hasPlayedBefore()
