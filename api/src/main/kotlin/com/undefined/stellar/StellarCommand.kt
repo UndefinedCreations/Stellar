@@ -1,9 +1,11 @@
 package com.undefined.stellar
 
+import com.undefined.stellar.data.events.StellarCommandRegisterEvent
 import com.undefined.stellar.data.requirement.PermissionStellarRequirement
 import com.undefined.stellar.exception.UnsupportedVersionException
 import com.undefined.stellar.manager.CommandManager
 import com.undefined.stellar.util.NMSVersion
+import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.plugin.java.JavaPlugin
 import org.jetbrains.annotations.ApiStatus
@@ -22,6 +24,7 @@ class StellarCommand(name: String, permissions: List<String> = listOf()) : Abstr
         val registrar = CommandManager.registrars[NMSVersion.version] ?: throw UnsupportedVersionException()
         registrar.register(this)
         for (execution in this.registerExecutions) execution()
+        Bukkit.getPluginManager().callEvent(StellarCommandRegisterEvent(this))
     }
 
     companion object {
