@@ -4,6 +4,7 @@ import com.undefined.stellar.StellarCommand
 
 fun command(name: String, description: String, permissions: List<String>, builder: StellarCommand.() -> Unit): StellarCommand {
     val command = StellarCommand(name, description)
+    command.addRequirements(*permissions.toTypedArray())
     command.builder()
     return command
 }

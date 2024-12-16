@@ -19,10 +19,11 @@ object CommandAdapter {
     }
 
     fun handleCommandFunctions(command: AbstractStellarCommand<*>, brigadierCommand: ArgumentBuilder<CommandSourceStack, *>) {
-        brigadierCommand.executes { context ->
-            BrigadierCommandHelper.handleExecutions(command, context)
-            1
-        }
+        if (command.executions.isNotEmpty() || command.executions.isNotEmpty())
+            brigadierCommand.executes { context ->
+                BrigadierCommandHelper.handleExecutions(command, context)
+                1
+            }
         brigadierCommand.requires { source ->
             BrigadierCommandHelper.fulfillsRequirements(command, source)
         }
