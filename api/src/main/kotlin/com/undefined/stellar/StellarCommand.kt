@@ -1,5 +1,6 @@
 package com.undefined.stellar
 
+import com.undefined.stellar.data.requirement.PermissionStellarRequirement
 import com.undefined.stellar.exception.UnsupportedVersionException
 import com.undefined.stellar.manager.CommandManager
 import com.undefined.stellar.util.NMSVersion
@@ -7,12 +8,12 @@ import org.bukkit.command.CommandSender
 import org.bukkit.plugin.java.JavaPlugin
 import org.jetbrains.annotations.ApiStatus
 
-class StellarCommand(name: String, vararg aliases: String = arrayOf()) : AbstractStellarCommand<StellarCommand>(name) {
+class StellarCommand(name: String, permissions: List<String> = listOf()) : AbstractStellarCommand<StellarCommand>(name) {
 
-    constructor(name: String, aliases: List<String>) : this(name, aliases = aliases.toTypedArray())
+    constructor(name: String, vararg permissions: String) : this(name, permissions = permissions.toList())
 
     init {
-        this.aliases.addAll(aliases)
+        this.permissionRequirements.addAll(permissions.map { PermissionStellarRequirement(1, it) })
     }
 
     override fun register(plugin: JavaPlugin) {
