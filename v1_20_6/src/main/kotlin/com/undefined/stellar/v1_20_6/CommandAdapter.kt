@@ -29,9 +29,7 @@ object CommandAdapter {
             BrigadierCommandHelper.fulfillsRequirements(command, source)
         }
 
-        println("1!\n")
         if (command !is AbstractStellarArgument || command.suggestions.isEmpty() || brigadierCommand !is RequiredArgumentBuilder<CommandSourceStack, *>) return
-        println("suggestions!\n")
         brigadierCommand.suggests { context, builder ->
             BrigadierCommandHelper.handleSuggestions(command, context, builder)
         }

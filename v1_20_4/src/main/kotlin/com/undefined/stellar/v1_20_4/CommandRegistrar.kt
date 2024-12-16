@@ -20,10 +20,10 @@ object CommandRegistrar : AbstractCommandRegistrar {
         if (results.reader.remainingLength == 0) return false
 
         val baseCommand: AbstractStellarCommand<*> = StellarCommands.getStellarCommand(context.nodes[0].node.name)!!
-        val subCommand = BrigadierCommandHelper.getArguments(baseCommand, context).lastOrNull()
-        subCommand?.let {
-            BrigadierCommandHelper.handleFailureMessageAndExecutions(subCommand, context)
-            if (subCommand.hideDefaultFailureMessages.hide) return true
+        val argument = BrigadierCommandHelper.getArguments(baseCommand, context).lastOrNull()
+        argument?.let {
+            BrigadierCommandHelper.handleFailureMessageAndExecutions(argument, context)
+            if (argument.hideDefaultFailureMessages.hide) return true
         } ?: run {
             BrigadierCommandHelper.handleFailureMessageAndExecutions(baseCommand, context)
             if (baseCommand.hideDefaultFailureMessages.hide) return true

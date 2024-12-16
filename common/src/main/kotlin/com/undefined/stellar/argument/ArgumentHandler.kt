@@ -188,7 +188,7 @@ open class ArgumentHandler {
     fun addGameModeArgument(name: String): GameModeArgument =
         addArgument { GameModeArgument(base, name) }
 
-    fun addDimensionSubCommand(name: String): DimensionArgument =
+    fun addDimensionArgument(name: String): DimensionArgument =
         addArgument { DimensionArgument(base, name) }
 
     fun addTimeArgument(name: String, minimum: Int = 0): TimeArgument =

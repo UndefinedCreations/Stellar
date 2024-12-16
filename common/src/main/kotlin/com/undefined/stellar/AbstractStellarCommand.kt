@@ -27,6 +27,7 @@ abstract class AbstractStellarCommand<T>(val name: String, var description: Stri
     @ApiStatus.Internal open val permissionRequirements: MutableList<PermissionStellarRequirement> = mutableListOf()
     @ApiStatus.Internal open val executions: MutableList<StellarExecution<*>> = mutableListOf()
     @ApiStatus.Internal open val runnables: MutableList<StellarRunnable<*>> = mutableListOf()
+    @ApiStatus.Internal open val registerExecutions: MutableList<() -> Unit> = mutableListOf()
 
     fun setAliases(vararg aliases: String): T {
         this.aliases.clear()
@@ -184,6 +185,11 @@ abstract class AbstractStellarCommand<T>(val name: String, var description: Stri
 
     inline fun <reified C : CommandSender> addRunnable(noinline runnable: CommandContext<C>.() -> Boolean): T {
         runnables.add(StellarRunnable(C::class, runnable))
+        return this as T
+    }
+
+    fun onRegister(execution: () -> Unit): T {
+        base.registerExecutions.add(execution)
         return this as T
     }
 

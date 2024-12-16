@@ -44,14 +44,12 @@ object BrigadierCommandHelper {
         baseCommand: AbstractStellarCommand<*>,
         context: CommandContext<CommandSourceStack>,
         currentIndex: Int = 1,
-        listOfSubCommands: List<AbstractStellarArgument<*>> = emptyList()
+        listOfArguments: List<AbstractStellarArgument<*>> = emptyList()
     ): List<AbstractStellarArgument<*>> {
-        if (listOfSubCommands.size == context.nodes.size - 1) return listOfSubCommands
-        for (subCommand in baseCommand.arguments) {
-            if (subCommand.name == context.nodes[currentIndex].node.name) {
-                return getArguments(subCommand, context, currentIndex + 1, listOfSubCommands + subCommand)
-            }
-        }
+        if (listOfArguments.size == context.nodes.size - 1) return listOfArguments
+        for (argument in baseCommand.arguments)
+            if (argument.name == context.nodes[currentIndex].node.name)
+                return getArguments(argument, context, currentIndex + 1, listOfArguments + argument)
         return emptyList()
     }
 

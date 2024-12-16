@@ -12,6 +12,8 @@ import org.jetbrains.annotations.ApiStatus
 abstract class AbstractStellarArgument<T>(val parent: AbstractStellarCommand<*>, name: String) : AbstractStellarCommand<T>(name) {
 
     @ApiStatus.Internal open val suggestions: MutableList<StellarSuggestion<*>> = mutableListOf()
+    override val registerExecutions: MutableList<() -> Unit>
+        get() = base.registerExecutions
 
     fun addSuggestion(title: String, tooltip: String): T {
         addSuggestion(Suggestion(title, tooltip))

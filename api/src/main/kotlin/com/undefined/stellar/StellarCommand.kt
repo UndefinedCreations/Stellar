@@ -20,6 +20,7 @@ class StellarCommand(name: String, vararg aliases: String = arrayOf()) : Abstrac
         CommandManager.initialize(plugin)
         val registrar = CommandManager.registrars[NMSVersion.version] ?: throw UnsupportedVersionException()
         registrar.register(this)
+        for (execution in this.registerExecutions) execution()
     }
 
     companion object {
