@@ -284,7 +284,7 @@ object ArgumentHelper {
         }
     }
 
-    private fun getArgumentInput(context: CommandContext<CommandSourceStack>, name: String): String? {
+    fun getArgumentInput(context: CommandContext<CommandSourceStack>, name: String): String? {
         val field = CommandContext::class.java.getDeclaredField("arguments")
         field.isAccessible = true
         val arguments: Map<String, ParsedArgument<CommandSourceStack, *>> = field.get(context) as Map<String, ParsedArgument<CommandSourceStack, *>>

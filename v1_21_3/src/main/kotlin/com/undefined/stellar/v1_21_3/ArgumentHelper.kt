@@ -210,7 +210,6 @@ object ArgumentHelper {
             is DoubleArgument -> DoubleArgumentType.getDouble(context, argument.name)
             is BooleanArgument -> BoolArgumentType.getBool(context, argument.name)
             is ListArgument<*> -> argument.parse(StringArgumentType.getString(context, argument.name))
-            is EnumArgument<*> -> argument.parse(StringArgumentType.getString(context, argument.name))
             is com.undefined.stellar.argument.types.entity.EntityArgument -> EntityArgument.getEntities(context, argument.name)
                 .map { it.bukkitEntity }.toMutableList()
                 .addAll(listOf(EntityArgument.getEntity(context, argument.name).bukkitEntity))

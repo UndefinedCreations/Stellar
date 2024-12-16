@@ -34,37 +34,37 @@ class GreedyWordArgument {
         return this
     }
 
-    fun addSuggestionsWithoutGreedyWordArgumenTooltip(list: List<String>): GreedyWordArgument {
+    fun addSuggestionsWithoutGreedyWordArgumentTooltip(list: List<String>): GreedyWordArgument {
         suggestions.add(GreedyStellarSuggestion(CommandSender::class) { list.map { Suggestion(it, "") } })
         return this
     }
 
-    fun addSuggestions(vararg list: String): GreedyWordArgument {
-        suggestions.add(GreedyStellarSuggestion(CommandSender::class) { list.map { Suggestion(it, "") } })
+    fun addSuggestions(vararg suggestions: String): GreedyWordArgument {
+        this.suggestions.add(GreedyStellarSuggestion(CommandSender::class) { suggestions.map { Suggestion(it, "") } })
         return this
     }
 
-    fun setSuggestions(vararg suggestion: Suggestion): GreedyWordArgument {
-        suggestions.clear()
-        suggestions.add(GreedyStellarSuggestion(CommandSender::class) { suggestion.toList() })
+    fun setSuggestions(vararg suggestions: Suggestion): GreedyWordArgument {
+        this.suggestions.clear()
+        this.suggestions.add(GreedyStellarSuggestion(CommandSender::class) { suggestions.toList() })
         return this
     }
 
-    fun setSuggestions(vararg suggestion: String): GreedyWordArgument {
-        suggestions.clear()
-        suggestions.add(GreedyStellarSuggestion(CommandSender::class) { suggestion.map { Suggestion(it, "") } })
+    fun setSuggestions(vararg suggestions: String): GreedyWordArgument {
+        this.suggestions.clear()
+        this.suggestions.add(GreedyStellarSuggestion(CommandSender::class) { suggestions.map { Suggestion(it, "") } })
         return this
     }
 
-    fun setSuggestions(suggestion: List<Suggestion>): GreedyWordArgument {
-        suggestions.clear()
-        suggestions.add(GreedyStellarSuggestion(CommandSender::class) { suggestion.toList() })
+    fun setSuggestions(suggestions: List<Suggestion>): GreedyWordArgument {
+        this.suggestions.clear()
+        this.suggestions.add(GreedyStellarSuggestion(CommandSender::class) { suggestions.toList() })
         return this
     }
 
-    fun setSuggestionsWithoutTooltip(suggestion: List<String>): GreedyWordArgument {
-        suggestions.clear()
-        suggestions.add(GreedyStellarSuggestion(CommandSender::class) { suggestion.map { Suggestion(it, "") } })
+    fun setSuggestionsWithoutTooltip(suggestions: List<String>): GreedyWordArgument {
+        this.suggestions.clear()
+        this.suggestions.add(GreedyStellarSuggestion(CommandSender::class) { suggestions.map { Suggestion(it, "") } })
         return this
     }
 
