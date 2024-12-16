@@ -3,9 +3,11 @@ package com.undefined.stellar.v1_20_6
 import com.mojang.brigadier.Command
 import com.mojang.brigadier.builder.ArgumentBuilder
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
+import com.mojang.brigadier.builder.RequiredArgumentBuilder
 import com.undefined.stellar.AbstractStellarCommand
 import com.undefined.stellar.argument.AbstractStellarArgument
 import com.undefined.stellar.argument.LiteralStellarArgument
+import com.undefined.stellar.argument.types.custom.ListArgument
 import com.undefined.stellar.argument.types.primitive.GreedyStringArgument
 import net.minecraft.commands.CommandSourceStack
 
@@ -25,6 +27,13 @@ object CommandAdapter {
         }
         brigadierCommand.requires { source ->
             BrigadierCommandHelper.fulfillsRequirements(command, source)
+        }
+
+        println("1!\n")
+        if (command !is AbstractStellarArgument || command.suggestions.isEmpty() || brigadierCommand !is RequiredArgumentBuilder<CommandSourceStack, *>) return
+        println("suggestions!\n")
+        brigadierCommand.suggests { context, builder ->
+            BrigadierCommandHelper.handleSuggestions(command, context, builder)
         }
     }
 

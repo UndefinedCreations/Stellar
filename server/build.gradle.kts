@@ -9,7 +9,7 @@ val groupIdVar = "com.undefined"
 val artifactIdVar = "stellar"
 
 dependencies {
-    compileOnly("org.spigotmc:spigot-api:1.20.1-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot-api:1.20.6-R0.1-SNAPSHOT")
 
     implementation(project(":api"))
     implementation(project(":common"))
@@ -21,7 +21,7 @@ dependencies {
     implementation(project(":v1_21_1:", "reobf"))
     implementation(project(":v1_21_3:", "reobf"))
     implementation(project(":v1_21_4:", "reobf"))
-    compileOnly(project(":v1_20_1"))
+    compileOnly(project(":v1_20_6"))
 }
 
 tasks {
@@ -38,7 +38,7 @@ tasks {
     }
 
     runServer {
-        minecraftVersion("1.20.1")
+        minecraftVersion("1.20.6")
         jvmArgs("-Xmx2G")
     }
 }

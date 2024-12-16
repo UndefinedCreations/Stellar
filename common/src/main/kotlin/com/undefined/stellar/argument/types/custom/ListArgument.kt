@@ -2,23 +2,27 @@ package com.undefined.stellar.argument.types.custom
 
 import com.undefined.stellar.AbstractStellarCommand
 import com.undefined.stellar.argument.AbstractStellarArgument
+import com.undefined.stellar.data.suggestion.StellarSuggestion
+import com.undefined.stellar.data.suggestion.Suggestion
+import org.bukkit.command.CommandSender
 
 open class ListArgument<T>(
     parent: AbstractStellarCommand<*>,
-    name: String,
+    val type: AbstractStellarArgument<*>,
     val list: () -> List<T>,
-    val stringifier: (T) -> String = { it.toString() },
-    val parse: (String) -> T?,
-    val type: AbstractStellarArgument<*>
-) : AbstractStellarArgument<ListArgument<T>>(parent, name) {
+    val converter: (T) -> Suggestion = { Suggestion.withText(it.toString()) },
+    val parse: (Any?) -> T?
+) : AbstractStellarArgument<ListArgument<T>>(parent, type.name) {
 
     constructor(parent: AbstractStellarCommand<*>,
-                name: String,
+                type: AbstractStellarArgument<*>,
                 list: List<T>,
-                stringifier: (T) -> String = { it.toString() },
-                parse: (String) -> T?,
-                type: AbstractStellarArgument<*>) : this(parent, name, { list }, stringifier, parse, type)
+                converter: (T) -> Suggestion = { Suggestion.withText(it.toString()) },
+                parse: (Any?) -> T?) : this(parent, type, { list }, converter, parse)
 
-    fun getStringList(): List<String> = list().map(stringifier)
+    override val suggestions: MutableList<StellarSuggestion<*>>
+        get() = (super.suggestions + StellarSuggestion(CommandSender::class) { getSuggestionList() }).toMutableList()
+
+    fun getSuggestionList(): List<Suggestion> = list().map(converter)
 
 }

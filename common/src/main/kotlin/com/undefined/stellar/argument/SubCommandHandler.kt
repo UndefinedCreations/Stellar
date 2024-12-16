@@ -24,11 +24,13 @@ import com.undefined.stellar.argument.types.text.ComponentArgument
 import com.undefined.stellar.argument.types.text.MessageArgument
 import com.undefined.stellar.argument.types.text.StyleArgument
 import com.undefined.stellar.argument.types.world.*
+import com.undefined.stellar.data.suggestion.Suggestion
 import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Player
 import java.util.*
 
+@Suppress("DEPRECATION")
 open class ArgumentHandler {
 
     open val base: AbstractStellarCommand<*> get() = throw IllegalStateException("Cannot access the getter from the property base when it hasn't been overridden!")
@@ -77,28 +79,30 @@ open class ArgumentHandler {
     fun addBooleanArgument(name: String): BooleanArgument =
         addArgument { BooleanArgument(base, name) }
 
-    fun <T> addListArgument(
-        name: String,
+    fun <T, U : AbstractStellarArgument<*>> addListArgument(
+        type: AbstractStellarArgument<*>,
         list: List<T>,
-        stringifier: (T) -> String,
-        parse: (String) -> T,
-        type: AbstractStellarArgument<*> = StringArgument(base, name, StringType.WORD)
-    ): ListArgument<T> = addArgument { ListArgument(base, name, list, stringifier, parse, type) }
+        stringifier: (T) -> Suggestion,
+        parse: (Any?) -> T
+    ): ListArgument<T> = addArgument { ListArgument(base, type, list, stringifier, parse) }
 
-    fun addStringListArgument(name: String, list: List<String>, type: StringType): ListArgument<String> =
-        addArgument { ListArgument(base, name, list, { it }, { it }, StringArgument(base, name, type)) }
+    fun addStringListArgument(name: String, list: List<String>, type: StringType = StringType.WORD): ListArgument<String> =
+        addArgument { ListArgument(base, StringArgument(base, name, type), list, { Suggestion.withText(it.toString()) }, { it }) }
+
+    fun addStringListArgument(name: String, vararg list: String): ListArgument<String> =
+        addArgument { ListArgument(base, StringArgument(base, name, StringType.WORD), list.toList(), { Suggestion.withText(it.toString()) }, { it }) }
 
     fun addUUIDListArgument(name: String, list: List<UUID>): ListArgument<UUID> =
-        addArgument { ListArgument(base, name, list, parse = { UUID.fromString(it) }, type = UUIDArgument(base, name) ) }
+        addArgument { ListArgument(base, UUIDArgument(base, name), list, parse = { UUID.fromString(it.toString()) }) }
 
     inline fun <reified T : Enum<T>> addEnumArgument(name: String): EnumArgument<T> =
-        addArgument { EnumArgument<T>(base, name, T::class) }
+        addArgument { EnumArgument<T>(base, StringArgument(base, name, StringType.WORD), T::class) }
 
     inline fun <reified T : Enum<T>> addEnumArgument(
         name: String,
-        noinline stringifier: (Enum<*>) -> String = { it.name },
-        noinline parse: (String) -> Enum<T>?
-    ): EnumArgument<T> = addArgument { EnumArgument(base, name, T::class, stringifier, parse) }
+        noinline converter: (Enum<*>?) -> Suggestion = { Suggestion.withText(it?.name ?: "") },
+        noinline parse: (Any?) -> Enum<T>?
+    ): EnumArgument<T> = addArgument { EnumArgument(base, StringArgument(base, name, StringType.WORD), T::class, converter, parse) }
 
     fun addEntityArgument(name: String, type: EntityDisplayType): EntityArgument =
         addArgument { EntityArgument(base, name, type) }
@@ -209,24 +213,21 @@ open class ArgumentHandler {
         addArgument {
             ListArgument(
                 base,
-                name,
-                Bukkit.getOnlinePlayers().toList(),
-                { it.name },
-                { Bukkit.getPlayer(it) },
-                StringArgument(base, name, StringType.WORD)
+                StringArgument(base, name, StringType.WORD),
+                { Bukkit.getOnlinePlayers().toList() },
+                { Suggestion.withText(it.name) },
+                { Bukkit.getPlayer(it.toString()) },
             )
         }
 
-    @Suppress("DEPRECATION")
     fun addOfflinePlayersArgument(name: String): ListArgument<OfflinePlayer> =
         addArgument {
             ListArgument(
                 base,
-                name,
-                Bukkit.getOfflinePlayers().toList(),
-                { it.name!! },
-                { Bukkit.getOfflinePlayer(it) },
-                StringArgument(base, name, StringType.WORD)
+                StringArgument(base, name, StringType.WORD),
+                { Bukkit.getOfflinePlayers().toList() },
+                { Suggestion.withText(it.name!!) },
+                { Bukkit.getOfflinePlayer(it.toString()) },
             )
         }
 

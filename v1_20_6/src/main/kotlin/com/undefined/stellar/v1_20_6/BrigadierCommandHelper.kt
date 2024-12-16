@@ -2,12 +2,15 @@ package com.undefined.stellar.v1_20_6
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
+import com.mojang.brigadier.suggestion.Suggestions
+import com.mojang.brigadier.suggestion.SuggestionsBuilder
 import com.mojang.brigadier.tree.LiteralCommandNode
 import com.undefined.stellar.AbstractStellarCommand
 import com.undefined.stellar.argument.AbstractStellarArgument
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.server.MinecraftServer
+import java.util.concurrent.CompletableFuture
 
 object BrigadierCommandHelper {
 
@@ -32,6 +35,18 @@ object BrigadierCommandHelper {
         val fulfillsExecutionRequirements = command.requirements.all { it(source.bukkitSender) }
         val fulfillsPermissionRequirements = command.permissionRequirements.all { source.hasPermission(it.level, it.permission) }
         return fulfillsExecutionRequirements.and(fulfillsPermissionRequirements)
+    }
+
+    fun handleSuggestions(
+        command: AbstractStellarArgument<*>,
+        context: CommandContext<CommandSourceStack>,
+        builder: SuggestionsBuilder
+    ): CompletableFuture<Suggestions>? {
+        val stellarContext = CommandContextAdapter.getStellarCommandContext(context)
+        for (stellarSuggestion in command.suggestions)
+            for (suggestion in stellarSuggestion.get(stellarContext))
+                builder.suggest(suggestion.text) { suggestion.tooltip }
+        return builder.buildFuture()
     }
 
     fun handleFailureMessageAndExecutions(command: AbstractStellarCommand<*>, context: CommandContext<CommandSourceStack>) {

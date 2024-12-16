@@ -111,7 +111,6 @@ object ArgumentHelper {
     fun <T : AbstractStellarArgument<*>> getArgumentType(argument: T): ArgumentType<*> =
         when (argument) {
             is ListArgument<*> -> getArgumentType(argument.type)
-            is EnumArgument<*> -> StringArgumentType.word()
             is CustomArgument<*> -> getArgumentType(argument.type)
             is StringArgument -> brigadier(argument.type)
             is GreedyStringArgument -> brigadier(StringType.PHRASE)
@@ -129,13 +128,9 @@ object ArgumentHelper {
                 LocationType.DOUBLE_LOCATION_2D -> Vec2Argument.vec2()
             }
             is BlockDataArgument -> BlockStateArgument.block(COMMAND_BUILD_CONTEXT)
-            is com.undefined.stellar.argument.types.block.BlockPredicateArgument -> BlockPredicateArgument.blockPredicate(
-                COMMAND_BUILD_CONTEXT
-            )
+            is com.undefined.stellar.argument.types.block.BlockPredicateArgument -> BlockPredicateArgument.blockPredicate(COMMAND_BUILD_CONTEXT)
             is com.undefined.stellar.argument.types.item.ItemArgument -> ItemArgument.item(COMMAND_BUILD_CONTEXT)
-            is com.undefined.stellar.argument.types.item.ItemPredicateArgument -> ItemPredicateArgument.itemPredicate(
-                COMMAND_BUILD_CONTEXT
-            )
+            is com.undefined.stellar.argument.types.item.ItemPredicateArgument -> ItemPredicateArgument.itemPredicate(COMMAND_BUILD_CONTEXT)
             is com.undefined.stellar.argument.types.text.ColorArgument -> ColorArgument.color()
             is com.undefined.stellar.argument.types.text.ComponentArgument -> ComponentArgument.textComponent()
             is com.undefined.stellar.argument.types.text.StyleArgument -> throwArgumentVersionException(argument)
@@ -204,8 +199,7 @@ object ArgumentHelper {
             is FloatArgument -> FloatArgumentType.getFloat(context, argument.name)
             is DoubleArgument -> DoubleArgumentType.getDouble(context, argument.name)
             is BooleanArgument -> BoolArgumentType.getBool(context, argument.name)
-            is ListArgument<*> -> argument.parse(StringArgumentType.getString(context, argument.name))
-            is EnumArgument<*> -> argument.parse(StringArgumentType.getString(context, argument.name))
+            is ListArgument<*> -> argument.parse(getParsedArgument(context, argument))
             is com.undefined.stellar.argument.types.entity.EntityArgument -> EntityArgument.getEntities(context, argument.name)
                 .map { it.bukkitEntity }.toMutableList()
                 .addAll(listOf(EntityArgument.getEntity(context, argument.name).bukkitEntity))
