@@ -5,9 +5,11 @@ import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.tree.LiteralCommandNode
 import com.undefined.stellar.AbstractStellarCommand
 import com.undefined.stellar.argument.AbstractStellarArgument
+import com.undefined.stellar.data.help.CustomCommandHelpTopic
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.server.MinecraftServer
+import org.bukkit.Bukkit
 
 object BrigadierCommandHelper {
 
@@ -19,6 +21,20 @@ object BrigadierCommandHelper {
 
     fun register(command: LiteralArgumentBuilder<CommandSourceStack>): LiteralCommandNode<CommandSourceStack>? =
         dispatcher.register(command)
+
+    fun handleHelpTopic(command: AbstractStellarCommand<*>) {
+        Bukkit.getServer().helpMap.addTopic(
+            CustomCommandHelpTopic(command.name, command.description, command.helpTopic) {
+                val context = MinecraftServer.getServer().createCommandSourceStack()
+                val requirements = command.requirements.all { it(this) }
+                val permissionRequirements = command.permissionRequirements.all {
+                    if (it.permission.isEmpty()) context.hasPermission(it.level)
+                    else context.hasPermission(it.level, it.permission)
+                }
+                requirements.and(permissionRequirements)
+            }
+        )
+    }
 
     fun handleExecutions(command: AbstractStellarCommand<*>, context: CommandContext<CommandSourceStack>) {
         val stellarContext = CommandContextAdapter.getStellarCommandContext(context)

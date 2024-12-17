@@ -9,7 +9,6 @@ import com.undefined.stellar.argument.AbstractStellarArgument
 import com.undefined.stellar.argument.LiteralStellarArgument
 import com.undefined.stellar.argument.types.primitive.GreedyStringArgument
 import net.minecraft.commands.CommandSourceStack
-import org.codehaus.plexus.util.cli.Commandline.Argument
 
 object CommandAdapter {
 

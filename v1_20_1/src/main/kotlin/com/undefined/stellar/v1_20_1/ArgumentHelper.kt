@@ -16,7 +16,6 @@ import com.undefined.stellar.argument.types.block.BlockDataArgument
 import com.undefined.stellar.argument.types.block.BlockTypeArgument
 import com.undefined.stellar.argument.types.block.FluidArgument
 import com.undefined.stellar.argument.types.custom.CustomArgument
-import com.undefined.stellar.argument.types.custom.EnumArgument
 import com.undefined.stellar.argument.types.custom.ListArgument
 import com.undefined.stellar.argument.types.entity.*
 import com.undefined.stellar.argument.types.item.*

@@ -9,6 +9,7 @@ import org.bukkit.command.CommandSender
 object CommandRegistrar : AbstractCommandRegistrar {
 
     override fun register(command: AbstractStellarCommand<*>) {
+        BrigadierCommandHelper.handleHelpTopic(command)
         for (name in command.aliases + command.name)
             BrigadierCommandHelper.register(CommandAdapter.getBaseCommand(command, name))
     }

@@ -5,6 +5,7 @@ import com.undefined.stellar.data.argument.CommandContext
 import com.undefined.stellar.data.execution.StellarExecution
 import com.undefined.stellar.data.execution.StellarRunnable
 import com.undefined.stellar.data.failure.HideDefaultFailureMessages
+import com.undefined.stellar.data.help.CustomCommandHelpTopic
 import com.undefined.stellar.data.requirement.PermissionStellarRequirement
 import com.undefined.stellar.data.requirement.StellarRequirement
 import net.kyori.adventure.text.Component
@@ -12,13 +13,16 @@ import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.command.CommandSender
 import org.bukkit.plugin.java.JavaPlugin
 import org.jetbrains.annotations.ApiStatus
+import java.util.*
+import kotlin.collections.HashMap
 
 @Suppress("UNCHECKED_CAST")
-abstract class AbstractStellarCommand<T>(val name: String, var description: String = "", var usage: String = "") : ArgumentHandler() {
+abstract class AbstractStellarCommand<T>(val name: String, val description: String = "", usage: String = "") : ArgumentHandler() {
 
     override val base: AbstractStellarCommand<*>
         get() = this
     @ApiStatus.Internal val aliases: MutableList<String> = mutableListOf()
+    @ApiStatus.Internal val helpTopic: SortedMap<String, String> = sortedMapOf()
     @ApiStatus.Internal open val failureMessages: MutableList<Component> = mutableListOf()
     @ApiStatus.Internal open val globalFailureMessages: MutableList<Component> = mutableListOf()
     @ApiStatus.Internal open val failureExecutions: MutableList<StellarExecution<*>> = mutableListOf()
@@ -28,6 +32,12 @@ abstract class AbstractStellarCommand<T>(val name: String, var description: Stri
     @ApiStatus.Internal open val executions: MutableList<StellarExecution<*>> = mutableListOf()
     @ApiStatus.Internal open val runnables: MutableList<StellarRunnable<*>> = mutableListOf()
     @ApiStatus.Internal open val registerExecutions: MutableList<() -> Unit> = mutableListOf()
+
+    init {
+        if (description.isNotEmpty()) helpTopic["Description"] to description
+        if (usage.isNotEmpty()) helpTopic["Usage"] to usage
+        if (aliases.isNotEmpty()) helpTopic["Aliases"] = aliases.joinToString(", ")
+    }
 
     fun setAliases(vararg aliases: String): T {
         this.aliases.clear()
@@ -41,12 +51,22 @@ abstract class AbstractStellarCommand<T>(val name: String, var description: Stri
     }
 
     fun setDescription(description: String): T {
-        this.description = description
+        helpTopic["Description"] = description
         return this as T
     }
 
-    fun setUsageText(text: String): T {
-        usage = text
+    fun setUsageText(usage: String): T {
+        helpTopic["Usage"] = usage
+        return this as T
+    }
+
+    fun setHelpTopicInformation(name: String, text: String): T {
+        helpTopic[name] = text
+        return this as T
+    }
+
+    fun clearHelpTopicInformation(): T {
+        helpTopic.clear()
         return this as T
     }
 
