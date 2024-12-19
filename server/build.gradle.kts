@@ -9,10 +9,11 @@ val groupIdVar = "com.undefined"
 val artifactIdVar = "stellar"
 
 dependencies {
-    compileOnly("org.spigotmc:spigot-api:1.20.6-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot-api:1.20-R0.1-SNAPSHOT")
 
     implementation(project(":api"))
     implementation(project(":common"))
+    implementation(project(":v1_20:", "reobf"))
     implementation(project(":v1_20_1:", "reobf"))
     implementation(project(":v1_20_2:", "reobf"))
     implementation(project(":v1_20_4:", "reobf"))
@@ -21,7 +22,7 @@ dependencies {
     implementation(project(":v1_21_1:", "reobf"))
     implementation(project(":v1_21_3:", "reobf"))
     implementation(project(":v1_21_4:", "reobf"))
-    compileOnly(project(":v1_20_6"))
+    implementation(project(":v1_20"))
 }
 
 tasks {
@@ -34,11 +35,11 @@ tasks {
     }
 
     compileKotlin {
-        kotlinOptions.jvmTarget = "21"
+        kotlinOptions.jvmTarget = "17"
     }
 
     runServer {
-        minecraftVersion("1.20.6")
+        minecraftVersion("1.20")
         jvmArgs("-Xmx2G")
     }
 }
@@ -48,5 +49,5 @@ java {
 }
 
 kotlin {
-    jvmToolchain(21)
+    jvmToolchain(17)
 }

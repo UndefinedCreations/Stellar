@@ -77,6 +77,7 @@ allprojects {
 dependencies {
     implementation(project(":api"))
     implementation(project(":common"))
+    compileOnly(project(":v1_20", "reobf"))
     compileOnly(project(":v1_20_1", "reobf"))
     compileOnly(project(":v1_20_2", "reobf"))
     compileOnly(project(":v1_20_4", "reobf"))
@@ -94,7 +95,7 @@ tasks {
     }
 
     compileKotlin {
-        kotlinOptions.jvmTarget = "21"
+        kotlinOptions.jvmTarget = "17"
     }
 }
 
@@ -105,5 +106,5 @@ java {
 }
 
 kotlin {
-    jvmToolchain(21)
+    jvmToolchain(17)
 }

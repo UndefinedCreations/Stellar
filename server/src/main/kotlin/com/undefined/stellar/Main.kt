@@ -1,33 +1,20 @@
 package com.undefined.stellar
 
-import com.undefined.stellar.argument.types.misc.UUIDArgument
+import org.bukkit.Instrument
 import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
-
-class TestCommand : BaseStellarCommand("test", "description") {
-    override fun setup() = createCommand {
-        addExecution<Player> {
-            sender.sendMessage("hi!")
-        }
-    }
-
-    override fun arguments(): List<StellarArgument> = listOf(TestArgument(this.command))
-}
-
-class TestArgument(parent: AbstractStellarCommand<*>) : StellarArgument(UUIDArgument(parent, "sub")) {
-    override fun setup() = createArgument {
-        addExecution<Player> {
-            sender.sendMessage("Hello there! Argument.")
-        }
-    }
-}
+import org.bukkit.potion.PotionEffectType
 
 class Main : JavaPlugin() {
 
     override fun onEnable() {
-        val command = TestCommand()
+        val command = StellarCommand("test")
+        command.addArgument("t")
+            .addInstrumentArgument("block")
+            .addExecution<Player> {
+                sender.sendMessage(getArgument<Instrument>("block").name)
+            }
         command.register(this)
-        println(command.name)
     }
 
 }

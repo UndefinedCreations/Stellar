@@ -137,9 +137,7 @@ object ArgumentHelper {
             is com.undefined.stellar.argument.types.scoreboard.ObjectiveArgument -> ObjectiveArgument.objective()
             is com.undefined.stellar.argument.types.scoreboard.ObjectiveCriteriaArgument -> ObjectiveCriteriaArgument.criteria()
             is com.undefined.stellar.argument.types.math.OperationArgument -> OperationArgument.operation()
-            is com.undefined.stellar.argument.types.item.ParticleArgument -> ParticleArgument.particle(
-                COMMAND_BUILD_CONTEXT
-            )
+            is com.undefined.stellar.argument.types.item.ParticleArgument -> ParticleArgument.particle(COMMAND_BUILD_CONTEXT)
             is com.undefined.stellar.argument.types.math.AngleArgument -> AngleArgument.angle()
             is com.undefined.stellar.argument.types.math.RotationArgument -> RotationArgument.rotation()
             is DisplaySlotArgument -> ScoreboardSlotArgument.displaySlot()

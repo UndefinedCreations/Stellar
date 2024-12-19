@@ -6,14 +6,14 @@ plugins {
 paperweight.reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArtifactConfiguration.REOBF_PRODUCTION
 
 dependencies {
-    paperweight.paperDevBundle("1.20.1-R0.1-SNAPSHOT")
+    paperweight.paperDevBundle("1.20-R0.1-SNAPSHOT")
     pluginRemapper("net.fabricmc:tiny-remapper:0.10.3:fat")
     compileOnly(project(":common"))
 }
 
 tasks {
     compileKotlin {
-        kotlinOptions.jvmTarget = "21"
+        kotlinOptions.jvmTarget = "17"
     }
 }
 
@@ -22,5 +22,5 @@ java {
 }
 
 kotlin {
-    jvmToolchain(21)
+    jvmToolchain(17)
 }

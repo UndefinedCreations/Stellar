@@ -5,7 +5,6 @@ import com.undefined.stellar.data.argument.CommandContext
 import com.undefined.stellar.data.execution.StellarExecution
 import com.undefined.stellar.data.execution.StellarRunnable
 import com.undefined.stellar.data.failure.HideDefaultFailureMessages
-import com.undefined.stellar.data.help.CustomCommandHelpTopic
 import com.undefined.stellar.data.requirement.PermissionStellarRequirement
 import com.undefined.stellar.data.requirement.StellarRequirement
 import net.kyori.adventure.text.Component
@@ -14,7 +13,6 @@ import org.bukkit.command.CommandSender
 import org.bukkit.plugin.java.JavaPlugin
 import org.jetbrains.annotations.ApiStatus
 import java.util.*
-import kotlin.collections.HashMap
 
 @Suppress("UNCHECKED_CAST")
 abstract class AbstractStellarCommand<T>(val name: String, val description: String = "", usage: String = "") : ArgumentHandler() {
@@ -60,12 +58,12 @@ abstract class AbstractStellarCommand<T>(val name: String, val description: Stri
         return this as T
     }
 
-    fun setHelpTopicInformation(name: String, text: String): T {
+    fun setInformation(name: String, text: String): T {
         helpTopic[name] = text
         return this as T
     }
 
-    fun clearHelpTopicInformation(): T {
+    fun clearInformation(): T {
         helpTopic.clear()
         return this as T
     }

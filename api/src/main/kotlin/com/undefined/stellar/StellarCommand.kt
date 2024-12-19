@@ -18,7 +18,11 @@ class StellarCommand(name: String, permissions: List<String> = listOf()) : Abstr
         this.permissionRequirements.addAll(permissions.map { PermissionStellarRequirement(1, it) })
     }
 
+    private var registered = false
+
     override fun register(plugin: JavaPlugin) {
+        if (registered) return
+        registered = true
         StellarCommands.commands.add(this)
         CommandManager.initialize(plugin)
         val registrar = CommandManager.registrars[NMSVersion.version] ?: throw UnsupportedVersionException()

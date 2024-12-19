@@ -14,6 +14,7 @@ version = versionVar
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.20.6-R0.1-SNAPSHOT")
     implementation(project(":common"))
+    compileOnly(project(":v1_20"))
     compileOnly(project(":v1_20_1"))
     compileOnly(project(":v1_20_2"))
     compileOnly(project(":v1_20_4"))
@@ -38,10 +39,10 @@ publishing {
 
 tasks {
     compileKotlin {
-        kotlinOptions.jvmTarget = "21"
+        kotlinOptions.jvmTarget = "17"
     }
 }
 
 kotlin {
-    jvmToolchain(21)
+    jvmToolchain(17)
 }
