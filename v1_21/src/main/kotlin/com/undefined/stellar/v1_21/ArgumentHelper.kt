@@ -134,9 +134,7 @@ object ArgumentHelper {
             is com.undefined.stellar.argument.types.item.ItemArgument -> ItemArgument.item(COMMAND_BUILD_CONTEXT)
             is com.undefined.stellar.argument.types.item.ItemPredicateArgument -> ItemPredicateArgument.itemPredicate(COMMAND_BUILD_CONTEXT)
             is com.undefined.stellar.argument.types.text.ColorArgument -> ColorArgument.color()
-            is com.undefined.stellar.argument.types.text.ComponentArgument -> ComponentArgument.textComponent(
-                COMMAND_BUILD_CONTEXT
-            )
+            is com.undefined.stellar.argument.types.text.ComponentArgument -> ComponentArgument.textComponent(COMMAND_BUILD_CONTEXT)
             is com.undefined.stellar.argument.types.text.StyleArgument -> StyleArgument.style(COMMAND_BUILD_CONTEXT)
             is com.undefined.stellar.argument.types.text.MessageArgument -> MessageArgument.message()
             is com.undefined.stellar.argument.types.scoreboard.ObjectiveArgument -> ObjectiveArgument.objective()
@@ -161,9 +159,7 @@ object ArgumentHelper {
             is MirrorArgument -> TemplateMirrorArgument.templateMirror()
             is StructureRotationArgument -> TemplateRotationArgument.templateRotation()
             is HeightMapArgument -> HeightmapTypeArgument.heightmap()
-            is com.undefined.stellar.argument.types.structure.LootTableArgument -> LootTableArgument.lootTable(
-                COMMAND_BUILD_CONTEXT
-            )
+            is com.undefined.stellar.argument.types.structure.LootTableArgument -> LootTableArgument.lootTable(COMMAND_BUILD_CONTEXT)
             is UUIDArgument -> UuidArgument.uuid()
             is GameEventArgument -> ResourceKeyArgument.key(Registries.GAME_EVENT)
             is StructureTypeArgument -> ResourceKeyArgument.key(Registries.STRUCTURE_TYPE)
