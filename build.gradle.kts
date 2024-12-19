@@ -9,7 +9,7 @@ plugins {
 
 apply(plugin = "maven-publish")
 val projectGroupId = "com.undefined"
-val projectVersion = "0.0.9"
+val projectVersion = "0.0.14"
 val projectArtifactId = "stellar"
 
 group = projectGroupId
@@ -41,6 +41,17 @@ publishing {
             }
         }
     }
+}
+
+allprojects {
+    apply(plugin = "java")
+    apply(plugin = "java-library")
+    apply(plugin = "maven-publish")
+
+    repositories {
+        mavenCentral()
+        maven("https://repo.papermc.io/repository/maven-public/")
+    }
 
     publishing {
         publications {
@@ -52,17 +63,6 @@ publishing {
                 from(components["java"])
             }
         }
-    }
-}
-
-allprojects {
-    apply(plugin = "java")
-    apply(plugin = "java-library")
-    apply(plugin = "maven-publish")
-
-    repositories {
-        mavenCentral()
-        maven("https://repo.papermc.io/repository/maven-public/")
     }
 
     dependencies {
@@ -77,15 +77,15 @@ allprojects {
 dependencies {
     implementation(project(":api"))
     implementation(project(":common"))
-    compileOnly(project(":v1_20", "reobf"))
-    compileOnly(project(":v1_20_1", "reobf"))
-    compileOnly(project(":v1_20_2", "reobf"))
-    compileOnly(project(":v1_20_4", "reobf"))
-    compileOnly(project(":v1_20_6", "reobf"))
-    compileOnly(project(":v1_21", "reobf"))
-    compileOnly(project(":v1_21_1", "reobf"))
-    compileOnly(project(":v1_21_3", "reobf"))
-    compileOnly(project(":v1_21_4", "reobf"))
+    implementation(project(":v1_20", "reobf"))
+    implementation(project(":v1_20_1", "reobf"))
+    implementation(project(":v1_20_2", "reobf"))
+    implementation(project(":v1_20_4", "reobf"))
+    implementation(project(":v1_20_6", "reobf"))
+    implementation(project(":v1_21", "reobf"))
+    implementation(project(":v1_21_1", "reobf"))
+    implementation(project(":v1_21_3", "reobf"))
+    implementation(project(":v1_21_4", "reobf"))
 }
 
 tasks {

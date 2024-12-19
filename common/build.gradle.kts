@@ -11,18 +11,6 @@ dependencies {
     api("com.mojang:authlib:1.5.21")
 }
 
-publishing {
-    publications {
-        register<MavenPublication>("maven") {
-            groupId = groupIdVar
-            artifactId = artifactIdVar
-            version = version.toString()
-
-            from(components["java"])
-        }
-    }
-}
-
 tasks {
     compileKotlin {
         kotlinOptions.jvmTarget = "17"
