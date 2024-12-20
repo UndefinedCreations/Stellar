@@ -114,7 +114,7 @@ object ArgumentHelper {
             is EnumArgument<*> -> StringArgumentType.word()
             is CustomArgument<*> -> getArgumentType(argument.type)
             is StringArgument -> brigadier(argument.type)
-            is GreedyStringArgument -> brigadier(StringType.PHRASE)
+            is PhraseArgument -> brigadier(StringType.PHRASE)
             is IntegerArgument -> IntegerArgumentType.integer(argument.min, argument.max)
             is LongArgument -> LongArgumentType.longArg(argument.min, argument.max)
             is FloatArgument -> FloatArgumentType.floatArg(argument.min, argument.max)

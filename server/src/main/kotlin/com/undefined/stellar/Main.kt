@@ -8,7 +8,9 @@ class Main : JavaPlugin() {
 
     override fun onEnable() {
         val command = StellarCommand("test")
-        command.addArgument("t")
+        command
+            .addArgument("t")
+            .addArguments
             .addInstrumentArgument("block")
             .addExecution<Player> {
                 sender.sendMessage(getArgument<Instrument>("block").name)

@@ -7,7 +7,7 @@ import com.undefined.stellar.argument.AbstractStellarArgument
 import com.undefined.stellar.argument.LiteralStellarArgument
 import com.undefined.stellar.argument.types.custom.CustomArgument
 import com.undefined.stellar.data.argument.CommandNode
-import com.undefined.stellar.data.argument.GreedyCommandContext
+import com.undefined.stellar.data.argument.PhraseCommandContext
 import com.undefined.stellar.exception.DuplicateArgumentNameException
 import com.undefined.stellar.exception.LiteralArgumentMismatchException
 import io.papermc.paper.adventure.PaperAdventure
@@ -43,13 +43,13 @@ object CommandContextAdapter {
         )
     }
 
-    fun getGreedyCommandContext(context: CommandContext<CommandSourceStack>): GreedyCommandContext<CommandSender> {
+    fun getGreedyCommandContext(context: CommandContext<CommandSourceStack>): PhraseCommandContext<CommandSender> {
         val input = context.input.removePrefix("/")
         val words = input.split(' ').toMutableList()
 
         val totalOtherArguments = context.nodes.size - 1
         for (i in (1..totalOtherArguments)) words.removeFirst()
-        return GreedyCommandContext(
+        return PhraseCommandContext(
             words,
             context.source.bukkitSender,
             input

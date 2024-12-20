@@ -39,7 +39,6 @@ import com.undefined.stellar.data.argument.Anchor
 import com.undefined.stellar.data.argument.Operation
 import com.undefined.stellar.data.argument.ParticleData
 import com.undefined.stellar.exception.LiteralArgumentMismatchException
-import com.undefined.stellar.exception.ServerTypeMismatchException
 import com.undefined.stellar.exception.UnsupportedArgumentException
 import net.kyori.adventure.text.format.Style
 import net.kyori.adventure.text.format.TextColor
@@ -79,7 +78,6 @@ import org.bukkit.block.data.BlockData
 import org.bukkit.block.structure.Mirror
 import org.bukkit.block.structure.StructureRotation
 import org.bukkit.craftbukkit.CraftParticle
-import org.bukkit.craftbukkit.CraftServer
 import org.bukkit.craftbukkit.block.data.CraftBlockData
 import org.bukkit.craftbukkit.inventory.CraftItemStack
 import org.bukkit.event.inventory.InventoryType
@@ -115,7 +113,7 @@ object ArgumentHelper {
             is EnumArgument<*> -> StringArgumentType.word()
             is CustomArgument<*> -> getArgumentType(argument.type)
             is StringArgument -> brigadier(argument.type)
-            is GreedyStringArgument -> brigadier(StringType.PHRASE)
+            is PhraseArgument -> brigadier(StringType.PHRASE)
             is IntegerArgument -> IntegerArgumentType.integer(argument.min, argument.max)
             is LongArgument -> LongArgumentType.longArg(argument.min, argument.max)
             is FloatArgument -> FloatArgumentType.floatArg(argument.min, argument.max)

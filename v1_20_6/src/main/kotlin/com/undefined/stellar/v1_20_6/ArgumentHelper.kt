@@ -16,7 +16,6 @@ import com.undefined.stellar.argument.types.block.BlockDataArgument
 import com.undefined.stellar.argument.types.block.BlockTypeArgument
 import com.undefined.stellar.argument.types.block.FluidArgument
 import com.undefined.stellar.argument.types.custom.CustomArgument
-import com.undefined.stellar.argument.types.custom.EnumArgument
 import com.undefined.stellar.argument.types.custom.ListArgument
 import com.undefined.stellar.argument.types.entity.*
 import com.undefined.stellar.argument.types.item.*
@@ -39,7 +38,6 @@ import com.undefined.stellar.data.argument.Anchor
 import com.undefined.stellar.data.argument.Operation
 import com.undefined.stellar.data.argument.ParticleData
 import com.undefined.stellar.exception.LiteralArgumentMismatchException
-import com.undefined.stellar.exception.ServerTypeMismatchException
 import com.undefined.stellar.exception.UnsupportedArgumentException
 import net.kyori.adventure.text.format.Style
 import net.kyori.adventure.text.format.TextColor
@@ -113,7 +111,7 @@ object ArgumentHelper {
             is ListArgument<*> -> getArgumentType(argument.type)
             is CustomArgument<*> -> getArgumentType(argument.type)
             is StringArgument -> brigadier(argument.type)
-            is GreedyStringArgument -> brigadier(StringType.PHRASE)
+            is PhraseArgument -> brigadier(StringType.PHRASE)
             is IntegerArgument -> IntegerArgumentType.integer(argument.min, argument.max)
             is LongArgument -> LongArgumentType.longArg(argument.min, argument.max)
             is FloatArgument -> FloatArgumentType.floatArg(argument.min, argument.max)

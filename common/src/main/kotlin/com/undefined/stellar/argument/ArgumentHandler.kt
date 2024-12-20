@@ -61,8 +61,8 @@ open class ArgumentHandler {
     fun addStringArgument(name: String, type: StringType = StringType.WORD): StringArgument =
         addArgument { StringArgument(base, name, type)  }
 
-    fun addGreedyStringArgument(name: String): GreedyStringArgument =
-        addArgument { GreedyStringArgument(base, name) }
+    fun addPhraseArgument(name: String): PhraseArgument =
+        addArgument { PhraseArgument(base, name) }
 
     fun addIntegerArgument(name: String, min: Int = Int.MIN_VALUE, max: Int = Int.MAX_VALUE): IntegerArgument =
         addArgument { IntegerArgument(base, name, min, max) }

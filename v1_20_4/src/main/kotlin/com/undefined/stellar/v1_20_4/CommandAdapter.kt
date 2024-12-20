@@ -7,7 +7,7 @@ import com.mojang.brigadier.builder.RequiredArgumentBuilder
 import com.undefined.stellar.AbstractStellarCommand
 import com.undefined.stellar.argument.AbstractStellarArgument
 import com.undefined.stellar.argument.LiteralStellarArgument
-import com.undefined.stellar.argument.types.primitive.GreedyStringArgument
+import com.undefined.stellar.argument.types.primitive.PhraseArgument
 import net.minecraft.commands.CommandSourceStack
 
 object CommandAdapter {
@@ -34,7 +34,7 @@ object CommandAdapter {
         for (argument in command.arguments) {
             when (argument) {
                 is LiteralStellarArgument -> handleLiteralArgument(argument, brigadierCommand)
-                is GreedyStringArgument-> handleGreedyStringArgument(argument, brigadierCommand)
+                is PhraseArgument-> handlePhraseArgument(argument, brigadierCommand)
                 else -> handleRequiredArgument(argument, brigadierCommand)
             }
         }
@@ -48,14 +48,14 @@ object CommandAdapter {
         }
     }
 
-    private fun handleGreedyStringArgument(argument: GreedyStringArgument, brigadierCommand: ArgumentBuilder<CommandSourceStack, *>) {
+    private fun handlePhraseArgument(argument: PhraseArgument, brigadierCommand: ArgumentBuilder<CommandSourceStack, *>) {
         val argumentBuilder = ArgumentHelper.getRequiredArgumentBuilder(argument)
         handleCommandFunctions(argument, argumentBuilder)
         handleGreedyStringWordFunctions(argument, argumentBuilder)
         brigadierCommand.then(argumentBuilder)
     }
 
-    private fun handleGreedyStringWordFunctions(argument: GreedyStringArgument, argumentBuilder: RequiredArgumentBuilder<CommandSourceStack, *>) {
+    private fun handleGreedyStringWordFunctions(argument: PhraseArgument, argumentBuilder: RequiredArgumentBuilder<CommandSourceStack, *>) {
         if (argument.executions.isNotEmpty() || argument.executions.isNotEmpty()) argumentBuilder.executes { context ->
             val greedyContext = CommandContextAdapter.getGreedyCommandContext(context)
 
