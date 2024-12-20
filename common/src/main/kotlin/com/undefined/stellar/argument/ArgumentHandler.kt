@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.undefined.stellar.argument
 
 import com.undefined.stellar.AbstractStellarCommand
@@ -31,7 +33,12 @@ import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Player
 import java.util.*
 
-@Suppress("DEPRECATION")
+/**
+ * An open class that adds all the methods for adding arguments
+ *
+ * @code
+ * @since 1.0
+ */
 open class ArgumentHandler {
 
     open val base: AbstractStellarCommand<*> get() = throw IllegalStateException("Cannot access the getter from the property base when it hasn't been overridden!")

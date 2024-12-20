@@ -14,6 +14,9 @@ version = versionVar
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.20.6-R0.1-SNAPSHOT")
     implementation(project(":common"))
+    implementation(project(":v1_19_2"))
+    implementation(project(":v1_19_3"))
+    implementation(project(":v1_19_4"))
     implementation(project(":v1_20"))
     implementation(project(":v1_20_1"))
     implementation(project(":v1_20_2"))

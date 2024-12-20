@@ -77,6 +77,8 @@ allprojects {
 dependencies {
     implementation(project(":api"))
     implementation(project(":common"))
+    implementation(project(":v1_19_3:", "reobf"))
+    implementation(project(":v1_19_4:", "reobf"))
     implementation(project(":v1_20", "reobf"))
     implementation(project(":v1_20_1", "reobf"))
     implementation(project(":v1_20_2", "reobf"))
