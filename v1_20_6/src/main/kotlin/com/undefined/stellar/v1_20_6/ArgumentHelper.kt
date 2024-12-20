@@ -135,7 +135,7 @@ object ArgumentHelper {
             is com.undefined.stellar.argument.types.scoreboard.ObjectiveArgument -> ObjectiveArgument.objective()
             is com.undefined.stellar.argument.types.scoreboard.ObjectiveCriteriaArgument -> ObjectiveCriteriaArgument.criteria()
             is com.undefined.stellar.argument.types.math.OperationArgument -> OperationArgument.operation()
-            is com.undefined.stellar.argument.types.item.ParticleArgument -> ParticleArgument.particle(COMMAND_BUILD_CONTEXT)
+            is com.undefined.stellar.argument.types.world.ParticleArgument -> ParticleArgument.particle(COMMAND_BUILD_CONTEXT)
             is com.undefined.stellar.argument.types.math.AngleArgument -> AngleArgument.angle()
             is com.undefined.stellar.argument.types.math.RotationArgument -> RotationArgument.rotation()
             is DisplaySlotArgument -> ScoreboardSlotArgument.displaySlot()
@@ -218,7 +218,7 @@ object ArgumentHelper {
             is com.undefined.stellar.argument.types.scoreboard.ObjectiveArgument ->  Bukkit.getScoreboardManager().mainScoreboard.getObjective(ObjectiveArgument.getObjective(context, argument.name).name)
             is com.undefined.stellar.argument.types.scoreboard.ObjectiveCriteriaArgument ->  ObjectiveCriteriaArgument.getCriteria(context, argument.name).name
             is com.undefined.stellar.argument.types.math.OperationArgument -> Operation.getOperation(getArgumentInput(context, argument.name) ?: return null)
-            is com.undefined.stellar.argument.types.item.ParticleArgument ->  {
+            is com.undefined.stellar.argument.types.world.ParticleArgument ->  {
                 val particleOptions = ParticleArgument.getParticle(context, argument.name)
                 getParticleData(context, CraftParticle.minecraftToBukkit(particleOptions.type), particleOptions)
             }

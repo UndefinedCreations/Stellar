@@ -36,7 +36,6 @@ import java.util.*
 /**
  * An open class that adds all the methods for adding arguments
  *
- * @code
  * @since 1.0
  */
 open class ArgumentHandler {

@@ -58,7 +58,6 @@ import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceKey
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ColumnPos
-import net.minecraft.world.entity.ai.attributes.Attribute
 import net.minecraft.world.inventory.MenuType
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.pattern.BlockInWorld
@@ -79,7 +78,6 @@ import org.bukkit.scoreboard.DisplaySlot
 import java.time.Duration
 import java.util.*
 import java.util.function.Predicate
-import java.util.function.Supplier
 
 @Suppress("UNCHECKED_CAST")
 object ArgumentHelper {
@@ -135,7 +133,7 @@ object ArgumentHelper {
             is com.undefined.stellar.argument.types.scoreboard.ObjectiveArgument -> ObjectiveArgument.objective()
             is com.undefined.stellar.argument.types.scoreboard.ObjectiveCriteriaArgument -> ObjectiveCriteriaArgument.criteria()
             is com.undefined.stellar.argument.types.math.OperationArgument -> OperationArgument.operation()
-            is com.undefined.stellar.argument.types.item.ParticleArgument -> ParticleArgument.particle()
+            is com.undefined.stellar.argument.types.world.ParticleArgument -> ParticleArgument.particle()
             is com.undefined.stellar.argument.types.math.AngleArgument -> AngleArgument.angle()
             is com.undefined.stellar.argument.types.math.RotationArgument -> RotationArgument.rotation()
             is DisplaySlotArgument -> ScoreboardSlotArgument.displaySlot()
@@ -219,7 +217,7 @@ object ArgumentHelper {
             is com.undefined.stellar.argument.types.scoreboard.ObjectiveArgument ->  Bukkit.getScoreboardManager().mainScoreboard.getObjective(ObjectiveArgument.getObjective(context, argument.name).name)
             is com.undefined.stellar.argument.types.scoreboard.ObjectiveCriteriaArgument ->  ObjectiveCriteriaArgument.getCriteria(context, argument.name).name
             is com.undefined.stellar.argument.types.math.OperationArgument -> Operation.getOperation(getArgumentInput(context, argument.name) ?: return null)
-            is com.undefined.stellar.argument.types.item.ParticleArgument ->  {
+            is com.undefined.stellar.argument.types.world.ParticleArgument ->  {
                 val particleOptions = ParticleArgument.getParticle(context, argument.name)
                 getParticleData(context, CraftParticle.toBukkit(particleOptions.type), particleOptions)
             }

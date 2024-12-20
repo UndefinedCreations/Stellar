@@ -1,19 +1,21 @@
 package com.undefined.stellar
 
-import org.bukkit.Location
+import org.bukkit.Material
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
+import java.util.function.Predicate
 
 class Main : JavaPlugin() {
 
     override fun onEnable() {
-        val command = StellarCommand("test")
-        command.addArgument("t")
-            .addLocationArgument("block")
+        StellarCommand("isItem")
+            .addItemArgument(name = "item")
             .addExecution<Player> {
-                sender.sendMessage(getArgument<Location>("block").toVector().toString())
+                val predicate = getArgument<Predicate<ItemStack>>("item")
+                sender.inventory.setItem()
             }
-        command.register(this)
+            .register(this)
     }
 
 }
