@@ -18,7 +18,7 @@ enum class Anchor(
     });
 
     fun apply(entity: LivingEntity): Location = offset(entity.location, entity)
-    fun apply(location: Location, entity: LivingEntity): Location = offset(entity.location, entity)
+    fun apply(location: Location, entity: LivingEntity): Location = offset(location, entity)
 
     companion object {
         fun getFromName(name: String, ignoreCase: Boolean = false): Anchor = Anchor.entries.first { it.anchorName.equals(name, ignoreCase) }
