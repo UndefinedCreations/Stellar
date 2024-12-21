@@ -19,6 +19,7 @@ val minecraftVersion = "1.20.6"
 
 repositories {
     mavenCentral()
+    mavenLocal()
     maven {
         name = "spigotmc-repo"
         url = uri("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
@@ -79,6 +80,8 @@ allprojects {
 dependencies {
     implementation(project(":api"))
     implementation(project(":common"))
+    implementation(project(":v1_17"))
+    implementation(project(":v1_17_1:", "reobf"))
     implementation(project(":v1_18_1:", "reobf"))
     implementation(project(":v1_18_2:", "reobf"))
     implementation(project(":v1_19_2:", "reobf"))
