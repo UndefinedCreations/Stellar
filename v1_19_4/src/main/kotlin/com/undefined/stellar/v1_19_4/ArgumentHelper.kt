@@ -39,6 +39,7 @@ import com.undefined.stellar.data.argument.ParticleData
 import com.undefined.stellar.exception.ArgumentVersionMismatchException
 import com.undefined.stellar.exception.LiteralArgumentMismatchException
 import com.undefined.stellar.exception.UnsupportedArgumentException
+import com.undefined.stellar.util.NMSVersion
 import com.undefined.stellar.v1_19_4.BrigadierCommandHelper.version
 import net.kyori.adventure.text.format.Style
 import net.kyori.adventure.text.format.TextColor
@@ -471,6 +472,6 @@ object ArgumentHelper {
     private fun Vec2.toLocation(world: World?) = Location(world, x.toDouble(), 0.0, y.toDouble())
 
     private fun throwArgumentVersionException(argument: AbstractStellarArgument<*>): Nothing =
-        throw ArgumentVersionMismatchException(argument, version)
+        throw ArgumentVersionMismatchException(argument, NMSVersion.version)
 
 }

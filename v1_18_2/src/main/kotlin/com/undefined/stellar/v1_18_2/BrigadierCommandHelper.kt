@@ -1,4 +1,4 @@
-package com.undefined.stellar.v1_20_4
+package com.undefined.stellar.v1_18_2
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
@@ -17,6 +17,7 @@ object BrigadierCommandHelper {
         MinecraftServer.getServer().createCommandSourceStack()
     }
     val dispatcher by lazy { MinecraftServer.getServer().functions.dispatcher }
+    val version: String = "1.18.2"
 
     fun register(command: LiteralArgumentBuilder<CommandSourceStack>): LiteralCommandNode<CommandSourceStack>? =
         dispatcher.register(command)

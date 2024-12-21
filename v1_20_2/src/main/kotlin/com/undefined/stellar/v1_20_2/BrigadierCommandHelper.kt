@@ -17,7 +17,6 @@ object BrigadierCommandHelper {
         MinecraftServer.getServer().createCommandSourceStack()
     }
     val dispatcher by lazy { MinecraftServer.getServer().functions.dispatcher }
-    val version: String = "1.20.2"
 
     fun register(command: LiteralArgumentBuilder<CommandSourceStack>): LiteralCommandNode<CommandSourceStack>? =
         dispatcher.register(command)

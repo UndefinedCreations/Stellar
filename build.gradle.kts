@@ -48,6 +48,8 @@ allprojects {
     apply(plugin = "java-library")
     apply(plugin = "maven-publish")
 
+    version = projectVersion
+
     repositories {
         mavenCentral()
         maven("https://repo.papermc.io/repository/maven-public/")
@@ -77,6 +79,9 @@ allprojects {
 dependencies {
     implementation(project(":api"))
     implementation(project(":common"))
+    implementation(project(":v1_18_1:", "reobf"))
+    implementation(project(":v1_18_2:", "reobf"))
+    implementation(project(":v1_19_2:", "reobf"))
     implementation(project(":v1_19_3:", "reobf"))
     implementation(project(":v1_19_4:", "reobf"))
     implementation(project(":v1_20", "reobf"))

@@ -1,9 +1,9 @@
-package com.undefined.stellar.v1_20_2
+package com.undefined.stellar.v1_18_1
 
 import com.undefined.stellar.AbstractStellarCommand
 import com.undefined.stellar.StellarCommands
 import com.undefined.stellar.registrar.AbstractCommandRegistrar
-import com.undefined.stellar.v1_20_2.BrigadierCommandHelper.dispatcher
+import com.undefined.stellar.v1_18_1.BrigadierCommandHelper.dispatcher
 import org.bukkit.command.CommandSender
 import org.bukkit.plugin.java.JavaPlugin
 
@@ -13,7 +13,9 @@ object CommandRegistrar : AbstractCommandRegistrar {
 
     override fun register(command: AbstractStellarCommand<*>, plugin: JavaPlugin) {
         this.plugin = plugin
+        println(1)
         BrigadierCommandHelper.handleHelpTopic(command)
+        println(2)
         for (name in command.aliases + command.name)
             BrigadierCommandHelper.register(CommandAdapter.getBaseCommand(command, name))
     }

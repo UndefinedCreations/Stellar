@@ -26,7 +26,7 @@ class StellarCommand(name: String, permissions: List<String> = listOf()) : Abstr
         StellarCommands.commands.add(this)
         CommandManager.initialize(plugin)
         val registrar = CommandManager.registrars[NMSVersion.version] ?: throw UnsupportedVersionException()
-        registrar.register(this)
+        registrar.register(this, plugin)
         for (execution in this.registerExecutions) execution()
         Bukkit.getPluginManager().callEvent(StellarCommandRegisterEvent(this))
     }

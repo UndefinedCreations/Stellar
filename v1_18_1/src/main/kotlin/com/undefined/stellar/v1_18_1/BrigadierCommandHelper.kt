@@ -1,4 +1,4 @@
-package com.undefined.stellar.v1_20_4
+package com.undefined.stellar.v1_18_1
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
@@ -10,6 +10,8 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.server.MinecraftServer
 import org.bukkit.Bukkit
+import org.bukkit.scheduler.BukkitRunnable
+import javax.lang.model.type.UnionType
 
 object BrigadierCommandHelper {
 
@@ -36,12 +38,18 @@ object BrigadierCommandHelper {
     }
 
     fun handleExecutions(command: AbstractStellarCommand<*>, context: CommandContext<CommandSourceStack>) {
+        println(24)
         val stellarContext = CommandContextAdapter.getStellarCommandContext(context)
+        println(25)
 
         for (runnable in command.base.runnables) runnable(stellarContext)
+        println(26)
         val arguments = getArguments(command.base, context)
+        println(27)
         for (argument in arguments) for (runnable in argument.runnables) runnable(stellarContext)
+        println(28)
         for (execution in command.executions) execution(stellarContext)
+        println(29)
     }
 
     fun fulfillsRequirements(command: AbstractStellarCommand<*>, source: CommandSourceStack): Boolean {
