@@ -9,14 +9,10 @@ import org.bukkit.plugin.java.JavaPlugin
 class Main : JavaPlugin() {
 
     override fun onEnable() {
-        if (Bukkit.getScoreboardManager()!!.mainScoreboard.getObjective("test") == null)
-            Bukkit.getScoreboardManager()!!.mainScoreboard.registerNewObjective("test", Criteria.HEALTH, "test")
-        StellarCommand("objective")
-            .addScoreHolderArgument(name = "holder")
+        StellarCommand("test")
+            .addStringArgument(name = "string")
             .addExecution<Player> {
-                val holder = getArgument<String>("holder")
-                val item = ItemStack(Material.DIAMOND)
-                Bukkit.getPlayer(holder)?.inventory?.addItem(item)
+                sender.sendMessage(getArgument<String>("string"))
             }
             .register(this)
     }

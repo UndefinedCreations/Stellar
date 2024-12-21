@@ -13,35 +13,25 @@ import net.minecraft.commands.CommandSourceStack
 object CommandAdapter {
 
     fun getBaseCommand(command: AbstractStellarCommand<*>, name: String = command.name): LiteralArgumentBuilder<CommandSourceStack> {
-        println(4)
         val brigadierCommand = LiteralArgumentBuilder.literal<CommandSourceStack>(name)
-        println(5)
         handleCommandFunctions(command, brigadierCommand)
-        println(6)
         handleArguments(command, brigadierCommand)
-        println(7)
         return brigadierCommand
     }
 
     fun handleCommandFunctions(command: AbstractStellarCommand<*>, brigadierCommand: ArgumentBuilder<CommandSourceStack, *>) {
-        println(8)
         if (command.executions.isNotEmpty() || command.executions.isNotEmpty())
-            println(9)
             brigadierCommand.executes { context ->
-                println(10)
                 BrigadierCommandHelper.handleExecutions(command, context)
                 1
             }
         brigadierCommand.requires { source ->
-            println(11)
             BrigadierCommandHelper.fulfillsRequirements(command, source)
         }
     }
 
     fun handleArguments(command: AbstractStellarCommand<*>, brigadierCommand: ArgumentBuilder<CommandSourceStack, *>) {
-        println(12)
         for (argument in command.arguments) {
-            println(13)
             when (argument) {
                 is LiteralStellarArgument -> handleLiteralArgument(argument, brigadierCommand)
                 is PhraseArgument-> handlePhraseArgument(argument, brigadierCommand)
@@ -51,15 +41,10 @@ object CommandAdapter {
     }
 
     private fun handleLiteralArgument(argument: LiteralStellarArgument, brigadierCommand: ArgumentBuilder<CommandSourceStack, *>) {
-        println(14)
         for (argumentBuilder in ArgumentHelper.getLiteralArguments(argument)) {
-            println(15)
             handleCommandFunctions(argument, argumentBuilder)
-            println(16)
             handleArguments(argument, argumentBuilder)
-            println(17)
             brigadierCommand.then(argumentBuilder)
-            println(18)
         }
     }
 
@@ -102,15 +87,10 @@ object CommandAdapter {
     }
 
     private fun handleRequiredArgument(argument: AbstractStellarArgument<*>, brigadierCommand: ArgumentBuilder<CommandSourceStack, *>) {
-        println(19)
         val argumentBuilder = ArgumentHelper.getRequiredArgumentBuilder(argument)
-        println(20)
         handleCommandFunctions(argument, argumentBuilder)
-        println(21)
         handleArguments(argument, argumentBuilder)
-        println(22)
         brigadierCommand.then(argumentBuilder)
-        println(23)
     }
 
 }

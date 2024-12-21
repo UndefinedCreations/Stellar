@@ -224,7 +224,7 @@ object ArgumentHelper {
             is com.undefined.stellar.argument.types.math.AngleArgument -> AngleArgument.getAngle(context, argument.name)
             is com.undefined.stellar.argument.types.math.RotationArgument -> {
                 val rotation = RotationArgument.getRotation(context, argument.name).getPosition(context.source)
-                Location(context.source.bukkitWorld, rotation.x, rotation.y, rotation.z)
+                Location(context.source.level.world, rotation.x, rotation.y, rotation.z)
             }
             is DisplaySlotArgument -> getBukkitDisplaySlot(ScoreboardSlotArgument.getDisplaySlot(context, argument.name))
             is com.undefined.stellar.argument.types.scoreboard.ScoreHolderArgument -> when (argument.type) {
@@ -383,24 +383,7 @@ object ArgumentHelper {
 
     private fun getBukkitDisplaySlot(slot: Int): DisplaySlot = when (slot) {
         0 -> DisplaySlot.PLAYER_LIST
-        1 -> DisplaySlot.SIDEBAR
         2 -> DisplaySlot.BELOW_NAME
-        3 -> DisplaySlot.SIDEBAR_TEAM_BLACK
-        4 -> DisplaySlot.SIDEBAR_TEAM_DARK_BLUE
-        5 -> DisplaySlot.SIDEBAR_TEAM_DARK_GREEN
-        6 -> DisplaySlot.SIDEBAR_TEAM_DARK_AQUA
-        7 -> DisplaySlot.SIDEBAR_TEAM_DARK_RED
-        8 -> DisplaySlot.SIDEBAR_TEAM_DARK_PURPLE
-        9 -> DisplaySlot.SIDEBAR_TEAM_GOLD
-        10 -> DisplaySlot.SIDEBAR_TEAM_GRAY
-        11 -> DisplaySlot.SIDEBAR_TEAM_DARK_GRAY
-        12 -> DisplaySlot.SIDEBAR_TEAM_BLUE
-        13 -> DisplaySlot.SIDEBAR_TEAM_GREEN
-        14 -> DisplaySlot.SIDEBAR_TEAM_AQUA
-        15 -> DisplaySlot.SIDEBAR_TEAM_RED
-        16 -> DisplaySlot.SIDEBAR_TEAM_LIGHT_PURPLE
-        17 -> DisplaySlot.SIDEBAR_TEAM_YELLOW
-        18 -> DisplaySlot.SIDEBAR_TEAM_WHITE
         else -> DisplaySlot.SIDEBAR
     }
 
@@ -449,7 +432,7 @@ object ArgumentHelper {
     }
 
     private fun getLocation(context: CommandContext<CommandSourceStack>, command: LocationArgument): Location {
-        val world = context.source.bukkitWorld
+        val world = context.source.level.world
         return when (command.type) {
             LocationType.LOCATION_3D -> context.getArgument(command.name, Coordinates::class.java).getBlockPos(context.source).toLocation(world);
             LocationType.LOCATION_2D -> ColumnPosArgument.getColumnPos(context, command.name).toLocation(world)

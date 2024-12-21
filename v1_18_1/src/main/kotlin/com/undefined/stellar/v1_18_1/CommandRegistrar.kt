@@ -13,9 +13,7 @@ object CommandRegistrar : AbstractCommandRegistrar {
 
     override fun register(command: AbstractStellarCommand<*>, plugin: JavaPlugin) {
         this.plugin = plugin
-        println(1)
         BrigadierCommandHelper.handleHelpTopic(command)
-        println(2)
         for (name in command.aliases + command.name)
             BrigadierCommandHelper.register(CommandAdapter.getBaseCommand(command, name))
     }

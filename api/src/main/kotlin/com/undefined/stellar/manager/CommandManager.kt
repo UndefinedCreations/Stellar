@@ -9,6 +9,8 @@ import org.jetbrains.annotations.ApiStatus
 @ApiStatus.Internal
 object CommandManager {
     val registrars: Map<String, AbstractCommandRegistrar> = mapOf(
+        "1.17" to com.undefined.stellar.v1_17.CommandRegistrar,
+        "1.17.1" to com.undefined.stellar.v1_17_1.CommandRegistrar,
         "1.18" to com.undefined.stellar.v1_18_1.CommandRegistrar,
         "1.18.1" to com.undefined.stellar.v1_18_1.CommandRegistrar,
         "1.18.2" to com.undefined.stellar.v1_18_2.CommandRegistrar,

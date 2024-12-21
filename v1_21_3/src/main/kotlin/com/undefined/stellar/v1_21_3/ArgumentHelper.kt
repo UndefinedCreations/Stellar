@@ -228,7 +228,7 @@ object ArgumentHelper {
             is com.undefined.stellar.argument.types.math.AngleArgument -> AngleArgument.getAngle(context, argument.name)
             is com.undefined.stellar.argument.types.math.RotationArgument -> {
                 val rotation = RotationArgument.getRotation(context, argument.name).getPosition(context.source)
-                Location(context.source.bukkitWorld, rotation.x, rotation.y, rotation.z)
+                Location(context.source.level.world, rotation.x, rotation.y, rotation.z)
             }
             is DisplaySlotArgument -> getBukkitDisplaySlot(ScoreboardSlotArgument.getDisplaySlot(context, argument.name))
             is com.undefined.stellar.argument.types.scoreboard.ScoreHolderArgument -> when (argument.type) {
