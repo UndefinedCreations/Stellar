@@ -6,8 +6,8 @@ import com.undefined.stellar.argument.AbstractStellarArgument
 class LocationArgument(parent: AbstractStellarCommand<*>, name: String, val type: LocationType) : AbstractStellarArgument<LocationArgument>(parent, name)
 
 enum class LocationType {
-    LOCATION3D,
-    LOCATION2D,
-    DOUBLE_LOCATION_3D,
-    DOUBLE_LOCATION_2D
+    LOCATION_3D,
+    LOCATION_2D,
+    PRECISE_LOCATION_3D,
+    PRECISE_LOCATION_2D
 }
