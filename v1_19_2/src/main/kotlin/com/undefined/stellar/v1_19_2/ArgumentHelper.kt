@@ -23,7 +23,7 @@ import com.undefined.stellar.argument.types.player.GameModeArgument
 import com.undefined.stellar.argument.types.primitive.*
 import com.undefined.stellar.argument.types.registry.*
 import com.undefined.stellar.argument.types.scoreboard.DisplaySlotArgument
-import com.undefined.stellar.argument.types.scoreboard.ScoreHoldersArgument
+import com.undefined.stellar.argument.types.scoreboard.ScoreHolderType
 import com.undefined.stellar.argument.types.structure.MirrorArgument
 import com.undefined.stellar.argument.types.structure.StructureRotationArgument
 import com.undefined.stellar.argument.types.world.*
@@ -113,19 +113,15 @@ object ArgumentHelper {
             is com.undefined.stellar.argument.types.entity.EntityArgument -> brigadier(argument.type)
             is com.undefined.stellar.argument.types.player.GameProfileArgument -> GameProfileArgument.gameProfile()
             is LocationArgument -> when (argument.type) {
-                LocationType.LOCATION3D -> BlockPosArgument.blockPos()
-                LocationType.LOCATION2D -> ColumnPosArgument.columnPos()
-                LocationType.DOUBLE_LOCATION_3D -> Vec3Argument.vec3()
-                LocationType.DOUBLE_LOCATION_2D -> Vec2Argument.vec2()
+                LocationType.LOCATION_3D -> BlockPosArgument.blockPos()
+                LocationType.LOCATION_2D -> ColumnPosArgument.columnPos()
+                LocationType.PRECISE_LOCATION_3D -> Vec3Argument.vec3()
+                LocationType.PRECISE_LOCATION_2D -> Vec2Argument.vec2()
             }
             is BlockDataArgument -> BlockStateArgument.block(COMMAND_BUILD_CONTEXT)
-            is com.undefined.stellar.argument.types.block.BlockPredicateArgument -> BlockPredicateArgument.blockPredicate(
-                COMMAND_BUILD_CONTEXT
-            )
+            is com.undefined.stellar.argument.types.block.BlockPredicateArgument -> BlockPredicateArgument.blockPredicate(COMMAND_BUILD_CONTEXT)
             is com.undefined.stellar.argument.types.item.ItemArgument -> ItemArgument.item(COMMAND_BUILD_CONTEXT)
-            is com.undefined.stellar.argument.types.item.ItemPredicateArgument -> ItemPredicateArgument.itemPredicate(
-                COMMAND_BUILD_CONTEXT
-            )
+            is com.undefined.stellar.argument.types.item.ItemPredicateArgument -> ItemPredicateArgument.itemPredicate(COMMAND_BUILD_CONTEXT)
             is com.undefined.stellar.argument.types.text.ColorArgument -> ColorArgument.color()
             is com.undefined.stellar.argument.types.text.ComponentArgument -> ComponentArgument.textComponent()
             is com.undefined.stellar.argument.types.text.StyleArgument -> throwArgumentVersionException(argument)
@@ -137,8 +133,10 @@ object ArgumentHelper {
             is com.undefined.stellar.argument.types.math.AngleArgument -> AngleArgument.angle()
             is com.undefined.stellar.argument.types.math.RotationArgument -> RotationArgument.rotation()
             is DisplaySlotArgument -> ScoreboardSlotArgument.displaySlot()
-            is com.undefined.stellar.argument.types.scoreboard.ScoreHolderArgument -> ScoreHolderArgument.scoreHolder()
-            is ScoreHoldersArgument -> ScoreHolderArgument.scoreHolders()
+            is com.undefined.stellar.argument.types.scoreboard.ScoreHolderArgument -> when (argument.type) {
+                ScoreHolderType.SINGLE -> ScoreHolderArgument.scoreHolder()
+                ScoreHolderType.MULTIPLE -> ScoreHolderArgument.scoreHolders()
+            }
             is AxisArgument -> SwizzleArgument.swizzle()
             is com.undefined.stellar.argument.types.scoreboard.TeamArgument -> TeamArgument.team()
             is ItemSlotArgument -> SlotArgument.slot()
@@ -180,7 +178,7 @@ object ArgumentHelper {
             is EntityTypeArgument -> ResourceKeyArgument.key(Registry.ENTITY_TYPE.key())
             is PotionArgument -> throwArgumentVersionException(argument)
             is MemoryKeyArgument -> ResourceKeyArgument.key(Registry.MEMORY_MODULE_TYPE.key())
-            else -> throw UnsupportedArgumentException()
+            else -> throw UnsupportedArgumentException(argument)
         }
 
     fun <T : AbstractStellarArgument<*>> getParsedArgument(context: CommandContext<CommandSourceStack>, argument: T): Any? {
@@ -227,8 +225,10 @@ object ArgumentHelper {
                 Location(context.source.bukkitWorld, rotation.x, rotation.y, rotation.z)
             }
             is DisplaySlotArgument -> getBukkitDisplaySlot(ScoreboardSlotArgument.getDisplaySlot(context, argument.name))
-            is com.undefined.stellar.argument.types.scoreboard.ScoreHolderArgument -> ScoreHolderArgument.getName(context, argument.name)
-            is ScoreHoldersArgument -> ScoreHolderArgument.getNames(context, argument.name)
+            is com.undefined.stellar.argument.types.scoreboard.ScoreHolderArgument -> when (argument.type) {
+                ScoreHolderType.SINGLE -> ScoreHolderArgument.getName(context, argument.name)
+                ScoreHolderType.MULTIPLE -> ScoreHolderArgument.getNames(context, argument.name)
+            }
             is AxisArgument -> getBukkitAxis(SwizzleArgument.getSwizzle(context, argument.name))
             is com.undefined.stellar.argument.types.scoreboard.TeamArgument -> Bukkit.getScoreboardManager().mainScoreboard.getTeam(TeamArgument.getTeam(context, argument.name).name)
             is ItemSlotArgument -> SlotArgument.getSlot(context, argument.name)
@@ -273,7 +273,7 @@ object ArgumentHelper {
             is EntityTypeArgument -> org.bukkit.Registry.ENTITY_TYPE.get(getId(context, argument.name, Registry.ENTITY_TYPE_REGISTRY))
             is PotionArgument -> throwArgumentVersionException(argument)
             is MemoryKeyArgument -> org.bukkit.Registry.MEMORY_MODULE_TYPE.get(getId(context, argument.name, Registry.MEMORY_MODULE_TYPE_REGISTRY))
-            else -> throw UnsupportedArgumentException()
+            else -> throw UnsupportedArgumentException(argument)
         }
     }
 
@@ -466,10 +466,10 @@ object ArgumentHelper {
     private fun getLocation(context: CommandContext<CommandSourceStack>, command: LocationArgument): Location {
         val world = context.source.bukkitWorld
         return when (command.type) {
-            LocationType.LOCATION3D -> context.getArgument(command.name, Coordinates::class.java).getBlockPos(context.source).toLocation(world);
-            LocationType.LOCATION2D -> ColumnPosArgument.getColumnPos(context, command.name).toLocation(world)
-            LocationType.DOUBLE_LOCATION_3D -> Vec3Argument.getVec3(context, command.name).toLocation(world)
-            LocationType.DOUBLE_LOCATION_2D -> Vec2Argument.getVec2(context, command.name).toLocation(world)
+            LocationType.LOCATION_3D -> context.getArgument(command.name, Coordinates::class.java).getBlockPos(context.source).toLocation(world);
+            LocationType.LOCATION_2D -> ColumnPosArgument.getColumnPos(context, command.name).toLocation(world)
+            LocationType.PRECISE_LOCATION_3D -> Vec3Argument.getVec3(context, command.name).toLocation(world)
+            LocationType.PRECISE_LOCATION_2D -> Vec2Argument.getVec2(context, command.name).toLocation(world)
         }
     }
 

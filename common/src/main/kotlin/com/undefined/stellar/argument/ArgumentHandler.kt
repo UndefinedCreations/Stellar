@@ -117,7 +117,7 @@ open class ArgumentHandler {
     fun addGameProfileArgument(name: String): GameProfileArgument =
         addArgument { GameProfileArgument(base, name) }
 
-    fun addLocationArgument(name: String, type: LocationType = LocationType.LOCATION3D): LocationArgument =
+    fun addLocationArgument(name: String, type: LocationType = LocationType.LOCATION_3D): LocationArgument =
         addArgument { LocationArgument(base, name, type) }
 
     fun addBlockDataArgument(name: String): BlockDataArgument =
@@ -165,11 +165,8 @@ open class ArgumentHandler {
     fun addDisplaySlotArgument(name: String): DisplaySlotArgument =
         addArgument { DisplaySlotArgument(base, name) }
 
-    fun addScoreHolderArgument(name: String): ScoreHoldersArgument =
-        addArgument { ScoreHoldersArgument(base, name) }
-
-    fun addScoreHoldersArgument(name: String): ScoreHoldersArgument =
-        addArgument { ScoreHoldersArgument(base, name) }
+    fun addScoreHolderArgument(name: String, type: ScoreHolderType = ScoreHolderType.SINGLE): ScoreHolderArgument =
+        addArgument { ScoreHolderArgument(base, name, type) }
 
     fun addAxisArgument(name: String): AxisArgument =
         addArgument { AxisArgument(base, name) }

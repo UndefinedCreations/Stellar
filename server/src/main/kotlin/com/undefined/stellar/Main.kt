@@ -1,19 +1,24 @@
 package com.undefined.stellar
 
+import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
-import java.util.function.Predicate
+import org.bukkit.scoreboard.Criteria
+import org.bukkit.scoreboard.Objective
 
 class Main : JavaPlugin() {
 
     override fun onEnable() {
-        StellarCommand("isItem")
-            .addItemArgument(name = "item")
+        if (Bukkit.getScoreboardManager()!!.mainScoreboard.getObjective("test") == null)
+            Bukkit.getScoreboardManager()!!.mainScoreboard.registerNewObjective("test", Criteria.HEALTH, "test")
+        StellarCommand("objective")
+            .addScoreHolderArgument(name = "holder")
             .addExecution<Player> {
-                val predicate = getArgument<Predicate<ItemStack>>("item")
-                sender.inventory.setItem()
+                val holder = getArgument<String>("holder")
+                val item = ItemStack(Material.DIAMOND)
+                Bukkit.getPlayer(holder)?.inventory?.addItem(item)
             }
             .register(this)
     }
