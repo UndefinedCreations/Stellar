@@ -228,8 +228,9 @@ object ArgumentHelper {
             }
             is com.undefined.stellar.argument.types.math.AngleArgument -> AngleArgument.getAngle(context, argument.name)
             is com.undefined.stellar.argument.types.math.RotationArgument -> {
-                val rotation = RotationArgument.getRotation(context, argument.name).getPosition(context.source)
-                Location(context.source.level.world, rotation.x, rotation.y, rotation.z)
+                val coordinates = RotationArgument.getRotation(context, argument.name)
+                val rotation = coordinates.getRotation(context.source)
+                Location(context.source.bukkitWorld, 0.0, 0.0, 0.0, rotation.y, rotation.x)
             }
             is DisplaySlotArgument -> getBukkitDisplaySlot(ScoreboardSlotArgument.getDisplaySlot(context, argument.name))
             is com.undefined.stellar.argument.types.scoreboard.ScoreHolderArgument -> when (argument.type) {
@@ -248,7 +249,7 @@ object ArgumentHelper {
             }
             is com.undefined.stellar.argument.types.world.DimensionArgument -> DimensionArgument.getDimension(context, argument.name).world.environment
             is com.undefined.stellar.argument.types.player.GameModeArgument -> GameMode.getByValue(GameModeArgument.getGameMode(context, argument.name).id)
-            is com.undefined.stellar.argument.types.math.TimeArgument -> Duration.ofSeconds(IntegerArgumentType.getInteger(context, argument.name).toLong() / 20)
+            is com.undefined.stellar.argument.types.math.TimeArgument -> IntegerArgumentType.getInteger(context, argument.name).toLong()
             is MirrorArgument -> Mirror.valueOf(TemplateMirrorArgument.getMirror(context, argument.name).name)
             is StructureRotationArgument -> StructureRotation.valueOf(TemplateRotationArgument.getRotation(context, argument.name).name)
             is HeightMapArgument -> HeightMap.valueOf(HeightmapTypeArgument.getHeightmap(context, argument.name).name)
@@ -388,7 +389,24 @@ object ArgumentHelper {
 
     private fun getBukkitDisplaySlot(slot: Int): DisplaySlot = when (slot) {
         0 -> DisplaySlot.PLAYER_LIST
+        1 -> DisplaySlot.SIDEBAR
         2 -> DisplaySlot.BELOW_NAME
+        3 -> DisplaySlot.SIDEBAR_TEAM_BLACK
+        4 -> DisplaySlot.SIDEBAR_TEAM_DARK_BLUE
+        5 -> DisplaySlot.SIDEBAR_TEAM_DARK_GREEN
+        6 -> DisplaySlot.SIDEBAR_TEAM_DARK_AQUA
+        7 -> DisplaySlot.SIDEBAR_TEAM_DARK_RED
+        8 -> DisplaySlot.SIDEBAR_TEAM_DARK_PURPLE
+        9 -> DisplaySlot.SIDEBAR_TEAM_GOLD
+        10 -> DisplaySlot.SIDEBAR_TEAM_GRAY
+        11 -> DisplaySlot.SIDEBAR_TEAM_DARK_GRAY
+        12 -> DisplaySlot.SIDEBAR_TEAM_BLUE
+        13 -> DisplaySlot.SIDEBAR_TEAM_GREEN
+        14 -> DisplaySlot.SIDEBAR_TEAM_AQUA
+        15 -> DisplaySlot.SIDEBAR_TEAM_RED
+        16 -> DisplaySlot.SIDEBAR_TEAM_LIGHT_PURPLE
+        17 -> DisplaySlot.SIDEBAR_TEAM_YELLOW
+        18 -> DisplaySlot.SIDEBAR_TEAM_WHITE
         else -> DisplaySlot.SIDEBAR
     }
 

@@ -19,6 +19,5 @@ enum class Operation(val string: String, private val application: (a: Float, b: 
     }
 
     fun apply(a: Float, b: Float): Float = application(a, b)
-
     fun apply(a: Int, b: Int): Float = apply(a.toFloat(), b.toFloat())
 }

@@ -221,8 +221,10 @@ object ArgumentHelper {
             }
             is com.undefined.stellar.argument.types.math.AngleArgument -> AngleArgument.getAngle(context, argument.name)
             is com.undefined.stellar.argument.types.math.RotationArgument -> {
-                val rotation = RotationArgument.getRotation(context, argument.name).getPosition(context.source)
-                Location(context.source.level.world, rotation.x, rotation.y, rotation.z)
+                val coordinates = RotationArgument.getRotation(context, argument.name)
+                val position = coordinates.getPosition(context.source)
+                val rotation = coordinates.getRotation(context.source)
+                Location(context.source.bukkitWorld, position.x, position.y, position.z, rotation.x, rotation.y)
             }
             is DisplaySlotArgument -> getBukkitDisplaySlot(ScoreboardSlotArgument.getDisplaySlot(context, argument.name))
             is com.undefined.stellar.argument.types.scoreboard.ScoreHolderArgument -> when (argument.type) {
@@ -241,7 +243,7 @@ object ArgumentHelper {
             }
             is com.undefined.stellar.argument.types.world.DimensionArgument -> DimensionArgument.getDimension(context, argument.name).world.environment
             is GameModeArgument -> throwArgumentVersionException(argument)
-            is com.undefined.stellar.argument.types.math.TimeArgument -> Duration.ofSeconds(IntegerArgumentType.getInteger(context, argument.name).toLong() / 20)
+            is com.undefined.stellar.argument.types.math.TimeArgument -> IntegerArgumentType.getInteger(context, argument.name).toLong()
             is MirrorArgument -> Mirror.valueOf(TemplateMirrorArgument.getMirror(context, argument.name).name)
             is StructureRotationArgument -> StructureRotation.valueOf(TemplateRotationArgument.getRotation(context, argument.name).name)
             is HeightMapArgument -> throwArgumentVersionException(argument)
