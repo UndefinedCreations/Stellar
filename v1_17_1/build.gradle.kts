@@ -1,19 +1,26 @@
 plugins {
     kotlin("jvm") version "1.9.22"
-    id("io.papermc.paperweight.userdev") version "1.7.1"
+    id("io.papermc.paperweight.userdev")
 }
 
 paperweight.reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArtifactConfiguration.REOBF_PRODUCTION
 
 dependencies {
     paperweight.paperDevBundle("1.17.1-R0.1-SNAPSHOT")
-//    pluginRemapper("net.fabricmc:tiny-remapper:0.10.3:fat")
     compileOnly(project(":common"))
 }
 
 tasks {
     compileKotlin {
         kotlinOptions.jvmTarget = "16"
+    }
+    compileJava {
+        options.release.set(16)
+    }
+    paperweight {
+        javaLauncher.set(
+            project.javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(16)) }
+        )
     }
 }
 
@@ -22,5 +29,5 @@ java {
 }
 
 kotlin {
-    jvmToolchain(16)
+    jvmToolchain(21)
 }

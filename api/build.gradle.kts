@@ -14,8 +14,9 @@ version = versionVar
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.20.6-R0.1-SNAPSHOT")
     implementation(project(":common"))
+    implementation(project(":v1_16_5"))
     implementation(project(":v1_17"))
-    implementation(project(":v1_17_1:", "reobf"))
+    implementation(project(":v1_17_1"))
     implementation(project(":v1_18_1"))
     implementation(project(":v1_18_2"))
     implementation(project(":v1_19_2"))
@@ -30,14 +31,18 @@ dependencies {
     implementation(project(":v1_21_1"))
     implementation(project(":v1_21_3"))
     implementation(project(":v1_21_4"))
+    implementation(kotlin("reflect"))
 }
 
 tasks {
     compileKotlin {
-        kotlinOptions.jvmTarget = "16"
+        kotlinOptions.jvmTarget = "1.8"
+    }
+    compileJava {
+        options.release.set(8)
     }
 }
 
 kotlin {
-    jvmToolchain(16)
+    jvmToolchain(21)
 }

@@ -1,4 +1,4 @@
-package com.undefined.stellar.v1_17_1
+package com.undefined.stellar.v1_16_5
 
 import com.mojang.brigadier.context.CommandContext
 import com.undefined.stellar.AbstractStellarCommand
@@ -10,21 +10,15 @@ import com.undefined.stellar.data.argument.CommandNode
 import com.undefined.stellar.data.argument.PhraseCommandContext
 import com.undefined.stellar.exception.DuplicateArgumentNameException
 import com.undefined.stellar.exception.LiteralArgumentMismatchException
-import io.papermc.paper.adventure.PaperAdventure
-import net.kyori.adventure.identity.Identity
-import net.minecraft.commands.CommandSource
-import net.minecraft.commands.CommandSourceStack
-import net.minecraft.network.chat.Component
-import net.minecraft.network.chat.TextComponent
-import net.minecraft.server.MinecraftServer
-import net.minecraft.world.phys.Vec2
-import net.minecraft.world.phys.Vec3
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
+import net.minecraft.server.v1_16_R3.*
 import org.bukkit.command.CommandSender
-import java.util.UUID
+import java.util.*
 
 object CommandContextAdapter {
 
-    fun getStellarCommandContext(context: CommandContext<CommandSourceStack>): com.undefined.stellar.data.argument.CommandContext<CommandSender> {
+    fun getStellarCommandContext(context: CommandContext<CommandListenerWrapper>): com.undefined.stellar.data.argument.CommandContext<CommandSender> {
         val input = context.input.removePrefix("/")
         val baseCommand: AbstractStellarCommand<*> = StellarCommands.getStellarCommand(context.nodes[0].node.name)!!
         val arguments = BrigadierCommandHelper.getArguments(baseCommand, context)
@@ -45,7 +39,7 @@ object CommandContextAdapter {
         )
     }
 
-    fun getGreedyCommandContext(context: CommandContext<CommandSourceStack>): PhraseCommandContext<CommandSender> {
+    fun getGreedyCommandContext(context: CommandContext<CommandListenerWrapper>): PhraseCommandContext<CommandSender> {
         val input = context.input.removePrefix("/")
         val words = input.split(' ').toMutableList()
 
@@ -58,42 +52,33 @@ object CommandContextAdapter {
         )
     }
 
-    fun getCommandSourceStack(sender: CommandSender): CommandSourceStack {
-        val overworld = MinecraftServer.getServer().overworld()
-        return CommandSourceStack(
+    @Suppress("DEPRECATION")
+    fun getCommandListenerWrapper(sender: CommandSender): CommandListenerWrapper {
+        val overworld = MinecraftServer.getServer().E()
+        return CommandListenerWrapper(
             Source(sender),
-            Vec3.atLowerCornerOf(overworld.getSharedSpawnPos()),
-            Vec2.ZERO,
+            Vec3D.b(overworld.spawn),
+            Vec2F.a,
             overworld,
             4,
             sender.name,
-            TextComponent(sender.name),
+            ChatComponentText(sender.name),
             MinecraftServer.getServer(),
             null
         )
     }
 
-    @Suppress("DEPRECATION")
-    private data class Source(val sender: CommandSender) : CommandSource {
-        override fun sendMessage(message: Component, sender: UUID) {
-            this.sender.sendMessage(Identity.identity(sender), PaperAdventure.asAdventure(message))
+    private data class Source(val sender: CommandSender) : ICommandListener {
+        override fun sendMessage(message: IChatBaseComponent, sender: UUID) {
+            this.sender.sendMessage(LegacyComponentSerializer.legacySection().serialize(asAdventure(message)))
         }
-
-        override fun acceptsSuccess(): Boolean {
-            return true
-        }
-
-        override fun acceptsFailure(): Boolean {
-            return true
-        }
-
-        override fun shouldInformAdmins(): Boolean {
-            return false
-        }
-
-        override fun getBukkitSender(stack: CommandSourceStack): CommandSender {
-            return this.sender
-        }
+        override fun shouldSendSuccess(): Boolean = true
+        override fun shouldSendFailure(): Boolean = true
+        override fun shouldBroadcastCommands(): Boolean = false
+        override fun getBukkitSender(stack: CommandListenerWrapper): CommandSender = this.sender
     }
+
+    fun asAdventure(component: IChatBaseComponent): net.kyori.adventure.text.Component =
+        GsonComponentSerializer.gson().deserializeFromTree(IChatBaseComponent.ChatSerializer.b(component))
 
 }

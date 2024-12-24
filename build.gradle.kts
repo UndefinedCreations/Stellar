@@ -1,10 +1,9 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-
 plugins {
     java
     kotlin("jvm") version "1.9.22"
     `maven-publish`
     id("com.github.johnrengelman.shadow") version "8.1.1"
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.8" apply false
 }
 
 apply(plugin = "maven-publish")
@@ -80,6 +79,7 @@ allprojects {
 dependencies {
     implementation(project(":api"))
     implementation(project(":common"))
+    implementation(project(":v1_16_5"))
     implementation(project(":v1_17"))
     implementation(project(":v1_17_1:", "reobf"))
     implementation(project(":v1_18_1:", "reobf"))
@@ -99,13 +99,8 @@ dependencies {
 }
 
 tasks {
-    withType<ShadowJar> {
-        archiveFileName.set("${project.name}-${project.version}.jar")
-        archiveClassifier.set("mapped")
-    }
-
     compileKotlin {
-        kotlinOptions.jvmTarget = "16"
+        kotlinOptions.jvmTarget = "1.8"
     }
 }
 
@@ -116,5 +111,5 @@ java {
 }
 
 kotlin {
-    jvmToolchain(16)
+    jvmToolchain(21)
 }

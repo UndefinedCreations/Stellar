@@ -1,9 +1,9 @@
-package com.undefined.stellar.v1_17_1
+package com.undefined.stellar.v1_16_5
 
 import com.undefined.stellar.AbstractStellarCommand
 import com.undefined.stellar.StellarCommands
 import com.undefined.stellar.registrar.AbstractCommandRegistrar
-import com.undefined.stellar.v1_17_1.BrigadierCommandHelper.dispatcher
+import com.undefined.stellar.v1_16_5.BrigadierCommandHelper.dispatcher
 import org.bukkit.command.CommandSender
 import org.bukkit.plugin.java.JavaPlugin
 
@@ -17,7 +17,7 @@ object CommandRegistrar : AbstractCommandRegistrar {
 
     override fun handleCommandFailure(sender: CommandSender, input: String): Boolean {
         val results = dispatcher.parse(input, BrigadierCommandHelper.COMMAND_SOURCE)
-        val context = results.context.withSource(CommandContextAdapter.getCommandSourceStack(sender)).build(input)
+        val context = results.context.withSource(CommandContextAdapter.getCommandListenerWrapper(sender)).build(input)
 
         if (results.reader.remainingLength == 0) return false
         if (context.nodes.isEmpty()) return false

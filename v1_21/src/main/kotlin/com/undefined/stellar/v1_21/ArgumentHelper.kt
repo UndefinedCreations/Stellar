@@ -105,7 +105,7 @@ object ArgumentHelper {
     fun getRequiredArgumentBuilder(argument: AbstractStellarArgument<*>): RequiredArgumentBuilder<CommandSourceStack, *> =
         RequiredArgumentBuilder.argument(argument.name, getArgumentType(argument))
 
-    fun <T : AbstractStellarArgument<*>> getArgumentType(argument: T): ArgumentType<*> =
+    private fun <T : AbstractStellarArgument<*>> getArgumentType(argument: T): ArgumentType<*> =
         when (argument) {
             is ListArgument<*> -> getArgumentType(argument.type)
             is CustomArgument<*> -> getArgumentType(argument.type)

@@ -71,7 +71,6 @@ object CommandContextAdapter {
         )
     }
 
-    @JvmRecord
     @Suppress("DEPRECATION")
     private data class Source(val sender: CommandSender) : CommandSource {
         override fun sendSystemMessage(message: Component) {

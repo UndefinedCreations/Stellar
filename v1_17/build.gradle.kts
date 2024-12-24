@@ -17,7 +17,10 @@ tasks {
         finalizedBy(remap)
     }
     compileKotlin {
-        kotlinOptions.jvmTarget = "16"
+        kotlinOptions.jvmTarget = "1.8"
+    }
+    compileJava {
+        options.release.set(8)
     }
     remap {
         mcVersion.set("1.17")

@@ -9,10 +9,7 @@ import org.bukkit.plugin.java.JavaPlugin
 
 object CommandRegistrar : AbstractCommandRegistrar {
 
-    lateinit var plugin: JavaPlugin
-
     override fun register(command: AbstractStellarCommand<*>, plugin: JavaPlugin) {
-        this.plugin = plugin
         BrigadierCommandHelper.handleHelpTopic(command)
         for (name in command.aliases + command.name)
             BrigadierCommandHelper.register(CommandAdapter.getBaseCommand(command, name))

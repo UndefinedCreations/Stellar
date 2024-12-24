@@ -2,13 +2,13 @@ plugins {
     kotlin("jvm") version "1.9.22"
 }
 
-val versionVar = version.toString()
-val groupIdVar = "com.undefined"
-val artifactIdVar = "stellar"
+repositories {
+    mavenLocal()
+}
 
 dependencies {
-    compileOnly("org.spigotmc:spigot-api:1.20.6-R0.1-SNAPSHOT")
-    api("com.mojang:authlib:1.5.21")
+    compileOnly("org.spigotmc:spigot:1.16.5-R0.1-SNAPSHOT")
+    compileOnly(project(":common"))
 }
 
 tasks {
@@ -18,6 +18,10 @@ tasks {
     compileJava {
         options.release.set(8)
     }
+}
+
+java {
+    disableAutoTargetJvm()
 }
 
 kotlin {

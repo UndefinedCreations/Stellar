@@ -1,5 +1,6 @@
-package com.undefined.stellar.v1_18_2
+package com.undefined.stellar.v1_16_5
 
+import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.tree.LiteralCommandNode
@@ -7,25 +8,27 @@ import com.undefined.stellar.AbstractStellarCommand
 import com.undefined.stellar.argument.AbstractStellarArgument
 import com.undefined.stellar.data.help.CustomCommandHelpTopic
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
-import net.minecraft.commands.CommandSourceStack
-import net.minecraft.server.MinecraftServer
+import net.minecraft.server.v1_16_R3.CommandListenerWrapper
+import net.minecraft.server.v1_16_R3.MinecraftServer
 import org.bukkit.Bukkit
 
 @Suppress("DEPRECATION")
 object BrigadierCommandHelper {
 
-    val COMMAND_SOURCE: CommandSourceStack by lazy {
-        MinecraftServer.getServer().createCommandSourceStack()
+    val COMMAND_SOURCE: CommandListenerWrapper by lazy {
+        MinecraftServer.getServer().serverCommandListener
     }
-    val dispatcher by lazy { MinecraftServer.getServer().functions.dispatcher }
+    val dispatcher: CommandDispatcher<CommandListenerWrapper> by lazy {
+        MinecraftServer.getServer().functionData.commandDispatcher
+    }
 
-    fun register(command: LiteralArgumentBuilder<CommandSourceStack>): LiteralCommandNode<CommandSourceStack>? =
+    fun register(command: LiteralArgumentBuilder<CommandListenerWrapper>): LiteralCommandNode<CommandListenerWrapper>? =
         dispatcher.register(command)
 
     fun handleHelpTopic(command: AbstractStellarCommand<*>) {
         Bukkit.getServer().helpMap.addTopic(
             CustomCommandHelpTopic(command.name, command.description, command.helpTopic) {
-                val context = MinecraftServer.getServer().createCommandSourceStack()
+                val context = MinecraftServer.getServer().serverCommandListener
                 val requirements = command.requirements.all { it(this) }
                 val permissionRequirements = command.permissionRequirements.all {
                     if (it.permission.isEmpty()) context.hasPermission(it.level)
@@ -36,7 +39,7 @@ object BrigadierCommandHelper {
         )
     }
 
-    fun handleExecutions(command: AbstractStellarCommand<*>, context: CommandContext<CommandSourceStack>) {
+    fun handleExecutions(command: AbstractStellarCommand<*>, context: CommandContext<CommandListenerWrapper>) {
         val stellarContext = CommandContextAdapter.getStellarCommandContext(context)
 
         for (runnable in command.base.runnables) runnable(stellarContext)
@@ -45,13 +48,13 @@ object BrigadierCommandHelper {
         for (execution in command.executions) execution(stellarContext)
     }
 
-    fun fulfillsRequirements(command: AbstractStellarCommand<*>, source: CommandSourceStack): Boolean {
+    fun fulfillsRequirements(command: AbstractStellarCommand<*>, source: CommandListenerWrapper): Boolean {
         val fulfillsExecutionRequirements = command.requirements.all { it(source.bukkitSender) }
         val fulfillsPermissionRequirements = command.permissionRequirements.all { source.hasPermission(it.level, it.permission) }
         return fulfillsExecutionRequirements.and(fulfillsPermissionRequirements)
     }
 
-    fun handleFailureMessageAndExecutions(command: AbstractStellarCommand<*>, context: CommandContext<CommandSourceStack>) {
+    fun handleFailureMessageAndExecutions(command: AbstractStellarCommand<*>, context: CommandContext<CommandListenerWrapper>) {
         for (execution in command.failureExecutions) execution(CommandContextAdapter.getStellarCommandContext(context))
         for (message in command.failureMessages) context.source.bukkitSender.sendMessage(LegacyComponentSerializer.legacySection().serialize(message))
         for (message in command.globalFailureMessages) context.source.bukkitSender.sendMessage(LegacyComponentSerializer.legacySection().serialize(message))
@@ -59,7 +62,7 @@ object BrigadierCommandHelper {
 
     fun getArguments(
         baseCommand: AbstractStellarCommand<*>,
-        context: CommandContext<CommandSourceStack>,
+        context: CommandContext<CommandListenerWrapper>,
         currentIndex: Int = 1,
         listOfArguments: List<AbstractStellarArgument<*>> = emptyList()
     ): List<AbstractStellarArgument<*>> {

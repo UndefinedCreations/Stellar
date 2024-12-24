@@ -4,6 +4,7 @@ import com.undefined.stellar.data.events.StellarCommandRegisterEvent
 import com.undefined.stellar.data.requirement.PermissionStellarRequirement
 import com.undefined.stellar.exception.UnsupportedVersionException
 import com.undefined.stellar.manager.CommandManager
+import com.undefined.stellar.registrar.AbstractCommandRegistrar
 import com.undefined.stellar.util.NMSVersion
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
@@ -25,8 +26,8 @@ class StellarCommand(name: String, permissions: List<String> = listOf()) : Abstr
         registered = true
         StellarCommands.commands.add(this)
         CommandManager.initialize(plugin)
-        val registrar = CommandManager.registrars[NMSVersion.version] ?: throw UnsupportedVersionException()
-        registrar.register(this, plugin)
+        val registrar = (CommandManager.registrars[NMSVersion.version] ?: throw UnsupportedVersionException()).objectInstance
+        registrar?.register(this, plugin)
         for (execution in this.registerExecutions) execution()
         Bukkit.getPluginManager().callEvent(StellarCommandRegisterEvent(this))
     }
@@ -34,8 +35,8 @@ class StellarCommand(name: String, permissions: List<String> = listOf()) : Abstr
     companion object {
         @ApiStatus.Internal
         fun parseAndReturnCancelled(sender: CommandSender, input: String): Boolean {
-            val registrar = CommandManager.registrars[NMSVersion.version] ?: throw UnsupportedVersionException()
-            return registrar.handleCommandFailure(sender, input)
+            val registrar = (CommandManager.registrars[NMSVersion.version] ?: throw UnsupportedVersionException()).objectInstance
+            return registrar?.handleCommandFailure(sender, input) ?: false
         }
     }
 

@@ -332,7 +332,7 @@ object ArgumentHelper {
         val optional = resourceKey.cast(registryRef)
         return optional.orElseThrow {
             invalidException.create(resourceKey)
-        }
+        }!!
     }
 
     private fun <T> getRegistry(
