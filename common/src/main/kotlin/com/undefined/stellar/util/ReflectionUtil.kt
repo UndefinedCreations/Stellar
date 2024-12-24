@@ -9,7 +9,7 @@ object ReflectionUtil {
     fun <T : Any> getPrivateField(any: Class<*>, name: String): T =
         any::class.java.getDeclaredField(name).apply { isAccessible = true }[this] as T
 
-    inline fun <reified T : Any, R> getPrivateMethod(name: String, vararg args: Any?): R =
+    inline fun <reified T : Any, R> executePrivateMethod(name: String, vararg args: Any?): R =
         T::class.java.getDeclaredMethod(name).apply { isAccessible = true }(null, args) as R
 }
 

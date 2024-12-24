@@ -155,7 +155,7 @@ object ArgumentHelper {
             is ItemSlotsArgument -> throwArgumentVersionException(argument)
             is NamespacedKeyArgument -> ArgumentMinecraftKeyRegistered.a()
             is com.undefined.stellar.argument.types.entity.EntityAnchorArgument -> ArgumentAnchor.a()
-            is com.undefined.stellar.argument.types.math.RangeArgument -> ReflectionUtil.getPrivateMethod<ArgumentCriterionValue<*>, ArgumentCriterionValue<*>>("a")
+            is com.undefined.stellar.argument.types.math.RangeArgument -> ReflectionUtil.executePrivateMethod<ArgumentCriterionValue<*>, ArgumentCriterionValue<*>>("a")
             is com.undefined.stellar.argument.types.world.DimensionArgument -> ArgumentDimension.a()
             is GameModeArgument -> throwArgumentVersionException(argument)
             is com.undefined.stellar.argument.types.math.TimeArgument -> ArgumentTime.a()
@@ -370,7 +370,7 @@ object ArgumentHelper {
     }
 
     private fun brigadier(type: EntityDisplayType): ArgumentEntity = when (type) {
-        EntityDisplayType.ENTITY -> ReflectionUtil.getPrivateMethod<ArgumentEntity, ArgumentEntity>("a")
+        EntityDisplayType.ENTITY -> ReflectionUtil.executePrivateMethod<ArgumentEntity, ArgumentEntity>("a")
         EntityDisplayType.ENTITIES -> ArgumentEntity.multipleEntities()
         EntityDisplayType.PLAYER -> ArgumentEntity.c()
         EntityDisplayType.PLAYERS -> ArgumentEntity.d()

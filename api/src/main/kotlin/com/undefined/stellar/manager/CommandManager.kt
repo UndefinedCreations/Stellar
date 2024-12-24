@@ -10,6 +10,22 @@ import kotlin.reflect.KClass
 @ApiStatus.Internal
 object CommandManager {
     val registrars: Map<String, KClass<out AbstractCommandRegistrar>> = mapOf(
+        "1.13" to com.undefined.stellar.v1_13.CommandRegistrar::class,
+        "1.13.1" to com.undefined.stellar.v1_13_1.CommandRegistrar::class,
+        "1.13.2" to com.undefined.stellar.v1_13_2.CommandRegistrar::class,
+        "1.14" to com.undefined.stellar.v1_14_1.CommandRegistrar::class,
+        "1.14.1" to com.undefined.stellar.v1_14_1.CommandRegistrar::class,
+        "1.14.2" to com.undefined.stellar.v1_14_2.CommandRegistrar::class,
+        "1.14.3" to com.undefined.stellar.v1_14_3.CommandRegistrar::class,
+        "1.14.4" to com.undefined.stellar.v1_14_4.CommandRegistrar::class,
+        "1.15" to com.undefined.stellar.v1_15.CommandRegistrar::class,
+        "1.15.1" to com.undefined.stellar.v1_15_1.CommandRegistrar::class,
+        "1.15.2" to com.undefined.stellar.v1_15_2.CommandRegistrar::class,
+        "1.16" to com.undefined.stellar.v1_16_1.CommandRegistrar::class,
+        "1.16.1" to com.undefined.stellar.v1_16_1.CommandRegistrar::class,
+        "1.16.2" to com.undefined.stellar.v1_16_2.CommandRegistrar::class,
+        "1.16.3" to com.undefined.stellar.v1_16_3.CommandRegistrar::class,
+        "1.16.4" to com.undefined.stellar.v1_16_4.CommandRegistrar::class,
         "1.16.5" to com.undefined.stellar.v1_16_5.CommandRegistrar::class,
         "1.17" to com.undefined.stellar.v1_17.CommandRegistrar::class,
         "1.17.1" to com.undefined.stellar.v1_17_1.CommandRegistrar::class,
