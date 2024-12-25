@@ -11,7 +11,6 @@ import net.minecraft.commands.CommandSourceStack
 import net.minecraft.server.MinecraftServer
 import org.bukkit.Bukkit
 import org.bukkit.scheduler.BukkitRunnable
-import javax.lang.model.type.UnionType
 
 object BrigadierCommandHelper {
 
@@ -75,8 +74,6 @@ object BrigadierCommandHelper {
 
 fun sync(execution: () -> Unit) {
     object : BukkitRunnable() {
-        override fun run() {
-            execution()
-        }
+        override fun run() = execution()
     }.runTask(CommandRegistrar.plugin)
 }

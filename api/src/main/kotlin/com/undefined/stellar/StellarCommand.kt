@@ -4,7 +4,6 @@ import com.undefined.stellar.data.events.StellarCommandRegisterEvent
 import com.undefined.stellar.data.requirement.PermissionStellarRequirement
 import com.undefined.stellar.exception.UnsupportedVersionException
 import com.undefined.stellar.manager.CommandManager
-import com.undefined.stellar.registrar.AbstractCommandRegistrar
 import com.undefined.stellar.util.NMSVersion
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender

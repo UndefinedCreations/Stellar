@@ -37,8 +37,6 @@ import com.undefined.stellar.exception.ArgumentVersionMismatchException
 import com.undefined.stellar.exception.LiteralArgumentMismatchException
 import com.undefined.stellar.exception.UnsupportedArgumentException
 import com.undefined.stellar.util.NMSVersion
-import net.kyori.adventure.text.format.Style
-import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.SharedSuggestionProvider
@@ -75,7 +73,6 @@ import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack
 import org.bukkit.event.inventory.InventoryType
 import org.bukkit.inventory.ItemStack
 import org.bukkit.scoreboard.DisplaySlot
-import java.time.Duration
 import java.util.*
 import java.util.function.Predicate
 
@@ -238,7 +235,7 @@ object ArgumentHelper {
             is com.undefined.stellar.argument.types.item.ItemPredicateArgument -> Predicate<ItemStack> { item: ItemStack ->
                 ItemPredicateArgument.getItemPredicate(context, argument.name).test(CraftItemStack.asNMSCopy(item))
             }
-            is com.undefined.stellar.argument.types.text.ColorArgument -> ColorArgument.getColor(context, argument.name).color?.let { Style.style(TextColor.color(it)) } ?: Style.empty()
+            is com.undefined.stellar.argument.types.text.ColorArgument -> ChatColor.getByChar(ColorArgument.getColor(context, argument.name).char)
             is com.undefined.stellar.argument.types.text.ComponentArgument ->  GsonComponentSerializer.gson().deserialize(Component.Serializer.toJson(ComponentArgument.getComponent(context, argument.name)))
             is com.undefined.stellar.argument.types.text.StyleArgument ->  GsonComponentSerializer.gson().deserialize(
                 getArgumentInput(context, argument.name) ?: return null).style()
@@ -272,7 +269,7 @@ object ArgumentHelper {
             }
             is com.undefined.stellar.argument.types.world.DimensionArgument -> DimensionArgument.getDimension(context, argument.name).world.environment
             is GameModeArgument -> throwArgumentVersionException(argument)
-            is com.undefined.stellar.argument.types.math.TimeArgument -> Duration.ofSeconds(IntegerArgumentType.getInteger(context, argument.name).toLong() / 20)
+            is com.undefined.stellar.argument.types.math.TimeArgument -> IntegerArgumentType.getInteger(context, argument.name).toLong()
             is MirrorArgument -> throwArgumentVersionException(argument)
             is StructureRotationArgument -> throwArgumentVersionException(argument)
             is HeightMapArgument -> throwArgumentVersionException(argument)

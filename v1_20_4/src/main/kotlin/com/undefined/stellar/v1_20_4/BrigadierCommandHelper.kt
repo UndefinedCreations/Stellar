@@ -74,8 +74,6 @@ object BrigadierCommandHelper {
 
 fun sync(execution: () -> Unit) {
     object : BukkitRunnable() {
-        override fun run() {
-            execution()
-        }
+        override fun run() = execution()
     }.runTask(CommandRegistrar.plugin)
 }

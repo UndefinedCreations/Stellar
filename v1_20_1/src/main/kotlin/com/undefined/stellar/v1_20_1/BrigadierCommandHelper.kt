@@ -18,7 +18,6 @@ object BrigadierCommandHelper {
         MinecraftServer.getServer().createCommandSourceStack()
     }
     val dispatcher by lazy { MinecraftServer.getServer().functions.dispatcher }
-    val version: String = "1.20.1"
 
     fun register(command: LiteralArgumentBuilder<CommandSourceStack>): LiteralCommandNode<CommandSourceStack>? =
         dispatcher.register(command)
@@ -75,8 +74,6 @@ object BrigadierCommandHelper {
 
 fun sync(execution: () -> Unit) {
     object : BukkitRunnable() {
-        override fun run() {
-            execution()
-        }
+        override fun run() = execution()
     }.runTask(CommandRegistrar.plugin)
 }

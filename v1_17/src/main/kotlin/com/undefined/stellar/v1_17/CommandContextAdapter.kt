@@ -10,8 +10,6 @@ import com.undefined.stellar.data.argument.CommandNode
 import com.undefined.stellar.data.argument.PhraseCommandContext
 import com.undefined.stellar.exception.DuplicateArgumentNameException
 import com.undefined.stellar.exception.LiteralArgumentMismatchException
-import net.kyori.adventure.identity.Identity
-import net.kyori.adventure.text.serializer.ComponentSerializer
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import net.minecraft.commands.CommandSource
@@ -22,9 +20,7 @@ import net.minecraft.server.MinecraftServer
 import net.minecraft.world.phys.Vec2
 import net.minecraft.world.phys.Vec3
 import org.bukkit.command.CommandSender
-import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer
 import java.util.*
-import java.util.function.Function
 
 object CommandContextAdapter {
 

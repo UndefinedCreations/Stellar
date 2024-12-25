@@ -9,7 +9,6 @@ import com.undefined.stellar.argument.AbstractStellarArgument
 import com.undefined.stellar.argument.LiteralStellarArgument
 import com.undefined.stellar.argument.types.primitive.PhraseArgument
 import net.minecraft.commands.CommandSourceStack
-import org.bukkit.scheduler.BukkitRunnable
 
 object CommandAdapter {
 

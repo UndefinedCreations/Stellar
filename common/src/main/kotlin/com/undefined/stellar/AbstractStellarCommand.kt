@@ -78,6 +78,9 @@ abstract class AbstractStellarCommand<T>(val name: String, val description: Stri
         return addPermissionRequirements(permissions)
     }
 
+    fun addPermission(permission: String): T = addRequirement(permission)
+    fun addPermissions(vararg permission: String): T = addRequirements(*permission)
+
     fun setRequirements(vararg permissions: StellarRequirement<*>): T {
         this.requirements.clear()
         return addRequirements(*permissions)
@@ -111,6 +114,21 @@ abstract class AbstractStellarCommand<T>(val name: String, val description: Stri
 
     fun addRequirements(vararg permissions: String): T {
         for (permission in permissions) permissionRequirements.add(PermissionStellarRequirement(1, permission))
+        return this as T
+    }
+
+    fun addRequirement(permission: String): T {
+        permissionRequirements.add(PermissionStellarRequirement(1, permission))
+        return this as T
+    }
+
+    fun addRequirement(level: Int): T {
+        permissionRequirements.add(PermissionStellarRequirement(level))
+        return this as T
+    }
+
+    fun addRequirement(requirement: PermissionStellarRequirement): T {
+        permissionRequirements.add(requirement)
         return this as T
     }
 

@@ -11,10 +11,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType
 import com.undefined.stellar.argument.AbstractStellarArgument
 import com.undefined.stellar.argument.LiteralStellarArgument
-import com.undefined.stellar.argument.types.registry.ArtArgument
 import com.undefined.stellar.argument.types.block.BlockDataArgument
-import com.undefined.stellar.argument.types.registry.BlockTypeArgument
-import com.undefined.stellar.argument.types.registry.FluidArgument
 import com.undefined.stellar.argument.types.custom.CustomArgument
 import com.undefined.stellar.argument.types.custom.ListArgument
 import com.undefined.stellar.argument.types.entity.*
@@ -25,13 +22,9 @@ import com.undefined.stellar.argument.types.misc.UUIDArgument
 import com.undefined.stellar.argument.types.primitive.*
 import com.undefined.stellar.argument.types.registry.*
 import com.undefined.stellar.argument.types.scoreboard.DisplaySlotArgument
-import com.undefined.stellar.argument.types.registry.InstrumentArgument
-import com.undefined.stellar.argument.types.registry.SoundArgument
-import com.undefined.stellar.argument.types.structure.MirrorArgument
-import com.undefined.stellar.argument.types.registry.StructureArgument
-import com.undefined.stellar.argument.types.structure.StructureRotationArgument
-import com.undefined.stellar.argument.types.registry.StructureTypeArgument
 import com.undefined.stellar.argument.types.scoreboard.ScoreHolderType
+import com.undefined.stellar.argument.types.structure.MirrorArgument
+import com.undefined.stellar.argument.types.structure.StructureRotationArgument
 import com.undefined.stellar.argument.types.world.*
 import com.undefined.stellar.data.argument.Anchor
 import com.undefined.stellar.data.argument.Operation
@@ -40,8 +33,6 @@ import com.undefined.stellar.exception.ArgumentVersionMismatchException
 import com.undefined.stellar.exception.LiteralArgumentMismatchException
 import com.undefined.stellar.exception.UnsupportedArgumentException
 import com.undefined.stellar.util.NMSVersion
-import net.kyori.adventure.text.format.Style
-import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import net.minecraft.commands.CommandBuildContext
 import net.minecraft.commands.CommandSourceStack
@@ -82,7 +73,6 @@ import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack
 import org.bukkit.event.inventory.InventoryType
 import org.bukkit.inventory.ItemStack
 import org.bukkit.scoreboard.DisplaySlot
-import java.time.Duration
 import java.util.*
 import java.util.function.Predicate
 
@@ -106,7 +96,7 @@ object ArgumentHelper {
     fun getRequiredArgumentBuilder(argument: AbstractStellarArgument<*>): RequiredArgumentBuilder<CommandSourceStack, *> =
         RequiredArgumentBuilder.argument(argument.name, getArgumentType(argument))
 
-    fun <T : AbstractStellarArgument<*>> getArgumentType(argument: T): ArgumentType<*> =
+    private fun <T : AbstractStellarArgument<*>> getArgumentType(argument: T): ArgumentType<*> =
         when (argument) {
             is ListArgument<*> -> getArgumentType(argument.type)
             is CustomArgument<*> -> getArgumentType(argument.type)
@@ -214,7 +204,7 @@ object ArgumentHelper {
             is com.undefined.stellar.argument.types.item.ItemPredicateArgument -> Predicate<ItemStack> { item: ItemStack ->
                 ItemPredicateArgument.getItemPredicate(context, argument.name).test(CraftItemStack.asNMSCopy(item))
             }
-            is com.undefined.stellar.argument.types.text.ColorArgument -> ColorArgument.getColor(context, argument.name).color?.let { Style.style(TextColor.color(it)) } ?: Style.empty()
+            is com.undefined.stellar.argument.types.text.ColorArgument -> ChatColor.getByChar(ColorArgument.getColor(context, argument.name).char)
             is com.undefined.stellar.argument.types.text.ComponentArgument ->  GsonComponentSerializer.gson().deserialize(Component.Serializer.toJson(ComponentArgument.getComponent(context, argument.name)))
             is com.undefined.stellar.argument.types.text.StyleArgument ->  GsonComponentSerializer.gson().deserialize(
                 getArgumentInput(context, argument.name) ?: return null).style()
@@ -230,7 +220,7 @@ object ArgumentHelper {
             is com.undefined.stellar.argument.types.math.RotationArgument -> {
                 val coordinates = RotationArgument.getRotation(context, argument.name)
                 val rotation = coordinates.getRotation(context.source)
-                Location(context.source.bukkitWorld, 0.0, 0.0, 0.0, rotation.y, rotation.x)
+                Location(context.source.level.world, 0.0, 0.0, 0.0, rotation.y, rotation.x)
             }
             is DisplaySlotArgument -> getBukkitDisplaySlot(ScoreboardSlotArgument.getDisplaySlot(context, argument.name))
             is com.undefined.stellar.argument.types.scoreboard.ScoreHolderArgument -> when (argument.type) {

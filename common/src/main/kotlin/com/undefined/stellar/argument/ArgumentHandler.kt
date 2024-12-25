@@ -3,25 +3,29 @@
 package com.undefined.stellar.argument
 
 import com.undefined.stellar.AbstractStellarCommand
-import com.undefined.stellar.argument.types.block.*
+import com.undefined.stellar.argument.types.block.BlockDataArgument
+import com.undefined.stellar.argument.types.block.BlockPredicateArgument
 import com.undefined.stellar.argument.types.custom.CustomArgument
 import com.undefined.stellar.argument.types.custom.EnumArgument
 import com.undefined.stellar.argument.types.custom.ListArgument
-import com.undefined.stellar.argument.types.entity.*
-import com.undefined.stellar.argument.types.item.*
+import com.undefined.stellar.argument.types.entity.EntityAnchorArgument
+import com.undefined.stellar.argument.types.entity.EntityArgument
+import com.undefined.stellar.argument.types.entity.EntityDisplayType
+import com.undefined.stellar.argument.types.item.ItemArgument
+import com.undefined.stellar.argument.types.item.ItemPredicateArgument
+import com.undefined.stellar.argument.types.item.ItemSlotArgument
+import com.undefined.stellar.argument.types.item.ItemSlotsArgument
 import com.undefined.stellar.argument.types.math.*
 import com.undefined.stellar.argument.types.misc.NamespacedKeyArgument
 import com.undefined.stellar.argument.types.misc.UUIDArgument
-import com.undefined.stellar.argument.types.registry.BlockTypeArgument
-import com.undefined.stellar.argument.types.registry.FluidArgument
 import com.undefined.stellar.argument.types.player.GameModeArgument
 import com.undefined.stellar.argument.types.player.GameProfileArgument
 import com.undefined.stellar.argument.types.primitive.*
 import com.undefined.stellar.argument.types.registry.*
 import com.undefined.stellar.argument.types.scoreboard.*
-import com.undefined.stellar.argument.types.registry.InstrumentArgument
-import com.undefined.stellar.argument.types.registry.SoundArgument
-import com.undefined.stellar.argument.types.structure.*
+import com.undefined.stellar.argument.types.structure.LootTableArgument
+import com.undefined.stellar.argument.types.structure.MirrorArgument
+import com.undefined.stellar.argument.types.structure.StructureRotationArgument
 import com.undefined.stellar.argument.types.text.ColorArgument
 import com.undefined.stellar.argument.types.text.ComponentArgument
 import com.undefined.stellar.argument.types.text.MessageArgument
@@ -34,7 +38,7 @@ import org.bukkit.entity.Player
 import java.util.*
 
 /**
- * An open class that adds all the methods for adding arguments
+ * An open class that handles the addition of arguments
  *
  * @since 1.0
  */
@@ -43,13 +47,11 @@ open class ArgumentHandler {
     open val base: AbstractStellarCommand<*> get() = throw IllegalStateException("Cannot access the getter from the property base when it hasn't been overridden!")
     open val arguments: MutableList<AbstractStellarArgument<*>> = mutableListOf()
 
-    fun addArgument(argument: AbstractStellarArgument<*>): AbstractStellarArgument<*> {
-        arguments.add(argument)
-        return argument
-    }
+    fun addArgument(argument: AbstractStellarArgument<*>): AbstractStellarArgument<*> =
+        argument.also { arguments.add(it) }
 
-    fun addArgument(name: String): LiteralStellarArgument =
-        addArgument { LiteralStellarArgument(base, name) }
+    fun addArgument(name: String, vararg aliases: String): LiteralStellarArgument =
+        addArgument { LiteralStellarArgument(base, name).apply { this.aliases.addAll(aliases) } }
 
     fun addLiteralArgument(name: String): LiteralStellarArgument =
         addArgument { LiteralStellarArgument(base, name) }
@@ -87,8 +89,29 @@ open class ArgumentHandler {
         addArgument { BooleanArgument(base, name) }
 
     fun <T, U : AbstractStellarArgument<*>> addListArgument(
+        name: String,
+        list: List<T>,
+        stringifier: (T) -> Suggestion,
+        parse: (Any?) -> T
+    ): ListArgument<T> = addArgument { ListArgument(base, StringArgument(base, name, StringType.WORD), list, stringifier, parse) }
+
+    fun <T, U : AbstractStellarArgument<*>> addListArgument(
         type: AbstractStellarArgument<*>,
         list: List<T>,
+        stringifier: (T) -> Suggestion,
+        parse: (Any?) -> T
+    ): ListArgument<T> = addArgument { ListArgument(base, type, list, stringifier, parse) }
+
+    fun <T, U : AbstractStellarArgument<*>> addListArgument(
+        name: String,
+        list: () -> List<T>,
+        stringifier: (T) -> Suggestion,
+        parse: (Any?) -> T
+    ): ListArgument<T> = addArgument { ListArgument(base, StringArgument(base, name, StringType.WORD), list, stringifier, parse) }
+
+    fun <T, U : AbstractStellarArgument<*>> addListArgument(
+        type: AbstractStellarArgument<*>,
+        list: () -> List<T>,
         stringifier: (T) -> Suggestion,
         parse: (Any?) -> T
     ): ListArgument<T> = addArgument { ListArgument(base, type, list, stringifier, parse) }
@@ -102,6 +125,15 @@ open class ArgumentHandler {
     fun addUUIDListArgument(name: String, list: List<UUID>): ListArgument<UUID> =
         addArgument { ListArgument(base, UUIDArgument(base, name), list, parse = { UUID.fromString(it.toString()) }) }
 
+    fun addStringListArgument(name: String, list: () -> List<String>, type: StringType = StringType.WORD): ListArgument<String> =
+        addArgument { ListArgument(base, StringArgument(base, name, type), list, { Suggestion.withText(it.toString()) }, { it }) }
+
+    fun addStringListArgument(name: String, vararg list: () -> List<String>): ListArgument<String> =
+        addArgument { ListArgument(base, StringArgument(base, name, StringType.WORD), list.toList(), { Suggestion.withText(it.toString()) }, { it }) }
+
+    fun addUUIDListArgument(name: String, list: () -> List<UUID>): ListArgument<UUID> =
+        addArgument { ListArgument(base, UUIDArgument(base, name), list, parse = { UUID.fromString(it.toString()) }) }
+
     inline fun <reified T : Enum<T>> addEnumArgument(name: String): EnumArgument<T> =
         addArgument { EnumArgument<T>(base, StringArgument(base, name, StringType.WORD), T::class) }
 
@@ -110,6 +142,15 @@ open class ArgumentHandler {
         noinline converter: (Enum<*>?) -> Suggestion = { Suggestion.withText(it?.name ?: "") },
         noinline parse: (Any?) -> Enum<T>?
     ): EnumArgument<T> = addArgument { EnumArgument(base, StringArgument(base, name, StringType.WORD), T::class, converter, parse) }
+
+    inline fun <reified T : Enum<T>> addEnumArgument(type: AbstractStellarArgument<*>): EnumArgument<T> =
+        addArgument { EnumArgument<T>(base, type, T::class) }
+
+    inline fun <reified T : Enum<T>> addEnumArgument(
+        type: AbstractStellarArgument<*>,
+        noinline converter: (Enum<*>?) -> Suggestion = { Suggestion.withText(it?.name ?: "") },
+        noinline parse: (Any?) -> Enum<T>?
+    ): EnumArgument<T> = addArgument { EnumArgument(base, type, T::class, converter, parse) }
 
     fun addEntityArgument(name: String, type: EntityDisplayType): EntityArgument =
         addArgument { EntityArgument(base, name, type) }

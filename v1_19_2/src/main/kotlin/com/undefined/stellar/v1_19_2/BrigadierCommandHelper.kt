@@ -10,6 +10,7 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.server.MinecraftServer
 import org.bukkit.Bukkit
+import org.bukkit.scheduler.BukkitRunnable
 
 object BrigadierCommandHelper {
 
@@ -17,7 +18,6 @@ object BrigadierCommandHelper {
         MinecraftServer.getServer().createCommandSourceStack()
     }
     val dispatcher by lazy { MinecraftServer.getServer().functions.dispatcher }
-    val version: String = "1.19.2"
 
     fun register(command: LiteralArgumentBuilder<CommandSourceStack>): LiteralCommandNode<CommandSourceStack>? =
         dispatcher.register(command)
@@ -74,8 +74,6 @@ object BrigadierCommandHelper {
 
 fun sync(execution: () -> Unit) {
     object : BukkitRunnable() {
-        override fun run() {
-            execution()
-        }
+        override fun run() = execution()
     }.runTask(CommandRegistrar.plugin)
 }

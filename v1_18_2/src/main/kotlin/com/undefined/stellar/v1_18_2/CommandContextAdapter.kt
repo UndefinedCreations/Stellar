@@ -20,7 +20,7 @@ import net.minecraft.server.MinecraftServer
 import net.minecraft.world.phys.Vec2
 import net.minecraft.world.phys.Vec3
 import org.bukkit.command.CommandSender
-import java.util.UUID
+import java.util.*
 
 object CommandContextAdapter {
 
