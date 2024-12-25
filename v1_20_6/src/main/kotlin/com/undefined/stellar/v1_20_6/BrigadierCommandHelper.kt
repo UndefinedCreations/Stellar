@@ -12,6 +12,7 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.server.MinecraftServer
 import org.bukkit.Bukkit
+import org.bukkit.scheduler.BukkitRunnable
 import java.util.concurrent.CompletableFuture
 
 object BrigadierCommandHelper {
@@ -84,4 +85,12 @@ object BrigadierCommandHelper {
         return emptyList()
     }
 
+}
+
+fun sync(execution: () -> Unit) {
+    object : BukkitRunnable() {
+        override fun run() {
+            execution()
+        }
+    }.runTask(CommandRegistrar.plugin)
 }

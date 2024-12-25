@@ -66,7 +66,7 @@ tasks {
 
     runServer {
         minecraftVersion("1.13")
-        jvmArgs("-Xmx2G")
+        jvmArgs("-Xmx4G")
     }
 }
 

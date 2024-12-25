@@ -11,6 +11,7 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import net.minecraft.server.v1_13_R2.CommandListenerWrapper
 import net.minecraft.server.v1_13_R2.MinecraftServer
 import org.bukkit.Bukkit
+import org.bukkit.scheduler.BukkitRunnable
 
 @Suppress("DEPRECATION")
 object BrigadierCommandHelper {
@@ -68,9 +69,17 @@ object BrigadierCommandHelper {
     ): List<AbstractStellarArgument<*>> {
         if (listOfArguments.size == context.nodes.size - 1) return listOfArguments
         for (argument in baseCommand.arguments)
-            if (argument.name == context.nodes.entries.first().key.name)
+            if (context.nodes.entries.any { it.key.name == argument.name })
                 return getArguments(argument, context, currentIndex + 1, listOfArguments + argument)
         return emptyList()
     }
 
+}
+
+fun sync(execution: () -> Unit) {
+    object : BukkitRunnable() {
+        override fun run() {
+            execution()
+        }
+    }.runTask(CommandRegistrar.plugin)
 }

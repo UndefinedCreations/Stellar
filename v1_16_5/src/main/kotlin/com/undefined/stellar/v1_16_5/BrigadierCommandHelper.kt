@@ -11,6 +11,7 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import net.minecraft.server.v1_16_R3.CommandListenerWrapper
 import net.minecraft.server.v1_16_R3.MinecraftServer
 import org.bukkit.Bukkit
+import org.bukkit.scheduler.BukkitRunnable
 
 @Suppress("DEPRECATION")
 object BrigadierCommandHelper {
@@ -73,4 +74,12 @@ object BrigadierCommandHelper {
         return emptyList()
     }
 
+}
+
+fun sync(execution: () -> Unit) {
+    object : BukkitRunnable() {
+        override fun run() {
+            execution()
+        }
+    }.runTask(CommandRegistrar.plugin)
 }
