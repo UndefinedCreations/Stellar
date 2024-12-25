@@ -5,7 +5,7 @@ Stellar is a simple, yet very powerful Spigot command framework.
 
 ## Documentation
 
-[Documentation](https://linktodocumentation)
+[Documentation](https://docs.undefinecreation.com)
 
 
 ## Installation
