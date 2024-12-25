@@ -22,7 +22,9 @@ object CommandAdapter {
     private fun handleCommandFunctions(command: AbstractStellarCommand<*>, brigadierCommand: ArgumentBuilder<CommandListenerWrapper, *>) {
         if (command.executions.isNotEmpty() || command.executions.isNotEmpty())
             brigadierCommand.executes { context ->
-                BrigadierCommandHelper.handleExecutions(command, context)
+                sync {
+                    BrigadierCommandHelper.handleExecutions(command, context)
+                }
                 1
             }
         brigadierCommand.requires { source ->
@@ -57,13 +59,15 @@ object CommandAdapter {
 
     private fun handleGreedyStringWordFunctions(argument: PhraseArgument, argumentBuilder: RequiredArgumentBuilder<CommandListenerWrapper, *>) {
         argumentBuilder.executes { context ->
-            val greedyContext = CommandContextAdapter.getGreedyCommandContext(context)
+            sync {
+                val greedyContext = CommandContextAdapter.getGreedyCommandContext(context)
 
-            for (i in greedyContext.arguments.indices) {
-                val word = argument.words[i] ?: continue
-                for (runnable in word.runnables) runnable(greedyContext)
-                if (i == greedyContext.arguments.lastIndex)
-                    for (execution in word.executions) execution(greedyContext)
+                for (i in greedyContext.arguments.indices) {
+                    val word = argument.words[i] ?: continue
+                    for (runnable in word.runnables) runnable(greedyContext)
+                    if (i == greedyContext.arguments.lastIndex)
+                        for (execution in word.executions) execution(greedyContext)
+                }
             }
             Command.SINGLE_SUCCESS
         }
