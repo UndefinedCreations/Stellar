@@ -4,12 +4,24 @@ plugins {
     id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
-val versionVar = version.toString()
+val versionVar = version
 val groupIdVar = "com.undefined"
 val artifactIdVar = "stellar"
 
 group = groupIdVar
 version = versionVar
+
+publishing {
+    publications {
+        register<MavenPublication>("maven") {
+            groupId = groupIdVar
+            artifactId = artifactIdVar
+            version = versionVar.toString()
+
+            from(components["java"])
+        }
+    }
+}
 
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.20.6-R0.1-SNAPSHOT")
@@ -30,7 +42,7 @@ dependencies {
     implementation(project(":v1_16_4"))
     implementation(project(":v1_16_5"))
     implementation(project(":v1_17"))
-    implementation(project(":v1_17_1", "reobf"))
+    implementation(project(":v1_17_1"))
     implementation(project(":v1_18_1"))
     implementation(project(":v1_18_2"))
     implementation(project(":v1_19_2"))
@@ -49,6 +61,11 @@ dependencies {
 }
 
 tasks {
+    shadowJar {
+        dependencyFilter.exclude { element ->
+            Regex("^v\\d+").matches(element.moduleName)
+        }
+    }
     compileKotlin {
         kotlinOptions.jvmTarget = "1.8"
     }

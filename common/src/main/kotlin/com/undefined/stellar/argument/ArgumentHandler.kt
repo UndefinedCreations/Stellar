@@ -88,28 +88,28 @@ open class ArgumentHandler {
     fun addBooleanArgument(name: String): BooleanArgument =
         addArgument { BooleanArgument(base, name) }
 
-    fun <T, U : AbstractStellarArgument<*>> addListArgument(
+    fun <T> addListArgument(
         name: String,
         list: List<T>,
         stringifier: (T) -> Suggestion,
         parse: (Any?) -> T
     ): ListArgument<T> = addArgument { ListArgument(base, StringArgument(base, name, StringType.WORD), list, stringifier, parse) }
 
-    fun <T, U : AbstractStellarArgument<*>> addListArgument(
+    fun <T> addListArgument(
         type: AbstractStellarArgument<*>,
         list: List<T>,
         stringifier: (T) -> Suggestion,
         parse: (Any?) -> T
     ): ListArgument<T> = addArgument { ListArgument(base, type, list, stringifier, parse) }
 
-    fun <T, U : AbstractStellarArgument<*>> addListArgument(
+    fun <T> addListArgument(
         name: String,
         list: () -> List<T>,
         stringifier: (T) -> Suggestion,
         parse: (Any?) -> T
     ): ListArgument<T> = addArgument { ListArgument(base, StringArgument(base, name, StringType.WORD), list, stringifier, parse) }
 
-    fun <T, U : AbstractStellarArgument<*>> addListArgument(
+    fun <T> addListArgument(
         type: AbstractStellarArgument<*>,
         list: () -> List<T>,
         stringifier: (T) -> Suggestion,

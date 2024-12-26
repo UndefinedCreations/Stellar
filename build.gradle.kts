@@ -1,3 +1,5 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 plugins {
     java
     kotlin("jvm") version "1.9.22"
@@ -8,7 +10,7 @@ plugins {
 
 apply(plugin = "maven-publish")
 val projectGroupId = "com.undefined"
-val projectVersion = "0.0.14"
+val projectVersion = "0.0.30"
 val projectArtifactId = "stellar"
 
 group = projectGroupId
@@ -41,6 +43,16 @@ publishing {
             }
         }
     }
+
+    publications {
+        register<MavenPublication>("maven") {
+            groupId = projectGroupId
+            artifactId = projectArtifactId
+            version = projectVersion
+
+            from(components["java"])
+        }
+    }
 }
 
 allprojects {
@@ -55,18 +67,6 @@ allprojects {
         maven("https://repo.papermc.io/repository/maven-public/")
     }
 
-    publishing {
-        publications {
-            register<MavenPublication>("maven") {
-                groupId = projectGroupId
-                artifactId = projectArtifactId
-                version = projectVersion
-
-                from(components["java"])
-            }
-        }
-    }
-
     dependencies {
         implementation("org.jetbrains.kotlin:kotlin-stdlib")
         implementation("net.kyori:adventure-api:4.17.0")
@@ -79,41 +79,45 @@ allprojects {
 dependencies {
     implementation(project(":api"))
     implementation(project(":common"))
-    implementation(project(":v1_13"))
-    implementation(project(":v1_13_1"))
-    implementation(project(":v1_13_2"))
-    implementation(project(":v1_14_1"))
-    implementation(project(":v1_14_2"))
-    implementation(project(":v1_14_3"))
-    implementation(project(":v1_14_4"))
-    implementation(project(":v1_15"))
-    implementation(project(":v1_15_1"))
-    implementation(project(":v1_15_2"))
-    implementation(project(":v1_16_1"))
-    implementation(project(":v1_16_2"))
-    implementation(project(":v1_16_3"))
-    implementation(project(":v1_16_4"))
-    implementation(project(":v1_16_5"))
-    implementation(project(":v1_17"))
-    implementation(project(":v1_17"))
-    implementation(project(":v1_17_1:", "reobf"))
-    implementation(project(":v1_18_1:", "reobf"))
-    implementation(project(":v1_18_2:", "reobf"))
-    implementation(project(":v1_19_2:", "reobf"))
-    implementation(project(":v1_19_3:", "reobf"))
-    implementation(project(":v1_19_4:", "reobf"))
-    implementation(project(":v1_20", "reobf"))
-    implementation(project(":v1_20_1", "reobf"))
-    implementation(project(":v1_20_2", "reobf"))
-    implementation(project(":v1_20_4", "reobf"))
-    implementation(project(":v1_20_6", "reobf"))
-    implementation(project(":v1_21", "reobf"))
-    implementation(project(":v1_21_1", "reobf"))
-    implementation(project(":v1_21_3", "reobf"))
-    implementation(project(":v1_21_4", "reobf"))
+//    implementation(project(":v1_13"))
+//    implementation(project(":v1_13_1"))
+//    implementation(project(":v1_13_2"))
+//    implementation(project(":v1_14_1"))
+//    implementation(project(":v1_14_2"))
+//    implementation(project(":v1_14_3"))
+//    implementation(project(":v1_14_4"))
+//    implementation(project(":v1_15"))
+//    implementation(project(":v1_15_1"))
+//    implementation(project(":v1_15_2"))
+//    implementation(project(":v1_16_1"))
+//    implementation(project(":v1_16_2"))
+//    implementation(project(":v1_16_3"))
+//    implementation(project(":v1_16_4"))
+//    implementation(project(":v1_16_5"))
+//    implementation(project(":v1_17"))
+//    implementation(project(":v1_17"))
+//    implementation(project(":v1_17_1:", "reobf"))
+//    implementation(project(":v1_18_1:", "reobf"))
+//    implementation(project(":v1_18_2:", "reobf"))
+//    implementation(project(":v1_19_2:", "reobf"))
+//    implementation(project(":v1_19_3:", "reobf"))
+//    implementation(project(":v1_19_4:", "reobf"))
+//    implementation(project(":v1_20", "reobf"))
+//    implementation(project(":v1_20_1", "reobf"))
+//    implementation(project(":v1_20_2", "reobf"))
+//    implementation(project(":v1_20_4", "reobf"))
+//    implementation(project(":v1_20_6", "reobf"))
+//    implementation(project(":v1_21", "reobf"))
+//    implementation(project(":v1_21_1", "reobf"))
+//    implementation(project(":v1_21_3", "reobf"))
+//    implementation(project(":v1_21_4", "reobf"))
 }
 
 tasks {
+    withType<ShadowJar> {
+        archiveFileName.set("${project.name}-${project.version}.jar")
+        archiveClassifier.set("mapped")
+    }
     compileKotlin {
         kotlinOptions.jvmTarget = "1.8"
     }
