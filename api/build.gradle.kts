@@ -61,11 +61,6 @@ dependencies {
 }
 
 tasks {
-    shadowJar {
-        dependencyFilter.exclude { element ->
-            Regex("^v\\d+").matches(element.moduleName)
-        }
-    }
     compileKotlin {
         kotlinOptions.jvmTarget = "1.8"
     }

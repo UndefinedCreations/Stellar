@@ -31,9 +31,11 @@ import com.undefined.stellar.argument.types.text.ComponentArgument
 import com.undefined.stellar.argument.types.text.MessageArgument
 import com.undefined.stellar.argument.types.text.StyleArgument
 import com.undefined.stellar.argument.types.world.*
+import com.undefined.stellar.data.argument.CommandContext
 import com.undefined.stellar.data.suggestion.Suggestion
 import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
+import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import java.util.*
 
@@ -104,14 +106,14 @@ open class ArgumentHandler {
 
     fun <T> addListArgument(
         name: String,
-        list: () -> List<T>,
+        list: CommandContext<CommandSender>.() -> List<T>,
         stringifier: (T) -> Suggestion,
         parse: (Any?) -> T
     ): ListArgument<T> = addArgument { ListArgument(base, StringArgument(base, name, StringType.WORD), list, stringifier, parse) }
 
     fun <T> addListArgument(
         type: AbstractStellarArgument<*>,
-        list: () -> List<T>,
+        list: CommandContext<CommandSender>.() -> List<T>,
         stringifier: (T) -> Suggestion,
         parse: (Any?) -> T
     ): ListArgument<T> = addArgument { ListArgument(base, type, list, stringifier, parse) }
@@ -125,13 +127,13 @@ open class ArgumentHandler {
     fun addUUIDListArgument(name: String, list: List<UUID>): ListArgument<UUID> =
         addArgument { ListArgument(base, UUIDArgument(base, name), list, parse = { UUID.fromString(it.toString()) }) }
 
-    fun addStringListArgument(name: String, list: () -> List<String>, type: StringType = StringType.WORD): ListArgument<String> =
+    fun addStringListArgument(name: String, list: CommandContext<CommandSender>.() -> List<String>, type: StringType = StringType.WORD): ListArgument<String> =
         addArgument { ListArgument(base, StringArgument(base, name, type), list, { Suggestion.withText(it.toString()) }, { it }) }
 
-    fun addStringListArgument(name: String, vararg list: () -> List<String>): ListArgument<String> =
+    fun addStringListArgument(name: String, vararg list: CommandContext<CommandSender>.() -> List<String>): ListArgument<String> =
         addArgument { ListArgument(base, StringArgument(base, name, StringType.WORD), list.toList(), { Suggestion.withText(it.toString()) }, { it }) }
 
-    fun addUUIDListArgument(name: String, list: () -> List<UUID>): ListArgument<UUID> =
+    fun addUUIDListArgument(name: String, list: CommandContext<CommandSender>.() -> List<UUID>): ListArgument<UUID> =
         addArgument { ListArgument(base, UUIDArgument(base, name), list, parse = { UUID.fromString(it.toString()) }) }
 
     inline fun <reified T : Enum<T>> addEnumArgument(name: String): EnumArgument<T> =
