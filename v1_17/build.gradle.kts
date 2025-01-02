@@ -1,6 +1,6 @@
 plugins {
     kotlin("jvm") version "1.9.22"
-    id("com.undefinedcreation.mapper") version "0.0.4"
+    id("com.undefinedcreation.mapper") version "1.0.0"
 }
 
 repositories {

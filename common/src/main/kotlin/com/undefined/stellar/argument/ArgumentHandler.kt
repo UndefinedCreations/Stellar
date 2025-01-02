@@ -95,64 +95,55 @@ open class ArgumentHandler {
         list: List<T>,
         stringifier: (T) -> Suggestion,
         parse: (Any?) -> T
-    ): ListArgument<T> = addArgument { ListArgument(base, StringArgument(base, name, StringType.WORD), list, stringifier, parse) }
+    ): ListArgument<T> = addArgument { ListArgument(StringArgument(base, name, StringType.WORD), list, stringifier, parse) }
 
     fun <T> addListArgument(
         type: AbstractStellarArgument<*>,
         list: List<T>,
         stringifier: (T) -> Suggestion,
         parse: (Any?) -> T
-    ): ListArgument<T> = addArgument { ListArgument(base, type, list, stringifier, parse) }
+    ): ListArgument<T> = addArgument { ListArgument(type, list, stringifier, parse) }
 
     fun <T> addListArgument(
         name: String,
         list: CommandContext<CommandSender>.() -> List<T>,
         stringifier: (T) -> Suggestion,
         parse: (Any?) -> T
-    ): ListArgument<T> = addArgument { ListArgument(base, StringArgument(base, name, StringType.WORD), list, stringifier, parse) }
+    ): ListArgument<T> = addArgument { ListArgument(StringArgument(base, name, StringType.WORD), list, stringifier, parse) }
 
     fun <T> addListArgument(
         type: AbstractStellarArgument<*>,
         list: CommandContext<CommandSender>.() -> List<T>,
         stringifier: (T) -> Suggestion,
         parse: (Any?) -> T
-    ): ListArgument<T> = addArgument { ListArgument(base, type, list, stringifier, parse) }
+    ): ListArgument<T> = addArgument { ListArgument(type, list, stringifier, parse) }
 
     fun addStringListArgument(name: String, list: List<String>, type: StringType = StringType.WORD): ListArgument<String> =
-        addArgument { ListArgument(base, StringArgument(base, name, type), list, { Suggestion.withText(it.toString()) }, { it }) }
+        addArgument { ListArgument(StringArgument(base, name, type), list, { Suggestion.withText(it.toString()) }, { it }) }
 
     fun addStringListArgument(name: String, vararg list: String): ListArgument<String> =
-        addArgument { ListArgument(base, StringArgument(base, name, StringType.WORD), list.toList(), { Suggestion.withText(it.toString()) }, { it }) }
+        addArgument { ListArgument(StringArgument(base, name, StringType.WORD), list.toList(), { Suggestion.withText(it.toString()) }, { it }) }
 
     fun addUUIDListArgument(name: String, list: List<UUID>): ListArgument<UUID> =
-        addArgument { ListArgument(base, UUIDArgument(base, name), list, parse = { UUID.fromString(it.toString()) }) }
+        addArgument { ListArgument(UUIDArgument(base, name), list, parse = { it }) }
 
     fun addStringListArgument(name: String, list: CommandContext<CommandSender>.() -> List<String>, type: StringType = StringType.WORD): ListArgument<String> =
-        addArgument { ListArgument(base, StringArgument(base, name, type), list, { Suggestion.withText(it.toString()) }, { it }) }
+        addArgument { ListArgument(StringArgument(base, name, type), list, { Suggestion.withText(it.toString()) }, { it }) }
 
     fun addStringListArgument(name: String, vararg list: CommandContext<CommandSender>.() -> List<String>): ListArgument<String> =
-        addArgument { ListArgument(base, StringArgument(base, name, StringType.WORD), list.toList(), { Suggestion.withText(it.toString()) }, { it }) }
+        addArgument { ListArgument(StringArgument(base, name, StringType.WORD), list.toList(), { Suggestion.withText(it.toString()) }, { it }) }
 
     fun addUUIDListArgument(name: String, list: CommandContext<CommandSender>.() -> List<UUID>): ListArgument<UUID> =
-        addArgument { ListArgument(base, UUIDArgument(base, name), list, parse = { UUID.fromString(it.toString()) }) }
+        addArgument { ListArgument(UUIDArgument(base, name), list, parse = { it }) }
 
     inline fun <reified T : Enum<T>> addEnumArgument(name: String): EnumArgument<T> =
-        addArgument { EnumArgument<T>(base, StringArgument(base, name, StringType.WORD), T::class) }
+        addArgument { EnumArgument<T>(base, name, T::class) }
 
     inline fun <reified T : Enum<T>> addEnumArgument(
         name: String,
         noinline converter: (Enum<*>?) -> Suggestion = { Suggestion.withText(it?.name ?: "") },
         noinline parse: (Any?) -> Enum<T>?
-    ): EnumArgument<T> = addArgument { EnumArgument(base, StringArgument(base, name, StringType.WORD), T::class, converter, parse) }
-
-    inline fun <reified T : Enum<T>> addEnumArgument(type: AbstractStellarArgument<*>): EnumArgument<T> =
-        addArgument { EnumArgument<T>(base, type, T::class) }
-
-    inline fun <reified T : Enum<T>> addEnumArgument(
-        type: AbstractStellarArgument<*>,
-        noinline converter: (Enum<*>?) -> Suggestion = { Suggestion.withText(it?.name ?: "") },
-        noinline parse: (Any?) -> Enum<T>?
-    ): EnumArgument<T> = addArgument { EnumArgument(base, type, T::class, converter, parse) }
+    ): EnumArgument<T> = addArgument { EnumArgument(base, name, T::class, converter, parse) }
 
     fun addEntityArgument(name: String, type: EntityDisplayType): EntityArgument =
         addArgument { EntityArgument(base, name, type) }
@@ -259,7 +250,6 @@ open class ArgumentHandler {
     fun addOnlinePlayersArgument(name: String): ListArgument<Player> =
         addArgument {
             ListArgument(
-                base,
                 StringArgument(base, name, StringType.WORD),
                 { Bukkit.getOnlinePlayers().toList() },
                 { Suggestion.withText(it.name) },
@@ -270,7 +260,6 @@ open class ArgumentHandler {
     fun addOfflinePlayersArgument(name: String): ListArgument<OfflinePlayer> =
         addArgument {
             ListArgument(
-                base,
                 StringArgument(base, name, StringType.WORD),
                 { Bukkit.getOfflinePlayers().toList() },
                 { Suggestion.withText(it.name!!) },

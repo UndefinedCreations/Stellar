@@ -8,18 +8,16 @@ import com.undefined.stellar.data.suggestion.Suggestion
 import org.bukkit.command.CommandSender
 
 open class ListArgument<T>(
-    parent: AbstractStellarCommand<*>,
     val type: AbstractStellarArgument<*>,
     val list: CommandContext<CommandSender>.() -> List<T>,
     val converter: (T) -> Suggestion = { Suggestion.withText(it.toString()) },
     val parse: (Any?) -> T?
-) : AbstractStellarArgument<ListArgument<T>>(parent, type.name) {
+) : AbstractStellarArgument<ListArgument<T>>(type.parent, type.name) {
 
-    constructor(parent: AbstractStellarCommand<*>,
-                type: AbstractStellarArgument<*>,
+    constructor(type: AbstractStellarArgument<*>,
                 list: List<T>,
                 converter: (T) -> Suggestion = { Suggestion.withText(it.toString()) },
-                parse: (Any?) -> T?) : this(parent, type, { list }, converter, parse)
+                parse: (Any?) -> T?) : this(type, { list }, converter, parse)
 
     override val suggestions: MutableList<StellarSuggestion<*>>
         get() = (super.suggestions + StellarSuggestion(CommandSender::class) { getSuggestionList(this) }).toMutableList()

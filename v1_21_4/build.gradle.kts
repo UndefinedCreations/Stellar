@@ -1,27 +1,31 @@
 plugins {
     kotlin("jvm") version "1.9.22"
-    id("io.papermc.paperweight.userdev")
+    id("com.undefinedcreation.mapper") version "0.0.5"
+    id("com.gradleup.shadow") version "8.3.5"
 }
 
-paperweight.reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArtifactConfiguration.REOBF_PRODUCTION
+repositories {
+    mavenLocal()
+}
 
 dependencies {
-    paperweight.paperDevBundle("1.21.4-R0.1-SNAPSHOT")
-    implementation("com.mojang:brigadier:1.2.9")
+    compileOnly("org.spigotmc:spigot:1.21.4-R0.1-SNAPSHOT:remapped-mojang")
     compileOnly(project(":common"))
 }
 
 tasks {
+    jar {
+        finalizedBy(remap)
+    }
     compileKotlin {
         kotlinOptions.jvmTarget = "1.8"
     }
     compileJava {
         options.release.set(8)
     }
-    paperweight {
-        javaLauncher.set(
-            project.javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(21)) }
-        )
+    remap {
+        dependsOn(shadowJar)
+        mcVersion.set("1.21.4")
     }
 }
 

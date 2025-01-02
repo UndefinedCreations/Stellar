@@ -177,6 +177,7 @@ object ArgumentHelper {
             is CustomArgument<*> -> argument.parse(CommandContextAdapter.getStellarCommandContext(context))
             is StringArgument -> StringArgumentType.getString(context, argument.name)
             is IntegerArgument -> IntegerArgumentType.getInteger(context, argument.name)
+            is LongArgument -> throwArgumentVersionException(argument)
             is FloatArgument -> FloatArgumentType.getFloat(context, argument.name)
             is DoubleArgument -> DoubleArgumentType.getDouble(context, argument.name)
             is BooleanArgument -> BoolArgumentType.getBool(context, argument.name)

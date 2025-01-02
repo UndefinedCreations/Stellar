@@ -18,15 +18,10 @@ import org.bukkit.command.CommandSender
 object CommandContextAdapter {
 
     fun getStellarCommandContext(context: CommandContext<CommandListenerWrapper>): com.undefined.stellar.data.argument.CommandContext<CommandSender> {
-        println("getting stellar context...")
         val input = context.input.removePrefix("/")
-        println("input: $input")
         val baseCommand: AbstractStellarCommand<*> = StellarCommands.getStellarCommand(context.nodes.entries.first().key.name)!!
-        println("base command: ${baseCommand.name}")
         val arguments = BrigadierCommandHelper.getArguments(baseCommand, context)
-        println("arguments: ${arguments.joinToString(", ") { it.name }}")
         if (arguments.filter { it !is LiteralStellarArgument }.groupingBy { it.name }.eachCount().any { it.value > 1 }) throw DuplicateArgumentNameException()
-        println("No duplicates found!")
         val parsedArguments: CommandNode =
             arguments
                 .associate<AbstractStellarArgument<*>, String, (com.undefined.stellar.data.argument.CommandContext<CommandSender>) -> Any?> { argument ->

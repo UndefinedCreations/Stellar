@@ -1,3 +1,11 @@
+pluginManagement {
+    repositories {
+        mavenCentral()
+        mavenLocal()
+        gradlePluginPortal()
+    }
+}
+
 rootProject.name = "stellar"
 include(
     "server",

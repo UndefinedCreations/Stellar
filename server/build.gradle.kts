@@ -1,7 +1,7 @@
 plugins {
     kotlin("jvm") version "1.9.22"
     id("xyz.jpenilla.run-paper") version "2.3.0"
-    id("com.github.johnrengelman.shadow") version "8.1.1"
+    id("com.gradleup.shadow") version "8.3.5"
 }
 
 val versionVar = version
@@ -9,7 +9,7 @@ val groupIdVar = "com.undefined"
 val artifactIdVar = "stellar"
 
 dependencies {
-    compileOnly("org.spigotmc:spigot-api:1.13-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot-api:1.20.6-R0.1-SNAPSHOT")
 
     implementation(project(":api"))
     implementation(project(":common"))
@@ -43,8 +43,8 @@ dependencies {
     implementation(project(":v1_21:", "reobf"))
     implementation(project(":v1_21_1:", "reobf"))
     implementation(project(":v1_21_3:", "reobf"))
-    implementation(project(":v1_21_4:", "reobf"))
-    compileOnly(project(":v1_13"))
+    implementation(project(":v1_21_4:"))
+    compileOnly(project(":v1_20_6"))
 }
 
 tasks {
@@ -57,15 +57,15 @@ tasks {
     }
 
     compileKotlin {
-        kotlinOptions.jvmTarget = "1.8"
+        kotlinOptions.jvmTarget = "21"
     }
 
     compileJava {
-        options.release = 8
+        options.release = 21
     }
 
     runServer {
-        minecraftVersion("1.13")
+        minecraftVersion("1.20.6")
         jvmArgs("-Xmx4G")
     }
 }
@@ -75,5 +75,5 @@ java {
 }
 
 kotlin {
-    jvmToolchain(8)
+    jvmToolchain(21)
 }
