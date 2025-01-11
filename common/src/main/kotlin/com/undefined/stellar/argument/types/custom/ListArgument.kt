@@ -1,10 +1,10 @@
 package com.undefined.stellar.argument.types.custom
 
-import com.undefined.stellar.AbstractStellarCommand
 import com.undefined.stellar.argument.AbstractStellarArgument
 import com.undefined.stellar.data.argument.CommandContext
 import com.undefined.stellar.data.suggestion.StellarSuggestion
 import com.undefined.stellar.data.suggestion.Suggestion
+import com.undefined.stellar.exception.UnsupportedArgumentTypeException
 import org.bukkit.command.CommandSender
 import java.util.concurrent.CompletableFuture
 
@@ -19,6 +19,10 @@ open class ListArgument<T>(
                 list: List<T>,
                 converter: (T) -> Suggestion = { Suggestion.withText(it.toString()) },
                 parse: (Any?) -> T?) : this(type, { list }, converter, parse)
+
+    init {
+        if (type is ListArgument<*>) throw UnsupportedArgumentTypeException(type)
+    }
 
     override val suggestions: MutableList<StellarSuggestion<*>>
         get() = (super.suggestions + StellarSuggestion(CommandSender::class) { CompletableFuture.completedFuture(getSuggestionList(this)) }).toMutableList()
