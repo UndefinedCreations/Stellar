@@ -93,39 +93,67 @@ open class ArgumentHandler {
     fun <T> addListArgument(
         name: String,
         list: List<T>,
-        stringifier: (T) -> Suggestion,
+        converter: (T) -> Suggestion,
         parse: (Any?) -> T
-    ): ListArgument<T> = addArgument { ListArgument(StringArgument(base, name, StringType.WORD), list, stringifier, parse) }
+    ): ListArgument<T> = addArgument { ListArgument(StringArgument(base, name, StringType.WORD), list, converter, parse) }
 
     fun <T> addListArgument(
         type: AbstractStellarArgument<*>,
         list: List<T>,
-        stringifier: (T) -> Suggestion,
+        converter: (T) -> Suggestion,
         parse: (Any?) -> T
-    ): ListArgument<T> = addArgument { ListArgument(type, list, stringifier, parse) }
+    ): ListArgument<T> = addArgument { ListArgument(type, list, converter, parse) }
 
     fun <T> addListArgument(
         name: String,
         list: CommandContext<CommandSender>.() -> List<T>,
-        stringifier: (T) -> Suggestion,
+        converter: (T) -> Suggestion,
         parse: (Any?) -> T
-    ): ListArgument<T> = addArgument { ListArgument(StringArgument(base, name, StringType.WORD), list, stringifier, parse) }
+    ): ListArgument<T> = addArgument { ListArgument(StringArgument(base, name, StringType.WORD), list, converter, parse) }
 
     fun <T> addListArgument(
         type: AbstractStellarArgument<*>,
         list: CommandContext<CommandSender>.() -> List<T>,
-        stringifier: (T) -> Suggestion,
+        converter: (T) -> Suggestion,
         parse: (Any?) -> T
-    ): ListArgument<T> = addArgument { ListArgument(type, list, stringifier, parse) }
+    ): ListArgument<T> = addArgument { ListArgument(type, list, converter, parse) }
 
-    fun addStringListArgument(name: String, list: List<String>, type: StringType = StringType.WORD): ListArgument<String> =
-        addArgument { ListArgument(StringArgument(base, name, type), list, { Suggestion.withText(it.toString()) }, { it }) }
+    fun <T> addBasicListArgument(
+        name: String,
+        list: List<T>,
+        converter: (T) -> String,
+        parse: (Any?) -> T
+    ): ListArgument<T> = addArgument { ListArgument(StringArgument(base, name, StringType.WORD), list, { Suggestion.withText(converter(it)) }, parse) }
+
+    fun <T> addBasicListArgument(
+        type: AbstractStellarArgument<*>,
+        list: List<T>,
+        converter: (T) -> String,
+        parse: (Any?) -> T
+    ): ListArgument<T> = addArgument { ListArgument(type, list, { Suggestion.withText(converter(it)) }, parse) }
+
+    fun <T> addBasicListArgument(
+        name: String,
+        list: CommandContext<CommandSender>.() -> List<T>,
+        converter: (T) -> String,
+        parse: (Any?) -> T
+    ): ListArgument<T> = addArgument { ListArgument(StringArgument(base, name, StringType.WORD), list, { Suggestion.withText(converter(it)) }, parse) }
+
+    fun <T> addBasicListArgument(
+        type: AbstractStellarArgument<*>,
+        list: CommandContext<CommandSender>.() -> List<T>,
+        converter: (T) -> String,
+        parse: (Any?) -> T
+    ): ListArgument<T> = addArgument { ListArgument(type, list, { Suggestion.withText(converter(it)) }, parse) }
+
+    fun addStringListArgument(name: String, list: List<String>, type: StringType = StringType.WORD, parse: (Any?) -> Any? = { it }): ListArgument<String> =
+        addArgument { ListArgument(StringArgument(base, name, type), list, { Suggestion.withText(it.toString()) }, parse) }
 
     fun addStringListArgument(name: String, vararg list: String): ListArgument<String> =
         addArgument { ListArgument(StringArgument(base, name, StringType.WORD), list.toList(), { Suggestion.withText(it.toString()) }, { it }) }
 
-    fun addUUIDListArgument(name: String, list: List<UUID>): ListArgument<UUID> =
-        addArgument { ListArgument(UUIDArgument(base, name), list, parse = { it }) }
+    fun addUUIDListArgument(name: String, list: List<UUID>, parse: (Any?) -> Any? = { it }): ListArgument<UUID> =
+        addArgument { ListArgument(UUIDArgument(base, name), list, parse = parse) }
 
     fun addStringListArgument(name: String, list: CommandContext<CommandSender>.() -> List<String>, type: StringType = StringType.WORD): ListArgument<String> =
         addArgument { ListArgument(StringArgument(base, name, type), list, { Suggestion.withText(it.toString()) }, { it }) }
