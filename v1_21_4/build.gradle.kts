@@ -1,7 +1,6 @@
 plugins {
     kotlin("jvm") version "1.9.22"
-    id("com.undefinedcreation.mapper") version "0.0.5"
-    id("com.gradleup.shadow") version "8.3.5"
+    id("com.undefinedcreations.mapper") version "1.1.1"
 }
 
 repositories {
@@ -24,8 +23,7 @@ tasks {
         options.release.set(8)
     }
     remap {
-        dependsOn(shadowJar)
-        mcVersion.set("1.21.4")
+        minecraftVersion("1.21.4")
     }
 }
 

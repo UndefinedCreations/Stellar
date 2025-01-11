@@ -1,6 +1,6 @@
 plugins {
     kotlin("jvm") version "1.9.22"
-    id("com.undefinedcreation.mapper") version "1.0.0"
+    id("com.undefinedcreations.mapper") version "1.1.1"
 }
 
 repositories {
@@ -23,7 +23,7 @@ tasks {
         options.release.set(8)
     }
     remap {
-        mcVersion.set("1.17")
+        minecraftVersion("1.17")
     }
 }
 

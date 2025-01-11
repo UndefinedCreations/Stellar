@@ -58,12 +58,14 @@ object BrigadierCommandHelper {
         command: AbstractStellarArgument<*>,
         context: CommandContext<CommandSourceStack>,
         builder: SuggestionsBuilder
-    ): CompletableFuture<Suggestions>? {
+    ): CompletableFuture<Suggestions> {
         val stellarContext = CommandContextAdapter.getStellarCommandContext(context)
-        for (stellarSuggestion in command.suggestions)
-            for (suggestion in stellarSuggestion.get(stellarContext))
-                builder.suggest(suggestion.text) { suggestion.tooltip }
-        return builder.buildFuture()
+        val completions: CompletableFuture<List<com.undefined.stellar.data.suggestion.Suggestion>> = CompletableFuture.supplyAsync {
+            val suggestions: MutableList<com.undefined.stellar.data.suggestion.Suggestion> = mutableListOf()
+            for (suggestion in command.suggestions) suggestions.addAll(suggestion.get(stellarContext).get())
+            suggestions
+        }
+        return CommandAdapter.getMojangSuggestions(builder, completions)
     }
 
     fun handleFailureMessageAndExecutions(command: AbstractStellarCommand<*>, context: CommandContext<CommandSourceStack>) {

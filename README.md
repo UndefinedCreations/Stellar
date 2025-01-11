@@ -5,7 +5,7 @@ Stellar is a simple, yet very powerful Spigot command framework.
 
 ## Documentation
 
-[Documentation](https://docs.undefinedcreation.com)
+[Documentation](https://docs.undefinedcreations.com)
 
 
 ## Installation
@@ -28,7 +28,7 @@ implementation "com.undefined:stellar:(latest version)"
 <repository>
     <id>stellar</id>
     <name>Stellar Repository</name>
-    <url>https://repo.undefinedcreation.com/releases</url>
+    <url>https://repo.undefinedcreations.com/releases</url>
 </repository>
 ```
 ```xml

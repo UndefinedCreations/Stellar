@@ -16,7 +16,7 @@ class EnumArgument<T : Enum<T>>(
     converter: (Enum<*>?) -> Suggestion = { Suggestion.withText(it?.name ?: "") },
     parse: (Any?) -> Enum<T>? = {
         try {
-            valueOf(enum.java, it as String) as Enum<T>
+            valueOf(enum.java, (it as String).uppercase()) as Enum<T>
         } catch (e: IllegalArgumentException) {
             null
         }

@@ -2,6 +2,8 @@ package com.undefined.stellar.v1_19_3
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
+import com.mojang.brigadier.suggestion.Suggestions
+import com.mojang.brigadier.suggestion.SuggestionsBuilder
 import com.mojang.brigadier.tree.LiteralCommandNode
 import com.undefined.stellar.AbstractStellarCommand
 import com.undefined.stellar.argument.AbstractStellarArgument
@@ -11,6 +13,7 @@ import net.minecraft.commands.CommandSourceStack
 import net.minecraft.server.MinecraftServer
 import org.bukkit.Bukkit
 import org.bukkit.scheduler.BukkitRunnable
+import java.util.concurrent.CompletableFuture
 
 object BrigadierCommandHelper {
 
@@ -49,6 +52,20 @@ object BrigadierCommandHelper {
         val fulfillsExecutionRequirements = command.requirements.all { it(source.bukkitSender) }
         val fulfillsPermissionRequirements = command.permissionRequirements.all { source.hasPermission(it.level, it.permission) }
         return fulfillsExecutionRequirements.and(fulfillsPermissionRequirements)
+    }
+
+    fun handleSuggestions(
+        command: AbstractStellarArgument<*>,
+        context: CommandContext<CommandSourceStack>,
+        builder: SuggestionsBuilder
+    ): CompletableFuture<Suggestions> {
+        val stellarContext = CommandContextAdapter.getStellarCommandContext(context)
+        val completions: CompletableFuture<List<com.undefined.stellar.data.suggestion.Suggestion>> = CompletableFuture.supplyAsync {
+            val suggestions: MutableList<com.undefined.stellar.data.suggestion.Suggestion> = mutableListOf()
+            for (suggestion in command.suggestions) suggestions.addAll(suggestion.get(stellarContext).get())
+            suggestions
+        }
+        return CommandAdapter.getMojangSuggestions(builder, completions)
     }
 
     fun handleFailureMessageAndExecutions(command: AbstractStellarCommand<*>, context: CommandContext<CommandSourceStack>) {

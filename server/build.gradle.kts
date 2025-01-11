@@ -1,6 +1,6 @@
 plugins {
     kotlin("jvm") version "1.9.22"
-    id("xyz.jpenilla.run-paper") version "2.3.0"
+    id("com.undefinedcreations.runServer") version "0.1.6"
     id("com.gradleup.shadow") version "8.3.5"
 }
 
@@ -9,7 +9,7 @@ val groupIdVar = "com.undefined"
 val artifactIdVar = "stellar"
 
 dependencies {
-    compileOnly("org.spigotmc:spigot-api:1.20.6-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot-api:1.21.4-R0.1-SNAPSHOT")
 
     implementation(project(":api"))
     implementation(project(":common"))
@@ -34,7 +34,7 @@ dependencies {
     implementation(project(":v1_18_2:", "reobf"))
     implementation(project(":v1_19_2:", "reobf"))
     implementation(project(":v1_19_3:", "reobf"))
-    implementation(project(":v1_19_4:", "reobf"))
+    implementation(project(":v1_19_4"))
     implementation(project(":v1_20:", "reobf"))
     implementation(project(":v1_20_1:", "reobf"))
     implementation(project(":v1_20_2:", "reobf"))
@@ -44,29 +44,26 @@ dependencies {
     implementation(project(":v1_21_1:", "reobf"))
     implementation(project(":v1_21_3:", "reobf"))
     implementation(project(":v1_21_4:"))
-    compileOnly(project(":v1_20_6"))
+    compileOnly(project(":v1_19_4"))
 }
 
 tasks {
     assemble {
         dependsOn(shadowJar)
     }
-
     val shadowJar by getting(com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar::class) {
         archiveFileName.set("Stellar-shadow.jar")
     }
-
     compileKotlin {
         kotlinOptions.jvmTarget = "21"
     }
-
     compileJava {
         options.release = 21
     }
-
     runServer {
-        minecraftVersion("1.20.6")
-        jvmArgs("-Xmx4G")
+        minecraftVersion("1.21.4")
+        serverFolderName { "run" }
+        acceptMojangEula()
     }
 }
 

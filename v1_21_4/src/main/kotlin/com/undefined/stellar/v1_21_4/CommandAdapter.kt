@@ -4,11 +4,16 @@ import com.mojang.brigadier.Command
 import com.mojang.brigadier.builder.ArgumentBuilder
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.builder.RequiredArgumentBuilder
+import com.mojang.brigadier.context.StringRange
+import com.mojang.brigadier.suggestion.Suggestions
+import com.mojang.brigadier.suggestion.SuggestionsBuilder
 import com.undefined.stellar.AbstractStellarCommand
 import com.undefined.stellar.argument.AbstractStellarArgument
 import com.undefined.stellar.argument.LiteralStellarArgument
 import com.undefined.stellar.argument.types.primitive.PhraseArgument
+import com.undefined.stellar.data.suggestion.Suggestion
 import net.minecraft.commands.CommandSourceStack
+import java.util.concurrent.CompletableFuture
 
 object CommandAdapter {
 
@@ -30,6 +35,14 @@ object CommandAdapter {
         brigadierCommand.requires { source ->
             BrigadierCommandHelper.fulfillsRequirements(command, source)
         }
+
+        if (command !is AbstractStellarArgument || command.suggestions.isEmpty() || brigadierCommand !is RequiredArgumentBuilder<CommandSourceStack, *>) return
+        brigadierCommand.suggests { context, builder ->
+            BrigadierCommandHelper.handleSuggestions(command, context, builder)
+        }
+        brigadierCommand.suggests { context, builder ->
+            BrigadierCommandHelper.handleSuggestions(command, context, builder)
+        }
     }
 
     fun handleArguments(command: AbstractStellarCommand<*>, brigadierCommand: ArgumentBuilder<CommandSourceStack, *>) {
@@ -40,6 +53,16 @@ object CommandAdapter {
                 else -> handleRequiredArgument(argument, brigadierCommand)
             }
         }
+    }
+
+    fun getMojangSuggestions(builder: SuggestionsBuilder, suggestionsFuture: CompletableFuture<List<Suggestion>>): CompletableFuture<Suggestions> {
+        val range = StringRange.between(builder.start, builder.input.length)
+        val future = suggestionsFuture.thenApplyAsync { suggestions ->
+            Suggestions(range, suggestions.map { suggestion ->
+                com.mojang.brigadier.suggestion.Suggestion(range, suggestion.text) { suggestion.tooltip }
+            })
+        }
+        return future
     }
 
     private fun handleLiteralArgument(argument: LiteralStellarArgument, brigadierCommand: ArgumentBuilder<CommandSourceStack, *>) {

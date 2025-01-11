@@ -1,27 +1,29 @@
 plugins {
     kotlin("jvm") version "1.9.22"
-    id("io.papermc.paperweight.userdev")
+    id("com.undefinedcreations.mapper") version "1.1.1"
 }
 
-paperweight.reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArtifactConfiguration.REOBF_PRODUCTION
+repositories {
+    mavenLocal()
+}
 
 dependencies {
-    paperweight.paperDevBundle("1.19.4-R0.1-SNAPSHOT")
-    pluginRemapper("net.fabricmc:tiny-remapper:0.10.3:fat")
+    compileOnly("org.spigotmc:spigot:1.19.4-R0.1-SNAPSHOT:remapped-mojang")
     compileOnly(project(":common"))
 }
 
 tasks {
+    jar {
+        finalizedBy(remap)
+    }
     compileKotlin {
         kotlinOptions.jvmTarget = "1.8"
     }
     compileJava {
         options.release.set(8)
     }
-    paperweight {
-        javaLauncher.set(
-            project.javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(17)) }
-        )
+    remap {
+        minecraftVersion("1.19.4")
     }
 }
 

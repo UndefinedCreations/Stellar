@@ -7,6 +7,7 @@ import com.undefined.stellar.data.suggestion.Suggestion
 import org.bukkit.command.CommandSender
 import org.bukkit.plugin.java.JavaPlugin
 import org.jetbrains.annotations.ApiStatus
+import java.util.concurrent.CompletableFuture
 
 @Suppress("UNCHECKED_CAST")
 abstract class AbstractStellarArgument<T>(val parent: AbstractStellarCommand<*>, name: String) : AbstractStellarCommand<T>(name) {
@@ -20,57 +21,48 @@ abstract class AbstractStellarArgument<T>(val parent: AbstractStellarCommand<*>,
         return this as T
     }
 
-    fun addSuggestion(suggestion: Suggestion): T {
-        suggestions.add(StellarSuggestion(CommandSender::class) { listOf(suggestion) })
+    fun addSuggestion(suggestion: Suggestion): T = addSuggestions(listOf(suggestion))
+
+    fun addSuggestions(suggestions: List<Suggestion>): T {
+        this.suggestions.add(StellarSuggestion(CommandSender::class) { CompletableFuture.completedFuture(suggestions) })
         return this as T
     }
 
-    fun addSuggestions(list: List<Suggestion>): T {
-        suggestions.add(StellarSuggestion(CommandSender::class) { list })
-        return this as T
+    fun addSuggestions(vararg suggestions: Suggestion): T = addSuggestions(suggestions.toList())
+
+    fun addSuggestionWithoutTooltip(suggestion: String): T = addSuggestions(listOf(Suggestion(suggestion, "")))
+
+    fun addSuggestionsWithoutTooltip(suggestions: List<String>): T = addSuggestions(suggestions.map { Suggestion(it, "") })
+
+    fun addSuggestions(vararg list: String): T = addSuggestions(list.map { Suggestion(it, "") })
+
+    fun setSuggestions(vararg suggestions: Suggestion): T {
+        this.suggestions.clear()
+        return addSuggestions(suggestions.toList())
     }
 
-    fun addSuggestions(vararg list: Suggestion): T {
-        suggestions.add(StellarSuggestion(CommandSender::class) { list.toList() })
-        return this as T
+    fun setSuggestions(vararg suggestions: String): T {
+        this.suggestions.clear()
+        return addSuggestions(suggestions.map { Suggestion(it, "") })
     }
 
-    fun addSuggestionsWithoutTooltip(list: List<String>): T {
-        suggestions.add(StellarSuggestion(CommandSender::class) { list.map { Suggestion(it, "") } })
-        return this as T
+    fun setSuggestions(suggestions: List<Suggestion>): T {
+        this.suggestions.clear()
+        return addSuggestions(suggestions.toList())
     }
 
-    fun addSuggestions(vararg list: String): T {
-        suggestions.add(StellarSuggestion(CommandSender::class) { list.map { Suggestion(it, "") } })
-        return this as T
+    fun setSuggestionsWithoutTooltip(suggestions: List<String>): T {
+        this.suggestions.clear()
+        return addSuggestions(suggestions.map { Suggestion(it, "") })
     }
 
-    fun setSuggestions(vararg suggestion: Suggestion): T {
-        suggestions.clear()
-        suggestions.add(StellarSuggestion(CommandSender::class) { suggestion.toList() })
-        return this as T
-    }
-
-    fun setSuggestions(vararg suggestion: String): T {
-        suggestions.clear()
-        suggestions.add(StellarSuggestion(CommandSender::class) { suggestion.map { Suggestion(it, "") } })
-        return this as T
-    }
-
-    fun setSuggestions(suggestion: List<Suggestion>): T {
-        suggestions.clear()
-        suggestions.add(StellarSuggestion(CommandSender::class) { suggestion.toList() })
-        return this as T
-    }
-
-    fun setSuggestionsWithoutTooltip(suggestion: List<String>): T {
-        suggestions.clear()
-        suggestions.add(StellarSuggestion(CommandSender::class) { suggestion.map { Suggestion(it, "") } })
+    inline fun <reified C : CommandSender> addAsyncSuggestion(noinline suggestion: CommandContext<C>.() -> CompletableFuture<List<Suggestion>>): T {
+        suggestions.add(StellarSuggestion(C::class, suggestion))
         return this as T
     }
 
     inline fun <reified C : CommandSender> addSuggestion(noinline suggestion: CommandContext<C>.() -> List<Suggestion>): T {
-        suggestions.add(StellarSuggestion(C::class, suggestion))
+        suggestions.add(StellarSuggestion(C::class) { CompletableFuture.completedFuture(suggestion(this)) })
         return this as T
     }
 

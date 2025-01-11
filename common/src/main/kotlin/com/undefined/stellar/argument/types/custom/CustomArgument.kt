@@ -9,6 +9,7 @@ import com.undefined.stellar.data.requirement.StellarRequirement
 import com.undefined.stellar.data.suggestion.StellarSuggestion
 import com.undefined.stellar.data.suggestion.Suggestion
 import org.bukkit.command.CommandSender
+import java.util.concurrent.CompletableFuture
 
 abstract class CustomArgument<T>(
     parent: AbstractStellarCommand<*>,
@@ -43,5 +44,5 @@ abstract class CustomArgument<T>(
     open fun <T> runnable(info: CommandContext<CommandSender>, value: T): Boolean = true
     open fun <T> failureExecution(info: CommandContext<CommandSender>, value: T) {}
     open fun requirement(): Boolean = true
-    abstract fun listSuggestions(context: CommandContext<CommandSender>): List<Suggestion>
+    abstract fun listSuggestions(context: CommandContext<CommandSender>): CompletableFuture<List<Suggestion>>
 }

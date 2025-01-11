@@ -6,6 +6,7 @@ import com.undefined.stellar.data.argument.CommandContext
 import com.undefined.stellar.data.suggestion.StellarSuggestion
 import com.undefined.stellar.data.suggestion.Suggestion
 import org.bukkit.command.CommandSender
+import java.util.concurrent.CompletableFuture
 
 open class ListArgument<T>(
     val type: AbstractStellarArgument<*>,
@@ -20,7 +21,7 @@ open class ListArgument<T>(
                 parse: (Any?) -> T?) : this(type, { list }, converter, parse)
 
     override val suggestions: MutableList<StellarSuggestion<*>>
-        get() = (super.suggestions + StellarSuggestion(CommandSender::class) { getSuggestionList(this) }).toMutableList()
+        get() = (super.suggestions + StellarSuggestion(CommandSender::class) { CompletableFuture.completedFuture(getSuggestionList(this)) }).toMutableList()
 
     fun getSuggestionList(context: CommandContext<CommandSender>): List<Suggestion> = list(context).map(converter)
 

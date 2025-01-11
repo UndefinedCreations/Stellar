@@ -10,7 +10,7 @@ plugins {
 
 apply(plugin = "maven-publish")
 val projectGroupId = "com.undefined"
-val projectVersion = "0.0.37"
+val projectVersion = "0.0.38"
 val projectArtifactId = "stellar"
 
 group = projectGroupId
@@ -36,7 +36,7 @@ publishing {
     repositories {
         maven {
             name = "UndefinedCreations"
-            url = uri("https://repo.undefinedcreation.com/releases")
+            url = uri("https://repo.undefinedcreations.com/releases")
             credentials(PasswordCredentials::class) {
                 username = System.getenv("MAVEN_NAME")
                 password = System.getenv("MAVEN_SECRET")
@@ -79,38 +79,6 @@ allprojects {
 dependencies {
     implementation(project(":api"))
     implementation(project(":common"))
-//    implementation(project(":v1_13"))
-//    implementation(project(":v1_13_1"))
-//    implementation(project(":v1_13_2"))
-//    implementation(project(":v1_14_1"))
-//    implementation(project(":v1_14_2"))
-//    implementation(project(":v1_14_3"))
-//    implementation(project(":v1_14_4"))
-//    implementation(project(":v1_15"))
-//    implementation(project(":v1_15_1"))
-//    implementation(project(":v1_15_2"))
-//    implementation(project(":v1_16_1"))
-//    implementation(project(":v1_16_2"))
-//    implementation(project(":v1_16_3"))
-//    implementation(project(":v1_16_4"))
-//    implementation(project(":v1_16_5"))
-//    implementation(project(":v1_17"))
-//    implementation(project(":v1_17"))
-//    implementation(project(":v1_17_1:", "reobf"))
-//    implementation(project(":v1_18_1:", "reobf"))
-//    implementation(project(":v1_18_2:", "reobf"))
-//    implementation(project(":v1_19_2:", "reobf"))
-//    implementation(project(":v1_19_3:", "reobf"))
-//    implementation(project(":v1_19_4:", "reobf"))
-//    implementation(project(":v1_20", "reobf"))
-//    implementation(project(":v1_20_1", "reobf"))
-//    implementation(project(":v1_20_2", "reobf"))
-//    implementation(project(":v1_20_4", "reobf"))
-//    implementation(project(":v1_20_6", "reobf"))
-//    implementation(project(":v1_21", "reobf"))
-//    implementation(project(":v1_21_1", "reobf"))
-//    implementation(project(":v1_21_3", "reobf"))
-//    implementation(project(":v1_21_4", "reobf"))
 }
 
 tasks {
