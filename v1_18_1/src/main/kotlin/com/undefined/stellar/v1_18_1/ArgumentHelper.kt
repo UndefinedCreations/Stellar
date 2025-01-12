@@ -97,9 +97,6 @@ object ArgumentHelper {
             is GameEventArgument -> SuggestionProvider { _, builder ->
                 SharedSuggestionProvider.suggestResource(Registry.GAME_EVENT.keySet(), builder)
             }
-            is PotionEffectTypeArgument -> SuggestionProvider { _, builder ->
-                SharedSuggestionProvider.suggestResource(Registry.MOB_EFFECT.keySet(), builder)
-            }
             is VillagerProfessionArgument -> SuggestionProvider { _, builder ->
                 SharedSuggestionProvider.suggestResource(Registry.VILLAGER_PROFESSION.keySet(), builder)
             }
@@ -182,7 +179,7 @@ object ArgumentHelper {
             is UUIDArgument -> UuidArgument.uuid()
             is GameEventArgument -> ResourceLocationArgument.id()
             is StructureTypeArgument -> throwArgumentVersionException(argument)
-            is PotionEffectTypeArgument -> ResourceLocationArgument.id()
+            is PotionEffectTypeArgument -> throwArgumentVersionException(argument)
             is BlockTypeArgument -> throwArgumentVersionException(argument)
             is ItemTypeArgument -> throwArgumentVersionException(argument)
             is CatTypeArgument -> throwArgumentVersionException(argument)
@@ -241,7 +238,7 @@ object ArgumentHelper {
             is com.undefined.stellar.argument.types.text.StyleArgument ->  GsonComponentSerializer.gson().deserialize(
                 getArgumentInput(context, argument.name) ?: return null).style()
             is com.undefined.stellar.argument.types.text.MessageArgument ->  GsonComponentSerializer.gson().deserialize(Component.Serializer.toJson(MessageArgument.getMessage(context, argument.name)))
-            is com.undefined.stellar.argument.types.scoreboard.ObjectiveArgument ->  Bukkit.getScoreboardManager().mainScoreboard.getObjective(ObjectiveArgument.getObjective(context, argument.name).name)
+            is com.undefined.stellar.argument.types.scoreboard.ObjectiveArgument ->  Bukkit.getScoreboardManager()!!.mainScoreboard.getObjective(ObjectiveArgument.getObjective(context, argument.name).name)
             is com.undefined.stellar.argument.types.scoreboard.ObjectiveCriteriaArgument ->  ObjectiveCriteriaArgument.getCriteria(context, argument.name).name
             is com.undefined.stellar.argument.types.math.OperationArgument -> Operation.getOperation(getArgumentInput(context, argument.name) ?: return null)
             is com.undefined.stellar.argument.types.world.ParticleArgument ->  {
@@ -259,7 +256,7 @@ object ArgumentHelper {
                 ScoreHolderType.MULTIPLE -> ScoreHolderArgument.getNames(context, argument.name)
             }
             is AxisArgument -> getBukkitAxis(SwizzleArgument.getSwizzle(context, argument.name))
-            is com.undefined.stellar.argument.types.scoreboard.TeamArgument -> Bukkit.getScoreboardManager().mainScoreboard.getTeam(TeamArgument.getTeam(context, argument.name).name)
+            is com.undefined.stellar.argument.types.scoreboard.TeamArgument -> Bukkit.getScoreboardManager()!!.mainScoreboard.getTeam(TeamArgument.getTeam(context, argument.name).name)
             is ItemSlotArgument -> SlotArgument.getSlot(context, argument.name)
             is ItemSlotsArgument -> throwArgumentVersionException(argument)
             is NamespacedKeyArgument -> NamespacedKey(ResourceLocationArgument.getId(context, argument.name).namespace, ResourceLocationArgument.getId(context, argument.name).path)
@@ -278,9 +275,6 @@ object ArgumentHelper {
             is UUIDArgument -> UuidArgument.getUuid(context, argument.name)
             is GameEventArgument -> org.bukkit.Registry.GAME_EVENT.get(getId(context, argument.name))
             is StructureTypeArgument -> throwArgumentVersionException(argument)
-            is PotionEffectTypeArgument -> org.bukkit.Registry.POTION_EFFECT_TYPE.get(getId(context, argument.name))
-            is BlockTypeArgument -> throwArgumentVersionException(argument)
-            is ItemTypeArgument -> throwArgumentVersionException(argument)
             is CatTypeArgument -> throwArgumentVersionException(argument)
             is FrogVariantArgument -> throwArgumentVersionException(argument)
             is VillagerProfessionArgument -> org.bukkit.Registry.VILLAGER_PROFESSION.get(getId(context, argument.name))

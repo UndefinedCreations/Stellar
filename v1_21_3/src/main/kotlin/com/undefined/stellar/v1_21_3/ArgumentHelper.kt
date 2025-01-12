@@ -66,9 +66,9 @@ import org.bukkit.block.Block
 import org.bukkit.block.data.BlockData
 import org.bukkit.block.structure.Mirror
 import org.bukkit.block.structure.StructureRotation
-import org.bukkit.craftbukkit.CraftParticle
-import org.bukkit.craftbukkit.block.data.CraftBlockData
-import org.bukkit.craftbukkit.inventory.CraftItemStack
+import org.bukkit.craftbukkit.v1_21_R2.CraftParticle
+import org.bukkit.craftbukkit.v1_21_R2.block.data.CraftBlockData
+import org.bukkit.craftbukkit.v1_21_R2.inventory.CraftItemStack
 import org.bukkit.event.inventory.InventoryType
 import org.bukkit.inventory.ItemStack
 import org.bukkit.scoreboard.DisplaySlot
@@ -209,7 +209,7 @@ object ArgumentHelper {
             is com.undefined.stellar.argument.types.text.StyleArgument ->  GsonComponentSerializer.gson().deserialize(
                 getArgumentInput(context, argument.name) ?: return null).style()
             is com.undefined.stellar.argument.types.text.MessageArgument ->  GsonComponentSerializer.gson().deserialize(Component.Serializer.toJson(MessageArgument.getMessage(context, argument.name), COMMAND_BUILD_CONTEXT))
-            is com.undefined.stellar.argument.types.scoreboard.ObjectiveArgument ->  Bukkit.getScoreboardManager().mainScoreboard.getObjective(ObjectiveArgument.getObjective(context, argument.name).name)
+            is com.undefined.stellar.argument.types.scoreboard.ObjectiveArgument ->  Bukkit.getScoreboardManager()!!.mainScoreboard.getObjective(ObjectiveArgument.getObjective(context, argument.name).name)
             is com.undefined.stellar.argument.types.scoreboard.ObjectiveCriteriaArgument ->  ObjectiveCriteriaArgument.getCriteria(context, argument.name).name
             is com.undefined.stellar.argument.types.math.OperationArgument -> Operation.getOperation(getArgumentInput(context, argument.name) ?: return null)
             is com.undefined.stellar.argument.types.world.ParticleArgument ->  {
@@ -229,7 +229,7 @@ object ArgumentHelper {
                 ScoreHolderType.MULTIPLE -> ScoreHolderArgument.getNames(context, argument.name).map { it.scoreboardName }
             }
             is AxisArgument -> getBukkitAxis(SwizzleArgument.getSwizzle(context, argument.name))
-            is com.undefined.stellar.argument.types.scoreboard.TeamArgument -> Bukkit.getScoreboardManager().mainScoreboard.getTeam(TeamArgument.getTeam(context, argument.name).name)
+            is com.undefined.stellar.argument.types.scoreboard.TeamArgument -> Bukkit.getScoreboardManager()!!.mainScoreboard.getTeam(TeamArgument.getTeam(context, argument.name).name)
             is ItemSlotArgument -> SlotArgument.getSlot(context, argument.name)
             is ItemSlotsArgument -> SlotsArgument.getSlots(context, argument.name).slots().toList()
             is NamespacedKeyArgument -> NamespacedKey(ResourceLocationArgument.getId(context, argument.name).namespace, ResourceLocationArgument.getId(context, argument.name).path)
@@ -385,72 +385,71 @@ object ArgumentHelper {
         net.minecraft.world.scores.DisplaySlot.LIST -> DisplaySlot.PLAYER_LIST
         net.minecraft.world.scores.DisplaySlot.SIDEBAR -> DisplaySlot.SIDEBAR
         net.minecraft.world.scores.DisplaySlot.BELOW_NAME -> DisplaySlot.BELOW_NAME
-        net.minecraft.world.scores.DisplaySlot.TEAM_BLACK -> DisplaySlot.SIDEBAR_TEAM_BLACK
-        net.minecraft.world.scores.DisplaySlot.TEAM_DARK_BLUE -> DisplaySlot.SIDEBAR_TEAM_DARK_BLUE
-        net.minecraft.world.scores.DisplaySlot.TEAM_DARK_GREEN -> DisplaySlot.SIDEBAR_TEAM_DARK_GREEN
-        net.minecraft.world.scores.DisplaySlot.TEAM_DARK_AQUA -> DisplaySlot.SIDEBAR_TEAM_DARK_AQUA
-        net.minecraft.world.scores.DisplaySlot.TEAM_DARK_RED -> DisplaySlot.SIDEBAR_TEAM_DARK_RED
-        net.minecraft.world.scores.DisplaySlot.TEAM_DARK_PURPLE -> DisplaySlot.SIDEBAR_TEAM_DARK_PURPLE
-        net.minecraft.world.scores.DisplaySlot.TEAM_GOLD -> DisplaySlot.SIDEBAR_TEAM_GOLD
-        net.minecraft.world.scores.DisplaySlot.TEAM_GRAY -> DisplaySlot.SIDEBAR_TEAM_GRAY
-        net.minecraft.world.scores.DisplaySlot.TEAM_DARK_GRAY -> DisplaySlot.SIDEBAR_TEAM_DARK_GRAY
-        net.minecraft.world.scores.DisplaySlot.TEAM_BLUE -> DisplaySlot.SIDEBAR_TEAM_BLUE
-        net.minecraft.world.scores.DisplaySlot.TEAM_GREEN -> DisplaySlot.SIDEBAR_TEAM_GREEN
-        net.minecraft.world.scores.DisplaySlot.TEAM_AQUA -> DisplaySlot.SIDEBAR_TEAM_AQUA
-        net.minecraft.world.scores.DisplaySlot.TEAM_RED -> DisplaySlot.SIDEBAR_TEAM_RED
-        net.minecraft.world.scores.DisplaySlot.TEAM_LIGHT_PURPLE -> DisplaySlot.SIDEBAR_TEAM_LIGHT_PURPLE
-        net.minecraft.world.scores.DisplaySlot.TEAM_YELLOW -> DisplaySlot.SIDEBAR_TEAM_YELLOW
-        net.minecraft.world.scores.DisplaySlot.TEAM_WHITE -> DisplaySlot.SIDEBAR_TEAM_WHITE
+        net.minecraft.world.scores.DisplaySlot.TEAM_BLACK -> DisplaySlot.SIDEBAR_BLACK
+        net.minecraft.world.scores.DisplaySlot.TEAM_DARK_BLUE -> DisplaySlot.SIDEBAR_DARK_BLUE
+        net.minecraft.world.scores.DisplaySlot.TEAM_DARK_GREEN -> DisplaySlot.SIDEBAR_DARK_GREEN
+        net.minecraft.world.scores.DisplaySlot.TEAM_DARK_AQUA -> DisplaySlot.SIDEBAR_DARK_AQUA
+        net.minecraft.world.scores.DisplaySlot.TEAM_DARK_RED -> DisplaySlot.SIDEBAR_DARK_RED
+        net.minecraft.world.scores.DisplaySlot.TEAM_DARK_PURPLE -> DisplaySlot.SIDEBAR_DARK_PURPLE
+        net.minecraft.world.scores.DisplaySlot.TEAM_GOLD -> DisplaySlot.SIDEBAR_GOLD
+        net.minecraft.world.scores.DisplaySlot.TEAM_GRAY -> DisplaySlot.SIDEBAR_GRAY
+        net.minecraft.world.scores.DisplaySlot.TEAM_DARK_GRAY -> DisplaySlot.SIDEBAR_DARK_GRAY
+        net.minecraft.world.scores.DisplaySlot.TEAM_BLUE -> DisplaySlot.SIDEBAR_BLUE
+        net.minecraft.world.scores.DisplaySlot.TEAM_GREEN -> DisplaySlot.SIDEBAR_GREEN
+        net.minecraft.world.scores.DisplaySlot.TEAM_AQUA -> DisplaySlot.SIDEBAR_AQUA
+        net.minecraft.world.scores.DisplaySlot.TEAM_RED -> DisplaySlot.SIDEBAR_RED
+        net.minecraft.world.scores.DisplaySlot.TEAM_LIGHT_PURPLE -> DisplaySlot.SIDEBAR_LIGHT_PURPLE
+        net.minecraft.world.scores.DisplaySlot.TEAM_YELLOW -> DisplaySlot.SIDEBAR_YELLOW
+        net.minecraft.world.scores.DisplaySlot.TEAM_WHITE -> DisplaySlot.SIDEBAR_WHITE
         else -> DisplaySlot.SIDEBAR
     }
 
-    private fun getParticleData(context: CommandContext<CommandSourceStack>, particle: Particle, particleOptions: ParticleOptions): ParticleData<*> = when (particleOptions) {
+    private fun getParticleData(context: CommandContext<CommandSourceStack>, particle: Particle, options: ParticleOptions): ParticleData<*> = when (options) {
         is SimpleParticleType -> ParticleData(particle, null)
-        is BlockParticleOption -> ParticleData<BlockData>(particle, CraftBlockData.fromData(particleOptions.state))
+        is BlockParticleOption -> ParticleData<BlockData>(particle, CraftBlockData.fromData(options.state))
         is DustColorTransitionOptions -> {
             val fromColor = Color.fromRGB(
-                (particleOptions.fromColor.x() * 255.0f).toInt(),
-                (particleOptions.fromColor.y() * 255.0f).toInt(),
-                (particleOptions.fromColor.z() * 255.0f).toInt()
+                (options.fromColor.x() * 255.0f).toInt(),
+                (options.fromColor.y() * 255.0f).toInt(),
+                (options.fromColor.z() * 255.0f).toInt()
             )
             val toColor = Color.fromRGB(
-                (particleOptions.toColor.x() * 255.0f).toInt(),
-                (particleOptions.toColor.y() * 255.0f).toInt(),
-                (particleOptions.toColor.z() * 255.0f).toInt()
+                (options.toColor.x() * 255.0f).toInt(),
+                (options.toColor.y() * 255.0f).toInt(),
+                (options.toColor.z() * 255.0f).toInt()
             )
-            ParticleData(particle, Particle.DustTransition(fromColor, toColor, particleOptions.scale))
+            ParticleData(particle, Particle.DustTransition(fromColor, toColor, options.scale))
         }
         is DustParticleOptions -> ParticleData(
             particle,
             Particle.DustOptions(Color.fromRGB(
-                (particleOptions.color.x() * 255.0f).toInt(),
-                (particleOptions.color.y() * 255.0f).toInt(), (particleOptions.color.z() * 255.0f).toInt()
-            ), particleOptions.scale)
+                (options.color.x() * 255.0f).toInt(),
+                (options.color.y() * 255.0f).toInt(), (options.color.z() * 255.0f).toInt()
+            ), options.scale)
         )
         is ItemParticleOption -> ParticleData<ItemStack>(
             particle,
-            CraftItemStack.asBukkitCopy(particleOptions.item)
+            CraftItemStack.asBukkitCopy(options.item)
         )
         is VibrationParticleOption -> {
             val level: Level = context.source.level
-            val destination: Vibration.Destination
-
-            if (particleOptions.destination is BlockPositionSource) {
-                val to: Vec3 = particleOptions.destination.getPosition(level).get()
-                destination = Vibration.Destination.BlockDestination(Location(level.world, to.x(), to.y(), to.z()))
-                ParticleData(particle, Vibration(destination, particleOptions.arrivalInTicks))
+            if (options.destination is BlockPositionSource) {
+                val to: Vec3 = options.destination.getPosition(level).get()
+                val location = Location(level.world, to.x(), to.y(), to.z())
+                val destination = Vibration.Destination.BlockDestination(location)
+                ParticleData(particle, Vibration(location, destination, options.arrivalInTicks))
             } else {
                 ParticleData(particle, null)
             }
         }
-        is ShriekParticleOption -> ParticleData(particle, particleOptions.delay)
-        is SculkChargeParticleOptions -> ParticleData(particle, particleOptions.roll())
+        is ShriekParticleOption -> ParticleData(particle, options.delay)
+        is SculkChargeParticleOptions -> ParticleData(particle, options.roll())
         is ColorParticleOption -> {
             val color = Color.fromARGB(
-                (particleOptions.alpha * 255.0f).toInt(),
-                (particleOptions.red * 255.0f).toInt(),
-                (particleOptions.green * 255.0f).toInt(),
-                (particleOptions.blue * 255.0f).toInt())
+                (options.alpha * 255.0f).toInt(),
+                (options.red * 255.0f).toInt(),
+                (options.green * 255.0f).toInt(),
+                (options.blue * 255.0f).toInt())
             ParticleData(particle, color)
         }
         else -> ParticleData(particle, null)

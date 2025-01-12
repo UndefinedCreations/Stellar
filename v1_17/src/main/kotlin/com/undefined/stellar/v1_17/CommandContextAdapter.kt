@@ -75,28 +75,15 @@ object CommandContextAdapter {
 
     @Suppress("DEPRECATION")
     private data class Source(val sender: CommandSender) : CommandSource {
-        override fun sendMessage(message: Component, sender: UUID) {
+        override fun sendMessage(message: Component, uuid: UUID) =
             this.sender.sendMessage(LegacyComponentSerializer.legacySection().serialize(asAdventure(message)))
-        }
-
-        override fun acceptsSuccess(): Boolean {
-            return true
-        }
-
-        override fun acceptsFailure(): Boolean {
-            return true
-        }
-
-        override fun shouldInformAdmins(): Boolean {
-            return false
-        }
-
-        override fun getBukkitSender(stack: CommandSourceStack): CommandSender {
-            return this.sender
-        }
+        override fun acceptsSuccess(): Boolean = true
+        override fun acceptsFailure(): Boolean = true
+        override fun shouldInformAdmins(): Boolean = false
+        override fun getBukkitSender(stack: CommandSourceStack): CommandSender = this.sender
     }
 
     fun asAdventure(component: Component): net.kyori.adventure.text.Component =
-        GsonComponentSerializer.gson().deserializeFromTree(Component.Serializer.toJsonTree(component))
+        GsonComponentSerializer.gson().deserialize(Component.Serializer.toJson(component))
 
 }

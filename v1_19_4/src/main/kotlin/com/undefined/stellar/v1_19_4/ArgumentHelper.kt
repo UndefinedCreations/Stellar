@@ -153,7 +153,7 @@ object ArgumentHelper {
             is UUIDArgument -> UuidArgument.uuid()
             is GameEventArgument -> ResourceKeyArgument.key(Registries.GAME_EVENT)
             is StructureTypeArgument -> ResourceKeyArgument.key(Registries.STRUCTURE_TYPE)
-            is PotionEffectTypeArgument -> ResourceKeyArgument.key(Registries.MOB_EFFECT)
+            is PotionEffectTypeArgument -> throwArgumentVersionException(argument)
             is BlockTypeArgument -> throwArgumentVersionException(argument)
             is ItemTypeArgument -> throwArgumentVersionException(argument)
             is CatTypeArgument -> throwArgumentVersionException(argument)

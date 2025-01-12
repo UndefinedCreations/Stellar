@@ -1,7 +1,6 @@
 package com.undefined.stellar.argument.types.custom
 
 import com.undefined.stellar.AbstractStellarCommand
-import com.undefined.stellar.argument.AbstractStellarArgument
 import com.undefined.stellar.argument.types.primitive.StringArgument
 import com.undefined.stellar.argument.types.primitive.StringType
 import com.undefined.stellar.data.suggestion.Suggestion

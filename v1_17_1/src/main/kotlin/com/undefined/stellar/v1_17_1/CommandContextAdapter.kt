@@ -10,8 +10,8 @@ import com.undefined.stellar.data.argument.CommandNode
 import com.undefined.stellar.data.argument.PhraseCommandContext
 import com.undefined.stellar.exception.DuplicateArgumentNameException
 import com.undefined.stellar.exception.LiteralArgumentMismatchException
-import io.papermc.paper.adventure.PaperAdventure
-import net.kyori.adventure.identity.Identity
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import net.minecraft.commands.CommandSource
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.network.chat.Component
@@ -75,25 +75,15 @@ object CommandContextAdapter {
 
     @Suppress("DEPRECATION")
     private data class Source(val sender: CommandSender) : CommandSource {
-        override fun sendMessage(message: Component, sender: UUID) {
-            this.sender.sendMessage(Identity.identity(sender), PaperAdventure.asAdventure(message))
-        }
-
-        override fun acceptsSuccess(): Boolean {
-            return true
-        }
-
-        override fun acceptsFailure(): Boolean {
-            return true
-        }
-
-        override fun shouldInformAdmins(): Boolean {
-            return false
-        }
-
-        override fun getBukkitSender(stack: CommandSourceStack): CommandSender {
-            return this.sender
-        }
+        override fun sendMessage(message: Component, uuid: UUID) =
+            this.sender.sendMessage(LegacyComponentSerializer.legacySection().serialize(asAdventure(message)))
+        override fun acceptsSuccess(): Boolean = true
+        override fun acceptsFailure(): Boolean = true
+        override fun shouldInformAdmins(): Boolean = false
+        override fun getBukkitSender(stack: CommandSourceStack): CommandSender = this.sender
     }
+
+    fun asAdventure(component: Component): net.kyori.adventure.text.Component =
+        GsonComponentSerializer.gson().deserialize(Component.Serializer.toJson(component))
 
 }

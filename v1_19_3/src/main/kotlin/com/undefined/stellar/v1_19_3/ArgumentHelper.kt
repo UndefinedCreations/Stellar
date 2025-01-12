@@ -153,7 +153,7 @@ object ArgumentHelper {
             is UUIDArgument -> UuidArgument.uuid()
             is GameEventArgument -> ResourceKeyArgument.key(Registries.GAME_EVENT)
             is StructureTypeArgument -> ResourceKeyArgument.key(Registries.STRUCTURE_TYPE)
-            is PotionEffectTypeArgument -> ResourceKeyArgument.key(Registries.MOB_EFFECT)
+            is PotionEffectTypeArgument -> throwArgumentVersionException(argument)
             is BlockTypeArgument -> throwArgumentVersionException(argument)
             is ItemTypeArgument -> throwArgumentVersionException(argument)
             is CatTypeArgument -> throwArgumentVersionException(argument)
@@ -212,7 +212,7 @@ object ArgumentHelper {
             is com.undefined.stellar.argument.types.text.StyleArgument ->  GsonComponentSerializer.gson().deserialize(
                 getArgumentInput(context, argument.name) ?: return null).style()
             is com.undefined.stellar.argument.types.text.MessageArgument ->  GsonComponentSerializer.gson().deserialize(Component.Serializer.toJson(MessageArgument.getMessage(context, argument.name)))
-            is com.undefined.stellar.argument.types.scoreboard.ObjectiveArgument ->  Bukkit.getScoreboardManager().mainScoreboard.getObjective(ObjectiveArgument.getObjective(context, argument.name).name)
+            is com.undefined.stellar.argument.types.scoreboard.ObjectiveArgument ->  Bukkit.getScoreboardManager()!!.mainScoreboard.getObjective(ObjectiveArgument.getObjective(context, argument.name).name)
             is com.undefined.stellar.argument.types.scoreboard.ObjectiveCriteriaArgument ->  ObjectiveCriteriaArgument.getCriteria(context, argument.name).name
             is com.undefined.stellar.argument.types.math.OperationArgument -> Operation.getOperation(getArgumentInput(context, argument.name) ?: return null)
             is com.undefined.stellar.argument.types.world.ParticleArgument ->  {
@@ -232,7 +232,7 @@ object ArgumentHelper {
                 ScoreHolderType.MULTIPLE -> ScoreHolderArgument.getNames(context, argument.name)
             }
             is AxisArgument -> getBukkitAxis(SwizzleArgument.getSwizzle(context, argument.name))
-            is com.undefined.stellar.argument.types.scoreboard.TeamArgument -> Bukkit.getScoreboardManager().mainScoreboard.getTeam(TeamArgument.getTeam(context, argument.name).name)
+            is com.undefined.stellar.argument.types.scoreboard.TeamArgument -> Bukkit.getScoreboardManager()!!.mainScoreboard.getTeam(TeamArgument.getTeam(context, argument.name).name)
             is ItemSlotArgument -> SlotArgument.getSlot(context, argument.name)
             is ItemSlotsArgument -> throwArgumentVersionException(argument)
             is NamespacedKeyArgument -> NamespacedKey(ResourceLocationArgument.getId(context, argument.name).namespace, ResourceLocationArgument.getId(context, argument.name).path)
@@ -251,7 +251,7 @@ object ArgumentHelper {
             is UUIDArgument -> UuidArgument.getUuid(context, argument.name)
             is GameEventArgument -> org.bukkit.Registry.GAME_EVENT.get(getId(context, argument.name, Registries.GAME_EVENT))
             is StructureTypeArgument -> org.bukkit.Registry.STRUCTURE_TYPE.get(getId(context, argument.name, Registries.STRUCTURE_TYPE))
-            is PotionEffectTypeArgument -> org.bukkit.Registry.POTION_EFFECT_TYPE.get(getId(context, argument.name, Registries.MOB_EFFECT))
+            is PotionEffectTypeArgument -> throwArgumentVersionException(argument)
             is BlockTypeArgument -> throwArgumentVersionException(argument)
             is ItemTypeArgument -> throwArgumentVersionException(argument)
             is CatTypeArgument -> throwArgumentVersionException(argument)
@@ -387,47 +387,46 @@ object ArgumentHelper {
         else -> DisplaySlot.SIDEBAR
     }
 
-    private fun getParticleData(context: CommandContext<CommandSourceStack>, particle: Particle, particleOptions: ParticleOptions): ParticleData<*> = when (particleOptions) {
+    private fun getParticleData(context: CommandContext<CommandSourceStack>, particle: Particle, options: ParticleOptions): ParticleData<*> = when (options) {
         is SimpleParticleType -> ParticleData(particle, null)
-        is BlockParticleOption -> ParticleData<BlockData>(particle, CraftBlockData.fromData(particleOptions.state))
+        is BlockParticleOption -> ParticleData<BlockData>(particle, CraftBlockData.fromData(options.state))
         is DustColorTransitionOptions -> {
             val fromColor = Color.fromRGB(
-                (particleOptions.fromColor.x() * 255.0f).toInt(),
-                (particleOptions.fromColor.y() * 255.0f).toInt(),
-                (particleOptions.fromColor.z() * 255.0f).toInt()
+                (options.fromColor.x() * 255.0f).toInt(),
+                (options.fromColor.y() * 255.0f).toInt(),
+                (options.fromColor.z() * 255.0f).toInt()
             )
             val toColor = Color.fromRGB(
-                (particleOptions.toColor.x() * 255.0f).toInt(),
-                (particleOptions.toColor.y() * 255.0f).toInt(),
-                (particleOptions.toColor.z() * 255.0f).toInt()
+                (options.toColor.x() * 255.0f).toInt(),
+                (options.toColor.y() * 255.0f).toInt(),
+                (options.toColor.z() * 255.0f).toInt()
             )
-            ParticleData(particle, Particle.DustTransition(fromColor, toColor, particleOptions.scale))
+            ParticleData(particle, Particle.DustTransition(fromColor, toColor, options.scale))
         }
         is DustParticleOptions -> ParticleData(
             particle,
             Particle.DustOptions(Color.fromRGB(
-                (particleOptions.color.x() * 255.0f).toInt(),
-                (particleOptions.color.y() * 255.0f).toInt(), (particleOptions.color.z() * 255.0f).toInt()
-            ), particleOptions.scale)
+                (options.color.x() * 255.0f).toInt(),
+                (options.color.y() * 255.0f).toInt(), (options.color.z() * 255.0f).toInt()
+            ), options.scale)
         )
         is ItemParticleOption -> ParticleData<ItemStack>(
             particle,
-            CraftItemStack.asBukkitCopy(particleOptions.item)
+            CraftItemStack.asBukkitCopy(options.item)
         )
         is VibrationParticleOption -> {
             val level: Level = context.source.level
-            val destination: Vibration.Destination
-
-            if (particleOptions.destination is BlockPositionSource) {
-                val to: Vec3 = particleOptions.destination.getPosition(level).get()
-                destination = Vibration.Destination.BlockDestination(Location(level.world, to.x(), to.y(), to.z()))
-                ParticleData(particle, Vibration(destination, particleOptions.arrivalInTicks))
+            if (options.destination is BlockPositionSource) {
+                val to: Vec3 = options.destination.getPosition(level).get()
+                val location = Location(level.world, to.x(), to.y(), to.z())
+                val destination = Vibration.Destination.BlockDestination(location)
+                ParticleData(particle, Vibration(location, destination, options.arrivalInTicks))
             } else {
                 ParticleData(particle, null)
             }
         }
-        is ShriekParticleOption -> ParticleData(particle, particleOptions.delay)
-        is SculkChargeParticleOptions -> ParticleData(particle, particleOptions.roll())
+        is ShriekParticleOption -> ParticleData(particle, options.delay)
+        is SculkChargeParticleOptions -> ParticleData(particle, options.roll())
         else -> ParticleData(particle, null)
     }
 
