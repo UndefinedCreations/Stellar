@@ -5,12 +5,11 @@ plugins {
     kotlin("jvm") version "1.9.22"
     `maven-publish`
     id("com.gradleup.shadow") version "8.3.5"
-    id("io.papermc.paperweight.userdev") version "2.0.0-beta.8" apply false
 }
 
 apply(plugin = "maven-publish")
 val projectGroupId = "com.undefined"
-val projectVersion = "0.0.39"
+val projectVersion = "0.0.43"
 val projectArtifactId = "stellar"
 
 group = projectGroupId
@@ -21,14 +20,6 @@ val minecraftVersion = "1.20.6"
 repositories {
     mavenCentral()
     mavenLocal()
-    maven {
-        name = "spigotmc-repo"
-        url = uri("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
-    }
-    maven {
-        name = "minecraft-repo"
-        url = uri("https://libraries.minecraft.net/")
-    }
     maven("https://repo.codemc.io/repository/maven-snapshots/")
 }
 
@@ -43,7 +34,6 @@ publishing {
             }
         }
     }
-
     publications {
         register<MavenPublication>("maven") {
             groupId = projectGroupId
@@ -64,7 +54,11 @@ allprojects {
 
     repositories {
         mavenCentral()
-        maven("https://repo.papermc.io/repository/maven-public/")
+        mavenLocal()
+        maven {
+            name = "minecraft-repo"
+            url = uri("https://libraries.minecraft.net/")
+        }
     }
 
     dependencies {
@@ -77,14 +71,17 @@ allprojects {
 }
 
 dependencies {
-    implementation(project(":api"))
+    implementation(project(":spigot:api"))
     implementation(project(":common"))
 }
 
 tasks {
+    publish {
+        finalizedBy(project(":paper:common").tasks["publish"])
+    }
     withType<ShadowJar> {
-        archiveFileName.set("${project.name}-${project.version}.jar")
-        archiveClassifier.set("mapped")
+        archiveFileName = "${project.name}-${project.version}.jar"
+        archiveClassifier = "spigot"
     }
     compileKotlin {
         kotlinOptions.jvmTarget = "1.8"
