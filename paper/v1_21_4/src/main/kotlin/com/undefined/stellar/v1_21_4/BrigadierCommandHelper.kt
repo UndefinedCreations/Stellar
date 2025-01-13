@@ -15,6 +15,7 @@ import net.minecraft.server.MinecraftServer
 import org.bukkit.Bukkit
 import java.util.concurrent.CompletableFuture
 
+@Suppress("DEPRECATION")
 object BrigadierCommandHelper {
 
     val COMMAND_SOURCE: CommandSourceStack by lazy {
@@ -27,7 +28,7 @@ object BrigadierCommandHelper {
 
     fun handleHelpTopic(command: AbstractStellarCommand<*>) {
         Bukkit.getServer().helpMap.addTopic(
-            CustomCommandHelpTopic(command.name, command.description, command.helpTopic) {
+            CustomCommandHelpTopic(command.name, command.description, command.information) {
                 val context = MinecraftServer.getServer().createCommandSourceStack()
                 val requirements = command.requirements.all { it(this) }
                 val permissionRequirements = command.permissionRequirements.all {
@@ -62,7 +63,7 @@ object BrigadierCommandHelper {
         val stellarContext = CommandContextAdapter.getStellarCommandContext(context)
         val completions: CompletableFuture<List<com.undefined.stellar.data.suggestion.Suggestion>> = CompletableFuture.supplyAsync {
             val suggestions: MutableList<com.undefined.stellar.data.suggestion.Suggestion> = mutableListOf()
-            for (suggestion in command.suggestions) suggestions.addAll(suggestion.get(stellarContext).get())
+            for (suggestion in command.suggestions) suggestions.addAll(suggestion.get(stellarContext, builder.remaining).get())
             suggestions
         }
         return CommandAdapter.getMojangSuggestions(builder, completions)

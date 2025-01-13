@@ -12,7 +12,6 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.server.MinecraftServer
 import org.bukkit.Bukkit
-import org.bukkit.scheduler.BukkitRunnable
 import java.util.concurrent.CompletableFuture
 
 @Suppress("DEPRECATION")
@@ -28,7 +27,7 @@ object BrigadierCommandHelper {
 
     fun handleHelpTopic(command: AbstractStellarCommand<*>) {
         Bukkit.getServer().helpMap.addTopic(
-            CustomCommandHelpTopic(command.name, command.description, command.helpTopic) {
+            CustomCommandHelpTopic(command.name, command.description, command.information) {
                 val context = MinecraftServer.getServer().createCommandSourceStack()
                 val requirements = command.requirements.all { it(this) }
                 val permissionRequirements = command.permissionRequirements.all {
@@ -88,10 +87,4 @@ object BrigadierCommandHelper {
         return emptyList()
     }
 
-}
-
-fun sync(execution: () -> Unit) {
-    object : BukkitRunnable() {
-        override fun run() = execution()
-    }.runTask(CommandRegistrar.plugin)
 }

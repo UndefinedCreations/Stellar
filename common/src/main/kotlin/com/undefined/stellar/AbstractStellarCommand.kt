@@ -1,5 +1,6 @@
 package com.undefined.stellar
 
+import com.undefined.stellar.argument.AbstractStellarArgument
 import com.undefined.stellar.argument.ArgumentHandler
 import com.undefined.stellar.data.argument.CommandContext
 import com.undefined.stellar.data.execution.StellarExecution
@@ -15,12 +16,12 @@ import org.jetbrains.annotations.ApiStatus
 import java.util.*
 
 @Suppress("UNCHECKED_CAST")
-abstract class AbstractStellarCommand<T>(val name: String, val description: String = "", usage: String = "") : ArgumentHandler() {
+abstract class AbstractStellarCommand<T>(val name: String, val description: String = "A custom Stellar command.", usage: String = "", aliases: List<String> = mutableListOf()) : ArgumentHandler() {
 
     override val base: AbstractStellarCommand<*>
         get() = this
-    @ApiStatus.Internal val aliases: MutableList<String> = mutableListOf()
-    @ApiStatus.Internal val helpTopic: SortedMap<String, String> = sortedMapOf()
+    @ApiStatus.Internal val aliases: MutableList<String> = aliases.toMutableList()
+    @ApiStatus.Internal val information: SortedMap<String, String> = sortedMapOf()
     @ApiStatus.Internal open val failureMessages: MutableList<Component> = mutableListOf()
     @ApiStatus.Internal open val globalFailureMessages: MutableList<Component> = mutableListOf()
     @ApiStatus.Internal open val failureExecutions: MutableList<StellarExecution<*>> = mutableListOf()
@@ -32,9 +33,11 @@ abstract class AbstractStellarCommand<T>(val name: String, val description: Stri
     @ApiStatus.Internal open val registerExecutions: MutableList<() -> Unit> = mutableListOf()
 
     init {
-        if (description.isNotEmpty()) helpTopic["Description"] to description
-        if (usage.isNotEmpty()) helpTopic["Usage"] to usage
-        if (aliases.isNotEmpty()) helpTopic["Aliases"] = aliases.joinToString(", ")
+        if (this !is AbstractStellarArgument<*>) {
+            if (aliases.isNotEmpty()) information["Aliases"] = aliases.joinToString(", ")
+            if (usage.isNotEmpty()) information["Usage"] = usage
+            if (description.isNotEmpty()) information["Description"] = description
+        }
     }
 
     fun setAliases(vararg aliases: String): T {
@@ -49,22 +52,22 @@ abstract class AbstractStellarCommand<T>(val name: String, val description: Stri
     }
 
     fun setDescription(description: String): T {
-        helpTopic["Description"] = description
+        information["Description"] = description
         return this as T
     }
 
     fun setUsageText(usage: String): T {
-        helpTopic["Usage"] = usage
+        information["Usage"] = usage
         return this as T
     }
 
     fun setInformation(name: String, text: String): T {
-        helpTopic[name] = text
+        information[name] = text
         return this as T
     }
 
     fun clearInformation(): T {
-        helpTopic.clear()
+        information.clear()
         return this as T
     }
 

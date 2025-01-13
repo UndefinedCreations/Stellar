@@ -33,7 +33,10 @@ import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import net.minecraft.commands.CommandBuildContext
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.arguments.*
+import net.minecraft.commands.arguments.DimensionArgument
 import net.minecraft.commands.arguments.EntityAnchorArgument
+import net.minecraft.commands.arguments.EntityArgument
+import net.minecraft.commands.arguments.ParticleArgument
 import net.minecraft.commands.arguments.blocks.BlockPredicateArgument
 import net.minecraft.commands.arguments.blocks.BlockStateArgument
 import net.minecraft.commands.arguments.coordinates.*
@@ -96,8 +99,8 @@ object ArgumentHelper {
             is StringArgument -> brigadier(argument.type)
             is PhraseArgument -> brigadier(StringType.PHRASE)
             is IntegerArgument -> IntegerArgumentType.integer(argument.min, argument.max)
-            is com.undefined.stellar.argument.primitive.LongArgument -> LongArgumentType.longArg(argument.min, argument.max)
-            is com.undefined.stellar.argument.primitive.FloatArgument -> FloatArgumentType.floatArg(argument.min, argument.max)
+            is LongArgument -> LongArgumentType.longArg(argument.min, argument.max)
+            is FloatArgument -> FloatArgumentType.floatArg(argument.min, argument.max)
             is DoubleArgument -> DoubleArgumentType.doubleArg(argument.min, argument.max)
             is BooleanArgument -> BoolArgumentType.bool()
             is com.undefined.stellar.argument.entity.EntityArgument -> brigadier(argument.type)
@@ -145,31 +148,31 @@ object ArgumentHelper {
             is com.undefined.stellar.argument.structure.LootTableArgument -> throwArgumentVersionException(argument)
             is UUIDArgument -> UuidArgument.uuid()
             is GameEventArgument -> ResourceKeyArgument.key(Registries.GAME_EVENT)
-            is com.undefined.stellar.argument.registry.StructureTypeArgument -> ResourceKeyArgument.key(Registries.STRUCTURE_TYPE)
+            is StructureTypeArgument -> ResourceKeyArgument.key(Registries.STRUCTURE_TYPE)
             is PotionEffectTypeArgument -> throwArgumentVersionException(argument)
             is BlockTypeArgument -> throwArgumentVersionException(argument)
             is ItemTypeArgument -> throwArgumentVersionException(argument)
             is CatTypeArgument -> throwArgumentVersionException(argument)
-            is com.undefined.stellar.argument.registry.FrogVariantArgument -> ResourceKeyArgument.key(Registries.FROG_VARIANT)
+            is FrogVariantArgument -> ResourceKeyArgument.key(Registries.FROG_VARIANT)
             is VillagerProfessionArgument -> ResourceKeyArgument.key(Registries.VILLAGER_PROFESSION)
-            is com.undefined.stellar.argument.registry.VillagerTypeArgument -> ResourceKeyArgument.key(Registries.VILLAGER_TYPE)
-            is com.undefined.stellar.argument.registry.MapDecorationTypeArgument -> throwArgumentVersionException(argument)
+            is VillagerTypeArgument -> ResourceKeyArgument.key(Registries.VILLAGER_TYPE)
+            is MapDecorationTypeArgument -> throwArgumentVersionException(argument)
             is InventoryTypeArgument -> throwArgumentVersionException(argument)
-            is com.undefined.stellar.argument.registry.AttributeArgument -> ResourceKeyArgument.key(Registries.ATTRIBUTE)
+            is AttributeArgument -> ResourceKeyArgument.key(Registries.ATTRIBUTE)
             is FluidArgument -> ResourceKeyArgument.key(Registries.FLUID)
             is SoundArgument -> ResourceKeyArgument.key(Registries.SOUND_EVENT)
-            is com.undefined.stellar.argument.registry.BiomeArgument -> ResourceKeyArgument.key(Registries.BIOME)
+            is BiomeArgument -> ResourceKeyArgument.key(Registries.BIOME)
             is StructureArgument -> ResourceKeyArgument.key(Registries.STRUCTURE)
             is TrimMaterialArgument -> throwArgumentVersionException(argument)
             is TrimPatternArgument -> throwArgumentVersionException(argument)
             is DamageTypeArgument -> throwArgumentVersionException(argument)
             is WolfVariantArgument -> throwArgumentVersionException(argument)
             is PatternTypeArgument -> throwArgumentVersionException(argument)
-            is com.undefined.stellar.argument.registry.ArtArgument -> ResourceKeyArgument.key(Registries.PAINTING_VARIANT)
+            is ArtArgument -> ResourceKeyArgument.key(Registries.PAINTING_VARIANT)
             is InstrumentArgument -> throwArgumentVersionException(argument)
             is EntityTypeArgument -> ResourceKeyArgument.key(Registries.ENTITY_TYPE)
             is PotionArgument -> throwArgumentVersionException(argument)
-            is com.undefined.stellar.argument.registry.MemoryKeyArgument -> ResourceKeyArgument.key(Registries.MEMORY_MODULE_TYPE)
+            is MemoryKeyArgument -> ResourceKeyArgument.key(Registries.MEMORY_MODULE_TYPE)
             else -> throw UnsupportedArgumentException(argument)
         }
 
@@ -179,8 +182,8 @@ object ArgumentHelper {
             is CustomArgument<*> -> argument.parse(CommandContextAdapter.getStellarCommandContext(context))
             is StringArgument -> StringArgumentType.getString(context, argument.name)
             is IntegerArgument -> IntegerArgumentType.getInteger(context, argument.name)
-            is com.undefined.stellar.argument.primitive.LongArgument -> LongArgumentType.getLong(context, argument.name)
-            is com.undefined.stellar.argument.primitive.FloatArgument -> FloatArgumentType.getFloat(context, argument.name)
+            is LongArgument -> LongArgumentType.getLong(context, argument.name)
+            is FloatArgument -> FloatArgumentType.getFloat(context, argument.name)
             is DoubleArgument -> DoubleArgumentType.getDouble(context, argument.name)
             is BooleanArgument -> BoolArgumentType.getBool(context, argument.name)
             is ListArgument<*> -> argument.parse(getParsedArgument(context, argument))
@@ -243,31 +246,31 @@ object ArgumentHelper {
             is com.undefined.stellar.argument.structure.LootTableArgument -> throwArgumentVersionException(argument)
             is UUIDArgument -> UuidArgument.getUuid(context, argument.name)
             is GameEventArgument -> org.bukkit.Registry.GAME_EVENT.get(getId(context, argument.name, Registries.GAME_EVENT))
-            is com.undefined.stellar.argument.registry.StructureTypeArgument -> org.bukkit.Registry.STRUCTURE_TYPE.get(getId(context, argument.name, Registries.STRUCTURE_TYPE))
+            is StructureTypeArgument -> org.bukkit.Registry.STRUCTURE_TYPE.get(getId(context, argument.name, Registries.STRUCTURE_TYPE))
             is PotionEffectTypeArgument -> throwArgumentVersionException(argument)
             is BlockTypeArgument -> throwArgumentVersionException(argument)
             is ItemTypeArgument -> throwArgumentVersionException(argument)
             is CatTypeArgument -> throwArgumentVersionException(argument)
-            is com.undefined.stellar.argument.registry.FrogVariantArgument -> org.bukkit.Registry.FROG_VARIANT.get(getId(context, argument.name, Registries.FROG_VARIANT))
+            is FrogVariantArgument -> org.bukkit.Registry.FROG_VARIANT.get(getId(context, argument.name, Registries.FROG_VARIANT))
             is VillagerProfessionArgument -> org.bukkit.Registry.VILLAGER_PROFESSION.get(getId(context, argument.name, Registries.VILLAGER_PROFESSION))
-            is com.undefined.stellar.argument.registry.VillagerTypeArgument -> org.bukkit.Registry.VILLAGER_TYPE.get(getId(context, argument.name, Registries.VILLAGER_TYPE))
-            is com.undefined.stellar.argument.registry.MapDecorationTypeArgument -> throwArgumentVersionException(argument)
+            is VillagerTypeArgument -> org.bukkit.Registry.VILLAGER_TYPE.get(getId(context, argument.name, Registries.VILLAGER_TYPE))
+            is MapDecorationTypeArgument -> throwArgumentVersionException(argument)
             is InventoryTypeArgument -> getInventoryType(resolveKey(context, argument.name, Registries.MENU).value())
-            is com.undefined.stellar.argument.registry.AttributeArgument -> org.bukkit.Registry.ATTRIBUTE.get(getId(context, argument.name, Registries.ATTRIBUTE))
+            is AttributeArgument -> org.bukkit.Registry.ATTRIBUTE.get(getId(context, argument.name, Registries.ATTRIBUTE))
             is FluidArgument -> org.bukkit.Registry.FLUID.get(getId(context, argument.name, Registries.FLUID))
             is SoundArgument -> org.bukkit.Registry.SOUNDS.get(getId(context, argument.name, Registries.SOUND_EVENT))
-            is com.undefined.stellar.argument.registry.BiomeArgument -> org.bukkit.Registry.BIOME.get(getId(context, argument.name, Registries.BIOME))
+            is BiomeArgument -> org.bukkit.Registry.BIOME.get(getId(context, argument.name, Registries.BIOME))
             is StructureArgument -> org.bukkit.Registry.STRUCTURE.get(getId(context, argument.name, Registries.STRUCTURE))
             is TrimMaterialArgument -> throwArgumentVersionException(argument)
             is TrimPatternArgument -> throwArgumentVersionException(argument)
             is DamageTypeArgument -> throwArgumentVersionException(argument)
             is WolfVariantArgument -> throwArgumentVersionException(argument)
             is PatternTypeArgument -> throwArgumentVersionException(argument)
-            is com.undefined.stellar.argument.registry.ArtArgument -> org.bukkit.Registry.ART.get(getId(context, argument.name, Registries.PAINTING_VARIANT))
+            is ArtArgument -> org.bukkit.Registry.ART.get(getId(context, argument.name, Registries.PAINTING_VARIANT))
             is InstrumentArgument -> throwArgumentVersionException(argument)
             is EntityTypeArgument -> org.bukkit.Registry.ENTITY_TYPE.get(getId(context, argument.name, Registries.ENTITY_TYPE))
             is PotionArgument -> throwArgumentVersionException(argument)
-            is com.undefined.stellar.argument.registry.MemoryKeyArgument -> org.bukkit.Registry.MEMORY_MODULE_TYPE.get(getId(context, argument.name, Registries.MEMORY_MODULE_TYPE))
+            is MemoryKeyArgument -> org.bukkit.Registry.MEMORY_MODULE_TYPE.get(getId(context, argument.name, Registries.MEMORY_MODULE_TYPE))
             else -> throw UnsupportedArgumentException(argument)
         }
     }
@@ -357,11 +360,11 @@ object ArgumentHelper {
         StringType.PHRASE -> StringArgumentType.greedyString()
     }
 
-    private fun brigadier(type: com.undefined.stellar.argument.entity.EntityDisplayType): EntityArgument = when (type) {
-        com.undefined.stellar.argument.entity.EntityDisplayType.ENTITY -> EntityArgument.entity()
-        com.undefined.stellar.argument.entity.EntityDisplayType.ENTITIES -> EntityArgument.entities()
-        com.undefined.stellar.argument.entity.EntityDisplayType.PLAYER -> EntityArgument.player()
-        com.undefined.stellar.argument.entity.EntityDisplayType.PLAYERS -> EntityArgument.players()
+    private fun brigadier(type: EntityDisplayType): EntityArgument = when (type) {
+        EntityDisplayType.ENTITY -> EntityArgument.entity()
+        EntityDisplayType.ENTITIES -> EntityArgument.entities()
+        EntityDisplayType.PLAYER -> EntityArgument.player()
+        EntityDisplayType.PLAYERS -> EntityArgument.players()
     }
 
     private fun getBukkitAxis(argument: EnumSet<Direction.Axis>): EnumSet<Axis> =

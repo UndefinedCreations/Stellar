@@ -12,7 +12,7 @@ class EnumArgument<T : Enum<T>>(
     parent: AbstractStellarCommand<*>,
     name: String,
     val enum: KClass<out Enum<*>>,
-    converter: (Enum<*>?) -> Suggestion = { Suggestion.withText(it?.name ?: "") },
+    converter: (Enum<*>?) -> Suggestion = { Suggestion.withText(it!!.name) },
     parse: (Any?) -> Enum<T>? = {
         try {
             valueOf(enum.java, (it as String).uppercase()) as Enum<T>
@@ -21,12 +21,16 @@ class EnumArgument<T : Enum<T>>(
         }
     }
 ) : ListArgument<Enum<*>?>(StringArgument(parent, name, StringType.WORD), enum.java.enumConstants.toList(), converter, parse) {
-
     fun valueOf(name: String): Enum<T>? =
         try {
             valueOf(enum.java, name) as Enum<T>
         } catch (e: IllegalArgumentException) {
             null
         }
+}
 
+enum class EnumFormatting(val action: (String) -> String) {
+    LOWERCASE({ it.lowercase() }),
+    UPPERCASE({ it.uppercase() }),
+    CAPITALIZED({ it.lowercase().replaceFirstChar { char -> char.uppercase() } }),
 }

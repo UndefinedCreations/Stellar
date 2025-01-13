@@ -25,7 +25,9 @@ open class ListArgument<T>(
     }
 
     override val suggestions: MutableList<StellarSuggestion<*>>
-        get() = (super.suggestions + StellarSuggestion(CommandSender::class) { CompletableFuture.completedFuture(getSuggestionList(this)) }).toMutableList()
+        get() = (super.suggestions + StellarSuggestion(CommandSender::class) { input ->
+            CompletableFuture.completedFuture(getSuggestionList(this).filter { it.text.startsWith(input, true) })
+        }).toMutableList()
 
     fun getSuggestionList(context: CommandContext<CommandSender>): List<Suggestion> = list(context).map(converter)
 

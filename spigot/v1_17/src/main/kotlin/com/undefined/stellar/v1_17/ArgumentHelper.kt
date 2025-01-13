@@ -37,7 +37,10 @@ import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.SharedSuggestionProvider
 import net.minecraft.commands.arguments.*
+import net.minecraft.commands.arguments.DimensionArgument
 import net.minecraft.commands.arguments.EntityAnchorArgument
+import net.minecraft.commands.arguments.EntityArgument
+import net.minecraft.commands.arguments.ParticleArgument
 import net.minecraft.commands.arguments.blocks.BlockPredicateArgument
 import net.minecraft.commands.arguments.blocks.BlockStateArgument
 import net.minecraft.commands.arguments.coordinates.*

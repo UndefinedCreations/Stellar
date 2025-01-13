@@ -5,6 +5,8 @@ package com.undefined.stellar.argument
 import com.undefined.stellar.AbstractStellarCommand
 import com.undefined.stellar.argument.block.BlockDataArgument
 import com.undefined.stellar.argument.block.BlockPredicateArgument
+import com.undefined.stellar.argument.custom.EnumArgument
+import com.undefined.stellar.argument.custom.EnumFormatting
 import com.undefined.stellar.argument.custom.ListArgument
 import com.undefined.stellar.argument.entity.EntityAnchorArgument
 import com.undefined.stellar.argument.item.ItemPredicateArgument
@@ -163,15 +165,15 @@ open class ArgumentHandler {
     fun addUUIDListArgument(name: String, list: CommandContext<CommandSender>.() -> List<UUID>): ListArgument<UUID> =
         addArgument { ListArgument(UUIDArgument(base, name), list, parse = { it }) }
 
-    inline fun <reified T : Enum<T>> addEnumArgument(name: String): com.undefined.stellar.argument.custom.EnumArgument<T> =
-        addArgument { com.undefined.stellar.argument.custom.EnumArgument<T>(base, name, T::class) }
+    inline fun <reified T : Enum<T>> addEnumArgument(name: String, formatting: EnumFormatting = EnumFormatting.LOWERCASE): EnumArgument<T> =
+        addArgument { EnumArgument<T>(base, name, T::class, { Suggestion.withText(formatting.action(it!!.name)) }) }
 
     inline fun <reified T : Enum<T>> addEnumArgument(
         name: String,
-        noinline converter: (Enum<*>?) -> Suggestion = { Suggestion.withText(it?.name ?: "") },
+        noinline converter: (Enum<*>?) -> Suggestion = { Suggestion.withText(it!!.name) },
         noinline parse: (Any?) -> Enum<T>?
-    ): com.undefined.stellar.argument.custom.EnumArgument<T> = addArgument {
-        com.undefined.stellar.argument.custom.EnumArgument(
+    ): EnumArgument<T> = addArgument {
+        EnumArgument(
             base,
             name,
             T::class,

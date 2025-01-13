@@ -37,7 +37,10 @@ import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.SharedSuggestionProvider
 import net.minecraft.commands.arguments.*
+import net.minecraft.commands.arguments.DimensionArgument
 import net.minecraft.commands.arguments.EntityAnchorArgument
+import net.minecraft.commands.arguments.EntityArgument
+import net.minecraft.commands.arguments.ParticleArgument
 import net.minecraft.commands.arguments.blocks.BlockPredicateArgument
 import net.minecraft.commands.arguments.blocks.BlockStateArgument
 import net.minecraft.commands.arguments.coordinates.*
@@ -96,10 +99,10 @@ object ArgumentHelper {
             is VillagerProfessionArgument -> SuggestionProvider { _, builder ->
                 SharedSuggestionProvider.suggestResource(Registry.VILLAGER_PROFESSION.keySet(), builder)
             }
-            is com.undefined.stellar.argument.registry.VillagerTypeArgument -> SuggestionProvider { _, builder ->
+            is VillagerTypeArgument -> SuggestionProvider { _, builder ->
                 SharedSuggestionProvider.suggestResource(Registry.VILLAGER_TYPE.keySet(), builder)
             }
-            is com.undefined.stellar.argument.registry.AttributeArgument -> SuggestionProvider { _, builder ->
+            is AttributeArgument -> SuggestionProvider { _, builder ->
                 SharedSuggestionProvider.suggestResource(Registry.ATTRIBUTE.keySet(), builder)
             }
             is FluidArgument -> SuggestionProvider { _, builder ->
@@ -108,13 +111,13 @@ object ArgumentHelper {
             is SoundArgument -> SuggestionProvider { context, builder ->
                 SuggestionProviders.AVAILABLE_SOUNDS.getSuggestions(context, builder)
             }
-            is com.undefined.stellar.argument.registry.BiomeArgument -> SuggestionProvider { context, builder ->
+            is BiomeArgument -> SuggestionProvider { context, builder ->
                 SuggestionProviders.AVAILABLE_BIOMES.getSuggestions(context, builder)
             }
             is EntityTypeArgument -> SuggestionProvider { _, builder ->
                 SharedSuggestionProvider.suggestResource(Registry.ENTITY_TYPE.keySet(), builder)
             }
-            is com.undefined.stellar.argument.registry.MemoryKeyArgument -> SuggestionProvider { _, builder ->
+            is MemoryKeyArgument -> SuggestionProvider { _, builder ->
                 SharedSuggestionProvider.suggestResource(Registry.MEMORY_MODULE_TYPE.keySet(), builder)
             }
             else -> null
@@ -174,31 +177,31 @@ object ArgumentHelper {
             is LootTableArgument -> throwArgumentVersionException(argument)
             is UUIDArgument -> UuidArgument.uuid()
             is GameEventArgument -> ResourceLocationArgument.id()
-            is com.undefined.stellar.argument.registry.StructureTypeArgument -> throwArgumentVersionException(argument)
+            is StructureTypeArgument -> throwArgumentVersionException(argument)
             is PotionEffectTypeArgument -> throwArgumentVersionException(argument)
             is BlockTypeArgument -> throwArgumentVersionException(argument)
             is ItemTypeArgument -> throwArgumentVersionException(argument)
             is CatTypeArgument -> throwArgumentVersionException(argument)
-            is com.undefined.stellar.argument.registry.FrogVariantArgument -> throwArgumentVersionException(argument)
+            is FrogVariantArgument -> throwArgumentVersionException(argument)
             is VillagerProfessionArgument -> ResourceLocationArgument.id()
-            is com.undefined.stellar.argument.registry.VillagerTypeArgument -> ResourceLocationArgument.id()
-            is com.undefined.stellar.argument.registry.MapDecorationTypeArgument -> throwArgumentVersionException(argument)
+            is VillagerTypeArgument -> ResourceLocationArgument.id()
+            is MapDecorationTypeArgument -> throwArgumentVersionException(argument)
             is InventoryTypeArgument -> throwArgumentVersionException(argument)
-            is com.undefined.stellar.argument.registry.AttributeArgument -> ResourceLocationArgument.id()
+            is AttributeArgument -> ResourceLocationArgument.id()
             is FluidArgument -> ResourceLocationArgument.id()
             is SoundArgument -> ResourceLocationArgument.id()
-            is com.undefined.stellar.argument.registry.BiomeArgument -> ResourceLocationArgument.id()
+            is BiomeArgument -> ResourceLocationArgument.id()
             is StructureArgument -> throwArgumentVersionException(argument)
             is TrimMaterialArgument -> throwArgumentVersionException(argument)
             is TrimPatternArgument -> throwArgumentVersionException(argument)
             is DamageTypeArgument -> throwArgumentVersionException(argument)
             is WolfVariantArgument -> throwArgumentVersionException(argument)
             is PatternTypeArgument -> throwArgumentVersionException(argument)
-            is com.undefined.stellar.argument.registry.ArtArgument -> throwArgumentVersionException(argument)
+            is ArtArgument -> throwArgumentVersionException(argument)
             is InstrumentArgument -> throwArgumentVersionException(argument)
             is EntityTypeArgument -> ResourceLocationArgument.id()
             is PotionArgument -> throwArgumentVersionException(argument)
-            is com.undefined.stellar.argument.registry.MemoryKeyArgument -> ResourceLocationArgument.id()
+            is MemoryKeyArgument -> ResourceLocationArgument.id()
             else -> throw UnsupportedArgumentException(argument)
         }
 
@@ -270,31 +273,31 @@ object ArgumentHelper {
             is LootTableArgument -> throwArgumentVersionException(argument)
             is UUIDArgument -> UuidArgument.getUuid(context, argument.name)
             is GameEventArgument -> org.bukkit.Registry.GAME_EVENT.get(getId(context, argument.name))
-            is com.undefined.stellar.argument.registry.StructureTypeArgument -> throwArgumentVersionException(argument)
+            is StructureTypeArgument -> throwArgumentVersionException(argument)
             is PotionEffectTypeArgument -> throwArgumentVersionException(argument)
             is BlockTypeArgument -> throwArgumentVersionException(argument)
             is ItemTypeArgument -> throwArgumentVersionException(argument)
             is CatTypeArgument -> throwArgumentVersionException(argument)
-            is com.undefined.stellar.argument.registry.FrogVariantArgument -> throwArgumentVersionException(argument)
+            is FrogVariantArgument -> throwArgumentVersionException(argument)
             is VillagerProfessionArgument -> org.bukkit.Registry.VILLAGER_PROFESSION.get(getId(context, argument.name))
-            is com.undefined.stellar.argument.registry.VillagerTypeArgument -> org.bukkit.Registry.VILLAGER_TYPE.get(getId(context, argument.name))
-            is com.undefined.stellar.argument.registry.MapDecorationTypeArgument -> throwArgumentVersionException(argument)
+            is VillagerTypeArgument -> org.bukkit.Registry.VILLAGER_TYPE.get(getId(context, argument.name))
+            is MapDecorationTypeArgument -> throwArgumentVersionException(argument)
             is InventoryTypeArgument -> getInventoryType(Registry.MENU.getOrThrow(ResourceKey.create(Registry.MENU_REGISTRY, ResourceLocationArgument.getId(context, argument.name))))
-            is com.undefined.stellar.argument.registry.AttributeArgument -> org.bukkit.Registry.ATTRIBUTE.get(getId(context, argument.name))
+            is AttributeArgument -> org.bukkit.Registry.ATTRIBUTE.get(getId(context, argument.name))
             is FluidArgument -> org.bukkit.Registry.FLUID.get(getId(context, argument.name))
             is SoundArgument -> org.bukkit.Registry.SOUNDS.get(getId(context, argument.name))
-            is com.undefined.stellar.argument.registry.BiomeArgument -> org.bukkit.Registry.BIOME.get(getId(context, argument.name))
+            is BiomeArgument -> org.bukkit.Registry.BIOME.get(getId(context, argument.name))
             is StructureArgument -> throwArgumentVersionException(argument)
             is TrimMaterialArgument -> throwArgumentVersionException(argument)
             is TrimPatternArgument -> throwArgumentVersionException(argument)
             is DamageTypeArgument -> throwArgumentVersionException(argument)
             is WolfVariantArgument -> throwArgumentVersionException(argument)
             is PatternTypeArgument -> throwArgumentVersionException(argument)
-            is com.undefined.stellar.argument.registry.ArtArgument -> throwArgumentVersionException(argument)
+            is ArtArgument -> throwArgumentVersionException(argument)
             is InstrumentArgument -> throwArgumentVersionException(argument)
             is EntityTypeArgument -> org.bukkit.Registry.ENTITY_TYPE.get(getId(context, argument.name))
             is PotionArgument -> throwArgumentVersionException(argument)
-            is com.undefined.stellar.argument.registry.MemoryKeyArgument -> org.bukkit.Registry.MEMORY_MODULE_TYPE.get(getId(context, argument.name))
+            is MemoryKeyArgument -> org.bukkit.Registry.MEMORY_MODULE_TYPE.get(getId(context, argument.name))
             else -> throw UnsupportedArgumentException(argument)
         }
     }

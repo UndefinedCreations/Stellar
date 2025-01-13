@@ -31,12 +31,7 @@ abstract class AbstractStellarArgument<T>(val parent: AbstractStellarCommand<*>,
     }
 
     fun addSuggestions(vararg suggestions: Suggestion): T = addSuggestions(suggestions.toList())
-
-    fun addSuggestionWithoutTooltip(suggestion: String): T = addSuggestions(listOf(Suggestion(suggestion, "")))
-
-    fun addSuggestionsWithoutTooltip(suggestions: List<String>): T = addSuggestions(suggestions.map { Suggestion(it, "") })
-
-    fun addSuggestions(vararg list: String): T = addSuggestions(list.map { Suggestion(it, "") })
+    fun addSuggestions(vararg suggestions: String): T = addSuggestions(suggestions.map { Suggestion(it, "") })
 
     fun setSuggestions(vararg suggestions: Suggestion): T {
         this.suggestions.clear()
@@ -58,13 +53,18 @@ abstract class AbstractStellarArgument<T>(val parent: AbstractStellarCommand<*>,
         return addSuggestions(suggestions.map { Suggestion(it, "") })
     }
 
-    inline fun <reified C : CommandSender> addAsyncSuggestion(noinline suggestion: CommandContext<C>.() -> CompletableFuture<List<Suggestion>>): T {
+    inline fun <reified C : CommandSender> addFutureSuggestion(noinline suggestion: CommandContext<C>.(input: String) -> CompletableFuture<List<Suggestion>>): T {
         suggestions.add(StellarSuggestion(C::class, suggestion))
         return this as T
     }
 
-    inline fun <reified C : CommandSender> addSuggestion(noinline suggestion: CommandContext<C>.() -> List<Suggestion>): T {
-        suggestions.add(StellarSuggestion(C::class) { CompletableFuture.completedFuture(suggestion(this)) })
+    inline fun <reified C : CommandSender> addAsyncSuggestion(noinline suggestion: CommandContext<C>.(input: String) -> List<Suggestion>): T {
+        suggestions.add(StellarSuggestion(C::class) { CompletableFuture.supplyAsync { suggestion(this, it) } })
+        return this as T
+    }
+
+    inline fun <reified C : CommandSender> addSuggestion(noinline suggestion: CommandContext<C>.(input: String) -> List<Suggestion>): T {
+        suggestions.add(StellarSuggestion(C::class) { CompletableFuture.completedFuture(suggestion(this, it)) })
         return this as T
     }
 
