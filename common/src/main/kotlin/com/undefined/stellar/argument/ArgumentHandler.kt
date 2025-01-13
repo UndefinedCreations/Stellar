@@ -3,34 +3,33 @@
 package com.undefined.stellar.argument
 
 import com.undefined.stellar.AbstractStellarCommand
-import com.undefined.stellar.argument.types.block.BlockDataArgument
-import com.undefined.stellar.argument.types.block.BlockPredicateArgument
-import com.undefined.stellar.argument.types.custom.CustomArgument
-import com.undefined.stellar.argument.types.custom.EnumArgument
-import com.undefined.stellar.argument.types.custom.ListArgument
-import com.undefined.stellar.argument.types.entity.EntityAnchorArgument
-import com.undefined.stellar.argument.types.entity.EntityArgument
-import com.undefined.stellar.argument.types.entity.EntityDisplayType
-import com.undefined.stellar.argument.types.item.ItemArgument
-import com.undefined.stellar.argument.types.item.ItemPredicateArgument
-import com.undefined.stellar.argument.types.item.ItemSlotArgument
-import com.undefined.stellar.argument.types.item.ItemSlotsArgument
-import com.undefined.stellar.argument.types.math.*
-import com.undefined.stellar.argument.types.misc.NamespacedKeyArgument
-import com.undefined.stellar.argument.types.misc.UUIDArgument
-import com.undefined.stellar.argument.types.player.GameModeArgument
-import com.undefined.stellar.argument.types.player.GameProfileArgument
-import com.undefined.stellar.argument.types.primitive.*
-import com.undefined.stellar.argument.types.registry.*
-import com.undefined.stellar.argument.types.scoreboard.*
-import com.undefined.stellar.argument.types.structure.LootTableArgument
-import com.undefined.stellar.argument.types.structure.MirrorArgument
-import com.undefined.stellar.argument.types.structure.StructureRotationArgument
-import com.undefined.stellar.argument.types.text.ColorArgument
-import com.undefined.stellar.argument.types.text.ComponentArgument
-import com.undefined.stellar.argument.types.text.MessageArgument
-import com.undefined.stellar.argument.types.text.StyleArgument
-import com.undefined.stellar.argument.types.world.*
+import com.undefined.stellar.argument.block.BlockDataArgument
+import com.undefined.stellar.argument.block.BlockPredicateArgument
+import com.undefined.stellar.argument.custom.ListArgument
+import com.undefined.stellar.argument.entity.EntityAnchorArgument
+import com.undefined.stellar.argument.item.ItemPredicateArgument
+import com.undefined.stellar.argument.item.ItemSlotArgument
+import com.undefined.stellar.argument.item.ItemSlotsArgument
+import com.undefined.stellar.argument.math.AngleArgument
+import com.undefined.stellar.argument.math.OperationArgument
+import com.undefined.stellar.argument.math.RangeArgument
+import com.undefined.stellar.argument.math.TimeArgument
+import com.undefined.stellar.argument.misc.NamespacedKeyArgument
+import com.undefined.stellar.argument.misc.UUIDArgument
+import com.undefined.stellar.argument.player.GameModeArgument
+import com.undefined.stellar.argument.player.GameProfileArgument
+import com.undefined.stellar.argument.primitive.*
+import com.undefined.stellar.argument.registry.*
+import com.undefined.stellar.argument.scoreboard.ObjectiveCriteriaArgument
+import com.undefined.stellar.argument.structure.LootTableArgument
+import com.undefined.stellar.argument.structure.MirrorArgument
+import com.undefined.stellar.argument.text.ColorArgument
+import com.undefined.stellar.argument.text.ComponentArgument
+import com.undefined.stellar.argument.text.MessageArgument
+import com.undefined.stellar.argument.text.StyleArgument
+import com.undefined.stellar.argument.world.HeightMapArgument
+import com.undefined.stellar.argument.world.LocationArgument
+import com.undefined.stellar.argument.world.LocationType
 import com.undefined.stellar.data.argument.CommandContext
 import com.undefined.stellar.data.suggestion.Suggestion
 import org.bukkit.Bukkit
@@ -64,10 +63,10 @@ open class ArgumentHandler {
         return parsedArgument as T
     }
 
-    fun <T> addCustomArgument(argument: CustomArgument<T>): CustomArgument<T> {
-        addArgument(argument)
-        return argument
-    }
+//    fun <T> addCustomArgument(argument: CustomArgument<T>): CustomArgument<T> {
+//        addArgument(argument)
+//        return argument
+//    }
 
     fun addStringArgument(name: String, type: StringType = StringType.WORD): StringArgument =
         addArgument { StringArgument(base, name, type)  }
@@ -78,11 +77,11 @@ open class ArgumentHandler {
     fun addIntegerArgument(name: String, min: Int = Int.MIN_VALUE, max: Int = Int.MAX_VALUE): IntegerArgument =
         addArgument { IntegerArgument(base, name, min, max) }
 
-    fun addLongArgument(name: String, min: Long = Long.MIN_VALUE, max: Long = Long.MAX_VALUE): LongArgument =
-        addArgument { LongArgument(base, name, min, max) }
+    fun addLongArgument(name: String, min: Long = Long.MIN_VALUE, max: Long = Long.MAX_VALUE): com.undefined.stellar.argument.primitive.LongArgument =
+        addArgument { com.undefined.stellar.argument.primitive.LongArgument(base, name, min, max) }
 
-    fun addFloatArgument(name: String, min: Float = Float.MIN_VALUE, max: Float = Float.MAX_VALUE): FloatArgument =
-        addArgument { FloatArgument(base, name, min, max) }
+    fun addFloatArgument(name: String, min: Float = Float.MIN_VALUE, max: Float = Float.MAX_VALUE): com.undefined.stellar.argument.primitive.FloatArgument =
+        addArgument { com.undefined.stellar.argument.primitive.FloatArgument(base, name, min, max) }
 
     fun addDoubleArgument(name: String, min: Double = Double.MIN_VALUE, max: Double = Double.MAX_VALUE): DoubleArgument =
         addArgument { DoubleArgument(base, name, min, max) }
@@ -164,17 +163,25 @@ open class ArgumentHandler {
     fun addUUIDListArgument(name: String, list: CommandContext<CommandSender>.() -> List<UUID>): ListArgument<UUID> =
         addArgument { ListArgument(UUIDArgument(base, name), list, parse = { it }) }
 
-    inline fun <reified T : Enum<T>> addEnumArgument(name: String): EnumArgument<T> =
-        addArgument { EnumArgument<T>(base, name, T::class) }
+    inline fun <reified T : Enum<T>> addEnumArgument(name: String): com.undefined.stellar.argument.custom.EnumArgument<T> =
+        addArgument { com.undefined.stellar.argument.custom.EnumArgument<T>(base, name, T::class) }
 
     inline fun <reified T : Enum<T>> addEnumArgument(
         name: String,
         noinline converter: (Enum<*>?) -> Suggestion = { Suggestion.withText(it?.name ?: "") },
         noinline parse: (Any?) -> Enum<T>?
-    ): EnumArgument<T> = addArgument { EnumArgument(base, name, T::class, converter, parse) }
+    ): com.undefined.stellar.argument.custom.EnumArgument<T> = addArgument {
+        com.undefined.stellar.argument.custom.EnumArgument(
+            base,
+            name,
+            T::class,
+            converter,
+            parse
+        )
+    }
 
-    fun addEntityArgument(name: String, type: EntityDisplayType): EntityArgument =
-        addArgument { EntityArgument(base, name, type) }
+    fun addEntityArgument(name: String, type: com.undefined.stellar.argument.entity.EntityDisplayType): com.undefined.stellar.argument.entity.EntityArgument =
+        addArgument { com.undefined.stellar.argument.entity.EntityArgument(base, name, type) }
 
     fun addGameProfileArgument(name: String): GameProfileArgument =
         addArgument { GameProfileArgument(base, name) }
@@ -188,8 +195,8 @@ open class ArgumentHandler {
     fun addBlockPredicateArgument(name: String): BlockPredicateArgument =
         addArgument { BlockPredicateArgument(base, name) }
 
-    fun addItemArgument(name: String): ItemArgument =
-        addArgument { ItemArgument(base, name) }
+    fun addItemArgument(name: String): com.undefined.stellar.argument.item.ItemArgument =
+        addArgument { com.undefined.stellar.argument.item.ItemArgument(base, name) }
 
     fun addItemPredicateArgument(name: String): ItemPredicateArgument =
         addArgument { ItemPredicateArgument(base, name) }
@@ -206,8 +213,8 @@ open class ArgumentHandler {
     fun addMessageArgument(name: String): MessageArgument =
         addArgument { MessageArgument(base, name) }
 
-    fun addObjectiveArgument(name: String): ObjectiveArgument =
-        addArgument { ObjectiveArgument(base, name) }
+    fun addObjectiveArgument(name: String): com.undefined.stellar.argument.scoreboard.ObjectiveArgument =
+        addArgument { com.undefined.stellar.argument.scoreboard.ObjectiveArgument(base, name) }
 
     fun addObjectiveCriteriaArgument(name: String): ObjectiveCriteriaArgument =
         addArgument { ObjectiveCriteriaArgument(base, name) }
@@ -215,26 +222,26 @@ open class ArgumentHandler {
     fun addOperationArgument(name: String): OperationArgument =
         addArgument { OperationArgument(base, name) }
 
-    fun addParticleArgument(name: String): ParticleArgument =
-        addArgument { ParticleArgument(base, name) }
+    fun addParticleArgument(name: String): com.undefined.stellar.argument.world.ParticleArgument =
+        addArgument { com.undefined.stellar.argument.world.ParticleArgument(base, name) }
 
     fun addAngleArgument(name: String): AngleArgument =
         addArgument { AngleArgument(base, name) }
 
-    fun addRotationArgument(name: String): RotationArgument =
-        addArgument { RotationArgument(base, name) }
+    fun addRotationArgument(name: String): com.undefined.stellar.argument.math.RotationArgument =
+        addArgument { com.undefined.stellar.argument.math.RotationArgument(base, name) }
 
-    fun addDisplaySlotArgument(name: String): DisplaySlotArgument =
-        addArgument { DisplaySlotArgument(base, name) }
+    fun addDisplaySlotArgument(name: String): com.undefined.stellar.argument.scoreboard.DisplaySlotArgument =
+        addArgument { com.undefined.stellar.argument.scoreboard.DisplaySlotArgument(base, name) }
 
-    fun addScoreHolderArgument(name: String, type: ScoreHolderType = ScoreHolderType.SINGLE): ScoreHolderArgument =
-        addArgument { ScoreHolderArgument(base, name, type) }
+    fun addScoreHolderArgument(name: String, type: com.undefined.stellar.argument.scoreboard.ScoreHolderType = com.undefined.stellar.argument.scoreboard.ScoreHolderType.SINGLE): com.undefined.stellar.argument.scoreboard.ScoreHolderArgument =
+        addArgument { com.undefined.stellar.argument.scoreboard.ScoreHolderArgument(base, name, type) }
 
-    fun addAxisArgument(name: String): AxisArgument =
-        addArgument { AxisArgument(base, name) }
+    fun addAxisArgument(name: String): com.undefined.stellar.argument.math.AxisArgument =
+        addArgument { com.undefined.stellar.argument.math.AxisArgument(base, name) }
 
-    fun addTeamArgument(name: String): TeamArgument =
-        addArgument { TeamArgument(base, name) }
+    fun addTeamArgument(name: String): com.undefined.stellar.argument.scoreboard.TeamArgument =
+        addArgument { com.undefined.stellar.argument.scoreboard.TeamArgument(base, name) }
 
     fun addItemSlotArgument(name: String): ItemSlotArgument =
         addArgument { ItemSlotArgument(base, name) }
@@ -254,8 +261,8 @@ open class ArgumentHandler {
     fun addGameModeArgument(name: String): GameModeArgument =
         addArgument { GameModeArgument(base, name) }
 
-    fun addDimensionArgument(name: String): DimensionArgument =
-        addArgument { DimensionArgument(base, name) }
+    fun addDimensionArgument(name: String): com.undefined.stellar.argument.world.DimensionArgument =
+        addArgument { com.undefined.stellar.argument.world.DimensionArgument(base, name) }
 
     fun addTimeArgument(name: String, minimum: Int = 0): TimeArgument =
         addArgument { TimeArgument(base, name, minimum) }
@@ -263,8 +270,8 @@ open class ArgumentHandler {
     fun addMirrorArgument(name: String): MirrorArgument =
         addArgument { MirrorArgument(base, name) }
 
-    fun addStructureRotationArgument(name: String): StructureRotationArgument =
-        addArgument { StructureRotationArgument(base, name) }
+    fun addStructureRotationArgument(name: String): com.undefined.stellar.argument.structure.StructureRotationArgument =
+        addArgument { com.undefined.stellar.argument.structure.StructureRotationArgument(base, name) }
 
     fun addHeightMapArgument(name: String): HeightMapArgument =
         addArgument { HeightMapArgument(base, name) }
@@ -298,8 +305,8 @@ open class ArgumentHandler {
     fun addGameEventArgument(name: String): GameEventArgument =
         addArgument { GameEventArgument(base, name) }
 
-    fun addStructureTypeArgument(name: String): StructureTypeArgument =
-        addArgument { StructureTypeArgument(base, name) }
+    fun addStructureTypeArgument(name: String): com.undefined.stellar.argument.registry.StructureTypeArgument =
+        addArgument { com.undefined.stellar.argument.registry.StructureTypeArgument(base, name) }
 
     fun addPotionEffectTypeArgument(name: String): PotionEffectTypeArgument =
         addArgument { PotionEffectTypeArgument(base, name) }
@@ -313,23 +320,23 @@ open class ArgumentHandler {
     fun addCatTypeArgument(name: String): CatTypeArgument =
         addArgument { CatTypeArgument(base, name) }
 
-    fun addFrogVariantArgument(name: String): FrogVariantArgument =
-        addArgument { FrogVariantArgument(base, name) }
+    fun addFrogVariantArgument(name: String): com.undefined.stellar.argument.registry.FrogVariantArgument =
+        addArgument { com.undefined.stellar.argument.registry.FrogVariantArgument(base, name) }
 
     fun addVillagerProfessionArgument(name: String): VillagerProfessionArgument =
         addArgument { VillagerProfessionArgument(base, name) }
 
-    fun addVillagerTypeArgument(name: String): VillagerTypeArgument =
-        addArgument { VillagerTypeArgument(base, name) }
+    fun addVillagerTypeArgument(name: String): com.undefined.stellar.argument.registry.VillagerTypeArgument =
+        addArgument { com.undefined.stellar.argument.registry.VillagerTypeArgument(base, name) }
 
-    fun addMapDecorationType(name: String): MapDecorationTypeArgument =
-        addArgument { MapDecorationTypeArgument(base, name) }
+    fun addMapDecorationType(name: String): com.undefined.stellar.argument.registry.MapDecorationTypeArgument =
+        addArgument { com.undefined.stellar.argument.registry.MapDecorationTypeArgument(base, name) }
 
     fun addInventoryTypeArgument(name: String): InventoryTypeArgument =
         addArgument { InventoryTypeArgument(base, name) }
 
-    fun addAttributeArgument(name: String): AttributeArgument =
-        addArgument { AttributeArgument(base, name) }
+    fun addAttributeArgument(name: String): com.undefined.stellar.argument.registry.AttributeArgument =
+        addArgument { com.undefined.stellar.argument.registry.AttributeArgument(base, name) }
 
     fun addFluidArgument(name: String): FluidArgument =
         addArgument { FluidArgument(base, name) }
@@ -337,8 +344,8 @@ open class ArgumentHandler {
     fun addSoundArgument(name: String): SoundArgument =
         addArgument { SoundArgument(base, name) }
 
-    fun addBiomeArgument(name: String): BiomeArgument =
-        addArgument { BiomeArgument(base, name) }
+    fun addBiomeArgument(name: String): com.undefined.stellar.argument.registry.BiomeArgument =
+        addArgument { com.undefined.stellar.argument.registry.BiomeArgument(base, name) }
 
     fun addStructureArgument(name: String): StructureArgument =
         addArgument { StructureArgument(base, name) }
@@ -358,8 +365,8 @@ open class ArgumentHandler {
     fun addPatternTypeArgument(name: String): PatternTypeArgument =
         addArgument { PatternTypeArgument(base, name) }
 
-    fun addArtArgument(name: String): ArtArgument =
-        addArgument { ArtArgument(base, name) }
+    fun addArtArgument(name: String): com.undefined.stellar.argument.registry.ArtArgument =
+        addArgument { com.undefined.stellar.argument.registry.ArtArgument(base, name) }
 
     fun addInstrumentArgument(name: String): InstrumentArgument =
         addArgument { InstrumentArgument(base, name) }
@@ -370,7 +377,7 @@ open class ArgumentHandler {
     fun addPotionArgument(name: String): PotionArgument =
         addArgument { PotionArgument(base, name) }
 
-    fun addMemoryKeyArgument(name: String): MemoryKeyArgument =
-        addArgument { MemoryKeyArgument(base, name) }
+    fun addMemoryKeyArgument(name: String): com.undefined.stellar.argument.registry.MemoryKeyArgument =
+        addArgument { com.undefined.stellar.argument.registry.MemoryKeyArgument(base, name) }
 
 }

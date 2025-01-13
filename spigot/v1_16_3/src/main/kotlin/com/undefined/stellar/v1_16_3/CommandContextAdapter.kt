@@ -5,7 +5,7 @@ import com.undefined.stellar.AbstractStellarCommand
 import com.undefined.stellar.StellarCommands
 import com.undefined.stellar.argument.AbstractStellarArgument
 import com.undefined.stellar.argument.LiteralStellarArgument
-import com.undefined.stellar.argument.types.custom.CustomArgument
+import com.undefined.stellar.argument.custom.CustomArgument
 import com.undefined.stellar.data.argument.CommandNode
 import com.undefined.stellar.data.argument.PhraseCommandContext
 import com.undefined.stellar.exception.DuplicateArgumentNameException

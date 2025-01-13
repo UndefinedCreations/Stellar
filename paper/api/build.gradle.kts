@@ -39,8 +39,8 @@ publishing {
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.3-R0.1-SNAPSHOT")
-    implementation(project(":paper:common"))
-    implementation(project(":paper:v1_17_1"))
+    api(project(":paper:common"))
+    implementation(project(":paper:v1_21_4"))
     implementation(kotlin("reflect"))
 }
 

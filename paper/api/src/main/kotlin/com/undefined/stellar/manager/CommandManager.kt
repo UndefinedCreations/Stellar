@@ -10,7 +10,7 @@ import kotlin.reflect.KClass
 @ApiStatus.Internal
 object CommandManager {
     val registrars: Map<String, KClass<out AbstractCommandRegistrar>> = mapOf(
-        "1.17.1" to com.undefined.stellar.v1_17_1.CommandRegistrar::class,
+        "1.21.4" to com.undefined.stellar.v1_21_4.CommandRegistrar::class,
     )
 
     private val initializedPlugins: MutableList<JavaPlugin> = mutableListOf()

@@ -1,5 +1,6 @@
 package com.undefined.stellar.manager
 
+import com.undefined.stellar.CommandRegistrar
 import com.undefined.stellar.listener.StellarListener
 import com.undefined.stellar.registrar.AbstractCommandRegistrar
 import org.bukkit.Bukkit
@@ -28,7 +29,7 @@ object CommandManager {
         "1.16.4" to com.undefined.stellar.v1_16_4.CommandRegistrar::class,
         "1.16.5" to com.undefined.stellar.v1_16_5.CommandRegistrar::class,
         "1.17" to com.undefined.stellar.v1_17.CommandRegistrar::class,
-        "1.17.1" to com.undefined.stellar.v1_17_1.CommandRegistrar::class,
+        "1.17.1" to CommandRegistrar::class,
         "1.18" to com.undefined.stellar.v1_18_1.CommandRegistrar::class,
         "1.18.1" to com.undefined.stellar.v1_18_1.CommandRegistrar::class,
         "1.18.2" to com.undefined.stellar.v1_18_2.CommandRegistrar::class,

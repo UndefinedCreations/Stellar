@@ -10,7 +10,7 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder
 import com.undefined.stellar.AbstractStellarCommand
 import com.undefined.stellar.argument.AbstractStellarArgument
 import com.undefined.stellar.argument.LiteralStellarArgument
-import com.undefined.stellar.argument.types.primitive.PhraseArgument
+import com.undefined.stellar.argument.primitive.PhraseArgument
 import com.undefined.stellar.data.suggestion.Suggestion
 import net.minecraft.server.v1_14_R1.CommandListenerWrapper
 import org.bukkit.Bukkit

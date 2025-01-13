@@ -35,5 +35,5 @@ include(
     ":spigot:v1_21_4",
     ":paper:api",
     ":paper:common",
-    ":paper:v1_17_1",
+    ":paper:v1_21_4",
 )

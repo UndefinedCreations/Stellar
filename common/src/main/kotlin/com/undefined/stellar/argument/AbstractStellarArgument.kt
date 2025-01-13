@@ -21,6 +21,8 @@ abstract class AbstractStellarArgument<T>(val parent: AbstractStellarCommand<*>,
         return this as T
     }
 
+    fun addSuggestion(text: String): T = addSuggestion(text, "")
+
     fun addSuggestion(suggestion: Suggestion): T = addSuggestions(listOf(suggestion))
 
     fun addSuggestions(suggestions: List<Suggestion>): T {
