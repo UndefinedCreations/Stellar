@@ -61,7 +61,7 @@ object BrigadierCommandHelper {
         val stellarContext = CommandContextAdapter.getStellarCommandContext(context)
         val completions: CompletableFuture<List<com.undefined.stellar.data.suggestion.Suggestion>> = CompletableFuture.supplyAsync {
             val suggestions: MutableList<com.undefined.stellar.data.suggestion.Suggestion> = mutableListOf()
-            for (suggestion in command.suggestions) suggestions.addAll(suggestion.get(stellarContext).get())
+            for (suggestion in command.suggestions) suggestions.addAll(suggestion.get(stellarContext, builder.remaining).get())
             suggestions
         }
         return CommandAdapter.getMojangSuggestions(builder, completions)

@@ -25,7 +25,7 @@ publishing {
 
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.21.4-R0.1-SNAPSHOT")
-    implementation(project(":spigot:common"))
+    api(project(":spigot:common"))
     implementation(project(":spigot:v1_13"))
     implementation(project(":spigot:v1_13_1"))
     implementation(project(":spigot:v1_13_2"))

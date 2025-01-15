@@ -1,5 +1,3 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-
 plugins {
     java
     kotlin("jvm") version "1.9.22"
@@ -9,7 +7,7 @@ plugins {
 
 apply(plugin = "maven-publish")
 val projectGroupId = "com.undefined"
-val projectVersion = "0.0.43"
+val projectVersion = "0.0.70"
 val projectArtifactId = "stellar"
 
 group = projectGroupId
@@ -71,17 +69,16 @@ allprojects {
 }
 
 dependencies {
-    implementation(project(":spigot:api"))
-    implementation(project(":common"))
+    api(project(":spigot:api"))
+    api(project(":spigot:common"))
 }
 
 tasks {
     publish {
-        finalizedBy(project(":paper:common").tasks["publish"])
+        finalizedBy(project(":paper:api").tasks["publish"])
     }
-    withType<ShadowJar> {
-        archiveFileName = "${project.name}-${project.version}.jar"
-        archiveClassifier = "spigot"
+    shadowJar {
+        archiveClassifier = ""
     }
     compileKotlin {
         kotlinOptions.jvmTarget = "1.8"

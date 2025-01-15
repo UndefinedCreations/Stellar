@@ -13,7 +13,6 @@ import org.jetbrains.annotations.ApiStatus
 class StellarCommand(name: String, permissions: List<String> = listOf(), aliases: List<String> = listOf()) : AbstractStellarCommand<StellarCommand>(name) {
 
     constructor(name: String, vararg aliases: String) : this(name, aliases = aliases.toList())
-    constructor(name: String, permission: String, vararg aliases: String) : this(name, listOf(permission), aliases.toList())
     constructor(name: String, permission: String, aliases: List<String>) : this(name, listOf(permission), aliases)
 
     init {
