@@ -10,10 +10,12 @@ import com.undefined.stellar.data.requirement.PermissionStellarRequirement
 import com.undefined.stellar.data.requirement.StellarRequirement
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
+import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.plugin.java.JavaPlugin
 import org.jetbrains.annotations.ApiStatus
 import java.util.*
+import java.util.concurrent.CompletableFuture
 
 @Suppress("UNCHECKED_CAST")
 abstract class AbstractStellarCommand<T>(
@@ -219,6 +221,11 @@ abstract class AbstractStellarCommand<T>(
 
     inline fun <reified C : CommandSender> addExecution(noinline execution: CommandContext<C>.() -> Unit): T {
         executions.add(StellarExecution(C::class, execution))
+        return this as T
+    }
+
+    inline fun <reified C : CommandSender> addAsyncExecution(noinline execution: CommandContext<C>.() -> Unit): T {
+        executions.add(StellarExecution(C::class) { CompletableFuture.supplyAsync { execution() } })
         return this as T
     }
 

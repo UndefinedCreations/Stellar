@@ -90,7 +90,7 @@ open class ArgumentHandler {
         list: List<T>,
         converter: (T) -> Suggestion = { Suggestion.withText(it.toString()) },
         parse: (String) -> T?,
-        async: Boolean = true,
+        async: Boolean = false,
     ): ListArgument<T, String> = addArgument { ListArgument(StringArgument(base, name, StringType.WORD), list, converter, parse, async) }
 
     fun <T, R> addAdvancedListArgument(
@@ -98,7 +98,7 @@ open class ArgumentHandler {
         list: List<T>,
         converter: (T) -> Suggestion = { Suggestion.withText(it.toString()) },
         parse: (R) -> T?,
-        async: Boolean = true,
+        async: Boolean = false,
     ): ListArgument<T, R> = addArgument { ListArgument(type, list, converter, parse, async) }
 
     fun <T> addAdvancedListArgument(
@@ -106,7 +106,7 @@ open class ArgumentHandler {
         list: CommandContext<CommandSender>.() -> List<T>,
         converter: (T) -> Suggestion = { Suggestion.withText(it.toString()) },
         parse: (String) -> T?,
-        async: Boolean = true,
+        async: Boolean = false,
     ): ListArgument<T, String> = addArgument { ListArgument(StringArgument(base, name, StringType.WORD), list, converter, parse, async) }
 
     fun <T, R> addAdvancedListArgument(
@@ -114,7 +114,7 @@ open class ArgumentHandler {
         list: CommandContext<CommandSender>.() -> List<T>,
         converter: (T) -> Suggestion = { Suggestion.withText(it.toString()) },
         parse: (R) -> T?,
-        async: Boolean = true,
+        async: Boolean = false,
     ): ListArgument<T, R> = addArgument { ListArgument(type, list, converter, parse, async) }
 
     fun <T> addListArgument(
@@ -122,7 +122,7 @@ open class ArgumentHandler {
         list: List<T>,
         converter: (T) -> String = { it.toString() },
         parse: (String) -> T?,
-        async: Boolean = true,
+        async: Boolean = false,
     ): ListArgument<T, String> = addArgument { ListArgument(StringArgument(base, name, StringType.WORD), list, { Suggestion.withText(converter(it)) }, parse, async) }
 
     fun <T, R> addListArgument(
@@ -130,7 +130,7 @@ open class ArgumentHandler {
         list: List<T>,
         converter: (T) -> String = { it.toString() },
         parse: (R) -> T?,
-        async: Boolean = true,
+        async: Boolean = false,
     ): ListArgument<T, R> = addArgument { ListArgument(type, list, { Suggestion.withText(converter(it)) }, parse, async) }
 
     fun <T> addListArgument(
@@ -138,7 +138,7 @@ open class ArgumentHandler {
         list: CommandContext<CommandSender>.() -> List<T>,
         converter: (T) -> String = { it.toString() },
         parse: (String) -> T?,
-        async: Boolean = true,
+        async: Boolean = false,
     ): ListArgument<T, String> = addArgument { ListArgument(StringArgument(base, name, StringType.WORD), list, { Suggestion.withText(converter(it)) }, parse, async) }
 
     fun <T, R> addListArgument(
@@ -146,7 +146,7 @@ open class ArgumentHandler {
         list: CommandContext<CommandSender>.() -> List<T>,
         converter: (T) -> String = { it.toString() },
         parse: (R) -> T?,
-        async: Boolean = true,
+        async: Boolean = false,
     ): ListArgument<T, R> = addArgument { ListArgument(type, list, { Suggestion.withText(converter(it)) }, parse, async) }
 
     fun addStringListArgument(
@@ -154,14 +154,14 @@ open class ArgumentHandler {
         list: List<String>,
         type: StringType = StringType.WORD,
         parse: (Any?) -> Any? = { it },
-        async: Boolean = true,
+        async: Boolean = false,
     ): ListArgument<String, String> =
         addArgument { ListArgument(StringArgument(base, name, type), list, { Suggestion.withText(it.toString()) }, parse, async) }
 
     fun addStringListArgument(
         name: String,
         vararg list: String,
-        async: Boolean = true,
+        async: Boolean = false,
     ): ListArgument<String, String> =
         addArgument { ListArgument(StringArgument(base, name, StringType.WORD), list.toList(), { Suggestion.withText(it) }, { it }, async) }
 
@@ -169,7 +169,7 @@ open class ArgumentHandler {
         name: String,
         list: List<UUID>,
         parse: (Any?) -> Any? = { it },
-        async: Boolean = true,
+        async: Boolean = false,
     ): ListArgument<UUID, UUID> =
         addArgument { ListArgument(UUIDArgument(base, name), list, parse = parse, async = async) }
 
@@ -177,28 +177,28 @@ open class ArgumentHandler {
         name: String,
         list: CommandContext<CommandSender>.() -> List<String>,
         type: StringType = StringType.WORD,
-        async: Boolean = true,
+        async: Boolean = false,
     ): ListArgument<String, String> =
         addArgument { ListArgument(StringArgument(base, name, type), list, { Suggestion.withText(it) }, { it }, async) }
 
     fun addStringListArgument(
         name: String,
         vararg list: CommandContext<CommandSender>.() -> List<String>,
-        async: Boolean = true,
+        async: Boolean = false,
     ): ListArgument<String, String> =
         addArgument { ListArgument(StringArgument(base, name, StringType.WORD), { list.flatMap { it() } }, converter = { Suggestion.withText(it) }, { it }, async) }
 
     fun addUUIDListArgument(
         name: String,
         list: CommandContext<CommandSender>.() -> List<UUID>,
-        async: Boolean = true,
+        async: Boolean = false,
     ): ListArgument<UUID, UUID> =
         addArgument { ListArgument(UUIDArgument(base, name), list, parse = { it }, async = async) }
 
     inline fun <reified T : Enum<T>> addEnumArgument(
         name: String,
         formatting: EnumFormatting = EnumFormatting.LOWERCASE,
-        async: Boolean = true,
+        async: Boolean = false,
     ): EnumArgument<T> =
         addArgument { EnumArgument(base, name, T::class, { Suggestion.withText(formatting.action(it!!.name)) }, async = async) }
 
@@ -206,7 +206,7 @@ open class ArgumentHandler {
         name: String,
         noinline converter: (Enum<*>?) -> Suggestion = { Suggestion.withText(it!!.name) },
         noinline parse: (Any?) -> Enum<T>?,
-        async: Boolean = true,
+        async: Boolean = false,
     ): EnumArgument<T> = addArgument { EnumArgument(base, name, T::class, converter, parse, async) }
 
     fun addEntityArgument(name: String, type: com.undefined.stellar.argument.entity.EntityDisplayType): com.undefined.stellar.argument.entity.EntityArgument =
@@ -311,7 +311,7 @@ open class ArgumentHandler {
     fun addUUIDArgument(name: String): UUIDArgument =
         addArgument { UUIDArgument(base, name) }
 
-    fun addOnlinePlayersArgument(name: String, async: Boolean = true): ListArgument<Player, String> =
+    fun addOnlinePlayersArgument(name: String, async: Boolean = false): ListArgument<Player, String> =
         addArgument {
             ListArgument(
                 StringArgument(base, name, StringType.WORD),
@@ -322,7 +322,7 @@ open class ArgumentHandler {
             )
         }
 
-    fun addOfflinePlayersArgument(name: String, async: Boolean = true): ListArgument<OfflinePlayer, String> =
+    fun addOfflinePlayersArgument(name: String, async: Boolean = false): ListArgument<OfflinePlayer, String> =
         addArgument {
             ListArgument(
                 StringArgument(base, name, StringType.WORD),

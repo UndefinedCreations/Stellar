@@ -14,7 +14,7 @@ open class ListArgument<T, R>(
     val list: CommandContext<CommandSender>.() -> Collection<T>,
     val converter: (T) -> Suggestion = { Suggestion.withText(it.toString()) },
     val parse: (R) -> T?,
-    val async: Boolean = true
+    val async: Boolean = false
 ) : AbstractStellarArgument<ListArgument<T, R>, T>(type.parent, type.name) {
 
     constructor(type: AbstractStellarArgument<*, R>,

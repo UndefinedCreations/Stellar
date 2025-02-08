@@ -2,7 +2,10 @@ package com.undefined.stellar
 
 import org.bukkit.plugin.java.JavaPlugin
 
-abstract class BaseStellarCommand(val name: String, val description: String = "", val permissions: List<String> = listOf()) {
+abstract class BaseStellarCommand(val name: String, permission: String = "", val aliases: List<String> = listOf()) {
+
+    open val permissions: List<String> = listOf(permission)
+    open val description: String = ""
 
     var hasInitializedArguments = false
         private set
@@ -24,6 +27,7 @@ abstract class BaseStellarCommand(val name: String, val description: String = ""
     fun createCommand(init: StellarCommand.() -> Unit): StellarCommand {
         val command = StellarCommand(name, permissions)
         command.setDescription(description)
+        command.addAliases(*aliases.toTypedArray())
         command.init()
         return command
     }
