@@ -11,18 +11,16 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType
 import com.undefined.stellar.argument.AbstractStellarArgument
 import com.undefined.stellar.argument.LiteralStellarArgument
+import com.undefined.stellar.argument.basic.*
 import com.undefined.stellar.argument.block.BlockDataArgument
-import com.undefined.stellar.argument.custom.CustomArgument
-import com.undefined.stellar.argument.custom.ListArgument
 import com.undefined.stellar.argument.entity.*
 import com.undefined.stellar.argument.item.*
 import com.undefined.stellar.argument.misc.NamespacedKeyArgument
 import com.undefined.stellar.argument.misc.UUIDArgument
-import com.undefined.stellar.argument.primitive.*
 import com.undefined.stellar.argument.registry.*
 import com.undefined.stellar.argument.structure.MirrorArgument
 import com.undefined.stellar.argument.world.*
-import com.undefined.stellar.data.argument.Anchor
+import com.undefined.stellar.data.argument.EntityAnchor
 import com.undefined.stellar.data.argument.Operation
 import com.undefined.stellar.data.argument.ParticleData
 import com.undefined.stellar.exception.LiteralArgumentMismatchException
@@ -81,24 +79,24 @@ object ArgumentHelper {
         )
     }
 
-    fun getLiteralArguments(argument: AbstractStellarArgument<*>): List<ArgumentBuilder<CommandSourceStack, *>> {
+    fun getLiteralArguments(argument: AbstractStellarArgument<*, *>): List<ArgumentBuilder<CommandSourceStack, *>> {
         val arguments: MutableList<ArgumentBuilder<CommandSourceStack, *>> = mutableListOf()
         for (name in argument.aliases + argument.name)
             arguments.add(LiteralArgumentBuilder.literal(name))
         return arguments
     }
 
-    fun getRequiredArgumentBuilder(argument: AbstractStellarArgument<*>): RequiredArgumentBuilder<CommandSourceStack, *> =
+    fun getRequiredArgumentBuilder(argument: AbstractStellarArgument<*, *>): RequiredArgumentBuilder<CommandSourceStack, *> =
         RequiredArgumentBuilder.argument(argument.name, getArgumentType(argument))
 
-    private fun <T : AbstractStellarArgument<*>> getArgumentType(argument: T): ArgumentType<*> =
+    private fun <T : AbstractStellarArgument<*, *>> getArgumentType(argument: T): ArgumentType<*> =
         when (argument) {
-            is ListArgument<*> -> getArgumentType(argument.type)
-            is CustomArgument<*> -> getArgumentType(argument.type)
+            is ListArgument<*, *> -> getArgumentType(argument.type)
+            is CustomArgument<*, *> -> getArgumentType(argument.type)
             is StringArgument -> brigadier(argument.type)
             is PhraseArgument -> brigadier(StringType.PHRASE)
             is IntegerArgument -> IntegerArgumentType.integer(argument.min, argument.max)
-            is com.undefined.stellar.argument.primitive.LongArgument -> LongArgumentType.longArg(argument.min, argument.max)
+            is LongArgument -> LongArgumentType.longArg(argument.min, argument.max)
             is FloatArgument -> FloatArgumentType.floatArg(argument.min, argument.max)
             is DoubleArgument -> DoubleArgumentType.doubleArg(argument.min, argument.max)
             is BooleanArgument -> BoolArgumentType.bool()
@@ -136,7 +134,7 @@ object ArgumentHelper {
             is NamespacedKeyArgument -> ResourceLocationArgument.id()
             is com.undefined.stellar.argument.entity.EntityAnchorArgument -> EntityAnchorArgument.anchor()
             is com.undefined.stellar.argument.math.RangeArgument -> RangeArgument.intRange()
-            is com.undefined.stellar.argument.world.DimensionArgument -> DimensionArgument.dimension()
+            is com.undefined.stellar.argument.world.EnvironmentArgument -> DimensionArgument.dimension()
             is com.undefined.stellar.argument.player.GameModeArgument -> GameModeArgument.gameMode()
             is com.undefined.stellar.argument.math.TimeArgument -> TimeArgument.time(argument.minimum)
             is MirrorArgument -> TemplateMirrorArgument.templateMirror()
@@ -173,17 +171,17 @@ object ArgumentHelper {
             else -> throw UnsupportedArgumentException(argument)
         }
 
-    fun <T : AbstractStellarArgument<*>> getParsedArgument(context: CommandContext<CommandSourceStack>, argument: T): Any? {
+    fun <T : AbstractStellarArgument<*, *>> getParsedArgument(context: CommandContext<CommandSourceStack>, argument: T): Any? {
         return when (argument) {
             is LiteralStellarArgument -> throw LiteralArgumentMismatchException()
-            is CustomArgument<*> -> argument.parse(CommandContextAdapter.getStellarCommandContext(context))
+            is CustomArgument<*, *> -> argument.parseInternal(CommandContextAdapter.getStellarCommandContext(context), getParsedArgument(context, argument.type))
             is StringArgument -> StringArgumentType.getString(context, argument.name)
             is IntegerArgument -> IntegerArgumentType.getInteger(context, argument.name)
             is LongArgument -> LongArgumentType.getLong(context, argument.name)
             is FloatArgument -> FloatArgumentType.getFloat(context, argument.name)
             is DoubleArgument -> DoubleArgumentType.getDouble(context, argument.name)
             is BooleanArgument -> BoolArgumentType.getBool(context, argument.name)
-            is ListArgument<*> -> argument.parse(StringArgumentType.getString(context, argument.name))
+            is ListArgument<*, *> -> argument.parse(StringArgumentType.getString(context, argument.name))
             is com.undefined.stellar.argument.entity.EntityArgument -> EntityArgument.getEntities(context, argument.name)
                 .map { it.bukkitEntity }.toMutableList()
                 .addAll(listOf(EntityArgument.getEntity(context, argument.name).bukkitEntity))
@@ -229,12 +227,12 @@ object ArgumentHelper {
             is ItemSlotArgument -> SlotArgument.getSlot(context, argument.name)
             is ItemSlotsArgument -> SlotsArgument.getSlots(context, argument.name).slots().toList()
             is NamespacedKeyArgument -> NamespacedKey(ResourceLocationArgument.getId(context, argument.name).namespace, ResourceLocationArgument.getId(context, argument.name).path)
-            is com.undefined.stellar.argument.entity.EntityAnchorArgument -> Anchor.getFromName(getArgumentInput(context, argument.name) ?: return null)
+            is com.undefined.stellar.argument.entity.EntityAnchorArgument -> EntityAnchor.getFromName(getArgumentInput(context, argument.name) ?: return null)
             is com.undefined.stellar.argument.math.RangeArgument -> {
                 val range = RangeArgument.Ints.getRange(context, argument.name)
                 IntRange(range.min.orElse(1), range.max.orElse(2))
             }
-            is com.undefined.stellar.argument.world.DimensionArgument -> DimensionArgument.getDimension(context, argument.name).world.environment
+            is com.undefined.stellar.argument.world.EnvironmentArgument -> DimensionArgument.getDimension(context, argument.name).world.environment
             is com.undefined.stellar.argument.player.GameModeArgument -> GameMode.getByValue(GameModeArgument.getGameMode(context, argument.name).id)
             is com.undefined.stellar.argument.math.TimeArgument -> IntegerArgumentType.getInteger(context, argument.name).toLong()
             is MirrorArgument -> Mirror.valueOf(TemplateMirrorArgument.getMirror(context, argument.name).name)
@@ -360,11 +358,11 @@ object ArgumentHelper {
         StringType.PHRASE -> StringArgumentType.greedyString()
     }
 
-    private fun brigadier(type: com.undefined.stellar.argument.entity.EntityDisplayType): EntityArgument = when (type) {
-        com.undefined.stellar.argument.entity.EntityDisplayType.ENTITY -> EntityArgument.entity()
-        com.undefined.stellar.argument.entity.EntityDisplayType.ENTITIES -> EntityArgument.entities()
-        com.undefined.stellar.argument.entity.EntityDisplayType.PLAYER -> EntityArgument.player()
-        com.undefined.stellar.argument.entity.EntityDisplayType.PLAYERS -> EntityArgument.players()
+    private fun brigadier(type: EntityDisplayType): EntityArgument = when (type) {
+        EntityDisplayType.ENTITY -> EntityArgument.entity()
+        EntityDisplayType.ENTITIES -> EntityArgument.entities()
+        EntityDisplayType.PLAYER -> EntityArgument.player()
+        EntityDisplayType.PLAYERS -> EntityArgument.players()
     }
 
     private fun getBukkitAxis(argument: EnumSet<Direction.Axis>): EnumSet<Axis> =

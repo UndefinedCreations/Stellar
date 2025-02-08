@@ -11,22 +11,20 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException
 import com.mojang.brigadier.suggestion.SuggestionProvider
 import com.undefined.stellar.argument.AbstractStellarArgument
 import com.undefined.stellar.argument.LiteralStellarArgument
+import com.undefined.stellar.argument.basic.*
 import com.undefined.stellar.argument.block.BlockDataArgument
-import com.undefined.stellar.argument.custom.CustomArgument
-import com.undefined.stellar.argument.custom.ListArgument
 import com.undefined.stellar.argument.item.ItemSlotArgument
 import com.undefined.stellar.argument.item.ItemSlotsArgument
 import com.undefined.stellar.argument.misc.NamespacedKeyArgument
 import com.undefined.stellar.argument.misc.UUIDArgument
 import com.undefined.stellar.argument.player.GameModeArgument
-import com.undefined.stellar.argument.primitive.*
 import com.undefined.stellar.argument.registry.*
 import com.undefined.stellar.argument.structure.LootTableArgument
 import com.undefined.stellar.argument.structure.MirrorArgument
 import com.undefined.stellar.argument.world.HeightMapArgument
 import com.undefined.stellar.argument.world.LocationArgument
 import com.undefined.stellar.argument.world.LocationType
-import com.undefined.stellar.data.argument.Anchor
+import com.undefined.stellar.data.argument.EntityAnchor
 import com.undefined.stellar.data.argument.Operation
 import com.undefined.stellar.data.argument.ParticleData
 import com.undefined.stellar.exception.ArgumentVersionMismatchException
@@ -55,20 +53,20 @@ import java.util.function.Predicate
 @Suppress("UNCHECKED_CAST", "DEPRECATION")
 object ArgumentHelper {
 
-    fun getLiteralArguments(argument: AbstractStellarArgument<*>): List<ArgumentBuilder<CommandListenerWrapper, *>> {
+    fun getLiteralArguments(argument: AbstractStellarArgument<*, *>): List<ArgumentBuilder<CommandListenerWrapper, *>> {
         val arguments: MutableList<ArgumentBuilder<CommandListenerWrapper, *>> = mutableListOf()
         for (name in argument.aliases + argument.name)
             arguments.add(LiteralArgumentBuilder.literal(name))
         return arguments
     }
 
-    fun getRequiredArgumentBuilder(argument: AbstractStellarArgument<*>): RequiredArgumentBuilder<CommandListenerWrapper, *> {
+    fun getRequiredArgumentBuilder(argument: AbstractStellarArgument<*, *>): RequiredArgumentBuilder<CommandListenerWrapper, *> {
         val argumentBuilder: RequiredArgumentBuilder<CommandListenerWrapper, *> = RequiredArgumentBuilder.argument(argument.name, getArgumentType(argument))
         getSuggestions(argument)?.let { argumentBuilder.suggests(it) }
         return argumentBuilder
     }
 
-    private fun <T : AbstractStellarArgument<*>> getSuggestions(argument: T): SuggestionProvider<CommandListenerWrapper>? =
+    private fun <T : AbstractStellarArgument<*, *>> getSuggestions(argument: T): SuggestionProvider<CommandListenerWrapper>? =
         when (argument) {
             is GameEventArgument -> throwArgumentVersionException(argument)
             is PotionEffectTypeArgument -> SuggestionProvider { _, builder ->
@@ -77,30 +75,30 @@ object ArgumentHelper {
             is VillagerProfessionArgument -> SuggestionProvider { _, builder ->
                 ICompletionProvider.a(IRegistry.VILLAGER_PROFESSION.keySet(), builder)
             }
-            is com.undefined.stellar.argument.registry.VillagerTypeArgument -> SuggestionProvider { _, builder ->
+            is VillagerTypeArgument -> SuggestionProvider { _, builder ->
                 ICompletionProvider.a(IRegistry.VILLAGER_TYPE.keySet(), builder)
             }
-            is com.undefined.stellar.argument.registry.BiomeArgument -> SuggestionProvider { context, builder ->
+            is BiomeArgument -> SuggestionProvider { context, builder ->
                 CompletionProviders.d.getSuggestions(context, builder)
             }
             is EntityTypeArgument -> SuggestionProvider { _, builder ->
                 ICompletionProvider.a(IRegistry.ENTITY_TYPE.keySet(), builder)
             }
-            is com.undefined.stellar.argument.registry.MemoryKeyArgument -> SuggestionProvider { _, builder ->
+            is MemoryKeyArgument -> SuggestionProvider { _, builder ->
                 ICompletionProvider.a(IRegistry.MEMORY_MODULE_TYPE.keySet(), builder)
             }
             else -> null
         }
 
-    private fun <T : AbstractStellarArgument<*>> getArgumentType(argument: T): ArgumentType<*> =
+    private fun <T : AbstractStellarArgument<*, *>> getArgumentType(argument: T): ArgumentType<*> =
         when (argument) {
-            is ListArgument<*> -> getArgumentType(argument.type)
-            is CustomArgument<*> -> getArgumentType(argument.type)
+            is ListArgument<*, *> -> getArgumentType(argument.type)
+            is CustomArgument<*, *> -> getArgumentType(argument.type)
             is StringArgument -> brigadier(argument.type)
             is PhraseArgument -> brigadier(StringType.PHRASE)
             is IntegerArgument -> IntegerArgumentType.integer(argument.min, argument.max)
-            is com.undefined.stellar.argument.primitive.LongArgument -> LongArgumentType.longArg(argument.min, argument.max)
-            is com.undefined.stellar.argument.primitive.FloatArgument -> FloatArgumentType.floatArg(argument.min, argument.max)
+            is LongArgument -> LongArgumentType.longArg(argument.min, argument.max)
+            is FloatArgument -> FloatArgumentType.floatArg(argument.min, argument.max)
             is DoubleArgument -> DoubleArgumentType.doubleArg(argument.min, argument.max)
             is BooleanArgument -> BoolArgumentType.bool()
             is com.undefined.stellar.argument.entity.EntityArgument -> brigadier(argument.type)
@@ -137,7 +135,7 @@ object ArgumentHelper {
             is NamespacedKeyArgument -> ArgumentMinecraftKeyRegistered.a()
             is com.undefined.stellar.argument.entity.EntityAnchorArgument -> ArgumentAnchor.a()
             is com.undefined.stellar.argument.math.RangeArgument -> ReflectionUtil.executePrivateMethod<ArgumentCriterionValue<*>, ArgumentCriterionValue<*>>("a")
-            is com.undefined.stellar.argument.world.DimensionArgument -> ArgumentDimension.a()
+            is com.undefined.stellar.argument.world.EnvironmentArgument -> ArgumentDimension.a()
             is GameModeArgument -> throwArgumentVersionException(argument)
             is com.undefined.stellar.argument.math.TimeArgument -> ArgumentTime.a()
             is MirrorArgument -> throwArgumentVersionException(argument)
@@ -146,45 +144,45 @@ object ArgumentHelper {
             is LootTableArgument -> throwArgumentVersionException(argument)
             is UUIDArgument -> throwArgumentVersionException(argument)
             is GameEventArgument -> ArgumentMinecraftKeyRegistered.a()
-            is com.undefined.stellar.argument.registry.StructureTypeArgument -> throwArgumentVersionException(argument)
+            is StructureTypeArgument -> throwArgumentVersionException(argument)
             is PotionEffectTypeArgument -> throwArgumentVersionException(argument)
             is BlockTypeArgument -> throwArgumentVersionException(argument)
             is ItemTypeArgument -> throwArgumentVersionException(argument)
             is CatTypeArgument -> throwArgumentVersionException(argument)
-            is com.undefined.stellar.argument.registry.FrogVariantArgument -> throwArgumentVersionException(argument)
+            is FrogVariantArgument -> throwArgumentVersionException(argument)
             is VillagerProfessionArgument -> ArgumentMinecraftKeyRegistered.a()
-            is com.undefined.stellar.argument.registry.VillagerTypeArgument -> ArgumentMinecraftKeyRegistered.a()
-            is com.undefined.stellar.argument.registry.MapDecorationTypeArgument -> throwArgumentVersionException(argument)
+            is VillagerTypeArgument -> ArgumentMinecraftKeyRegistered.a()
+            is MapDecorationTypeArgument -> throwArgumentVersionException(argument)
             is InventoryTypeArgument -> throwArgumentVersionException(argument)
-            is com.undefined.stellar.argument.registry.AttributeArgument -> ArgumentMinecraftKeyRegistered.a()
+            is AttributeArgument -> ArgumentMinecraftKeyRegistered.a()
             is FluidArgument -> throwArgumentVersionException(argument)
             is SoundArgument -> throwArgumentVersionException(argument)
-            is com.undefined.stellar.argument.registry.BiomeArgument -> ArgumentMinecraftKeyRegistered.a()
+            is BiomeArgument -> ArgumentMinecraftKeyRegistered.a()
             is StructureArgument -> throwArgumentVersionException(argument)
             is TrimMaterialArgument -> throwArgumentVersionException(argument)
             is TrimPatternArgument -> throwArgumentVersionException(argument)
             is DamageTypeArgument -> throwArgumentVersionException(argument)
             is WolfVariantArgument -> throwArgumentVersionException(argument)
             is PatternTypeArgument -> throwArgumentVersionException(argument)
-            is com.undefined.stellar.argument.registry.ArtArgument -> throwArgumentVersionException(argument)
+            is ArtArgument -> throwArgumentVersionException(argument)
             is InstrumentArgument -> throwArgumentVersionException(argument)
             is EntityTypeArgument -> ArgumentMinecraftKeyRegistered.a()
             is PotionArgument -> throwArgumentVersionException(argument)
-            is com.undefined.stellar.argument.registry.MemoryKeyArgument -> ArgumentMinecraftKeyRegistered.a()
+            is MemoryKeyArgument -> ArgumentMinecraftKeyRegistered.a()
             else -> throw UnsupportedArgumentException(argument)
         }
 
-    fun <T : AbstractStellarArgument<*>> getParsedArgument(context: CommandContext<CommandListenerWrapper>, argument: T): Any? {
+    fun <T : AbstractStellarArgument<*, *>> getParsedArgument(context: CommandContext<CommandListenerWrapper>, argument: T): Any? {
         return when (argument) {
             is LiteralStellarArgument -> throw LiteralArgumentMismatchException()
-            is CustomArgument<*> -> argument.parse(CommandContextAdapter.getStellarCommandContext(context))
+            is CustomArgument<*, *> -> argument.parseInternal(CommandContextAdapter.getStellarCommandContext(context), getParsedArgument(context, argument.type))
             is StringArgument -> StringArgumentType.getString(context, argument.name)
             is IntegerArgument -> IntegerArgumentType.getInteger(context, argument.name)
-            is com.undefined.stellar.argument.primitive.LongArgument -> LongArgumentType.getLong(context, argument.name)
-            is com.undefined.stellar.argument.primitive.FloatArgument -> FloatArgumentType.getFloat(context, argument.name)
+            is LongArgument -> LongArgumentType.getLong(context, argument.name)
+            is FloatArgument -> FloatArgumentType.getFloat(context, argument.name)
             is DoubleArgument -> DoubleArgumentType.getDouble(context, argument.name)
             is BooleanArgument -> BoolArgumentType.getBool(context, argument.name)
-            is ListArgument<*> -> argument.parse(getParsedArgument(context, argument))
+            is ListArgument<*, *> -> argument.parse(getParsedArgument(context, argument.type))
             is com.undefined.stellar.argument.entity.EntityArgument -> ArgumentEntity.b(context, argument.name)
                 .map { it.bukkitEntity }.toMutableList()
                 .addAll(listOf(ArgumentEntity.a(context, argument.name).bukkitEntity))
@@ -252,14 +250,14 @@ object ArgumentHelper {
                 ArgumentMinecraftKeyRegistered.c(context, argument.name).namespace,
                 ArgumentMinecraftKeyRegistered.c(context, argument.name).key
             )
-            is com.undefined.stellar.argument.entity.EntityAnchorArgument -> Anchor.getFromName(
+            is com.undefined.stellar.argument.entity.EntityAnchorArgument -> EntityAnchor.getFromName(
                 getArgumentInput(context, argument.name) ?: return null
             )
             is com.undefined.stellar.argument.math.RangeArgument -> {
                 val range = ArgumentCriterionValue.b.a(context, argument.name)
                 IntRange(range.a() ?: 1, range.b() ?: 2)
             }
-            is com.undefined.stellar.argument.world.DimensionArgument -> World.Environment.getEnvironment(ArgumentDimension.a(context, argument.name).dimensionID)
+            is com.undefined.stellar.argument.world.EnvironmentArgument -> World.Environment.getEnvironment(ArgumentDimension.a(context, argument.name).dimensionID)
             is GameModeArgument -> throwArgumentVersionException(argument)
             is com.undefined.stellar.argument.math.TimeArgument -> IntegerArgumentType.getInteger(context, argument.name).toLong()
             is MirrorArgument -> throwArgumentVersionException(argument)
@@ -268,33 +266,33 @@ object ArgumentHelper {
             is LootTableArgument -> throwArgumentVersionException(argument)
             is UUIDArgument -> throwArgumentVersionException(argument)
             is GameEventArgument -> throwArgumentVersionException(argument)
-            is com.undefined.stellar.argument.registry.StructureTypeArgument -> throwArgumentVersionException(argument)
+            is StructureTypeArgument -> throwArgumentVersionException(argument)
             is PotionEffectTypeArgument -> throwArgumentVersionException(argument)
             is BlockTypeArgument -> throwArgumentVersionException(argument)
             is ItemTypeArgument -> throwArgumentVersionException(argument)
             is CatTypeArgument -> throwArgumentVersionException(argument)
-            is com.undefined.stellar.argument.registry.FrogVariantArgument -> throwArgumentVersionException(argument)
+            is FrogVariantArgument -> throwArgumentVersionException(argument)
             is VillagerProfessionArgument -> Registry.VILLAGER_PROFESSION.get(getId(context, argument.name))
-            is com.undefined.stellar.argument.registry.VillagerTypeArgument -> Registry.VILLAGER_TYPE.get(getId(context, argument.name))
-            is com.undefined.stellar.argument.registry.MapDecorationTypeArgument -> throwArgumentVersionException(argument)
+            is VillagerTypeArgument -> Registry.VILLAGER_TYPE.get(getId(context, argument.name))
+            is MapDecorationTypeArgument -> throwArgumentVersionException(argument)
             is InventoryTypeArgument -> getInventoryType(
                 IRegistry.MENU[ArgumentMinecraftKeyRegistered.c(context, argument.name)]
             )
-            is com.undefined.stellar.argument.registry.AttributeArgument -> throwArgumentVersionException(argument)
+            is AttributeArgument -> throwArgumentVersionException(argument)
             is FluidArgument -> throwArgumentVersionException(argument)
             is SoundArgument -> throwArgumentVersionException(argument)
-            is com.undefined.stellar.argument.registry.BiomeArgument -> Registry.BIOME.get(getId(context, argument.name))
+            is BiomeArgument -> Registry.BIOME.get(getId(context, argument.name))
             is StructureArgument -> throwArgumentVersionException(argument)
             is TrimMaterialArgument -> throwArgumentVersionException(argument)
             is TrimPatternArgument -> throwArgumentVersionException(argument)
             is DamageTypeArgument -> throwArgumentVersionException(argument)
             is WolfVariantArgument -> throwArgumentVersionException(argument)
             is PatternTypeArgument -> throwArgumentVersionException(argument)
-            is com.undefined.stellar.argument.registry.ArtArgument -> throwArgumentVersionException(argument)
+            is ArtArgument -> throwArgumentVersionException(argument)
             is InstrumentArgument -> throwArgumentVersionException(argument)
             is EntityTypeArgument -> Registry.ENTITY_TYPE.get(getId(context, argument.name))
             is PotionArgument -> throwArgumentVersionException(argument)
-            is com.undefined.stellar.argument.registry.MemoryKeyArgument -> Registry.MEMORY_MODULE_TYPE.get(getId(context, argument.name))
+            is MemoryKeyArgument -> Registry.MEMORY_MODULE_TYPE.get(getId(context, argument.name))
             else -> throw UnsupportedArgumentException(argument)
         }
     }
@@ -421,7 +419,7 @@ object ArgumentHelper {
     private fun toLocation(world: World, vec: Vec2F) =
         Location(world, vec.i.toDouble(), 0.0, vec.j.toDouble())
 
-    private fun throwArgumentVersionException(argument: AbstractStellarArgument<*>): Nothing =
+    private fun throwArgumentVersionException(argument: AbstractStellarArgument<*, *>): Nothing =
         throw ArgumentVersionMismatchException(argument, NMSVersion.version)
 
 }

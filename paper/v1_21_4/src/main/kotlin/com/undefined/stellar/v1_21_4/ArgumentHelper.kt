@@ -6,8 +6,8 @@ import com.mojang.brigadier.context.ParsedArgument
 import com.mojang.brigadier.context.StringRange
 import com.mojang.brigadier.exceptions.CommandSyntaxException
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType
+import com.undefined.stellar.argument.basic.StringType
 import com.undefined.stellar.argument.entity.EntityDisplayType
-import com.undefined.stellar.argument.primitive.StringType
 import com.undefined.stellar.argument.world.LocationArgument
 import com.undefined.stellar.argument.world.LocationType
 import com.undefined.stellar.data.argument.ParticleData

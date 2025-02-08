@@ -1,6 +1,5 @@
-package com.undefined.stellar.argument.custom
+package com.undefined.stellar.argument.basic
 
-import com.undefined.stellar.AbstractStellarCommand
 import com.undefined.stellar.argument.AbstractStellarArgument
 import com.undefined.stellar.data.argument.CommandContext
 import com.undefined.stellar.data.execution.StellarExecution
@@ -9,15 +8,14 @@ import com.undefined.stellar.data.requirement.StellarRequirement
 import com.undefined.stellar.data.suggestion.StellarSuggestion
 import com.undefined.stellar.data.suggestion.Suggestion
 import org.bukkit.command.CommandSender
+import org.jetbrains.annotations.ApiStatus
 import java.util.concurrent.CompletableFuture
 
-abstract class CustomArgument<T>(
-    parent: AbstractStellarCommand<*>,
-    name: String,
-    val type: AbstractStellarArgument<*>
-) : AbstractStellarArgument<T>(parent, name) {
+abstract class CustomArgument<R, T>(
+    val type: AbstractStellarArgument<*, R>
+) : AbstractStellarArgument<CustomArgument<*, T>, R>(type.parent, type.name) {
 
-    override val arguments: MutableList<AbstractStellarArgument<*>>
+    override val arguments: MutableList<AbstractStellarArgument<*, *>>
         get() = (super.arguments + getArgumentsList()).toMutableList()
     override val failureExecutions: MutableList<StellarExecution<*>>
         get() = (super.failureExecutions + StellarExecution(CommandSender::class) {
@@ -38,12 +36,15 @@ abstract class CustomArgument<T>(
             listSuggestions(this)
         }).toMutableList()
 
-    open fun getArgumentsList(): List<AbstractStellarArgument<*>> = listOf()
-    abstract fun parse(context: CommandContext<CommandSender>): T
-    open fun <T> execution(info: CommandContext<CommandSender>, value: T) {}
-    open fun <T> runnable(info: CommandContext<CommandSender>, value: T): Boolean = true
-    open fun <T> failureExecution(info: CommandContext<CommandSender>, value: T) {}
+    @Suppress("UNCHECKED_CAST")
+    @ApiStatus.Internal fun parseInternal(context: CommandContext<CommandSender>, value: Any?) = parse(context, value as R)
+
+    open fun getArgumentsList(): Collection<AbstractStellarArgument<*, *>> = listOf()
+    abstract fun parse(context: CommandContext<CommandSender>, value: R): T
+    open fun <T> execution(context: CommandContext<CommandSender>, value: T) {}
+    open fun <T> runnable(context: CommandContext<CommandSender>, value: T): Boolean = true
+    open fun <T> failureExecution(context: CommandContext<CommandSender>, value: T) {}
     open fun requirement(): Boolean = true
-    abstract fun listSuggestions(context: CommandContext<CommandSender>): CompletableFuture<List<Suggestion>>
+    open fun listSuggestions(context: CommandContext<CommandSender>): CompletableFuture<Collection<Suggestion>> = CompletableFuture.completedFuture(listOf())
 
 }

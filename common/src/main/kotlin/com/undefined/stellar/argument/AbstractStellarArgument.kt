@@ -10,7 +10,7 @@ import org.jetbrains.annotations.ApiStatus
 import java.util.concurrent.CompletableFuture
 
 @Suppress("UNCHECKED_CAST")
-abstract class AbstractStellarArgument<T>(val parent: AbstractStellarCommand<*>, name: String) : AbstractStellarCommand<T>(name) {
+abstract class AbstractStellarArgument<T, R>(val parent: AbstractStellarCommand<*>, name: String) : AbstractStellarCommand<T>(name) {
 
     @ApiStatus.Internal open val suggestions: MutableList<StellarSuggestion<*>> = mutableListOf()
     override val registerExecutions: MutableList<() -> Unit>
@@ -53,7 +53,7 @@ abstract class AbstractStellarArgument<T>(val parent: AbstractStellarCommand<*>,
         return addSuggestions(suggestions.map { Suggestion(it, "") })
     }
 
-    inline fun <reified C : CommandSender> addFutureSuggestion(noinline suggestion: CommandContext<C>.(input: String) -> CompletableFuture<List<Suggestion>>): T {
+    inline fun <reified C : CommandSender> addFutureSuggestion(noinline suggestion: CommandContext<C>.(input: String) -> CompletableFuture<Collection<Suggestion>>): T {
         suggestions.add(StellarSuggestion(C::class, suggestion))
         return this as T
     }

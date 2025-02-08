@@ -16,7 +16,12 @@ import org.jetbrains.annotations.ApiStatus
 import java.util.*
 
 @Suppress("UNCHECKED_CAST")
-abstract class AbstractStellarCommand<T>(val name: String, val description: String = "A custom Stellar command.", usage: String = "", aliases: List<String> = mutableListOf()) : ArgumentHandler() {
+abstract class AbstractStellarCommand<T>(
+    val name: String,
+    val description: String = "A custom Stellar command.",
+    usage: String = "",
+    aliases: List<String> = mutableListOf()
+) : ArgumentHandler() {
 
     override val base: AbstractStellarCommand<*>
         get() = this
@@ -33,7 +38,7 @@ abstract class AbstractStellarCommand<T>(val name: String, val description: Stri
     @ApiStatus.Internal open val registerExecutions: MutableList<() -> Unit> = mutableListOf()
 
     init {
-        if (this !is AbstractStellarArgument<*>) {
+        if (this !is AbstractStellarArgument<*, *>) {
             if (aliases.isNotEmpty()) information["Aliases"] = aliases.joinToString(", ")
             if (usage.isNotEmpty()) information["Usage"] = usage
             if (description.isNotEmpty()) information["Description"] = description

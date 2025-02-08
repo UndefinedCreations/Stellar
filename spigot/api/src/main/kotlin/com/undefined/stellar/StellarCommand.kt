@@ -12,8 +12,8 @@ import org.jetbrains.annotations.ApiStatus
 
 class StellarCommand(name: String, permissions: List<String> = listOf(), aliases: List<String> = listOf()) : AbstractStellarCommand<StellarCommand>(name) {
 
-    constructor(name: String, vararg aliases: String) : this(name, aliases = aliases.toList())
-    constructor(name: String, permission: String, aliases: List<String>) : this(name, listOf(permission), aliases)
+    constructor(name: String, aliases: List<String>) : this(name, permissions = listOf(), aliases = aliases)
+    constructor(name: String, permission: String, aliases: List<String> = listOf()) : this(name, listOf(permission), aliases)
 
     init {
         this.permissionRequirements.addAll(permissions.map { PermissionStellarRequirement(1, it) })

@@ -2,8 +2,9 @@ package com.undefined.stellar.argument.world
 
 import com.undefined.stellar.AbstractStellarCommand
 import com.undefined.stellar.argument.AbstractStellarArgument
+import org.bukkit.Location
 
-class LocationArgument(parent: AbstractStellarCommand<*>, name: String, val type: LocationType) : AbstractStellarArgument<LocationArgument>(parent, name)
+class LocationArgument(parent: AbstractStellarCommand<*>, name: String, val type: LocationType) : AbstractStellarArgument<LocationArgument, Location>(parent, name)
 
 enum class LocationType {
     LOCATION_3D,

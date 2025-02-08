@@ -7,7 +7,7 @@ plugins {
 
 apply(plugin = "maven-publish")
 val projectGroupId = "com.undefined"
-val projectVersion = "0.0.70"
+val projectVersion = "0.0.77"
 val projectArtifactId = "stellar"
 
 group = projectGroupId
@@ -71,6 +71,7 @@ allprojects {
 dependencies {
     api(project(":spigot:api"))
     api(project(":spigot:common"))
+    api(project(":paper:api"))
 }
 
 tasks {

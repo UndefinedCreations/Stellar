@@ -15,17 +15,17 @@ val artifactIdVar = "stellar"
 group = groupIdVar
 version = versionVar
 
-//publishing {
-//    publications {
-//        register<MavenPublication>("maven") {
-//            groupId = groupIdVar
-//            artifactId = artifactIdVar
-//            version = versionVar.toString()
-//
-//            from(components["java"])
-//        }
-//    }
-//}
+publishing {
+    publications {
+        register<MavenPublication>("maven") {
+            groupId = groupIdVar
+            artifactId = artifactIdVar
+            version = versionVar.toString()
+
+            from(components["java"])
+        }
+    }
+}
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.3-R0.1-SNAPSHOT")

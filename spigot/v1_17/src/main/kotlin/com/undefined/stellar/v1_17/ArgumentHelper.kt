@@ -13,20 +13,18 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException
 import com.mojang.brigadier.suggestion.SuggestionProvider
 import com.undefined.stellar.argument.AbstractStellarArgument
 import com.undefined.stellar.argument.LiteralStellarArgument
+import com.undefined.stellar.argument.basic.*
 import com.undefined.stellar.argument.block.BlockDataArgument
-import com.undefined.stellar.argument.custom.CustomArgument
-import com.undefined.stellar.argument.custom.ListArgument
 import com.undefined.stellar.argument.entity.*
 import com.undefined.stellar.argument.item.*
 import com.undefined.stellar.argument.misc.NamespacedKeyArgument
 import com.undefined.stellar.argument.misc.UUIDArgument
 import com.undefined.stellar.argument.player.GameModeArgument
-import com.undefined.stellar.argument.primitive.*
 import com.undefined.stellar.argument.registry.*
 import com.undefined.stellar.argument.structure.LootTableArgument
 import com.undefined.stellar.argument.structure.MirrorArgument
 import com.undefined.stellar.argument.world.*
-import com.undefined.stellar.data.argument.Anchor
+import com.undefined.stellar.data.argument.EntityAnchor
 import com.undefined.stellar.data.argument.Operation
 import com.undefined.stellar.data.argument.ParticleData
 import com.undefined.stellar.exception.ArgumentVersionMismatchException
@@ -75,20 +73,20 @@ import java.util.function.Predicate
 @Suppress("UNCHECKED_CAST")
 object ArgumentHelper {
 
-    fun getLiteralArguments(argument: AbstractStellarArgument<*>): List<ArgumentBuilder<CommandSourceStack, *>> {
+    fun getLiteralArguments(argument: AbstractStellarArgument<*, *>): List<ArgumentBuilder<CommandSourceStack, *>> {
         val arguments: MutableList<ArgumentBuilder<CommandSourceStack, *>> = mutableListOf()
         for (name in argument.aliases + argument.name)
             arguments.add(LiteralArgumentBuilder.literal(name))
         return arguments
     }
 
-    fun getRequiredArgumentBuilder(argument: AbstractStellarArgument<*>): RequiredArgumentBuilder<CommandSourceStack, *> {
+    fun getRequiredArgumentBuilder(argument: AbstractStellarArgument<*, *>): RequiredArgumentBuilder<CommandSourceStack, *> {
         val argumentBuilder: RequiredArgumentBuilder<CommandSourceStack, *> = RequiredArgumentBuilder.argument(argument.name, getArgumentType(argument))
         getSuggestions(argument)?.let { argumentBuilder.suggests(it) }
         return argumentBuilder
     }
 
-    private fun <T : AbstractStellarArgument<*>> getSuggestions(argument: T): SuggestionProvider<CommandSourceStack>? =
+    private fun <T : AbstractStellarArgument<*, *>> getSuggestions(argument: T): SuggestionProvider<CommandSourceStack>? =
         when (argument) {
             is GameEventArgument -> SuggestionProvider { _, builder ->
                 SharedSuggestionProvider.suggestResource(Registry.GAME_EVENT.keySet(), builder)
@@ -99,10 +97,10 @@ object ArgumentHelper {
             is VillagerProfessionArgument -> SuggestionProvider { _, builder ->
                 SharedSuggestionProvider.suggestResource(Registry.VILLAGER_PROFESSION.keySet(), builder)
             }
-            is com.undefined.stellar.argument.registry.VillagerTypeArgument -> SuggestionProvider { _, builder ->
+            is VillagerTypeArgument -> SuggestionProvider { _, builder ->
                 SharedSuggestionProvider.suggestResource(Registry.VILLAGER_TYPE.keySet(), builder)
             }
-            is com.undefined.stellar.argument.registry.AttributeArgument -> SuggestionProvider { _, builder ->
+            is AttributeArgument -> SuggestionProvider { _, builder ->
                 SharedSuggestionProvider.suggestResource(Registry.ATTRIBUTE.keySet(), builder)
             }
             is FluidArgument -> SuggestionProvider { _, builder ->
@@ -111,27 +109,27 @@ object ArgumentHelper {
             is SoundArgument -> SuggestionProvider { context, builder ->
                 SuggestionProviders.AVAILABLE_SOUNDS.getSuggestions(context, builder)
             }
-            is com.undefined.stellar.argument.registry.BiomeArgument -> SuggestionProvider { context, builder ->
+            is BiomeArgument -> SuggestionProvider { context, builder ->
                 SuggestionProviders.AVAILABLE_BIOMES.getSuggestions(context, builder)
             }
             is EntityTypeArgument -> SuggestionProvider { _, builder ->
                 SharedSuggestionProvider.suggestResource(Registry.ENTITY_TYPE.keySet(), builder)
             }
-            is com.undefined.stellar.argument.registry.MemoryKeyArgument -> SuggestionProvider { _, builder ->
+            is MemoryKeyArgument -> SuggestionProvider { _, builder ->
                 SharedSuggestionProvider.suggestResource(Registry.MEMORY_MODULE_TYPE.keySet(), builder)
             }
             else -> null
         }
 
-    private fun <T : AbstractStellarArgument<*>> getArgumentType(argument: T): ArgumentType<*> =
+    private fun <T : AbstractStellarArgument<*, *>> getArgumentType(argument: T): ArgumentType<*> =
         when (argument) {
-            is ListArgument<*> -> getArgumentType(argument.type)
-            is CustomArgument<*> -> getArgumentType(argument.type)
+            is ListArgument<*, *> -> getArgumentType(argument.type)
+            is CustomArgument<*, *> -> getArgumentType(argument.type)
             is StringArgument -> brigadier(argument.type)
             is PhraseArgument -> brigadier(StringType.PHRASE)
             is IntegerArgument -> IntegerArgumentType.integer(argument.min, argument.max)
-            is com.undefined.stellar.argument.primitive.LongArgument -> LongArgumentType.longArg(argument.min, argument.max)
-            is com.undefined.stellar.argument.primitive.FloatArgument -> FloatArgumentType.floatArg(argument.min, argument.max)
+            is LongArgument -> LongArgumentType.longArg(argument.min, argument.max)
+            is FloatArgument -> FloatArgumentType.floatArg(argument.min, argument.max)
             is DoubleArgument -> DoubleArgumentType.doubleArg(argument.min, argument.max)
             is BooleanArgument -> BoolArgumentType.bool()
             is com.undefined.stellar.argument.entity.EntityArgument -> brigadier(argument.type)
@@ -168,7 +166,7 @@ object ArgumentHelper {
             is NamespacedKeyArgument -> ResourceLocationArgument.id()
             is com.undefined.stellar.argument.entity.EntityAnchorArgument -> EntityAnchorArgument.anchor()
             is com.undefined.stellar.argument.math.RangeArgument -> RangeArgument.intRange()
-            is com.undefined.stellar.argument.world.DimensionArgument -> DimensionArgument.dimension()
+            is com.undefined.stellar.argument.world.EnvironmentArgument -> DimensionArgument.dimension()
             is GameModeArgument -> throwArgumentVersionException(argument)
             is com.undefined.stellar.argument.math.TimeArgument -> TimeArgument.time()
             is MirrorArgument -> throwArgumentVersionException(argument)
@@ -177,45 +175,45 @@ object ArgumentHelper {
             is LootTableArgument -> throwArgumentVersionException(argument)
             is UUIDArgument -> UuidArgument.uuid()
             is GameEventArgument -> ResourceLocationArgument.id()
-            is com.undefined.stellar.argument.registry.StructureTypeArgument -> throwArgumentVersionException(argument)
+            is StructureTypeArgument -> throwArgumentVersionException(argument)
             is PotionEffectTypeArgument -> throwArgumentVersionException(argument)
             is BlockTypeArgument -> throwArgumentVersionException(argument)
             is ItemTypeArgument -> throwArgumentVersionException(argument)
             is CatTypeArgument -> throwArgumentVersionException(argument)
-            is com.undefined.stellar.argument.registry.FrogVariantArgument -> throwArgumentVersionException(argument)
+            is FrogVariantArgument -> throwArgumentVersionException(argument)
             is VillagerProfessionArgument -> ResourceLocationArgument.id()
-            is com.undefined.stellar.argument.registry.VillagerTypeArgument -> ResourceLocationArgument.id()
-            is com.undefined.stellar.argument.registry.MapDecorationTypeArgument -> throwArgumentVersionException(argument)
+            is VillagerTypeArgument -> ResourceLocationArgument.id()
+            is MapDecorationTypeArgument -> throwArgumentVersionException(argument)
             is InventoryTypeArgument -> throwArgumentVersionException(argument)
-            is com.undefined.stellar.argument.registry.AttributeArgument -> ResourceLocationArgument.id()
+            is AttributeArgument -> ResourceLocationArgument.id()
             is FluidArgument -> ResourceLocationArgument.id()
             is SoundArgument -> ResourceLocationArgument.id()
-            is com.undefined.stellar.argument.registry.BiomeArgument -> ResourceLocationArgument.id()
+            is BiomeArgument -> ResourceLocationArgument.id()
             is StructureArgument -> throwArgumentVersionException(argument)
             is TrimMaterialArgument -> throwArgumentVersionException(argument)
             is TrimPatternArgument -> throwArgumentVersionException(argument)
             is DamageTypeArgument -> throwArgumentVersionException(argument)
             is WolfVariantArgument -> throwArgumentVersionException(argument)
             is PatternTypeArgument -> throwArgumentVersionException(argument)
-            is com.undefined.stellar.argument.registry.ArtArgument -> throwArgumentVersionException(argument)
+            is ArtArgument -> throwArgumentVersionException(argument)
             is InstrumentArgument -> throwArgumentVersionException(argument)
             is EntityTypeArgument -> ResourceLocationArgument.id()
             is PotionArgument -> throwArgumentVersionException(argument)
-            is com.undefined.stellar.argument.registry.MemoryKeyArgument -> ResourceLocationArgument.id()
+            is MemoryKeyArgument -> ResourceLocationArgument.id()
             else -> throw UnsupportedArgumentException(argument)
         }
 
-    fun <T : AbstractStellarArgument<*>> getParsedArgument(context: CommandContext<CommandSourceStack>, argument: T): Any? {
+    fun <T : AbstractStellarArgument<*, *>> getParsedArgument(context: CommandContext<CommandSourceStack>, argument: T): Any? {
         return when (argument) {
             is LiteralStellarArgument -> throw LiteralArgumentMismatchException()
-            is CustomArgument<*> -> argument.parse(CommandContextAdapter.getStellarCommandContext(context))
+            is CustomArgument<*, *> -> argument.parseInternal(CommandContextAdapter.getStellarCommandContext(context), getParsedArgument(context, argument.type))
             is StringArgument -> StringArgumentType.getString(context, argument.name)
             is IntegerArgument -> IntegerArgumentType.getInteger(context, argument.name)
-            is com.undefined.stellar.argument.primitive.LongArgument -> LongArgumentType.getLong(context, argument.name)
-            is com.undefined.stellar.argument.primitive.FloatArgument -> FloatArgumentType.getFloat(context, argument.name)
+            is LongArgument -> LongArgumentType.getLong(context, argument.name)
+            is FloatArgument -> FloatArgumentType.getFloat(context, argument.name)
             is DoubleArgument -> DoubleArgumentType.getDouble(context, argument.name)
             is BooleanArgument -> BoolArgumentType.getBool(context, argument.name)
-            is ListArgument<*> -> argument.parse(getParsedArgument(context, argument))
+            is ListArgument<*, *> -> argument.parse(getParsedArgument(context, argument.type))
             is com.undefined.stellar.argument.entity.EntityArgument -> EntityArgument.getEntities(context, argument.name)
                 .map { it.bukkitEntity }.toMutableList()
                 .addAll(listOf(EntityArgument.getEntity(context, argument.name).bukkitEntity))
@@ -259,12 +257,12 @@ object ArgumentHelper {
             is ItemSlotArgument -> SlotArgument.getSlot(context, argument.name)
             is ItemSlotsArgument -> throwArgumentVersionException(argument)
             is NamespacedKeyArgument -> NamespacedKey(ResourceLocationArgument.getId(context, argument.name).namespace, ResourceLocationArgument.getId(context, argument.name).path)
-            is com.undefined.stellar.argument.entity.EntityAnchorArgument -> Anchor.getFromName(getArgumentInput(context, argument.name) ?: return null)
+            is com.undefined.stellar.argument.entity.EntityAnchorArgument -> EntityAnchor.getFromName(getArgumentInput(context, argument.name) ?: return null)
             is com.undefined.stellar.argument.math.RangeArgument -> {
                 val range = RangeArgument.Ints.getRange(context, argument.name)
                 IntRange(range.min ?: 1, range.max ?: 2)
             }
-            is com.undefined.stellar.argument.world.DimensionArgument -> DimensionArgument.getDimension(context, argument.name).world.environment
+            is com.undefined.stellar.argument.world.EnvironmentArgument -> DimensionArgument.getDimension(context, argument.name).world.environment
             is GameModeArgument -> throwArgumentVersionException(argument)
             is com.undefined.stellar.argument.math.TimeArgument -> IntegerArgumentType.getInteger(context, argument.name).toLong()
             is MirrorArgument -> throwArgumentVersionException(argument)
@@ -273,31 +271,31 @@ object ArgumentHelper {
             is LootTableArgument -> throwArgumentVersionException(argument)
             is UUIDArgument -> UuidArgument.getUuid(context, argument.name)
             is GameEventArgument -> org.bukkit.Registry.GAME_EVENT.get(getId(context, argument.name))
-            is com.undefined.stellar.argument.registry.StructureTypeArgument -> throwArgumentVersionException(argument)
+            is StructureTypeArgument -> throwArgumentVersionException(argument)
             is PotionEffectTypeArgument -> throwArgumentVersionException(argument)
             is BlockTypeArgument -> throwArgumentVersionException(argument)
             is ItemTypeArgument -> throwArgumentVersionException(argument)
             is CatTypeArgument -> throwArgumentVersionException(argument)
-            is com.undefined.stellar.argument.registry.FrogVariantArgument -> throwArgumentVersionException(argument)
+            is FrogVariantArgument -> throwArgumentVersionException(argument)
             is VillagerProfessionArgument -> org.bukkit.Registry.VILLAGER_PROFESSION.get(getId(context, argument.name))
-            is com.undefined.stellar.argument.registry.VillagerTypeArgument -> org.bukkit.Registry.VILLAGER_TYPE.get(getId(context, argument.name))
-            is com.undefined.stellar.argument.registry.MapDecorationTypeArgument -> throwArgumentVersionException(argument)
+            is VillagerTypeArgument -> org.bukkit.Registry.VILLAGER_TYPE.get(getId(context, argument.name))
+            is MapDecorationTypeArgument -> throwArgumentVersionException(argument)
             is InventoryTypeArgument -> getInventoryType(Registry.MENU.getOrThrow(ResourceKey.create(Registry.MENU_REGISTRY, ResourceLocationArgument.getId(context, argument.name))))
-            is com.undefined.stellar.argument.registry.AttributeArgument -> org.bukkit.Registry.ATTRIBUTE.get(getId(context, argument.name))
+            is AttributeArgument -> org.bukkit.Registry.ATTRIBUTE.get(getId(context, argument.name))
             is FluidArgument -> org.bukkit.Registry.FLUID.get(getId(context, argument.name))
             is SoundArgument -> org.bukkit.Registry.SOUNDS.get(getId(context, argument.name))
-            is com.undefined.stellar.argument.registry.BiomeArgument -> org.bukkit.Registry.BIOME.get(getId(context, argument.name))
+            is BiomeArgument -> org.bukkit.Registry.BIOME.get(getId(context, argument.name))
             is StructureArgument -> throwArgumentVersionException(argument)
             is TrimMaterialArgument -> throwArgumentVersionException(argument)
             is TrimPatternArgument -> throwArgumentVersionException(argument)
             is DamageTypeArgument -> throwArgumentVersionException(argument)
             is WolfVariantArgument -> throwArgumentVersionException(argument)
             is PatternTypeArgument -> throwArgumentVersionException(argument)
-            is com.undefined.stellar.argument.registry.ArtArgument -> throwArgumentVersionException(argument)
+            is ArtArgument -> throwArgumentVersionException(argument)
             is InstrumentArgument -> throwArgumentVersionException(argument)
             is EntityTypeArgument -> org.bukkit.Registry.ENTITY_TYPE.get(getId(context, argument.name))
             is PotionArgument -> throwArgumentVersionException(argument)
-            is com.undefined.stellar.argument.registry.MemoryKeyArgument -> org.bukkit.Registry.MEMORY_MODULE_TYPE.get(getId(context, argument.name))
+            is MemoryKeyArgument -> org.bukkit.Registry.MEMORY_MODULE_TYPE.get(getId(context, argument.name))
             else -> throw UnsupportedArgumentException(argument)
         }
     }
@@ -354,11 +352,11 @@ object ArgumentHelper {
         StringType.PHRASE -> StringArgumentType.greedyString()
     }
 
-    private fun brigadier(type: com.undefined.stellar.argument.entity.EntityDisplayType): EntityArgument = when (type) {
-        com.undefined.stellar.argument.entity.EntityDisplayType.ENTITY -> EntityArgument.entity()
-        com.undefined.stellar.argument.entity.EntityDisplayType.ENTITIES -> EntityArgument.entities()
-        com.undefined.stellar.argument.entity.EntityDisplayType.PLAYER -> EntityArgument.player()
-        com.undefined.stellar.argument.entity.EntityDisplayType.PLAYERS -> EntityArgument.players()
+    private fun brigadier(type: EntityDisplayType): EntityArgument = when (type) {
+        EntityDisplayType.ENTITY -> EntityArgument.entity()
+        EntityDisplayType.ENTITIES -> EntityArgument.entities()
+        EntityDisplayType.PLAYER -> EntityArgument.player()
+        EntityDisplayType.PLAYERS -> EntityArgument.players()
     }
 
     private fun getBukkitAxis(argument: EnumSet<Direction.Axis>): EnumSet<Axis> =
@@ -421,7 +419,7 @@ object ArgumentHelper {
     private fun getLocation(context: CommandContext<CommandSourceStack>, command: LocationArgument): Location {
         val world = context.source.level.world
         return when (command.type) {
-            LocationType.LOCATION_3D -> context.getArgument(command.name, Coordinates::class.java).getBlockPos(context.source).toLocation(world);
+            LocationType.LOCATION_3D -> context.getArgument(command.name, Coordinates::class.java).getBlockPos(context.source).toLocation(world)
             LocationType.LOCATION_2D -> ColumnPosArgument.getColumnPos(context, command.name).toLocation(world)
             LocationType.PRECISE_LOCATION_3D -> Vec3Argument.getVec3(context, command.name).toLocation(world)
             LocationType.PRECISE_LOCATION_2D -> Vec2Argument.getVec2(context, command.name).toLocation(world)
@@ -433,7 +431,7 @@ object ArgumentHelper {
     private fun Vec3.toLocation(world: World?) = Location(world, x, y, z)
     private fun Vec2.toLocation(world: World?) = Location(world, x.toDouble(), 0.0, y.toDouble())
 
-    private fun throwArgumentVersionException(argument: AbstractStellarArgument<*>): Nothing =
+    private fun throwArgumentVersionException(argument: AbstractStellarArgument<*, *>): Nothing =
         throw ArgumentVersionMismatchException(argument, NMSVersion.version)
 
 }

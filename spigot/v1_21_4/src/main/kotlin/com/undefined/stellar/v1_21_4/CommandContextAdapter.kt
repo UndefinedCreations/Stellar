@@ -5,7 +5,7 @@ import com.undefined.stellar.AbstractStellarCommand
 import com.undefined.stellar.StellarCommands
 import com.undefined.stellar.argument.AbstractStellarArgument
 import com.undefined.stellar.argument.LiteralStellarArgument
-import com.undefined.stellar.argument.custom.CustomArgument
+import com.undefined.stellar.argument.basic.CustomArgument
 import com.undefined.stellar.data.argument.CommandNode
 import com.undefined.stellar.data.argument.PhraseCommandContext
 import com.undefined.stellar.exception.DuplicateArgumentNameException
@@ -29,12 +29,9 @@ object CommandContextAdapter {
         if (arguments.filter { it !is LiteralStellarArgument }.groupingBy { it.name }.eachCount().any { it.value > 1 }) throw DuplicateArgumentNameException()
         val parsedArguments: CommandNode =
             BrigadierCommandHelper.getArguments(baseCommand, context)
-                .associate<AbstractStellarArgument<*>, String, (com.undefined.stellar.data.argument.CommandContext<CommandSender>) -> Any?> { argument ->
-                    if (argument is CustomArgument) return@associate Pair(argument.name) { argument.parse(it) }
+                .associate<AbstractStellarArgument<*, *>, String, (com.undefined.stellar.data.argument.CommandContext<CommandSender>) -> Any?> { argument ->
                     if (argument is LiteralStellarArgument) return@associate Pair(argument.name) { throw LiteralArgumentMismatchException() }
-                    Pair(argument.name) {
-                        ArgumentHelper.getParsedArgument(context, argument)
-                    }
+                    Pair(argument.name) { ArgumentHelper.getParsedArgument(context, argument) }
                 } as CommandNode
         return com.undefined.stellar.data.argument.CommandContext(
             parsedArguments,
@@ -60,7 +57,7 @@ object CommandContextAdapter {
         val overworld = MinecraftServer.getServer().overworld()
         return CommandSourceStack(
             Source(sender),
-            Vec3.atLowerCornerOf(overworld.getSharedSpawnPos()),
+            Vec3.atLowerCornerOf(overworld.sharedSpawnPos),
             Vec2.ZERO,
             overworld,
             4,
@@ -71,7 +68,6 @@ object CommandContextAdapter {
         )
     }
 
-    @Suppress("DEPRECATION")
     private data class Source(val sender: CommandSender) : CommandSource {
         override fun sendSystemMessage(message: Component) =
             this.sender.sendMessage(LegacyComponentSerializer.legacySection().serialize(asAdventure(message)))

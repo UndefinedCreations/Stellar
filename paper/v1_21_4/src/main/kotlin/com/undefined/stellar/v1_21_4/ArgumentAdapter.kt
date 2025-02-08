@@ -9,15 +9,13 @@ import com.mojang.brigadier.builder.RequiredArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
 import com.undefined.stellar.argument.AbstractStellarArgument
 import com.undefined.stellar.argument.LiteralStellarArgument
+import com.undefined.stellar.argument.basic.*
 import com.undefined.stellar.argument.block.BlockDataArgument
-import com.undefined.stellar.argument.custom.CustomArgument
-import com.undefined.stellar.argument.custom.ListArgument
 import com.undefined.stellar.argument.item.ItemSlotArgument
 import com.undefined.stellar.argument.item.ItemSlotsArgument
 import com.undefined.stellar.argument.math.AxisArgument
 import com.undefined.stellar.argument.misc.NamespacedKeyArgument
 import com.undefined.stellar.argument.misc.UUIDArgument
-import com.undefined.stellar.argument.primitive.*
 import com.undefined.stellar.argument.registry.*
 import com.undefined.stellar.argument.scoreboard.DisplaySlotArgument
 import com.undefined.stellar.argument.scoreboard.ScoreHolderType
@@ -25,7 +23,7 @@ import com.undefined.stellar.argument.structure.MirrorArgument
 import com.undefined.stellar.argument.world.HeightMapArgument
 import com.undefined.stellar.argument.world.LocationArgument
 import com.undefined.stellar.argument.world.LocationType
-import com.undefined.stellar.data.argument.Anchor
+import com.undefined.stellar.data.argument.EntityAnchor
 import com.undefined.stellar.data.argument.Operation
 import com.undefined.stellar.exception.LiteralArgumentMismatchException
 import com.undefined.stellar.exception.UnsupportedArgumentException
@@ -64,20 +62,20 @@ object ArgumentAdapter {
         )
     }
 
-    fun getLiteralArguments(argument: AbstractStellarArgument<*>): List<ArgumentBuilder<CommandSourceStack, *>> {
+    fun getLiteralArguments(argument: AbstractStellarArgument<*, *>): List<ArgumentBuilder<CommandSourceStack, *>> {
         val arguments: MutableList<ArgumentBuilder<CommandSourceStack, *>> = mutableListOf()
         for (name in argument.aliases + argument.name)
             arguments.add(LiteralArgumentBuilder.literal(name))
         return arguments
     }
 
-    fun getRequiredArgumentBuilder(argument: AbstractStellarArgument<*>): RequiredArgumentBuilder<CommandSourceStack, *> =
+    fun getRequiredArgumentBuilder(argument: AbstractStellarArgument<*, *>): RequiredArgumentBuilder<CommandSourceStack, *> =
         RequiredArgumentBuilder.argument(argument.name, getArgumentType(argument))
 
-    private fun <T : AbstractStellarArgument<*>> getArgumentType(argument: T): ArgumentType<*> =
+    private fun <T : AbstractStellarArgument<*, *>> getArgumentType(argument: T): ArgumentType<*> =
         when (argument) {
-            is ListArgument<*> -> getArgumentType(argument.type)
-            is CustomArgument<*> -> getArgumentType(argument.type)
+            is ListArgument<*, *> -> getArgumentType(argument.type)
+            is CustomArgument<*, *> -> getArgumentType(argument.type)
             is StringArgument -> ArgumentHelper.brigadier(argument.type)
             is PhraseArgument -> ArgumentHelper.brigadier(StringType.PHRASE)
             is IntegerArgument -> IntegerArgumentType.integer(argument.min, argument.max)
@@ -119,7 +117,7 @@ object ArgumentAdapter {
             is NamespacedKeyArgument -> ResourceLocationArgument.id()
             is com.undefined.stellar.argument.entity.EntityAnchorArgument -> EntityAnchorArgument.anchor()
             is com.undefined.stellar.argument.math.RangeArgument -> RangeArgument.intRange()
-            is com.undefined.stellar.argument.world.DimensionArgument -> DimensionArgument.dimension()
+            is com.undefined.stellar.argument.world.EnvironmentArgument -> DimensionArgument.dimension()
             is com.undefined.stellar.argument.player.GameModeArgument -> GameModeArgument.gameMode()
             is com.undefined.stellar.argument.math.TimeArgument -> TimeArgument.time(argument.minimum)
             is MirrorArgument -> TemplateMirrorArgument.templateMirror()
@@ -156,17 +154,17 @@ object ArgumentAdapter {
             else -> throw UnsupportedArgumentException(argument)
         }
 
-    fun <T : AbstractStellarArgument<*>> getParsedArgument(context: CommandContext<CommandSourceStack>, argument: T): Any? {
+    fun <T : AbstractStellarArgument<*, *>> getParsedArgument(context: CommandContext<CommandSourceStack>, argument: T): Any? {
         return when (argument) {
             is LiteralStellarArgument -> throw LiteralArgumentMismatchException()
-            is CustomArgument<*> -> argument.parse(CommandContextAdapter.getStellarCommandContext(context))
+            is CustomArgument<*, *> -> argument.parseInternal(CommandContextAdapter.getStellarCommandContext(context), getParsedArgument(context, argument.type))
             is StringArgument -> StringArgumentType.getString(context, argument.name)
             is IntegerArgument -> IntegerArgumentType.getInteger(context, argument.name)
             is LongArgument -> LongArgumentType.getLong(context, argument.name)
             is FloatArgument -> FloatArgumentType.getFloat(context, argument.name)
             is DoubleArgument -> DoubleArgumentType.getDouble(context, argument.name)
             is BooleanArgument -> BoolArgumentType.getBool(context, argument.name)
-            is ListArgument<*> -> argument.parse(StringArgumentType.getString(context, argument.name))
+            is ListArgument<*, *> -> argument.parse(StringArgumentType.getString(context, argument.name))
             is com.undefined.stellar.argument.entity.EntityArgument -> EntityArgument.getEntities(context, argument.name)
                 .map { it.bukkitEntity }.toMutableList()
                 .addAll(listOf(EntityArgument.getEntity(context, argument.name).bukkitEntity))
@@ -204,7 +202,7 @@ object ArgumentAdapter {
             }
             is DisplaySlotArgument -> ArgumentHelper.getBukkitDisplaySlot(ScoreboardSlotArgument.getDisplaySlot(context, argument.name))
             is com.undefined.stellar.argument.scoreboard.ScoreHolderArgument -> when (argument.type) {
-                ScoreHolderType.SINGLE -> ScoreHolderArgument.getName(context, argument.name)
+                ScoreHolderType.SINGLE -> ScoreHolderArgument.getName(context, argument.name).scoreboardName
                 ScoreHolderType.MULTIPLE -> ScoreHolderArgument.getNames(context, argument.name).map { it.scoreboardName }
             }
             is AxisArgument -> ArgumentHelper.getBukkitAxis(SwizzleArgument.getSwizzle(context, argument.name))
@@ -212,12 +210,12 @@ object ArgumentAdapter {
             is ItemSlotArgument -> SlotArgument.getSlot(context, argument.name)
             is ItemSlotsArgument -> SlotsArgument.getSlots(context, argument.name).slots().toList()
             is NamespacedKeyArgument -> NamespacedKey(ResourceLocationArgument.getId(context, argument.name).namespace, ResourceLocationArgument.getId(context, argument.name).path)
-            is com.undefined.stellar.argument.entity.EntityAnchorArgument -> Anchor.getFromName(ArgumentHelper.getArgumentInput(context, argument.name) ?: return null)
+            is com.undefined.stellar.argument.entity.EntityAnchorArgument -> EntityAnchor.getFromName(ArgumentHelper.getArgumentInput(context, argument.name) ?: return null)
             is com.undefined.stellar.argument.math.RangeArgument -> {
                 val range = RangeArgument.Ints.getRange(context, argument.name)
                 IntRange(range.min.orElse(1), range.max.orElse(2))
             }
-            is com.undefined.stellar.argument.world.DimensionArgument -> DimensionArgument.getDimension(context, argument.name).world.environment
+            is com.undefined.stellar.argument.world.EnvironmentArgument -> DimensionArgument.getDimension(context, argument.name).world.environment
             is com.undefined.stellar.argument.player.GameModeArgument -> GameMode.getByValue(GameModeArgument.getGameMode(context, argument.name).id)
             is com.undefined.stellar.argument.math.TimeArgument -> IntegerArgumentType.getInteger(context, argument.name).toLong()
             is MirrorArgument -> Mirror.valueOf(TemplateMirrorArgument.getMirror(context, argument.name).name)
@@ -225,32 +223,32 @@ object ArgumentAdapter {
             is HeightMapArgument -> HeightMap.valueOf(HeightmapTypeArgument.getHeightmap(context, argument.name).name)
             is com.undefined.stellar.argument.structure.LootTableArgument -> LootTableArgument.getLootTable(context, argument.name).value().craftLootTable
             is UUIDArgument -> UuidArgument.getUuid(context, argument.name)
-            is GameEventArgument -> Registry.GAME_EVENT.get(ArgumentHelper.getId(context, argument.name, Registries.GAME_EVENT))
-            is StructureTypeArgument -> Registry.STRUCTURE_TYPE.get(ArgumentHelper.getId(context, argument.name, Registries.STRUCTURE_TYPE))
-            is PotionEffectTypeArgument -> Registry.EFFECT.get(ArgumentHelper.getId(context, argument.name, Registries.MOB_EFFECT))
-            is BlockTypeArgument -> Registry.BLOCK.get(ArgumentHelper.getId(context, argument.name, Registries.BLOCK_TYPE))
-            is ItemTypeArgument -> Registry.ITEM.get(ArgumentHelper.getId(context, argument.name, Registries.ITEM))
-            is CatTypeArgument -> Registry.CAT_VARIANT.get(ArgumentHelper.getId(context, argument.name, Registries.CAT_VARIANT))
-            is FrogVariantArgument -> Registry.FROG_VARIANT.get(ArgumentHelper.getId(context, argument.name, Registries.FROG_VARIANT))
-            is VillagerProfessionArgument -> Registry.VILLAGER_PROFESSION.get(ArgumentHelper.getId(context, argument.name, Registries.VILLAGER_PROFESSION))
-            is VillagerTypeArgument -> Registry.VILLAGER_TYPE.get(ArgumentHelper.getId(context, argument.name, Registries.VILLAGER_TYPE))
-            is MapDecorationTypeArgument -> Registry.MAP_DECORATION_TYPE.get(ArgumentHelper.getId(context, argument.name, Registries.MAP_DECORATION_TYPE))
+            is GameEventArgument -> Registry.GAME_EVENT.getOrThrow(ArgumentHelper.getId(context, argument.name, Registries.GAME_EVENT))
+            is StructureTypeArgument -> Registry.STRUCTURE_TYPE.getOrThrow(ArgumentHelper.getId(context, argument.name, Registries.STRUCTURE_TYPE))
+            is PotionEffectTypeArgument -> Registry.EFFECT.getOrThrow(ArgumentHelper.getId(context, argument.name, Registries.MOB_EFFECT))
+            is BlockTypeArgument -> Registry.BLOCK.getOrThrow(ArgumentHelper.getId(context, argument.name, Registries.BLOCK_TYPE))
+            is ItemTypeArgument -> Registry.ITEM.getOrThrow(ArgumentHelper.getId(context, argument.name, Registries.ITEM))
+            is CatTypeArgument -> Registry.CAT_VARIANT.getOrThrow(ArgumentHelper.getId(context, argument.name, Registries.CAT_VARIANT))
+            is FrogVariantArgument -> Registry.FROG_VARIANT.getOrThrow(ArgumentHelper.getId(context, argument.name, Registries.FROG_VARIANT))
+            is VillagerProfessionArgument -> Registry.VILLAGER_PROFESSION.getOrThrow(ArgumentHelper.getId(context, argument.name, Registries.VILLAGER_PROFESSION))
+            is VillagerTypeArgument -> Registry.VILLAGER_TYPE.getOrThrow(ArgumentHelper.getId(context, argument.name, Registries.VILLAGER_TYPE))
+            is MapDecorationTypeArgument -> Registry.MAP_DECORATION_TYPE.getOrThrow(ArgumentHelper.getId(context, argument.name, Registries.MAP_DECORATION_TYPE))
             is InventoryTypeArgument -> ArgumentHelper.getInventoryType(ArgumentHelper.resolveKey(context, argument.name, Registries.MENU).value())
-            is AttributeArgument -> Registry.ATTRIBUTE.get(ArgumentHelper.getId(context, argument.name, Registries.ATTRIBUTE))
-            is FluidArgument -> Registry.FLUID.get(ArgumentHelper.getId(context, argument.name, Registries.FLUID))
-            is SoundArgument -> Registry.SOUNDS.get(ArgumentHelper.getId(context, argument.name, Registries.SOUND_EVENT))
-            is BiomeArgument -> Registry.BIOME.get(ArgumentHelper.getId(context, argument.name, Registries.BIOME))
-            is StructureArgument -> Registry.STRUCTURE.get(ArgumentHelper.getId(context, argument.name, Registries.STRUCTURE))
-            is TrimMaterialArgument -> Registry.TRIM_MATERIAL.get(ArgumentHelper.getId(context, argument.name, Registries.TRIM_MATERIAL))
-            is TrimPatternArgument -> Registry.TRIM_PATTERN.get(ArgumentHelper.getId(context, argument.name, Registries.TRIM_PATTERN))
-            is DamageTypeArgument -> Registry.DAMAGE_TYPE.get(ArgumentHelper.getId(context, argument.name, Registries.DAMAGE_TYPE))
-            is WolfVariantArgument -> Registry.WOLF_VARIANT.get(ArgumentHelper.getId(context, argument.name, Registries.WOLF_VARIANT))
-            is PatternTypeArgument -> Registry.BANNER_PATTERN.get(ArgumentHelper.getId(context, argument.name, Registries.BANNER_PATTERN))
-            is ArtArgument -> Registry.ART.get(ArgumentHelper.getId(context, argument.name, Registries.PAINTING_VARIANT))
-            is InstrumentArgument -> Registry.INSTRUMENT.get(ArgumentHelper.getId(context, argument.name, Registries.INSTRUMENT))
-            is EntityTypeArgument -> Registry.ENTITY_TYPE.get(ArgumentHelper.getId(context, argument.name, Registries.ENTITY_TYPE))
-            is PotionArgument -> Registry.POTION.get(ArgumentHelper.getId(context, argument.name, Registries.POTION))
-            is MemoryKeyArgument -> Registry.MEMORY_MODULE_TYPE.get(ArgumentHelper.getId(context, argument.name, Registries.MEMORY_MODULE_TYPE))
+            is AttributeArgument -> Registry.ATTRIBUTE.getOrThrow(ArgumentHelper.getId(context, argument.name, Registries.ATTRIBUTE))
+            is FluidArgument -> Registry.FLUID.getOrThrow(ArgumentHelper.getId(context, argument.name, Registries.FLUID))
+            is SoundArgument -> Registry.SOUNDS.getOrThrow(ArgumentHelper.getId(context, argument.name, Registries.SOUND_EVENT))
+            is BiomeArgument -> Registry.BIOME.getOrThrow(ArgumentHelper.getId(context, argument.name, Registries.BIOME))
+            is StructureArgument -> Registry.STRUCTURE.getOrThrow(ArgumentHelper.getId(context, argument.name, Registries.STRUCTURE))
+            is TrimMaterialArgument -> Registry.TRIM_MATERIAL.getOrThrow(ArgumentHelper.getId(context, argument.name, Registries.TRIM_MATERIAL))
+            is TrimPatternArgument -> Registry.TRIM_PATTERN.getOrThrow(ArgumentHelper.getId(context, argument.name, Registries.TRIM_PATTERN))
+            is DamageTypeArgument -> Registry.DAMAGE_TYPE.getOrThrow(ArgumentHelper.getId(context, argument.name, Registries.DAMAGE_TYPE))
+            is WolfVariantArgument -> Registry.WOLF_VARIANT.getOrThrow(ArgumentHelper.getId(context, argument.name, Registries.WOLF_VARIANT))
+            is PatternTypeArgument -> Registry.BANNER_PATTERN.getOrThrow(ArgumentHelper.getId(context, argument.name, Registries.BANNER_PATTERN))
+            is ArtArgument -> Registry.ART.getOrThrow(ArgumentHelper.getId(context, argument.name, Registries.PAINTING_VARIANT))
+            is InstrumentArgument -> Registry.INSTRUMENT.getOrThrow(ArgumentHelper.getId(context, argument.name, Registries.INSTRUMENT))
+            is EntityTypeArgument -> Registry.ENTITY_TYPE.getOrThrow(ArgumentHelper.getId(context, argument.name, Registries.ENTITY_TYPE))
+            is PotionArgument -> Registry.POTION.getOrThrow(ArgumentHelper.getId(context, argument.name, Registries.POTION))
+            is MemoryKeyArgument -> Registry.MEMORY_MODULE_TYPE.getOrThrow(ArgumentHelper.getId(context, argument.name, Registries.MEMORY_MODULE_TYPE))
             else -> throw UnsupportedArgumentException(argument)
         }
     }

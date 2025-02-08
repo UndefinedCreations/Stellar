@@ -3,7 +3,7 @@ package com.undefined.stellar.data.argument
 import org.bukkit.Location
 import org.bukkit.entity.LivingEntity
 
-enum class Anchor(
+enum class EntityAnchor(
     val anchorName: String,
     private val offset: (location: Location, entity: LivingEntity) -> Location
 ) {
@@ -21,7 +21,7 @@ enum class Anchor(
     fun apply(location: Location, entity: LivingEntity): Location = offset(location, entity)
 
     companion object {
-        fun getFromName(name: String, ignoreCase: Boolean = false): Anchor = Anchor.entries.first { it.anchorName.equals(name, ignoreCase) }
+        fun getFromName(name: String, ignoreCase: Boolean = false): EntityAnchor = EntityAnchor.entries.first { it.anchorName.equals(name, ignoreCase) }
     }
 
 }

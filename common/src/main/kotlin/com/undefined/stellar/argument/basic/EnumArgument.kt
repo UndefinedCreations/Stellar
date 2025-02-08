@@ -1,8 +1,6 @@
-package com.undefined.stellar.argument.custom
+package com.undefined.stellar.argument.basic
 
 import com.undefined.stellar.AbstractStellarCommand
-import com.undefined.stellar.argument.primitive.StringArgument
-import com.undefined.stellar.argument.primitive.StringType
 import com.undefined.stellar.data.suggestion.Suggestion
 import java.lang.Enum.valueOf
 import kotlin.reflect.KClass
@@ -20,7 +18,7 @@ class EnumArgument<T : Enum<T>>(
             null
         }
     }
-) : ListArgument<Enum<*>?>(StringArgument(parent, name, StringType.WORD), enum.java.enumConstants.toList(), converter, parse) {
+) : ListArgument<Enum<*>?, String>(StringArgument(parent, name, StringType.WORD), enum.java.enumConstants.toList(), converter, parse) {
     fun valueOf(name: String): Enum<T>? =
         try {
             valueOf(enum.java, name) as Enum<T>

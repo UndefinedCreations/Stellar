@@ -54,7 +54,7 @@ object BrigadierCommandHelper {
     }
 
     fun handleSuggestions(
-        command: AbstractStellarArgument<*>,
+        command: AbstractStellarArgument<*, *>,
         context: CommandContext<CommandSourceStack>,
         builder: SuggestionsBuilder
     ): CompletableFuture<Suggestions> {
@@ -77,8 +77,8 @@ object BrigadierCommandHelper {
         baseCommand: AbstractStellarCommand<*>,
         context: CommandContext<CommandSourceStack>,
         currentIndex: Int = 1,
-        listOfArguments: List<AbstractStellarArgument<*>> = emptyList()
-    ): List<AbstractStellarArgument<*>> {
+        listOfArguments: List<AbstractStellarArgument<*, *>> = emptyList()
+    ): List<AbstractStellarArgument<*, *>> {
         if (listOfArguments.size == context.nodes.size - 1) return listOfArguments
         for (argument in baseCommand.arguments)
             if (argument.name == context.nodes[currentIndex].node.name)

@@ -3,11 +3,9 @@
 package com.undefined.stellar.argument
 
 import com.undefined.stellar.AbstractStellarCommand
+import com.undefined.stellar.argument.basic.*
 import com.undefined.stellar.argument.block.BlockDataArgument
 import com.undefined.stellar.argument.block.BlockPredicateArgument
-import com.undefined.stellar.argument.custom.EnumArgument
-import com.undefined.stellar.argument.custom.EnumFormatting
-import com.undefined.stellar.argument.custom.ListArgument
 import com.undefined.stellar.argument.entity.EntityAnchorArgument
 import com.undefined.stellar.argument.item.ItemPredicateArgument
 import com.undefined.stellar.argument.item.ItemSlotArgument
@@ -20,7 +18,6 @@ import com.undefined.stellar.argument.misc.NamespacedKeyArgument
 import com.undefined.stellar.argument.misc.UUIDArgument
 import com.undefined.stellar.argument.player.GameModeArgument
 import com.undefined.stellar.argument.player.GameProfileArgument
-import com.undefined.stellar.argument.primitive.*
 import com.undefined.stellar.argument.registry.*
 import com.undefined.stellar.argument.scoreboard.ObjectiveCriteriaArgument
 import com.undefined.stellar.argument.structure.LootTableArgument
@@ -48,9 +45,9 @@ import java.util.*
 open class ArgumentHandler {
 
     open val base: AbstractStellarCommand<*> get() = throw IllegalStateException("Cannot access the getter from the property base when it hasn't been overridden!")
-    open val arguments: MutableList<AbstractStellarArgument<*>> = mutableListOf()
+    open val arguments: MutableList<AbstractStellarArgument<*, *>> = mutableListOf()
 
-    fun addArgument(argument: AbstractStellarArgument<*>): AbstractStellarArgument<*> =
+    fun addArgument(argument: AbstractStellarArgument<*, *>): AbstractStellarArgument<*, *> =
         argument.also { arguments.add(it) }
 
     fun addArgument(name: String, vararg aliases: String): LiteralStellarArgument =
@@ -59,16 +56,13 @@ open class ArgumentHandler {
     fun addLiteralArgument(name: String): LiteralStellarArgument =
         addArgument { LiteralStellarArgument(base, name) }
 
-    inline fun <reified T : AbstractStellarArgument<*>> addArgument(argument: () -> AbstractStellarArgument<*>): T {
+    inline fun <reified T : AbstractStellarArgument<*, *>> addArgument(argument: () -> AbstractStellarArgument<*, *>): T {
         val parsedArgument = argument()
         addArgument(parsedArgument)
         return parsedArgument as T
     }
 
-//    fun <T> addCustomArgument(argument: CustomArgument<T>): CustomArgument<T> {
-//        addArgument(argument)
-//        return argument
-//    }
+    fun <T, R> addCustomArgument(block: (parent: AbstractStellarCommand<*>) -> CustomArgument<T, R>): CustomArgument<T, R> = addArgument { block(base) }
 
     fun addStringArgument(name: String, type: StringType = StringType.WORD): StringArgument =
         addArgument { StringArgument(base, name, type)  }
@@ -79,11 +73,11 @@ open class ArgumentHandler {
     fun addIntegerArgument(name: String, min: Int = Int.MIN_VALUE, max: Int = Int.MAX_VALUE): IntegerArgument =
         addArgument { IntegerArgument(base, name, min, max) }
 
-    fun addLongArgument(name: String, min: Long = Long.MIN_VALUE, max: Long = Long.MAX_VALUE): com.undefined.stellar.argument.primitive.LongArgument =
-        addArgument { com.undefined.stellar.argument.primitive.LongArgument(base, name, min, max) }
+    fun addLongArgument(name: String, min: Long = Long.MIN_VALUE, max: Long = Long.MAX_VALUE): LongArgument =
+        addArgument { LongArgument(base, name, min, max) }
 
-    fun addFloatArgument(name: String, min: Float = Float.MIN_VALUE, max: Float = Float.MAX_VALUE): com.undefined.stellar.argument.primitive.FloatArgument =
-        addArgument { com.undefined.stellar.argument.primitive.FloatArgument(base, name, min, max) }
+    fun addFloatArgument(name: String, min: Float = Float.MIN_VALUE, max: Float = Float.MAX_VALUE): FloatArgument =
+        addArgument { FloatArgument(base, name, min, max) }
 
     fun addDoubleArgument(name: String, min: Double = Double.MIN_VALUE, max: Double = Double.MAX_VALUE): DoubleArgument =
         addArgument { DoubleArgument(base, name, min, max) }
@@ -95,74 +89,74 @@ open class ArgumentHandler {
         name: String,
         list: List<T>,
         converter: (T) -> Suggestion = { Suggestion.withText(it.toString()) },
-        parse: (Any?) -> T?
-    ): ListArgument<T> = addArgument { ListArgument(StringArgument(base, name, StringType.WORD), list, converter, parse) }
+        parse: (String) -> T?
+    ): ListArgument<T, String> = addArgument { ListArgument(StringArgument(base, name, StringType.WORD), list, converter, parse) }
 
-    fun <T> addAdvancedListArgument(
-        type: AbstractStellarArgument<*>,
+    fun <T, R> addAdvancedListArgument(
+        type: AbstractStellarArgument<*, R>,
         list: List<T>,
         converter: (T) -> Suggestion = { Suggestion.withText(it.toString()) },
-        parse: (Any?) -> T?
-    ): ListArgument<T> = addArgument { ListArgument(type, list, converter, parse) }
+        parse: (R) -> T?
+    ): ListArgument<T, R> = addArgument { ListArgument(type, list, converter, parse) }
 
     fun <T> addAdvancedListArgument(
         name: String,
         list: CommandContext<CommandSender>.() -> List<T>,
         converter: (T) -> Suggestion = { Suggestion.withText(it.toString()) },
-        parse: (Any?) -> T?
-    ): ListArgument<T> = addArgument { ListArgument(StringArgument(base, name, StringType.WORD), list, converter, parse) }
+        parse: (String) -> T?
+    ): ListArgument<T, String> = addArgument { ListArgument(StringArgument(base, name, StringType.WORD), list, converter, parse) }
 
-    fun <T> addAdvancedListArgument(
-        type: AbstractStellarArgument<*>,
+    fun <T, R> addAdvancedListArgument(
+        type: AbstractStellarArgument<*, R>,
         list: CommandContext<CommandSender>.() -> List<T>,
         converter: (T) -> Suggestion = { Suggestion.withText(it.toString()) },
-        parse: (Any?) -> T?
-    ): ListArgument<T> = addArgument { ListArgument(type, list, converter, parse) }
+        parse: (R) -> T?
+    ): ListArgument<T, R> = addArgument { ListArgument(type, list, converter, parse) }
 
     fun <T> addListArgument(
         name: String,
         list: List<T>,
         converter: (T) -> String = { it.toString() },
-        parse: (Any?) -> T?
-    ): ListArgument<T> = addArgument { ListArgument(StringArgument(base, name, StringType.WORD), list, { Suggestion.withText(converter(it)) }, parse) }
+        parse: (String) -> T?
+    ): ListArgument<T, String> = addArgument { ListArgument(StringArgument(base, name, StringType.WORD), list, { Suggestion.withText(converter(it)) }, parse) }
 
-    fun <T> addListArgument(
-        type: AbstractStellarArgument<*>,
+    fun <T, R> addListArgument(
+        type: AbstractStellarArgument<*, R>,
         list: List<T>,
         converter: (T) -> String = { it.toString() },
-        parse: (Any?) -> T?
-    ): ListArgument<T> = addArgument { ListArgument(type, list, { Suggestion.withText(converter(it)) }, parse) }
+        parse: (R) -> T?
+    ): ListArgument<T, R> = addArgument { ListArgument(type, list, { Suggestion.withText(converter(it)) }, parse) }
 
     fun <T> addListArgument(
         name: String,
         list: CommandContext<CommandSender>.() -> List<T>,
         converter: (T) -> String = { it.toString() },
-        parse: (Any?) -> T?
-    ): ListArgument<T> = addArgument { ListArgument(StringArgument(base, name, StringType.WORD), list, { Suggestion.withText(converter(it)) }, parse) }
+        parse: (String) -> T?
+    ): ListArgument<T, String> = addArgument { ListArgument(StringArgument(base, name, StringType.WORD), list, { Suggestion.withText(converter(it)) }, parse) }
 
-    fun <T> addListArgument(
-        type: AbstractStellarArgument<*>,
+    fun <T, R> addListArgument(
+        type: AbstractStellarArgument<*, R>,
         list: CommandContext<CommandSender>.() -> List<T>,
         converter: (T) -> String = { it.toString() },
-        parse: (Any?) -> T?
-    ): ListArgument<T> = addArgument { ListArgument(type, list, { Suggestion.withText(converter(it)) }, parse) }
+        parse: (R) -> T?
+    ): ListArgument<T, R> = addArgument { ListArgument(type, list, { Suggestion.withText(converter(it)) }, parse) }
 
-    fun addStringListArgument(name: String, list: List<String>, type: StringType = StringType.WORD, parse: (Any?) -> Any? = { it }): ListArgument<String> =
+    fun addStringListArgument(name: String, list: List<String>, type: StringType = StringType.WORD, parse: (Any?) -> Any? = { it }): ListArgument<String, String> =
         addArgument { ListArgument(StringArgument(base, name, type), list, { Suggestion.withText(it.toString()) }, parse) }
 
-    fun addStringListArgument(name: String, vararg list: String): ListArgument<String> =
-        addArgument { ListArgument(StringArgument(base, name, StringType.WORD), list.toList(), { Suggestion.withText(it.toString()) }, { it }) }
+    fun addStringListArgument(name: String, vararg list: String): ListArgument<String, String> =
+        addArgument { ListArgument(StringArgument(base, name, StringType.WORD), list.toList(), { Suggestion.withText(it) }, { it }) }
 
-    fun addUUIDListArgument(name: String, list: List<UUID>, parse: (Any?) -> Any? = { it }): ListArgument<UUID> =
+    fun addUUIDListArgument(name: String, list: List<UUID>, parse: (Any?) -> Any? = { it }): ListArgument<UUID, UUID> =
         addArgument { ListArgument(UUIDArgument(base, name), list, parse = parse) }
 
-    fun addStringListArgument(name: String, list: CommandContext<CommandSender>.() -> List<String>, type: StringType = StringType.WORD): ListArgument<String> =
-        addArgument { ListArgument(StringArgument(base, name, type), list, { Suggestion.withText(it.toString()) }, { it }) }
+    fun addStringListArgument(name: String, list: CommandContext<CommandSender>.() -> List<String>, type: StringType = StringType.WORD): ListArgument<String, String> =
+        addArgument { ListArgument(StringArgument(base, name, type), list, { Suggestion.withText(it) }, { it }) }
 
-    fun addStringListArgument(name: String, vararg list: CommandContext<CommandSender>.() -> List<String>): ListArgument<String> =
-        addArgument { ListArgument(StringArgument(base, name, StringType.WORD), list.toList(), { Suggestion.withText(it.toString()) }, { it }) }
+    fun addStringListArgument(name: String, vararg list: CommandContext<CommandSender>.() -> List<String>): ListArgument<String, String> =
+        addArgument { ListArgument(StringArgument(base, name, StringType.WORD), { list.flatMap { it() } }, converter = { Suggestion.withText(it) }, { it }) }
 
-    fun addUUIDListArgument(name: String, list: CommandContext<CommandSender>.() -> List<UUID>): ListArgument<UUID> =
+    fun addUUIDListArgument(name: String, list: CommandContext<CommandSender>.() -> List<UUID>): ListArgument<UUID, UUID> =
         addArgument { ListArgument(UUIDArgument(base, name), list, parse = { it }) }
 
     inline fun <reified T : Enum<T>> addEnumArgument(name: String, formatting: EnumFormatting = EnumFormatting.LOWERCASE): EnumArgument<T> =
@@ -263,8 +257,8 @@ open class ArgumentHandler {
     fun addGameModeArgument(name: String): GameModeArgument =
         addArgument { GameModeArgument(base, name) }
 
-    fun addDimensionArgument(name: String): com.undefined.stellar.argument.world.DimensionArgument =
-        addArgument { com.undefined.stellar.argument.world.DimensionArgument(base, name) }
+    fun addDimensionArgument(name: String): com.undefined.stellar.argument.world.EnvironmentArgument =
+        addArgument { com.undefined.stellar.argument.world.EnvironmentArgument(base, name) }
 
     fun addTimeArgument(name: String, minimum: Int = 0): TimeArgument =
         addArgument { TimeArgument(base, name, minimum) }
@@ -284,31 +278,31 @@ open class ArgumentHandler {
     fun addUUIDArgument(name: String): UUIDArgument =
         addArgument { UUIDArgument(base, name) }
 
-    fun addOnlinePlayersArgument(name: String): ListArgument<Player> =
+    fun addOnlinePlayersArgument(name: String): ListArgument<Player, String> =
         addArgument {
             ListArgument(
                 StringArgument(base, name, StringType.WORD),
                 { Bukkit.getOnlinePlayers().toList() },
                 { Suggestion.withText(it.name) },
-                { Bukkit.getPlayer(it.toString()) },
+                { Bukkit.getPlayer(it) },
             )
         }
 
-    fun addOfflinePlayersArgument(name: String): ListArgument<OfflinePlayer> =
+    fun addOfflinePlayersArgument(name: String): ListArgument<OfflinePlayer, String> =
         addArgument {
             ListArgument(
                 StringArgument(base, name, StringType.WORD),
                 { Bukkit.getOfflinePlayers().toList() },
                 { Suggestion.withText(it.name!!) },
-                { Bukkit.getOfflinePlayer(it.toString()) },
+                { Bukkit.getOfflinePlayer(it) },
             )
         }
 
     fun addGameEventArgument(name: String): GameEventArgument =
         addArgument { GameEventArgument(base, name) }
 
-    fun addStructureTypeArgument(name: String): com.undefined.stellar.argument.registry.StructureTypeArgument =
-        addArgument { com.undefined.stellar.argument.registry.StructureTypeArgument(base, name) }
+    fun addStructureTypeArgument(name: String): StructureTypeArgument =
+        addArgument { StructureTypeArgument(base, name) }
 
     fun addPotionEffectTypeArgument(name: String): PotionEffectTypeArgument =
         addArgument { PotionEffectTypeArgument(base, name) }
@@ -322,23 +316,23 @@ open class ArgumentHandler {
     fun addCatTypeArgument(name: String): CatTypeArgument =
         addArgument { CatTypeArgument(base, name) }
 
-    fun addFrogVariantArgument(name: String): com.undefined.stellar.argument.registry.FrogVariantArgument =
-        addArgument { com.undefined.stellar.argument.registry.FrogVariantArgument(base, name) }
+    fun addFrogVariantArgument(name: String): FrogVariantArgument =
+        addArgument { FrogVariantArgument(base, name) }
 
     fun addVillagerProfessionArgument(name: String): VillagerProfessionArgument =
         addArgument { VillagerProfessionArgument(base, name) }
 
-    fun addVillagerTypeArgument(name: String): com.undefined.stellar.argument.registry.VillagerTypeArgument =
-        addArgument { com.undefined.stellar.argument.registry.VillagerTypeArgument(base, name) }
+    fun addVillagerTypeArgument(name: String): VillagerTypeArgument =
+        addArgument { VillagerTypeArgument(base, name) }
 
-    fun addMapDecorationType(name: String): com.undefined.stellar.argument.registry.MapDecorationTypeArgument =
-        addArgument { com.undefined.stellar.argument.registry.MapDecorationTypeArgument(base, name) }
+    fun addMapDecorationType(name: String): MapDecorationTypeArgument =
+        addArgument { MapDecorationTypeArgument(base, name) }
 
     fun addInventoryTypeArgument(name: String): InventoryTypeArgument =
         addArgument { InventoryTypeArgument(base, name) }
 
-    fun addAttributeArgument(name: String): com.undefined.stellar.argument.registry.AttributeArgument =
-        addArgument { com.undefined.stellar.argument.registry.AttributeArgument(base, name) }
+    fun addAttributeArgument(name: String): AttributeArgument =
+        addArgument { AttributeArgument(base, name) }
 
     fun addFluidArgument(name: String): FluidArgument =
         addArgument { FluidArgument(base, name) }
@@ -346,8 +340,8 @@ open class ArgumentHandler {
     fun addSoundArgument(name: String): SoundArgument =
         addArgument { SoundArgument(base, name) }
 
-    fun addBiomeArgument(name: String): com.undefined.stellar.argument.registry.BiomeArgument =
-        addArgument { com.undefined.stellar.argument.registry.BiomeArgument(base, name) }
+    fun addBiomeArgument(name: String): BiomeArgument =
+        addArgument { BiomeArgument(base, name) }
 
     fun addStructureArgument(name: String): StructureArgument =
         addArgument { StructureArgument(base, name) }
@@ -367,8 +361,8 @@ open class ArgumentHandler {
     fun addPatternTypeArgument(name: String): PatternTypeArgument =
         addArgument { PatternTypeArgument(base, name) }
 
-    fun addArtArgument(name: String): com.undefined.stellar.argument.registry.ArtArgument =
-        addArgument { com.undefined.stellar.argument.registry.ArtArgument(base, name) }
+    fun addArtArgument(name: String): ArtArgument =
+        addArgument { ArtArgument(base, name) }
 
     fun addInstrumentArgument(name: String): InstrumentArgument =
         addArgument { InstrumentArgument(base, name) }
@@ -379,7 +373,7 @@ open class ArgumentHandler {
     fun addPotionArgument(name: String): PotionArgument =
         addArgument { PotionArgument(base, name) }
 
-    fun addMemoryKeyArgument(name: String): com.undefined.stellar.argument.registry.MemoryKeyArgument =
-        addArgument { com.undefined.stellar.argument.registry.MemoryKeyArgument(base, name) }
+    fun addMemoryKeyArgument(name: String): MemoryKeyArgument =
+        addArgument { MemoryKeyArgument(base, name) }
 
 }

@@ -9,7 +9,7 @@ import com.mojang.brigadier.suggestion.Suggestions
 import com.mojang.brigadier.suggestion.SuggestionsBuilder
 import com.undefined.stellar.argument.AbstractStellarArgument
 import com.undefined.stellar.argument.LiteralStellarArgument
-import com.undefined.stellar.argument.primitive.PhraseArgument
+import com.undefined.stellar.argument.basic.PhraseArgument
 import com.undefined.stellar.data.suggestion.Suggestion
 import net.minecraft.commands.CommandSourceStack
 import org.bukkit.Bukkit
@@ -37,7 +37,7 @@ object CommandAdapter {
             BrigadierCommandHelper.fulfillsRequirements(command, source)
         }
 
-        if (command !is AbstractStellarArgument || command.suggestions.isEmpty() || brigadierCommand !is RequiredArgumentBuilder<CommandSourceStack, *>) return
+        if (command !is AbstractStellarArgument<*, *> || command.suggestions.isEmpty() || brigadierCommand !is RequiredArgumentBuilder<CommandSourceStack, *>) return
         brigadierCommand.suggests { context, builder ->
             BrigadierCommandHelper.handleSuggestions(command, context, builder)
         }
@@ -111,7 +111,7 @@ object CommandAdapter {
         }
     }
 
-    private fun handleRequiredArgument(argument: AbstractStellarArgument<*>, brigadierCommand: ArgumentBuilder<CommandSourceStack, *>) {
+    private fun handleRequiredArgument(argument: AbstractStellarArgument<*, *>, brigadierCommand: ArgumentBuilder<CommandSourceStack, *>) {
         val argumentBuilder = ArgumentHelper.getRequiredArgumentBuilder(argument)
         handleCommandFunctions(argument, argumentBuilder)
         handleArguments(argument, argumentBuilder)

@@ -1,9 +1,9 @@
-package com.undefined.stellar.argument.primitive
+package com.undefined.stellar.argument.basic
 
 import com.undefined.stellar.AbstractStellarCommand
 import com.undefined.stellar.argument.AbstractStellarArgument
 
-class StringArgument(parent: AbstractStellarCommand<*>, name: String, val type: StringType) : AbstractStellarArgument<StringArgument>(parent, name)
+class StringArgument(parent: AbstractStellarCommand<*>, name: String, val type: StringType) : AbstractStellarArgument<StringArgument, String>(parent, name)
 
 enum class StringType(vararg val examples: String) {
     WORD(*arrayOf("word", "words_with_underscores")),

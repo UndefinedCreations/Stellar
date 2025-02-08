@@ -1,4 +1,4 @@
-package com.undefined.stellar.argument.primitive
+package com.undefined.stellar.argument.basic
 
 import com.undefined.stellar.data.argument.PhraseCommandContext
 import com.undefined.stellar.data.execution.PhraseStellarExecution

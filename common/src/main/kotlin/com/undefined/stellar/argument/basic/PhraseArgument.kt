@@ -1,4 +1,4 @@
-package com.undefined.stellar.argument.primitive
+package com.undefined.stellar.argument.basic
 
 import com.undefined.stellar.AbstractStellarCommand
 import com.undefined.stellar.argument.AbstractStellarArgument
@@ -6,7 +6,7 @@ import com.undefined.stellar.data.argument.PhraseCommandContext
 import com.undefined.stellar.data.suggestion.Suggestion
 import org.bukkit.command.CommandSender
 
-class PhraseArgument(parent: AbstractStellarCommand<*>, name: String) : AbstractStellarArgument<PhraseArgument>(parent, name) {
+class PhraseArgument(parent: AbstractStellarCommand<*>, name: String) : AbstractStellarArgument<PhraseArgument, String>(parent, name) {
 
     val words: HashMap<Int, WordArgument> = hashMapOf()
 

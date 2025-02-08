@@ -15,7 +15,7 @@ val groupIdVar = "com.undefined"
 val artifactIdVar = "stellar"
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.21.3-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
     implementation(project(":spigot:api"))
 }
 
@@ -23,7 +23,7 @@ tasks {
     assemble {
         dependsOn(shadowJar)
     }
-    val shadowJar by getting(com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar::class) {
+    shadowJar {
         archiveFileName.set("Stellar-shadow.jar")
     }
     compileKotlin {
@@ -33,7 +33,7 @@ tasks {
         options.release = 21
     }
     runServer {
-        minecraftVersion("1.21.4")
+        minecraftVersion("1.21.1")
         serverFolderName { "run" }
         acceptMojangEula()
         serverType(ServerType.PAPERMC)

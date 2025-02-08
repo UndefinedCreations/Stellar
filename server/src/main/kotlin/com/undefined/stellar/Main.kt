@@ -1,60 +1,35 @@
 package com.undefined.stellar
 
-import com.undefined.stellar.argument.custom.EnumFormatting
+import com.undefined.stellar.argument.basic.CustomArgument
+import com.undefined.stellar.argument.basic.StringArgument
+import com.undefined.stellar.argument.basic.StringType
+import com.undefined.stellar.data.argument.CommandContext
 import com.undefined.stellar.data.suggestion.Suggestion
-import org.bukkit.entity.Player
+import org.bukkit.command.CommandSender
 import org.bukkit.plugin.java.JavaPlugin
+import java.util.*
 import java.util.concurrent.CompletableFuture
 
-enum class EntityType {
-    ACACIA_BOAT,
-    ACACIA_CHEST_BOAT,
-    ALLAY,
-    AREA_EFFECT_CLOUD,
-    ARMADILLO,
-    ARMOR_STAND,
-    ARROW,
-    AXOLOTL,
-    BAT,
-    BEE,
-    BIRCH_BOAT,
-    BIRCH_CHEST_BOAT,
-    BLAZE,
-    BLOCK_DISPLAY,
-    BOGGED,
-    BREEZE,
-    BREEZE_WIND_CHARGE,
-    CAMEL,
-    CAT,
-    CAVE_SPIDER,
-    CHERRY_BOAT,
-    CHERRY_CHEST_BOAT,
-    CHEST_MINECART,
-    CHICKEN,
-    COD,
-    COMMAND_BLOCK_MINECART,
-    COW,
-    CREAKING,
-    SPIDER,
-    MINECART
+class TestArgument(parent: AbstractStellarCommand<*>) : CustomArgument<String, String>(StringArgument(parent, "test", StringType.WORD)) {
+    override fun parse(context: CommandContext<CommandSender>, value: String): String = "$value!!"
+
+    override fun listSuggestions(context: CommandContext<CommandSender>): CompletableFuture<Collection<Suggestion>> = CompletableFuture.completedFuture(
+        listOf(Suggestion.create("test", "tooltip")))
+
+    override fun <T> execution(context: CommandContext<CommandSender>, value: T) {
+        context.sender.sendMessage("hi1!!1")
+    }
 }
 
 class Main : JavaPlugin() {
 
     override fun onEnable() {
+        val list: MutableList<UUID> = mutableListOf()
+        for (i in 0..100)
+            list.add(UUID.randomUUID())
         StellarCommand("test", "t")
-            .addEnumArgument<EntityType>("type", EnumFormatting.LOWERCASE)
-            .addExecution<Player> {
-                val type = getArgument<EntityType>("type")
-                sender.sendMessage(type.name)
-            }
-            .addStringArgument("test")
-            .addFutureSuggestion<Player> {
-                CompletableFuture.supplyAsync {
-                    return@supplyAsync listOf(Suggestion.withText("test"))
-                }
-            }
-            .addSuggestion("a")
+            .addCustomArgument { TestArgument(it) }
+            .addListArgument("test", list, { it.toString().replace('-', '_') }, { UUID.fromString(it.replace('_', '-')) })
             .register(this)
     }
 

@@ -2,6 +2,25 @@ plugins {
     kotlin("jvm") version "1.9.22"
 }
 
+val versionVar = version
+val groupIdVar = "com.undefined"
+val artifactIdVar = "stellar"
+
+group = groupIdVar
+version = versionVar
+
+publishing {
+    publications {
+        register<MavenPublication>("maven") {
+            groupId = groupIdVar
+            artifactId = artifactIdVar
+            version = versionVar.toString()
+
+            from(components["java"])
+        }
+    }
+}
+
 repositories {
     maven("https://repo.papermc.io/repository/maven-public/")
 }
