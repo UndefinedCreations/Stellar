@@ -17,8 +17,9 @@ class EnumArgument<T : Enum<T>>(
         } catch (e: IllegalArgumentException) {
             null
         }
-    }
-) : ListArgument<Enum<*>?, String>(StringArgument(parent, name, StringType.WORD), enum.java.enumConstants.toList(), converter, parse) {
+    },
+    async: Boolean = true
+) : ListArgument<Enum<*>?, String>(StringArgument(parent, name, StringType.WORD), enum.java.enumConstants.toList(), converter, parse, async) {
     fun valueOf(name: String): Enum<T>? =
         try {
             valueOf(enum.java, name) as Enum<T>

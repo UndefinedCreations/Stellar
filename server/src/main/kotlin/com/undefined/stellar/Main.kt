@@ -28,8 +28,15 @@ class Main : JavaPlugin() {
         for (i in 0..100)
             list.add(UUID.randomUUID())
         StellarCommand("test", "t")
-            .addCustomArgument { TestArgument(it) }
-            .addListArgument("test", list, { it.toString().replace('-', '_') }, { UUID.fromString(it.replace('_', '-')) })
+            .addListArgument("test", list, {
+                it.toString().replace('-', '_')
+            }, {
+                println(Thread.currentThread().name)
+                UUID.fromString(it.replace('_', '-'))
+            }, async = false)
+            .addExecution<CommandSender> {
+                sender.sendMessage(getArgument<UUID>("test"))
+            }
             .register(this)
     }
 

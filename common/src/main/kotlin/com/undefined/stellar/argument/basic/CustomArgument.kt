@@ -22,7 +22,7 @@ abstract class CustomArgument<R, T>(
             failureExecution(this, arguments.values.last())
         }).toMutableList()
     override val requirements: MutableList<StellarRequirement<*>>
-        get() = (super.requirements + StellarRequirement(CommandSender::class) { requirement() }).toMutableList()
+        get() = (super.requirements + StellarRequirement(CommandSender::class) { requirement(this) }).toMutableList()
     override val executions: MutableList<StellarExecution<*>>
         get() = (super.executions + StellarExecution(CommandSender::class) {
             execution(this, this.arguments.values.last())
@@ -44,7 +44,7 @@ abstract class CustomArgument<R, T>(
     open fun <T> execution(context: CommandContext<CommandSender>, value: T) {}
     open fun <T> runnable(context: CommandContext<CommandSender>, value: T): Boolean = true
     open fun <T> failureExecution(context: CommandContext<CommandSender>, value: T) {}
-    open fun requirement(): Boolean = true
+    open fun requirement(context: CommandSender): Boolean = true
     open fun listSuggestions(context: CommandContext<CommandSender>): CompletableFuture<Collection<Suggestion>> = CompletableFuture.completedFuture(listOf())
 
 }

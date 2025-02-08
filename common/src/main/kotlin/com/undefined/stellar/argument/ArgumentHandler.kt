@@ -89,92 +89,125 @@ open class ArgumentHandler {
         name: String,
         list: List<T>,
         converter: (T) -> Suggestion = { Suggestion.withText(it.toString()) },
-        parse: (String) -> T?
-    ): ListArgument<T, String> = addArgument { ListArgument(StringArgument(base, name, StringType.WORD), list, converter, parse) }
+        parse: (String) -> T?,
+        async: Boolean = true,
+    ): ListArgument<T, String> = addArgument { ListArgument(StringArgument(base, name, StringType.WORD), list, converter, parse, async) }
 
     fun <T, R> addAdvancedListArgument(
         type: AbstractStellarArgument<*, R>,
         list: List<T>,
         converter: (T) -> Suggestion = { Suggestion.withText(it.toString()) },
-        parse: (R) -> T?
-    ): ListArgument<T, R> = addArgument { ListArgument(type, list, converter, parse) }
+        parse: (R) -> T?,
+        async: Boolean = true,
+    ): ListArgument<T, R> = addArgument { ListArgument(type, list, converter, parse, async) }
 
     fun <T> addAdvancedListArgument(
         name: String,
         list: CommandContext<CommandSender>.() -> List<T>,
         converter: (T) -> Suggestion = { Suggestion.withText(it.toString()) },
-        parse: (String) -> T?
-    ): ListArgument<T, String> = addArgument { ListArgument(StringArgument(base, name, StringType.WORD), list, converter, parse) }
+        parse: (String) -> T?,
+        async: Boolean = true,
+    ): ListArgument<T, String> = addArgument { ListArgument(StringArgument(base, name, StringType.WORD), list, converter, parse, async) }
 
     fun <T, R> addAdvancedListArgument(
         type: AbstractStellarArgument<*, R>,
         list: CommandContext<CommandSender>.() -> List<T>,
         converter: (T) -> Suggestion = { Suggestion.withText(it.toString()) },
-        parse: (R) -> T?
-    ): ListArgument<T, R> = addArgument { ListArgument(type, list, converter, parse) }
+        parse: (R) -> T?,
+        async: Boolean = true,
+    ): ListArgument<T, R> = addArgument { ListArgument(type, list, converter, parse, async) }
 
     fun <T> addListArgument(
         name: String,
         list: List<T>,
         converter: (T) -> String = { it.toString() },
-        parse: (String) -> T?
-    ): ListArgument<T, String> = addArgument { ListArgument(StringArgument(base, name, StringType.WORD), list, { Suggestion.withText(converter(it)) }, parse) }
+        parse: (String) -> T?,
+        async: Boolean = true,
+    ): ListArgument<T, String> = addArgument { ListArgument(StringArgument(base, name, StringType.WORD), list, { Suggestion.withText(converter(it)) }, parse, async) }
 
     fun <T, R> addListArgument(
         type: AbstractStellarArgument<*, R>,
         list: List<T>,
         converter: (T) -> String = { it.toString() },
-        parse: (R) -> T?
-    ): ListArgument<T, R> = addArgument { ListArgument(type, list, { Suggestion.withText(converter(it)) }, parse) }
+        parse: (R) -> T?,
+        async: Boolean = true,
+    ): ListArgument<T, R> = addArgument { ListArgument(type, list, { Suggestion.withText(converter(it)) }, parse, async) }
 
     fun <T> addListArgument(
         name: String,
         list: CommandContext<CommandSender>.() -> List<T>,
         converter: (T) -> String = { it.toString() },
-        parse: (String) -> T?
-    ): ListArgument<T, String> = addArgument { ListArgument(StringArgument(base, name, StringType.WORD), list, { Suggestion.withText(converter(it)) }, parse) }
+        parse: (String) -> T?,
+        async: Boolean = true,
+    ): ListArgument<T, String> = addArgument { ListArgument(StringArgument(base, name, StringType.WORD), list, { Suggestion.withText(converter(it)) }, parse, async) }
 
     fun <T, R> addListArgument(
         type: AbstractStellarArgument<*, R>,
         list: CommandContext<CommandSender>.() -> List<T>,
         converter: (T) -> String = { it.toString() },
-        parse: (R) -> T?
-    ): ListArgument<T, R> = addArgument { ListArgument(type, list, { Suggestion.withText(converter(it)) }, parse) }
+        parse: (R) -> T?,
+        async: Boolean = true,
+    ): ListArgument<T, R> = addArgument { ListArgument(type, list, { Suggestion.withText(converter(it)) }, parse, async) }
 
-    fun addStringListArgument(name: String, list: List<String>, type: StringType = StringType.WORD, parse: (Any?) -> Any? = { it }): ListArgument<String, String> =
-        addArgument { ListArgument(StringArgument(base, name, type), list, { Suggestion.withText(it.toString()) }, parse) }
+    fun addStringListArgument(
+        name: String,
+        list: List<String>,
+        type: StringType = StringType.WORD,
+        parse: (Any?) -> Any? = { it },
+        async: Boolean = true,
+    ): ListArgument<String, String> =
+        addArgument { ListArgument(StringArgument(base, name, type), list, { Suggestion.withText(it.toString()) }, parse, async) }
 
-    fun addStringListArgument(name: String, vararg list: String): ListArgument<String, String> =
-        addArgument { ListArgument(StringArgument(base, name, StringType.WORD), list.toList(), { Suggestion.withText(it) }, { it }) }
+    fun addStringListArgument(
+        name: String,
+        vararg list: String,
+        async: Boolean = true,
+    ): ListArgument<String, String> =
+        addArgument { ListArgument(StringArgument(base, name, StringType.WORD), list.toList(), { Suggestion.withText(it) }, { it }, async) }
 
-    fun addUUIDListArgument(name: String, list: List<UUID>, parse: (Any?) -> Any? = { it }): ListArgument<UUID, UUID> =
-        addArgument { ListArgument(UUIDArgument(base, name), list, parse = parse) }
+    fun addUUIDListArgument(
+        name: String,
+        list: List<UUID>,
+        parse: (Any?) -> Any? = { it },
+        async: Boolean = true,
+    ): ListArgument<UUID, UUID> =
+        addArgument { ListArgument(UUIDArgument(base, name), list, parse = parse, async = async) }
 
-    fun addStringListArgument(name: String, list: CommandContext<CommandSender>.() -> List<String>, type: StringType = StringType.WORD): ListArgument<String, String> =
-        addArgument { ListArgument(StringArgument(base, name, type), list, { Suggestion.withText(it) }, { it }) }
+    fun addStringListArgument(
+        name: String,
+        list: CommandContext<CommandSender>.() -> List<String>,
+        type: StringType = StringType.WORD,
+        async: Boolean = true,
+    ): ListArgument<String, String> =
+        addArgument { ListArgument(StringArgument(base, name, type), list, { Suggestion.withText(it) }, { it }, async) }
 
-    fun addStringListArgument(name: String, vararg list: CommandContext<CommandSender>.() -> List<String>): ListArgument<String, String> =
-        addArgument { ListArgument(StringArgument(base, name, StringType.WORD), { list.flatMap { it() } }, converter = { Suggestion.withText(it) }, { it }) }
+    fun addStringListArgument(
+        name: String,
+        vararg list: CommandContext<CommandSender>.() -> List<String>,
+        async: Boolean = true,
+    ): ListArgument<String, String> =
+        addArgument { ListArgument(StringArgument(base, name, StringType.WORD), { list.flatMap { it() } }, converter = { Suggestion.withText(it) }, { it }, async) }
 
-    fun addUUIDListArgument(name: String, list: CommandContext<CommandSender>.() -> List<UUID>): ListArgument<UUID, UUID> =
-        addArgument { ListArgument(UUIDArgument(base, name), list, parse = { it }) }
+    fun addUUIDListArgument(
+        name: String,
+        list: CommandContext<CommandSender>.() -> List<UUID>,
+        async: Boolean = true,
+    ): ListArgument<UUID, UUID> =
+        addArgument { ListArgument(UUIDArgument(base, name), list, parse = { it }, async = async) }
 
-    inline fun <reified T : Enum<T>> addEnumArgument(name: String, formatting: EnumFormatting = EnumFormatting.LOWERCASE): EnumArgument<T> =
-        addArgument { EnumArgument<T>(base, name, T::class, { Suggestion.withText(formatting.action(it!!.name)) }) }
+    inline fun <reified T : Enum<T>> addEnumArgument(
+        name: String,
+        formatting: EnumFormatting = EnumFormatting.LOWERCASE,
+        async: Boolean = true,
+    ): EnumArgument<T> =
+        addArgument { EnumArgument(base, name, T::class, { Suggestion.withText(formatting.action(it!!.name)) }, async = async) }
 
     inline fun <reified T : Enum<T>> addEnumArgument(
         name: String,
         noinline converter: (Enum<*>?) -> Suggestion = { Suggestion.withText(it!!.name) },
-        noinline parse: (Any?) -> Enum<T>?
-    ): EnumArgument<T> = addArgument {
-        EnumArgument(
-            base,
-            name,
-            T::class,
-            converter,
-            parse
-        )
-    }
+        noinline parse: (Any?) -> Enum<T>?,
+        async: Boolean = true,
+    ): EnumArgument<T> = addArgument { EnumArgument(base, name, T::class, converter, parse, async) }
 
     fun addEntityArgument(name: String, type: com.undefined.stellar.argument.entity.EntityDisplayType): com.undefined.stellar.argument.entity.EntityArgument =
         addArgument { com.undefined.stellar.argument.entity.EntityArgument(base, name, type) }
@@ -278,23 +311,25 @@ open class ArgumentHandler {
     fun addUUIDArgument(name: String): UUIDArgument =
         addArgument { UUIDArgument(base, name) }
 
-    fun addOnlinePlayersArgument(name: String): ListArgument<Player, String> =
+    fun addOnlinePlayersArgument(name: String, async: Boolean = true): ListArgument<Player, String> =
         addArgument {
             ListArgument(
                 StringArgument(base, name, StringType.WORD),
                 { Bukkit.getOnlinePlayers().toList() },
                 { Suggestion.withText(it.name) },
                 { Bukkit.getPlayer(it) },
+                async
             )
         }
 
-    fun addOfflinePlayersArgument(name: String): ListArgument<OfflinePlayer, String> =
+    fun addOfflinePlayersArgument(name: String, async: Boolean = true): ListArgument<OfflinePlayer, String> =
         addArgument {
             ListArgument(
                 StringArgument(base, name, StringType.WORD),
                 { Bukkit.getOfflinePlayers().toList() },
                 { Suggestion.withText(it.name!!) },
                 { Bukkit.getOfflinePlayer(it) },
+                async
             )
         }
 
