@@ -40,12 +40,14 @@ object CommandContextAdapter {
     }
 
     fun getGreedyCommandContext(context: CommandContext<CommandSourceStack>): PhraseCommandContext<CommandSender> {
+        val stellarContext = getStellarCommandContext(context)
         val input = context.input.removePrefix("/")
         val words = input.split(' ').toMutableList()
 
         val totalOtherArguments = context.nodes.size - 1
         for (i in (1..totalOtherArguments)) words.removeFirst()
         return PhraseCommandContext(
+            stellarContext,
             words,
             context.source.bukkitSender,
             input

@@ -7,12 +7,12 @@ class Main : JavaPlugin() {
 
     override fun onEnable() {
         val list: MutableList<String> = mutableListOf("test", "hidden", "visible")
-        val main = StellarCommand("test", "t")
-        main.addListArgument("uuid", list, {
-            if (it == "hidden") null else it
-        }, { it.replace('_', '-') })
-            .addAsyncExecution<CommandSender> {
-                sender.sendMessage(Thread.currentThread().name)
+        StellarCommand("test", "t")
+            .addStringListArgument("name", list)
+            .addPhraseArgument("test")
+            .addWordExecution<CommandSender>(0) {
+                println("happened!")
+                sender.sendMessage(getGlobalArgument<String>("name").toString())
             }
             .register(this)
     }

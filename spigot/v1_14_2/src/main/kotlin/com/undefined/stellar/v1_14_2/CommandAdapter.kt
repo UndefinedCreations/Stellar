@@ -36,7 +36,7 @@ object CommandAdapter {
     }
 
     private fun handleCommandFunctions(command: AbstractStellarCommand<*>, brigadierCommand: ArgumentBuilder<CommandListenerWrapper, *>) {
-        if (command.executions.isNotEmpty() || command.executions.isNotEmpty())
+        if (command.executions.isNotEmpty() || (command is PhraseArgument && command.words.isNotEmpty()))
             brigadierCommand.executes { context ->
                 Bukkit.getScheduler().runTask(CommandRegistrar.plugin, Runnable {
                     BrigadierCommandHelper.handleExecutions(command, context)
@@ -79,7 +79,7 @@ object CommandAdapter {
     }
 
     private fun handleGreedyStringWordFunctions(argument: PhraseArgument, argumentBuilder: RequiredArgumentBuilder<CommandListenerWrapper, *>) {
-        argumentBuilder.executes { context ->
+        if (argument.words.isNotEmpty()) argumentBuilder.executes { context ->
             Bukkit.getScheduler().runTask(CommandRegistrar.plugin, Runnable {
                 val greedyContext = CommandContextAdapter.getGreedyCommandContext(context)
 

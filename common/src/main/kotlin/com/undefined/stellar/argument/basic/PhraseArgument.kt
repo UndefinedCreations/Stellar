@@ -25,6 +25,9 @@ class PhraseArgument(parent: AbstractStellarCommand<*>, name: String) : Abstract
     inline fun <reified C : CommandSender> addWordExecution(index: Int, noinline execution: PhraseCommandContext<C>.() -> Unit): PhraseArgument =
         getOrCreateWord(index) { addExecution(execution) }
 
+    inline fun <reified C : CommandSender> addAsyncWordExecution(index: Int, noinline execution: PhraseCommandContext<C>.() -> Unit): PhraseArgument =
+        getOrCreateWord(index) { addAsyncExecution(execution) }
+
     inline fun <reified C : CommandSender> setWordRunnable(index: Int, noinline runnable: PhraseCommandContext<C>.() -> Boolean): PhraseArgument =
         getOrCreateWord(index) {
             setRunnable(runnable)

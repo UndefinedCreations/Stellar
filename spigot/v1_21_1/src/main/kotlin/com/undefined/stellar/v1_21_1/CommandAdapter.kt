@@ -13,6 +13,7 @@ import com.undefined.stellar.argument.LiteralStellarArgument
 import com.undefined.stellar.argument.basic.PhraseArgument
 import com.undefined.stellar.data.suggestion.Suggestion
 import net.minecraft.commands.CommandSourceStack
+import net.minecraft.network.chat.Component
 import org.bukkit.Bukkit
 import org.bukkit.scheduler.BukkitRunnable
 import java.util.concurrent.CompletableFuture
@@ -27,7 +28,7 @@ object CommandAdapter {
     }
 
     fun handleCommandFunctions(command: AbstractStellarCommand<*>, brigadierCommand: ArgumentBuilder<CommandSourceStack, *>) {
-        if (command.executions.isNotEmpty() || command.executions.isNotEmpty())
+        if (command.executions.isNotEmpty())
             brigadierCommand.executes { context ->
                 object : BukkitRunnable() {
                     override fun run() =  BrigadierCommandHelper.handleExecutions(command, context)
@@ -80,7 +81,7 @@ object CommandAdapter {
     }
 
     private fun handleGreedyStringWordFunctions(argument: PhraseArgument, argumentBuilder: RequiredArgumentBuilder<CommandSourceStack, *>) {
-        if (argument.executions.isNotEmpty() || argument.executions.isNotEmpty()) argumentBuilder.executes { context ->
+        if (argument.words.isNotEmpty()) argumentBuilder.executes { context ->
             Bukkit.getScheduler().runTask(CommandRegistrar.plugin, Runnable {
                 val greedyContext = CommandContextAdapter.getGreedyCommandContext(context)
 

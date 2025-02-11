@@ -1,12 +1,15 @@
 package com.undefined.stellar.argument.basic
 
+import com.undefined.stellar.data.argument.CommandContext
 import com.undefined.stellar.data.argument.PhraseCommandContext
 import com.undefined.stellar.data.execution.PhraseStellarExecution
 import com.undefined.stellar.data.execution.PhraseStellarRunnable
+import com.undefined.stellar.data.execution.StellarExecution
 import com.undefined.stellar.data.suggestion.PhraseStellarSuggestion
 import com.undefined.stellar.data.suggestion.Suggestion
 import org.bukkit.command.CommandSender
 import org.jetbrains.annotations.ApiStatus
+import java.util.concurrent.CompletableFuture
 
 class WordArgument {
 
@@ -80,6 +83,11 @@ class WordArgument {
 
     inline fun <reified C : CommandSender> addExecution(noinline execution: PhraseCommandContext<C>.() -> Unit): WordArgument {
         executions.add(PhraseStellarExecution(C::class, execution))
+        return this
+    }
+
+    inline fun <reified C : CommandSender> addAsyncExecution(noinline execution: PhraseCommandContext<C>.() -> Unit): WordArgument {
+        executions.add(PhraseStellarExecution(C::class) { CompletableFuture.supplyAsync { execution() } })
         return this
     }
 
