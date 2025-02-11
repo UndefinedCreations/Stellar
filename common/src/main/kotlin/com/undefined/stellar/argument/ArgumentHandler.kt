@@ -88,72 +88,72 @@ open class ArgumentHandler {
     fun <T> addAdvancedListArgument(
         name: String,
         list: List<T>,
-        converter: CommandContext<CommandSender>.(T) -> Suggestion = { Suggestion.withText(it.toString()) },
-        parse: CommandContext<CommandSender>.(String) -> T?,
+        converter: CommandContext<CommandSender>.(T) -> Suggestion? = { Suggestion.withText(it.toString()) },
+        parse: CommandContext<CommandSender>.(String) -> T,
         async: Boolean = false,
     ): ListArgument<T, String> = addArgument { ListArgument(StringArgument(base, name, StringType.WORD), list, converter, parse, async) }
 
     fun <T, R> addAdvancedListArgument(
         type: AbstractStellarArgument<*, R>,
         list: List<T>,
-        converter: CommandContext<CommandSender>.(T) -> Suggestion = { Suggestion.withText(it.toString()) },
-        parse: CommandContext<CommandSender>.(R) -> T?,
+        converter: CommandContext<CommandSender>.(T) -> Suggestion? = { Suggestion.withText(it.toString()) },
+        parse: CommandContext<CommandSender>.(R) -> T,
         async: Boolean = false,
     ): ListArgument<T, R> = addArgument { ListArgument(type, list, converter, parse, async) }
 
     fun <T> addAdvancedListArgument(
         name: String,
         list: CommandContext<CommandSender>.() -> List<T>,
-        converter: CommandContext<CommandSender>.(T) -> Suggestion = { Suggestion.withText(it.toString()) },
-        parse: CommandContext<CommandSender>.(String) -> T?,
+        converter: CommandContext<CommandSender>.(T) -> Suggestion? = { Suggestion.withText(it.toString()) },
+        parse: CommandContext<CommandSender>.(String) -> T,
         async: Boolean = false,
     ): ListArgument<T, String> = addArgument { ListArgument(StringArgument(base, name, StringType.WORD), list, converter, parse, async) }
 
     fun <T, R> addAdvancedListArgument(
         type: AbstractStellarArgument<*, R>,
         list: CommandContext<CommandSender>.() -> List<T>,
-        converter: CommandContext<CommandSender>.(T) -> Suggestion = { Suggestion.withText(it.toString()) },
-        parse: CommandContext<CommandSender>.(R) -> T?,
+        converter: CommandContext<CommandSender>.(T) -> Suggestion? = { Suggestion.withText(it.toString()) },
+        parse: CommandContext<CommandSender>.(R) -> T,
         async: Boolean = false,
     ): ListArgument<T, R> = addArgument { ListArgument(type, list, converter, parse, async) }
 
     fun <T> addListArgument(
         name: String,
         list: List<T>,
-        converter: CommandContext<CommandSender>.(T) -> String = { it.toString() },
-        parse: CommandContext<CommandSender>.(String) -> T?,
+        converter: CommandContext<CommandSender>.(T) -> String? = { it.toString() },
+        parse: CommandContext<CommandSender>.(String) -> T,
         async: Boolean = false,
-    ): ListArgument<T, String> = addArgument { ListArgument(StringArgument(base, name, StringType.WORD), list, { Suggestion.withText(converter(it)) }, parse, async) }
+    ): ListArgument<T, String> = addArgument { ListArgument(StringArgument(base, name, StringType.WORD), list, { converter(it)?.let { Suggestion.withText(it) } }, parse, async) }
 
     fun <T, R> addListArgument(
         type: AbstractStellarArgument<*, R>,
         list: List<T>,
-        converter: CommandContext<CommandSender>.(T) -> String = { it.toString() },
-        parse: CommandContext<CommandSender>.(R) -> T?,
+        converter: CommandContext<CommandSender>.(T) -> String? = { it.toString() },
+        parse: CommandContext<CommandSender>.(R) -> T,
         async: Boolean = false,
-    ): ListArgument<T, R> = addArgument { ListArgument(type, list, { Suggestion.withText(converter(it)) }, parse, async) }
+    ): ListArgument<T, R> = addArgument { ListArgument(type, list, { converter(it)?.let { Suggestion.withText(it) } }, parse, async) }
 
     fun <T> addListArgument(
         name: String,
         list: CommandContext<CommandSender>.() -> List<T>,
-        converter: CommandContext<CommandSender>.(T) -> String = { it.toString() },
-        parse: CommandContext<CommandSender>.(String) -> T?,
+        converter: CommandContext<CommandSender>.(T) -> String? = { it.toString() },
+        parse: CommandContext<CommandSender>.(String) -> T,
         async: Boolean = false,
-    ): ListArgument<T, String> = addArgument { ListArgument(StringArgument(base, name, StringType.WORD), list, { Suggestion.withText(converter(it)) }, parse, async) }
+    ): ListArgument<T, String> = addArgument { ListArgument(StringArgument(base, name, StringType.WORD), list, { converter(it)?.let { Suggestion.withText(it) } }, parse, async) }
 
     fun <T, R> addListArgument(
         type: AbstractStellarArgument<*, R>,
         list: CommandContext<CommandSender>.() -> List<T>,
-        converter: CommandContext<CommandSender>.(T) -> String = { it.toString() },
-        parse: CommandContext<CommandSender>.(R) -> T?,
+        converter: CommandContext<CommandSender>.(T) -> String? = { it.toString() },
+        parse: CommandContext<CommandSender>.(R) -> T,
         async: Boolean = false,
-    ): ListArgument<T, R> = addArgument { ListArgument(type, list, { Suggestion.withText(converter(it)) }, parse, async) }
+    ): ListArgument<T, R> = addArgument { ListArgument(type, list, { converter(it)?.let { Suggestion.withText(it) } }, parse, async) }
 
     fun addStringListArgument(
         name: String,
         list: List<String>,
         type: StringType = StringType.WORD,
-        parse: CommandContext<CommandSender>.(String) -> Any? = { it },
+        parse: CommandContext<CommandSender>.(String) -> Any = { it },
         async: Boolean = false,
     ): ListArgument<String, String> =
         addArgument { ListArgument(StringArgument(base, name, type), list, { Suggestion.withText(it.toString()) }, parse, async) }
@@ -200,12 +200,12 @@ open class ArgumentHandler {
         formatting: EnumFormatting = EnumFormatting.LOWERCASE,
         async: Boolean = false,
     ): EnumArgument<T> =
-        addArgument { EnumArgument(base, name, T::class, { Suggestion.withText(formatting.action(it!!.name)) }, async = async) }
+        addArgument { EnumArgument(base, name, T::class, { Suggestion.withText(formatting.action(it.name)) }, async = async) }
 
     inline fun <reified T : Enum<T>> addEnumArgument(
         name: String,
-        noinline converter: CommandContext<CommandSender>.(Enum<*>?) -> Suggestion = { Suggestion.withText(it!!.name) },
-        noinline parse: CommandContext<CommandSender>.(String) -> Enum<T>?,
+        noinline converter: CommandContext<CommandSender>.(Enum<*>) -> Suggestion? = { Suggestion.withText(it.name) },
+        noinline parse: CommandContext<CommandSender>.(String) -> Enum<T>,
         async: Boolean = false,
     ): EnumArgument<T> = addArgument { EnumArgument(base, name, T::class, converter, parse, async) }
 

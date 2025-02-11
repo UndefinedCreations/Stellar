@@ -12,14 +12,14 @@ import java.util.concurrent.CompletableFuture
 open class ListArgument<T, R>(
     val type: AbstractStellarArgument<*, R>,
     val list: CommandContext<CommandSender>.() -> Collection<T>,
-    val converter: CommandContext<CommandSender>.(T) -> Suggestion = { Suggestion.withText(it.toString()) },
+    val converter: CommandContext<CommandSender>.(T) -> Suggestion? = { Suggestion.withText(it.toString()) },
     val parse: CommandContext<CommandSender>.(R) -> T?,
     val async: Boolean = false
 ) : AbstractStellarArgument<ListArgument<T, R>, T>(type.parent, type.name) {
 
     constructor(type: AbstractStellarArgument<*, R>,
                 list: Collection<T>,
-                converter: CommandContext<CommandSender>.(T) -> Suggestion = { Suggestion.withText(it.toString()) },
+                converter: CommandContext<CommandSender>.(T) -> Suggestion? = { Suggestion.withText(it.toString()) },
                 parse: CommandContext<CommandSender>.(R) -> T?,
                 async: Boolean = true) : this(type, { list }, converter, parse, async)
 
@@ -38,6 +38,6 @@ open class ListArgument<T, R>(
                 CompletableFuture.completedFuture(getSuggestionList(this).filter { it.text.startsWith(input, true) })
         }).toMutableList()
 
-    fun getSuggestionList(context: CommandContext<CommandSender>): List<Suggestion> = list(context).map { converter(context, it) }
+    fun getSuggestionList(context: CommandContext<CommandSender>): List<Suggestion> = list(context).mapNotNull { converter(context, it) }
 
 }

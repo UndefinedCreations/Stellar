@@ -12,7 +12,7 @@ class EnumArgument<T : Enum<T>>(
     parent: AbstractStellarCommand<*>,
     name: String,
     val enum: KClass<out Enum<*>>,
-    converter: CommandContext<CommandSender>.(Enum<*>?) -> Suggestion = { Suggestion.withText(it!!.name) },
+    converter: CommandContext<CommandSender>.(Enum<*>) -> Suggestion? = { Suggestion.withText(it.name) },
     parse: CommandContext<CommandSender>.(String) -> Enum<T>? = {
         try {
             valueOf(enum.java, it.uppercase()) as Enum<T>
@@ -21,7 +21,7 @@ class EnumArgument<T : Enum<T>>(
         }
     },
     async: Boolean = true
-) : ListArgument<Enum<*>?, String>(StringArgument(parent, name, StringType.WORD), enum.java.enumConstants.toList(), converter, parse, async) {
+) : ListArgument<Enum<*>, String>(StringArgument(parent, name, StringType.WORD), enum.java.enumConstants.toList(), converter, parse, async) {
     fun valueOf(name: String): Enum<T>? =
         try {
             valueOf(enum.java, name) as Enum<T>

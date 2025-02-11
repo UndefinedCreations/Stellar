@@ -32,7 +32,6 @@ object CommandContextAdapter {
         val parsedArguments: CommandNode =
             BrigadierCommandHelper.getArguments(baseCommand, context)
                 .associate<AbstractStellarArgument<*, *>, String, (com.undefined.stellar.data.argument.CommandContext<CommandSender>) -> Any?> { argument ->
-                    if (argument is LiteralStellarArgument) return@associate Pair(argument.name) { throw LiteralArgumentMismatchException() }
                     Pair(argument.name) { ArgumentHelper.getParsedArgument(context, argument) }
                 } as CommandNode
         return com.undefined.stellar.data.argument.CommandContext(
