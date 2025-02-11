@@ -7,7 +7,7 @@ plugins {
 
 apply(plugin = "maven-publish")
 val projectGroupId = "com.undefined"
-val projectVersion = "0.0.77"
+val projectVersion = "0.0.79"
 val projectArtifactId = "stellar"
 
 group = projectGroupId
@@ -27,8 +27,8 @@ publishing {
             name = "UndefinedCreations"
             url = uri("https://repo.undefinedcreations.com/releases")
             credentials(PasswordCredentials::class) {
-                username = System.getenv("MAVEN_NAME")
-                password = System.getenv("MAVEN_SECRET")
+                username = project.properties["mavenUser"].toString()
+                password = project.properties["mavenPassword"].toString()
             }
         }
     }

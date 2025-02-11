@@ -1,7 +1,9 @@
 package com.undefined.stellar.argument.basic
 
 import com.undefined.stellar.AbstractStellarCommand
+import com.undefined.stellar.data.argument.CommandContext
 import com.undefined.stellar.data.suggestion.Suggestion
+import org.bukkit.command.CommandSender
 import java.lang.Enum.valueOf
 import kotlin.reflect.KClass
 
@@ -10,10 +12,10 @@ class EnumArgument<T : Enum<T>>(
     parent: AbstractStellarCommand<*>,
     name: String,
     val enum: KClass<out Enum<*>>,
-    converter: (Enum<*>?) -> Suggestion = { Suggestion.withText(it!!.name) },
-    parse: (Any?) -> Enum<T>? = {
+    converter: CommandContext<CommandSender>.(Enum<*>?) -> Suggestion = { Suggestion.withText(it!!.name) },
+    parse: CommandContext<CommandSender>.(String) -> Enum<T>? = {
         try {
-            valueOf(enum.java, (it as String).uppercase()) as Enum<T>
+            valueOf(enum.java, it.uppercase()) as Enum<T>
         } catch (e: IllegalArgumentException) {
             null
         }

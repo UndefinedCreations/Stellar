@@ -12,15 +12,15 @@ import java.util.concurrent.CompletableFuture
 open class ListArgument<T, R>(
     val type: AbstractStellarArgument<*, R>,
     val list: CommandContext<CommandSender>.() -> Collection<T>,
-    val converter: (T) -> Suggestion = { Suggestion.withText(it.toString()) },
-    val parse: (R) -> T?,
+    val converter: CommandContext<CommandSender>.(T) -> Suggestion = { Suggestion.withText(it.toString()) },
+    val parse: CommandContext<CommandSender>.(R) -> T?,
     val async: Boolean = false
 ) : AbstractStellarArgument<ListArgument<T, R>, T>(type.parent, type.name) {
 
     constructor(type: AbstractStellarArgument<*, R>,
-                list: List<T>,
-                converter: (T) -> Suggestion = { Suggestion.withText(it.toString()) },
-                parse: (R) -> T?,
+                list: Collection<T>,
+                converter: CommandContext<CommandSender>.(T) -> Suggestion = { Suggestion.withText(it.toString()) },
+                parse: CommandContext<CommandSender>.(R) -> T?,
                 async: Boolean = true) : this(type, { list }, converter, parse, async)
 
     init {
@@ -28,7 +28,7 @@ open class ListArgument<T, R>(
     }
 
     @Suppress("UNCHECKED_CAST")
-    @ApiStatus.Internal fun parse(value: Any?): T? = parse.invoke(value as R)
+    @ApiStatus.Internal fun parseInternal(context: CommandContext<CommandSender>, value: Any?): T? = parse.invoke(context, value as R)
 
     override val suggestions: MutableList<StellarSuggestion<*>>
         get() = (super.suggestions + StellarSuggestion(CommandSender::class) { input ->
@@ -38,6 +38,6 @@ open class ListArgument<T, R>(
                 CompletableFuture.completedFuture(getSuggestionList(this).filter { it.text.startsWith(input, true) })
         }).toMutableList()
 
-    fun getSuggestionList(context: CommandContext<CommandSender>): List<Suggestion> = list(context).map(converter)
+    fun getSuggestionList(context: CommandContext<CommandSender>): List<Suggestion> = list(context).map { converter(context, it) }
 
 }

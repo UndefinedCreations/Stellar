@@ -181,7 +181,7 @@ object ArgumentHelper {
             is FloatArgument -> FloatArgumentType.getFloat(context, argument.name)
             is DoubleArgument -> DoubleArgumentType.getDouble(context, argument.name)
             is BooleanArgument -> BoolArgumentType.getBool(context, argument.name)
-            is ListArgument<*, *> -> argument.parse(StringArgumentType.getString(context, argument.name))
+            is ListArgument<*, *> -> argument.parseInternal(CommandContextAdapter.getStellarCommandContext(context), getParsedArgument(context, argument.type))
             is com.undefined.stellar.argument.entity.EntityArgument -> EntityArgument.getEntities(context, argument.name)
                 .map { it.bukkitEntity }.toMutableList()
                 .addAll(listOf(EntityArgument.getEntity(context, argument.name).bukkitEntity))
@@ -232,7 +232,7 @@ object ArgumentHelper {
                 val range = RangeArgument.Ints.getRange(context, argument.name)
                 IntRange(range.min.orElse(1), range.max.orElse(2))
             }
-            is com.undefined.stellar.argument.world.EnvironmentArgument -> DimensionArgument.getDimension(context, argument.name).world.environment
+            is EnvironmentArgument -> DimensionArgument.getDimension(context, argument.name).world.environment
             is com.undefined.stellar.argument.player.GameModeArgument -> GameMode.getByValue(GameModeArgument.getGameMode(context, argument.name).id)
             is com.undefined.stellar.argument.math.TimeArgument -> IntegerArgumentType.getInteger(context, argument.name).toLong()
             is MirrorArgument -> Mirror.valueOf(TemplateMirrorArgument.getMirror(context, argument.name).name)

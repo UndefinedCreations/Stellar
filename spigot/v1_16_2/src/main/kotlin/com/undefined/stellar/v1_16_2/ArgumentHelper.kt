@@ -185,7 +185,7 @@ object ArgumentHelper {
             is FloatArgument -> FloatArgumentType.getFloat(context, argument.name)
             is DoubleArgument -> DoubleArgumentType.getDouble(context, argument.name)
             is BooleanArgument -> BoolArgumentType.getBool(context, argument.name)
-            is ListArgument<*, *> -> argument.parse(getParsedArgument(context, argument.type))
+            is ListArgument<*, *> -> argument.parseInternal(CommandContextAdapter.getStellarCommandContext(context), getParsedArgument(context, argument.type))
             is com.undefined.stellar.argument.entity.EntityArgument -> ArgumentEntity.b(context, argument.name)
                 .map { it.bukkitEntity }.toMutableList()
                 .addAll(listOf(ArgumentEntity.a(context, argument.name).bukkitEntity))
