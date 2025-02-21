@@ -35,56 +35,97 @@ import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+import org.jetbrains.annotations.ApiStatus
 import java.util.*
 
 /**
- * An open class that handles the addition of arguments
+ * An open class that handles the addition of arguments.
  *
  * @since 1.0
  */
 open class ArgumentHandler {
 
+    @get:ApiStatus.Internal
     open val base: AbstractStellarCommand<*> get() = throw IllegalStateException("Cannot access the getter from the property base when it hasn't been overridden!")
     open val arguments: MutableList<AbstractStellarArgument<*, *>> = mutableListOf()
 
+    /**
+     * Add argument from a `AbstractStellarArgument` instance.
+     */
     fun addArgument(argument: AbstractStellarArgument<*, *>): AbstractStellarArgument<*, *> =
         argument.also { arguments.add(it) }
 
-    fun addArgument(name: String, vararg aliases: String): LiteralStellarArgument =
-        addArgument { LiteralStellarArgument(base, name).apply { this.aliases.addAll(aliases) } }
+    /**
+     * Add literal argument with specified names. The first name being the actual command name, while the rest are aliases.
+     */
+    fun addArgument(vararg names: String): LiteralStellarArgument =
+        addArgument { LiteralStellarArgument(base, names.first()).apply { this.aliases.addAll(names) } }
 
-    fun addLiteralArgument(name: String): LiteralStellarArgument =
-        addArgument { LiteralStellarArgument(base, name) }
+    /**
+     * Add literal argument with specified names. The first name being the actual command name, while the rest are aliases.
+     */
+    fun addLiteralArgument(vararg names: String): LiteralStellarArgument =
+        addArgument { LiteralStellarArgument(base, names.first()).apply { this.aliases.addAll(names) } }
 
+    /**
+     * Add argument from function type returning an argument.
+     */
     inline fun <reified T : AbstractStellarArgument<*, *>> addArgument(argument: () -> AbstractStellarArgument<*, *>): T {
         val parsedArgument = argument()
         addArgument(parsedArgument)
         return parsedArgument as T
     }
 
+    /**
+     * Add `CustomArgument` from function type including parent and returning a `CustomArgument`
+     */
     fun <T, R> addCustomArgument(block: (parent: AbstractStellarCommand<*>) -> CustomArgument<T, R>): CustomArgument<T, R> = addArgument { block(base) }
 
+    /**
+     * Add `StringArgument` with specified name, and `StringType`.
+     */
     fun addStringArgument(name: String, type: StringType = StringType.WORD): StringArgument =
         addArgument { StringArgument(base, name, type)  }
 
+    /**
+     * Add `PhraseArgument` with specified name.
+     */
     fun addPhraseArgument(name: String): PhraseArgument =
         addArgument { PhraseArgument(base, name) }
 
+    /**
+     * Add `IntegerArgument` with specified name, and minimum, maximum values, defining the range of the possible integer.
+     */
     fun addIntegerArgument(name: String, min: Int = Int.MIN_VALUE, max: Int = Int.MAX_VALUE): IntegerArgument =
         addArgument { IntegerArgument(base, name, min, max) }
 
+    /**
+     * Add `LongArgument` with specified name, and minimum, maximum values, defining the range of the possible long.
+     */
     fun addLongArgument(name: String, min: Long = Long.MIN_VALUE, max: Long = Long.MAX_VALUE): LongArgument =
         addArgument { LongArgument(base, name, min, max) }
 
+    /**
+     * Add `FloatArgument` with specified name, and minimum, maximum values, defining the range of the possible float.
+     */
     fun addFloatArgument(name: String, min: Float = Float.MIN_VALUE, max: Float = Float.MAX_VALUE): FloatArgument =
         addArgument { FloatArgument(base, name, min, max) }
 
+    /**
+     * Add `DoubleArgument` with specified name, and minimum, maximum values, defining the range of the possible double.
+     */
     fun addDoubleArgument(name: String, min: Double = Double.MIN_VALUE, max: Double = Double.MAX_VALUE): DoubleArgument =
         addArgument { DoubleArgument(base, name, min, max) }
 
+    /**
+     * Add `Boolean` with specified name.
+     */
     fun addBooleanArgument(name: String): BooleanArgument =
         addArgument { BooleanArgument(base, name) }
 
+    /**
+     * Add `LongArgument` with specified name, and minimum, maximum values, defining the range of the possible long.
+     */
     fun <T> addAdvancedListArgument(
         name: String,
         list: List<T>,
@@ -93,6 +134,11 @@ open class ArgumentHandler {
         async: Boolean = false,
     ): ListArgument<T, String> = addArgument { ListArgument(StringArgument(base, name, StringType.WORD), list, converter, parse, async) }
 
+    /**
+     * Add `ListArgument` with type.
+     *
+     * @param type An instance of `AbstractStellarArgument` to use for parsing
+     */
     fun <T, R> addAdvancedListArgument(
         type: AbstractStellarArgument<*, R>,
         list: List<T>,

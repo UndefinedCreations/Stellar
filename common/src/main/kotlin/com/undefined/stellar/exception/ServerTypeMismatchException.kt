@@ -1,3 +1,6 @@
 package com.undefined.stellar.exception
 
-class ServerTypeMismatchException : Exception("This server is not a CraftServer! This is not intentional.")
+/**
+ * This exception is thrown whenever the server is not `CraftServer`, which is obviously unsupported.
+ */
+class ServerTypeMismatchException : Exception("This server is not a CraftServer!")

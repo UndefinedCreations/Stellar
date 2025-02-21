@@ -16,6 +16,14 @@ import org.jetbrains.annotations.ApiStatus
 import java.util.*
 import java.util.concurrent.CompletableFuture
 
+/**
+ * This is the base of any command, whether it's an argument or a root command.
+ *
+ * @param name The command name.
+ * @param description The command description.
+ * @param usage The usage text, adding it to `information`.
+ * @param aliases The command alias names.
+ */
 @Suppress("UNCHECKED_CAST")
 abstract class AbstractStellarCommand<T>(
     val name: String,
@@ -24,6 +32,7 @@ abstract class AbstractStellarCommand<T>(
     aliases: List<String> = mutableListOf()
 ) : ArgumentHandler() {
 
+    @get:ApiStatus.Internal
     override val base: AbstractStellarCommand<*>
         get() = this
     @ApiStatus.Internal val aliases: MutableList<String> = aliases.toMutableList()
@@ -46,22 +55,34 @@ abstract class AbstractStellarCommand<T>(
         }
     }
 
+    /**
+     * Replace all aliases to method aliases.
+     */
     fun setAliases(vararg aliases: String): T {
         this.aliases.clear()
         for (alias in aliases) this.aliases.add(alias)
         return this as T
     }
 
+    /**
+     * Adds method aliases in addition to the existing command aliases.
+     */
     fun addAliases(vararg aliases: String): T {
         for (alias in aliases) this.aliases.add(alias)
         return this as T
     }
 
+    /**
+     * Sets the command description in `information`.
+     */
     fun setDescription(description: String): T {
         information["Description"] = description
         return this as T
     }
 
+    /**
+     * Sets the usage text in `information`.
+     */
     fun setUsageText(usage: String): T {
         information["Usage"] = usage
         return this as T

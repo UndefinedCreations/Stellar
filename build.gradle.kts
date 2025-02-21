@@ -7,7 +7,7 @@ plugins {
 
 apply(plugin = "maven-publish")
 val projectGroupId = "com.undefined"
-val projectVersion = "0.0.80"
+val projectVersion = "0.0.81"
 val projectArtifactId = "stellar"
 
 group = projectGroupId

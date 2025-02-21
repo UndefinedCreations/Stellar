@@ -1,3 +1,6 @@
 package com.undefined.stellar.exception
 
-class UnsupportedVersionException : RuntimeException("This version of Minecraft is unsupported by com.undefined.stellar.StellarCommands!")
+/**
+ * This exception is thrown whenever this API is used on a version that is unsupported.
+ */
+class UnsupportedVersionException : RuntimeException("This version of Minecraft is unsupported by the Stellar API!")
