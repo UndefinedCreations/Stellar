@@ -11,20 +11,20 @@ import kotlin.reflect.KClass
 class EnumArgument<T : Enum<T>>(
     parent: AbstractStellarCommand<*>,
     name: String,
-    val enum: KClass<out Enum<*>>,
-    converter: CommandContext<CommandSender>.(Enum<*>) -> Suggestion? = { Suggestion.withText(it.name) },
+    val enum: KClass<out Enum<T>>,
+    converter: CommandContext<CommandSender>.(Enum<T>) -> Suggestion? = { Suggestion.withText(it.name) },
     parse: CommandContext<CommandSender>.(String) -> Enum<T>? = {
         try {
-            valueOf(enum.java, it.uppercase()) as Enum<T>
+            valueOf(enum.java as Class<out Enum<*>>, it.uppercase()) as Enum<T>
         } catch (e: IllegalArgumentException) {
             null
         }
     },
     async: Boolean = true
-) : ListArgument<Enum<*>, String>(StringArgument(parent, name, StringType.WORD), enum.java.enumConstants.toList(), converter, parse, async) {
+) : ListArgument<Enum<T>, String>(StringArgument(parent, name, StringType.WORD), enum.java.enumConstants.toList(), converter as CommandContext<CommandSender>.(Enum<T>) -> Suggestion, parse, async) {
     fun valueOf(name: String): Enum<T>? =
         try {
-            valueOf(enum.java, name) as Enum<T>
+            valueOf(enum.java as Class<out Enum<*>>, name) as Enum<T>
         } catch (e: IllegalArgumentException) {
             null
         }

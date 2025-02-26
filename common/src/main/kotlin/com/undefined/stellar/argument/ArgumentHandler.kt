@@ -250,7 +250,7 @@ open class ArgumentHandler {
 
     inline fun <reified T : Enum<T>> addEnumArgument(
         name: String,
-        noinline converter: CommandContext<CommandSender>.(Enum<*>) -> Suggestion? = { Suggestion.withText(it.name) },
+        noinline converter: CommandContext<CommandSender>.(Enum<T>) -> Suggestion? = { Suggestion.withText(it.name) },
         noinline parse: CommandContext<CommandSender>.(String) -> Enum<T>,
         async: Boolean = false,
     ): EnumArgument<T> = addArgument { EnumArgument(base, name, T::class, converter, parse, async) }
