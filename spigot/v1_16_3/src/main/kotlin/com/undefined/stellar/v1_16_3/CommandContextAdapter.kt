@@ -20,7 +20,7 @@ object CommandContextAdapter {
 
     fun getStellarCommandContext(context: CommandContext<CommandListenerWrapper>): com.undefined.stellar.data.argument.CommandContext<CommandSender> {
         val input = context.input.removePrefix("/")
-        val baseCommand: AbstractStellarCommand<*> = StellarCommands.getStellarCommand(context.nodes[0].node.name)!!
+        val baseCommand: AbstractStellarCommand<*> = StellarCommands.getStellarCommand(context.nodes[0].node.name.substringAfter(":"))!!
         val arguments = BrigadierCommandHelper.getArguments(baseCommand, context)
         if (arguments.filter { it !is LiteralStellarArgument }.groupingBy { it.name }.eachCount().any { it.value > 1 }) throw DuplicateArgumentNameException()
         val parsedArguments: CommandNode =

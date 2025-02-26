@@ -1,6 +1,8 @@
-package com.undefined.stellar
+package com.undefined.v1_17_1
 
-import com.undefined.stellar.BrigadierCommandHelper.dispatcher
+import com.undefined.stellar.AbstractStellarCommand
+import com.undefined.stellar.StellarCommands
+import com.undefined.v1_17_1.BrigadierCommandHelper.dispatcher
 import com.undefined.stellar.registrar.AbstractCommandRegistrar
 import org.bukkit.command.CommandSender
 import org.bukkit.plugin.java.JavaPlugin

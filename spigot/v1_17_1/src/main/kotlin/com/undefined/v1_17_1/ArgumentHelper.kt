@@ -1,6 +1,6 @@
 @file:Suppress("DEPRECATION")
 
-package com.undefined.stellar
+package com.undefined.v1_17_1
 
 import com.mojang.brigadier.arguments.*
 import com.mojang.brigadier.builder.ArgumentBuilder

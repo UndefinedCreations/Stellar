@@ -25,7 +25,7 @@ object CommandRegistrar : AbstractCommandRegistrar {
         if (results.reader.remainingLength == 0) return false
         if (context.nodes.isEmpty()) return false
 
-        val baseCommand: AbstractStellarCommand<*> = StellarCommands.getStellarCommand(context.nodes.entries.first().key.name)!!
+        val baseCommand: AbstractStellarCommand<*> = StellarCommands.getStellarCommand(context.nodes.entries.first().key.name.substringAfter(':'))!!
         val argument = BrigadierCommandHelper.getArguments(baseCommand, context).lastOrNull()
         argument?.let {
             BrigadierCommandHelper.handleFailureMessageAndExecutions(argument, context)

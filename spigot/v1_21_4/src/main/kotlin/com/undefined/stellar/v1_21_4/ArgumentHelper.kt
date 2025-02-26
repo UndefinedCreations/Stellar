@@ -134,7 +134,7 @@ object ArgumentHelper {
             is NamespacedKeyArgument -> ResourceLocationArgument.id()
             is com.undefined.stellar.argument.entity.EntityAnchorArgument -> EntityAnchorArgument.anchor()
             is com.undefined.stellar.argument.math.RangeArgument -> RangeArgument.intRange()
-            is com.undefined.stellar.argument.world.EnvironmentArgument -> DimensionArgument.dimension()
+            is EnvironmentArgument -> DimensionArgument.dimension()
             is com.undefined.stellar.argument.player.GameModeArgument -> GameModeArgument.gameMode()
             is com.undefined.stellar.argument.math.TimeArgument -> TimeArgument.time(argument.minimum)
             is MirrorArgument -> TemplateMirrorArgument.templateMirror()
@@ -232,7 +232,7 @@ object ArgumentHelper {
                 val range = RangeArgument.Ints.getRange(context, argument.name)
                 IntRange(range.min.orElse(1), range.max.orElse(2))
             }
-            is com.undefined.stellar.argument.world.EnvironmentArgument -> DimensionArgument.getDimension(context, argument.name).world.environment
+            is EnvironmentArgument -> DimensionArgument.getDimension(context, argument.name).world.environment
             is com.undefined.stellar.argument.player.GameModeArgument -> GameMode.getByValue(GameModeArgument.getGameMode(context, argument.name).id)
             is com.undefined.stellar.argument.math.TimeArgument -> IntegerArgumentType.getInteger(context, argument.name).toLong()
             is MirrorArgument -> Mirror.valueOf(TemplateMirrorArgument.getMirror(context, argument.name).name)

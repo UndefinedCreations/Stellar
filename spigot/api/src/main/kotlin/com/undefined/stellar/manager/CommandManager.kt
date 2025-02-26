@@ -1,6 +1,6 @@
 package com.undefined.stellar.manager
 
-import com.undefined.stellar.CommandRegistrar
+import com.undefined.v1_17_1.CommandRegistrar
 import com.undefined.stellar.listener.StellarListener
 import com.undefined.stellar.registrar.AbstractCommandRegistrar
 import org.bukkit.Bukkit
