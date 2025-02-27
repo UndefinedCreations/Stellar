@@ -20,10 +20,6 @@ object BrigadierCommandHelper {
     val COMMAND_SOURCE: CommandSourceStack by lazy {
         MinecraftServer.getServer().createCommandSourceStack()
     }
-    val dispatcher by lazy { MinecraftServer.getServer().functions.dispatcher }
-
-    fun register(command: LiteralArgumentBuilder<CommandSourceStack>): LiteralCommandNode<CommandSourceStack>? =
-        dispatcher.register(command)
 
     fun handleHelpTopic(command: AbstractStellarCommand<*>) {
         Bukkit.getServer().helpMap.addTopic(

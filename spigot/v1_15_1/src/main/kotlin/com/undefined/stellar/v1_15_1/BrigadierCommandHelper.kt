@@ -21,12 +21,6 @@ object BrigadierCommandHelper {
     val COMMAND_SOURCE: CommandListenerWrapper by lazy {
         MinecraftServer.getServer().serverCommandListener
     }
-    val dispatcher: CommandDispatcher<CommandListenerWrapper> by lazy {
-        MinecraftServer.getServer().functionData.d()
-    }
-
-    fun register(command: LiteralArgumentBuilder<CommandListenerWrapper>): LiteralCommandNode<CommandListenerWrapper>? =
-        dispatcher.register(command)
 
     fun handleHelpTopic(command: AbstractStellarCommand<*>) {
         Bukkit.getServer().helpMap.addTopic(

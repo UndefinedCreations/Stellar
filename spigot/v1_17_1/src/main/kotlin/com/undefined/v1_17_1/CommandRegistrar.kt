@@ -1,21 +1,35 @@
 package com.undefined.v1_17_1
 
+import com.mojang.brigadier.CommandDispatcher
 import com.undefined.stellar.AbstractStellarCommand
 import com.undefined.stellar.StellarCommands
-import com.undefined.v1_17_1.BrigadierCommandHelper.dispatcher
+import com.undefined.v1_17_1.BrigadierCommandHelper
 import com.undefined.stellar.registrar.AbstractCommandRegistrar
+import com.undefined.stellar.util.getPrivateField
+import net.minecraft.commands.CommandSourceStack
+import net.minecraft.server.MinecraftServer
+import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
+import org.bukkit.craftbukkit.v1_17_R1.command.CraftCommandMap
 import org.bukkit.plugin.java.JavaPlugin
 
 object CommandRegistrar : AbstractCommandRegistrar {
 
     lateinit var plugin: JavaPlugin
+    val dispatcher: CommandDispatcher<CommandSourceStack> by lazy { MinecraftServer.getServer().functions.dispatcher }
 
     override fun register(command: AbstractStellarCommand<*>, plugin: JavaPlugin) {
         CommandRegistrar.plugin = plugin
         BrigadierCommandHelper.handleHelpTopic(command)
         for (name in command.aliases + command.name)
-            BrigadierCommandHelper.register(CommandAdapter.getBaseCommand(command, name))
+            dispatcher.register(CommandAdapter.getBaseCommand(command, name))
+    }
+
+    override fun unregister(name: String, plugin: JavaPlugin) {
+        val map = plugin.server.pluginManager.getPrivateField<CraftCommandMap>("commandMap")
+        val knownCommands: HashMap<String, Command> = map.knownCommands as HashMap<String, Command>
+        for ((key, value) in knownCommands) if (key == name) value.unregister(map)
+        knownCommands.remove(name)
     }
 
     override fun handleCommandFailure(sender: CommandSender, input: String): Boolean {

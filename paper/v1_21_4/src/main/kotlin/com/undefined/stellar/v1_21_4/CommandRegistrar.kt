@@ -3,19 +3,20 @@ package com.undefined.stellar.v1_21_4
 import com.undefined.stellar.AbstractStellarCommand
 import com.undefined.stellar.StellarCommands
 import com.undefined.stellar.registrar.AbstractCommandRegistrar
-import com.undefined.stellar.v1_21_4.BrigadierCommandHelper.dispatcher
+import com.undefined.stellar.v1_21_4.BrigadierCommandHelper
 import org.bukkit.command.CommandSender
 import org.bukkit.plugin.java.JavaPlugin
 
 object CommandRegistrar : AbstractCommandRegistrar {
 
     lateinit var plugin: JavaPlugin
+    val dispatcher: CommandDispatcher<CommandSourceStack> by lazy { MinecraftServer.getServer().functions.dispatcher }
 
     override fun register(command: AbstractStellarCommand<*>, plugin: JavaPlugin) {
         this.plugin = plugin
         BrigadierCommandHelper.handleHelpTopic(command)
         for (name in command.aliases + command.name)
-            BrigadierCommandHelper.register(CommandAdapter.getBaseCommand(command, name))
+            dispatcher.register(CommandAdapter.getBaseCommand(command, name))
     }
 
     override fun handleCommandFailure(sender: CommandSender, input: String): Boolean {

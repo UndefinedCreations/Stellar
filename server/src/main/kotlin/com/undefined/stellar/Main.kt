@@ -1,18 +1,17 @@
 package com.undefined.stellar
 
-import org.bukkit.command.CommandSender
+import com.undefined.stellar.util.unregisterCommand
+import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
 
 class Main : JavaPlugin() {
 
     override fun onEnable() {
-        val list: MutableList<String> = mutableListOf("test", "hidden", "visible")
-        StellarCommand("test", "t")
-            .addStringListArgument("name", list)
-            .addPhraseArgument("test")
-            .addWordExecution<CommandSender>(0) {
-                println("happened!")
-                sender.sendMessage(getGlobalArgument<String>("name").toString())
+        unregisterCommand("enchant", this)
+        StellarCommand("enchant")
+            .addArgument("a")
+            .addExecution<Player> {
+                sender.sendRichMessage("hi!")
             }
             .register(this)
     }

@@ -1,10 +1,8 @@
 package com.undefined.stellar.v1_21_1
 
-import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.suggestion.Suggestions
 import com.mojang.brigadier.suggestion.SuggestionsBuilder
-import com.mojang.brigadier.tree.LiteralCommandNode
 import com.undefined.stellar.AbstractStellarCommand
 import com.undefined.stellar.argument.AbstractStellarArgument
 import com.undefined.stellar.data.help.CustomCommandHelpTopic
@@ -14,16 +12,13 @@ import net.minecraft.server.MinecraftServer
 import org.bukkit.Bukkit
 import java.util.concurrent.CompletableFuture
 
+
 @Suppress("DEPRECATION")
 object BrigadierCommandHelper {
 
     val COMMAND_SOURCE: CommandSourceStack by lazy {
         MinecraftServer.getServer().createCommandSourceStack()
     }
-    val dispatcher by lazy { MinecraftServer.getServer().functions.dispatcher }
-
-    fun register(command: LiteralArgumentBuilder<CommandSourceStack>): LiteralCommandNode<CommandSourceStack>? =
-        dispatcher.register(command)
 
     fun handleHelpTopic(command: AbstractStellarCommand<*>) {
         Bukkit.getServer().helpMap.addTopic(
