@@ -3,7 +3,6 @@ package com.undefined.stellar.v1_21_4
 import com.undefined.stellar.AbstractStellarCommand
 import com.undefined.stellar.StellarCommands
 import com.undefined.stellar.registrar.AbstractCommandRegistrar
-import com.undefined.stellar.v1_21_4.BrigadierCommandHelper
 import org.bukkit.command.CommandSender
 import org.bukkit.plugin.java.JavaPlugin
 

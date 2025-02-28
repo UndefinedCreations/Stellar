@@ -60,8 +60,11 @@ object CommandAdapter {
     fun getMojangSuggestions(builder: SuggestionsBuilder, suggestionsFuture: CompletableFuture<List<Suggestion>>): CompletableFuture<Suggestions> {
         val range = StringRange.between(builder.start, builder.input.length)
         val future = suggestionsFuture.thenApplyAsync { suggestions ->
-            Suggestions(range, suggestions.map { suggestion ->
-                com.mojang.brigadier.suggestion.Suggestion(range, suggestion.text) { suggestion.tooltip }
+            Suggestions(range, suggestions.filter { it.text.isNotBlank() }.map { suggestion ->
+                if (suggestion.tooltip == null || suggestion.tooltip!!.isBlank())
+                    com.mojang.brigadier.suggestion.Suggestion(range, suggestion.text)
+                else
+                    com.mojang.brigadier.suggestion.Suggestion(range, suggestion.text) { suggestion.tooltip }
             })
         }
         return future

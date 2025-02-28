@@ -1,7 +1,7 @@
 package com.undefined.stellar.argument.registry
 
 import com.undefined.stellar.AbstractStellarCommand
-import com.undefined.stellar.argument.AbstractStellarArgument
+import org.bukkit.Registry
 import org.bukkit.generator.structure.StructureType
 
-class StructureTypeArgument(parent: AbstractStellarCommand<*>, name: String) : AbstractStellarArgument<StructureTypeArgument, StructureType>(parent, name)
+class StructureTypeArgument(parent: AbstractStellarCommand<*>, name: String) : RegistryArgument<Registry<StructureType>, StructureType>(parent, name, Registry.STRUCTURE_TYPE)

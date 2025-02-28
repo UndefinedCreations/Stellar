@@ -1,7 +1,8 @@
 package com.undefined.stellar.argument.registry
 
 import com.undefined.stellar.AbstractStellarCommand
-import com.undefined.stellar.argument.AbstractStellarArgument
-import org.bukkit.event.inventory.InventoryType
+import org.bukkit.Registry
+import org.bukkit.inventory.MenuType
 
-class InventoryTypeArgument(parent: AbstractStellarCommand<*>, name: String) : AbstractStellarArgument<InventoryTypeArgument, InventoryType>(parent, name)
+@Suppress("UnstableApiUsage")
+class InventoryTypeArgument(parent: AbstractStellarCommand<*>, name: String) : RegistryArgument<Registry<MenuType>, MenuType>(parent, name, Registry.MENU)

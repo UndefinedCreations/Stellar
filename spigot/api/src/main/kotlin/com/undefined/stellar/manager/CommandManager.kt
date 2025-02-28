@@ -1,8 +1,8 @@
 package com.undefined.stellar.manager
 
-import com.undefined.v1_17_1.CommandRegistrar
 import com.undefined.stellar.listener.StellarListener
 import com.undefined.stellar.registrar.AbstractCommandRegistrar
+import com.undefined.v1_17_1.CommandRegistrar
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
 import org.jetbrains.annotations.ApiStatus

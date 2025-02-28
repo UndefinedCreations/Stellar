@@ -3,7 +3,6 @@ package com.undefined.v1_17_1
 import com.mojang.brigadier.CommandDispatcher
 import com.undefined.stellar.AbstractStellarCommand
 import com.undefined.stellar.StellarCommands
-import com.undefined.v1_17_1.BrigadierCommandHelper
 import com.undefined.stellar.registrar.AbstractCommandRegistrar
 import com.undefined.stellar.util.getPrivateField
 import net.minecraft.commands.CommandSourceStack

@@ -7,7 +7,7 @@ import kotlin.reflect.KClass
 import kotlin.reflect.safeCast
 
 @Suppress("UNCHECKED_CAST")
-data class StellarSuggestion<C : CommandSender>(private val clazz: KClass<C>, private val suggestion: CommandContext<C>.(input: String) -> CompletableFuture<Collection<Suggestion>>) {
-    fun get(context: CommandContext<CommandSender>, input: String = ""): CompletableFuture<Collection<Suggestion>> = // TODO remove default value
+data class StellarSuggestion<C : CommandSender>(private val clazz: KClass<C>, private val suggestion: CommandContext<C>.(input: String) -> CompletableFuture<Iterable<Suggestion>>) {
+    fun get(context: CommandContext<CommandSender>, input: String): CompletableFuture<Iterable<Suggestion>> =
         clazz.safeCast(context.sender)?.let { suggestion(context as CommandContext<C>, input) } ?: CompletableFuture.completedFuture(listOf())
 }

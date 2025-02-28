@@ -7,7 +7,6 @@ import com.mojang.brigadier.builder.RequiredArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.context.ParsedArgument
 import com.mojang.brigadier.context.StringRange
-import com.mojang.brigadier.exceptions.CommandSyntaxException
 import com.undefined.stellar.argument.AbstractStellarArgument
 import com.undefined.stellar.argument.LiteralStellarArgument
 import com.undefined.stellar.argument.basic.*
@@ -17,7 +16,6 @@ import com.undefined.stellar.argument.item.ItemSlotsArgument
 import com.undefined.stellar.argument.misc.NamespacedKeyArgument
 import com.undefined.stellar.argument.misc.UUIDArgument
 import com.undefined.stellar.argument.player.GameModeArgument
-import com.undefined.stellar.argument.registry.*
 import com.undefined.stellar.argument.structure.LootTableArgument
 import com.undefined.stellar.argument.structure.MirrorArgument
 import com.undefined.stellar.argument.world.HeightMapArgument
@@ -113,32 +111,6 @@ object ArgumentHelper {
             is HeightMapArgument -> throwArgumentVersionException(argument)
             is LootTableArgument -> throwArgumentVersionException(argument)
             is UUIDArgument -> throwArgumentVersionException(argument)
-            is GameEventArgument -> ArgumentMinecraftKeyRegistered.a()
-            is StructureTypeArgument -> throwArgumentVersionException(argument)
-            is PotionEffectTypeArgument -> throwArgumentVersionException(argument)
-            is BlockTypeArgument -> throwArgumentVersionException(argument)
-            is ItemTypeArgument -> throwArgumentVersionException(argument)
-            is CatTypeArgument -> throwArgumentVersionException(argument)
-            is FrogVariantArgument -> throwArgumentVersionException(argument)
-            is VillagerProfessionArgument -> ArgumentMinecraftKeyRegistered.a()
-            is VillagerTypeArgument -> ArgumentMinecraftKeyRegistered.a()
-            is MapDecorationTypeArgument -> throwArgumentVersionException(argument)
-            is InventoryTypeArgument -> throwArgumentVersionException(argument)
-            is AttributeArgument -> ArgumentMinecraftKeyRegistered.a()
-            is FluidArgument -> throwArgumentVersionException(argument)
-            is SoundArgument -> throwArgumentVersionException(argument)
-            is BiomeArgument -> ArgumentMinecraftKeyRegistered.a()
-            is StructureArgument -> throwArgumentVersionException(argument)
-            is TrimMaterialArgument -> throwArgumentVersionException(argument)
-            is TrimPatternArgument -> throwArgumentVersionException(argument)
-            is DamageTypeArgument -> throwArgumentVersionException(argument)
-            is WolfVariantArgument -> throwArgumentVersionException(argument)
-            is PatternTypeArgument -> throwArgumentVersionException(argument)
-            is ArtArgument -> throwArgumentVersionException(argument)
-            is InstrumentArgument -> throwArgumentVersionException(argument)
-            is EntityTypeArgument -> ArgumentMinecraftKeyRegistered.a()
-            is PotionArgument -> throwArgumentVersionException(argument)
-            is MemoryKeyArgument -> ArgumentMinecraftKeyRegistered.a()
             else -> throw UnsupportedArgumentException(argument)
         }
 
@@ -235,32 +207,6 @@ object ArgumentHelper {
             is HeightMapArgument -> throwArgumentVersionException(argument)
             is LootTableArgument -> throwArgumentVersionException(argument)
             is UUIDArgument -> throwArgumentVersionException(argument)
-            is GameEventArgument -> throwArgumentVersionException(argument)
-            is StructureTypeArgument -> throwArgumentVersionException(argument)
-            is PotionEffectTypeArgument -> throwArgumentVersionException(argument)
-            is BlockTypeArgument -> throwArgumentVersionException(argument)
-            is ItemTypeArgument -> throwArgumentVersionException(argument)
-            is CatTypeArgument -> throwArgumentVersionException(argument)
-            is FrogVariantArgument -> throwArgumentVersionException(argument)
-            is VillagerProfessionArgument -> throwArgumentVersionException(argument)
-            is VillagerTypeArgument -> throwArgumentVersionException(argument)
-            is MapDecorationTypeArgument -> throwArgumentVersionException(argument)
-            is InventoryTypeArgument -> throwArgumentVersionException(argument)
-            is AttributeArgument -> throwArgumentVersionException(argument)
-            is FluidArgument -> throwArgumentVersionException(argument)
-            is SoundArgument -> throwArgumentVersionException(argument)
-            is BiomeArgument -> throwArgumentVersionException(argument)
-            is StructureArgument -> throwArgumentVersionException(argument)
-            is TrimMaterialArgument -> throwArgumentVersionException(argument)
-            is TrimPatternArgument -> throwArgumentVersionException(argument)
-            is DamageTypeArgument -> throwArgumentVersionException(argument)
-            is WolfVariantArgument -> throwArgumentVersionException(argument)
-            is PatternTypeArgument -> throwArgumentVersionException(argument)
-            is ArtArgument -> throwArgumentVersionException(argument)
-            is InstrumentArgument -> throwArgumentVersionException(argument)
-            is EntityTypeArgument -> throwArgumentVersionException(argument)
-            is PotionArgument -> throwArgumentVersionException(argument)
-            is MemoryKeyArgument -> throwArgumentVersionException(argument)
             else -> throw UnsupportedArgumentException(argument)
         }
     }
@@ -272,15 +218,6 @@ object ArgumentHelper {
         val argument = arguments[name] ?: return null
         val range = StringRange.between(argument.range.start, context.input.length)
         return range.get(context.input)
-    }
-
-    @Throws(CommandSyntaxException::class)
-    private fun getId(
-        context: CommandContext<CommandListenerWrapper>,
-        name: String
-    ): NamespacedKey {
-        val key = ArgumentMinecraftKeyRegistered.c(context, name)
-        return NamespacedKey(key.b(), key.key)
     }
 
     private fun brigadier(type: StringType): StringArgumentType = when (type) {

@@ -7,20 +7,21 @@ import com.mojang.brigadier.builder.RequiredArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.context.ParsedArgument
 import com.mojang.brigadier.context.StringRange
-import com.mojang.brigadier.exceptions.CommandSyntaxException
-import com.mojang.brigadier.exceptions.DynamicCommandExceptionType
 import com.undefined.stellar.argument.AbstractStellarArgument
 import com.undefined.stellar.argument.LiteralStellarArgument
 import com.undefined.stellar.argument.basic.*
 import com.undefined.stellar.argument.block.BlockDataArgument
-import com.undefined.stellar.argument.entity.*
-import com.undefined.stellar.argument.item.*
+import com.undefined.stellar.argument.entity.EntityDisplayType
+import com.undefined.stellar.argument.item.ItemSlotArgument
+import com.undefined.stellar.argument.item.ItemSlotsArgument
 import com.undefined.stellar.argument.misc.NamespacedKeyArgument
 import com.undefined.stellar.argument.misc.UUIDArgument
 import com.undefined.stellar.argument.player.GameModeArgument
-import com.undefined.stellar.argument.registry.*
 import com.undefined.stellar.argument.structure.MirrorArgument
-import com.undefined.stellar.argument.world.*
+import com.undefined.stellar.argument.world.EnvironmentArgument
+import com.undefined.stellar.argument.world.HeightMapArgument
+import com.undefined.stellar.argument.world.LocationArgument
+import com.undefined.stellar.argument.world.LocationType
 import com.undefined.stellar.data.argument.EntityAnchor
 import com.undefined.stellar.data.argument.Operation
 import com.undefined.stellar.data.argument.ParticleData
@@ -31,10 +32,6 @@ import com.undefined.stellar.util.NMSVersion
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.arguments.*
-import net.minecraft.commands.arguments.DimensionArgument
-import net.minecraft.commands.arguments.EntityAnchorArgument
-import net.minecraft.commands.arguments.EntityArgument
-import net.minecraft.commands.arguments.ParticleArgument
 import net.minecraft.commands.arguments.blocks.BlockPredicateArgument
 import net.minecraft.commands.arguments.blocks.BlockStateArgument
 import net.minecraft.commands.arguments.coordinates.*
@@ -42,14 +39,9 @@ import net.minecraft.commands.arguments.item.ItemArgument
 import net.minecraft.commands.arguments.item.ItemPredicateArgument
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
-import net.minecraft.core.Holder
-import net.minecraft.core.Registry
 import net.minecraft.core.particles.*
 import net.minecraft.network.chat.Component
-import net.minecraft.network.chat.TranslatableComponent
-import net.minecraft.resources.ResourceKey
 import net.minecraft.server.level.ColumnPos
-import net.minecraft.world.inventory.MenuType
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.pattern.BlockInWorld
 import net.minecraft.world.level.gameevent.BlockPositionSource
@@ -61,7 +53,6 @@ import org.bukkit.block.data.BlockData
 import org.bukkit.craftbukkit.v1_18_R2.CraftParticle
 import org.bukkit.craftbukkit.v1_18_R2.block.data.CraftBlockData
 import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftItemStack
-import org.bukkit.event.inventory.InventoryType
 import org.bukkit.inventory.ItemStack
 import org.bukkit.scoreboard.DisplaySlot
 import java.util.*
@@ -69,10 +60,6 @@ import java.util.function.Predicate
 
 @Suppress("UNCHECKED_CAST")
 object ArgumentHelper {
-
-    private val INVALID_EXCEPTION = DynamicCommandExceptionType { argument ->
-        TranslatableComponent("argument.resource_or_id.invalid", argument)
-    }
 
     fun getLiteralArguments(argument: AbstractStellarArgument<*, *>): List<ArgumentBuilder<CommandSourceStack, *>> {
         val arguments: MutableList<ArgumentBuilder<CommandSourceStack, *>> = mutableListOf()
@@ -129,7 +116,7 @@ object ArgumentHelper {
             is NamespacedKeyArgument -> ResourceLocationArgument.id()
             is com.undefined.stellar.argument.entity.EntityAnchorArgument -> EntityAnchorArgument.anchor()
             is com.undefined.stellar.argument.math.RangeArgument -> RangeArgument.intRange()
-            is com.undefined.stellar.argument.world.EnvironmentArgument -> DimensionArgument.dimension()
+            is EnvironmentArgument -> DimensionArgument.dimension()
             is GameModeArgument -> throwArgumentVersionException(argument)
             is com.undefined.stellar.argument.math.TimeArgument -> TimeArgument.time()
             is MirrorArgument -> throwArgumentVersionException(argument)
@@ -137,32 +124,6 @@ object ArgumentHelper {
             is HeightMapArgument -> throwArgumentVersionException(argument)
             is com.undefined.stellar.argument.structure.LootTableArgument -> throwArgumentVersionException(argument)
             is UUIDArgument -> UuidArgument.uuid()
-            is GameEventArgument -> ResourceKeyArgument.key(Registry.GAME_EVENT.key())
-            is StructureTypeArgument -> throwArgumentVersionException(argument)
-            is PotionEffectTypeArgument -> throwArgumentVersionException(argument)
-            is BlockTypeArgument -> throwArgumentVersionException(argument)
-            is ItemTypeArgument -> throwArgumentVersionException(argument)
-            is CatTypeArgument -> throwArgumentVersionException(argument)
-            is FrogVariantArgument -> throwArgumentVersionException(argument)
-            is VillagerProfessionArgument -> ResourceKeyArgument.key(Registry.VILLAGER_PROFESSION.key())
-            is VillagerTypeArgument -> ResourceKeyArgument.key(Registry.VILLAGER_TYPE.key())
-            is MapDecorationTypeArgument -> throwArgumentVersionException(argument)
-            is InventoryTypeArgument -> throwArgumentVersionException(argument)
-            is AttributeArgument -> ResourceKeyArgument.key(Registry.ATTRIBUTE.key())
-            is FluidArgument -> ResourceKeyArgument.key(Registry.FLUID.key())
-            is SoundArgument -> ResourceKeyArgument.key(Registry.SOUND_EVENT.key())
-            is BiomeArgument -> ResourceKeyArgument.key(Registry.BIOME_REGISTRY)
-            is StructureArgument -> throwArgumentVersionException(argument)
-            is TrimMaterialArgument -> throwArgumentVersionException(argument)
-            is TrimPatternArgument -> throwArgumentVersionException(argument)
-            is DamageTypeArgument -> throwArgumentVersionException(argument)
-            is WolfVariantArgument -> throwArgumentVersionException(argument)
-            is PatternTypeArgument -> throwArgumentVersionException(argument)
-            is ArtArgument -> throwArgumentVersionException(argument)
-            is InstrumentArgument -> throwArgumentVersionException(argument)
-            is EntityTypeArgument -> ResourceKeyArgument.key(Registry.ENTITY_TYPE.key())
-            is PotionArgument -> throwArgumentVersionException(argument)
-            is MemoryKeyArgument -> ResourceKeyArgument.key(Registry.MEMORY_MODULE_TYPE.key())
             else -> throw UnsupportedArgumentException(argument)
         }
 
@@ -225,7 +186,7 @@ object ArgumentHelper {
                 val range = RangeArgument.Ints.getRange(context, argument.name)
                 IntRange(range.min ?: 1, range.max ?: 2)
             }
-            is com.undefined.stellar.argument.world.EnvironmentArgument -> DimensionArgument.getDimension(context, argument.name).world.environment
+            is EnvironmentArgument -> DimensionArgument.getDimension(context, argument.name).world.environment
             is GameModeArgument -> throwArgumentVersionException(argument)
             is com.undefined.stellar.argument.math.TimeArgument -> IntegerArgumentType.getInteger(context, argument.name).toLong()
             is MirrorArgument -> throwArgumentVersionException(argument)
@@ -233,32 +194,6 @@ object ArgumentHelper {
             is HeightMapArgument -> throwArgumentVersionException(argument)
             is com.undefined.stellar.argument.structure.LootTableArgument -> throwArgumentVersionException(argument)
             is UUIDArgument -> UuidArgument.getUuid(context, argument.name)
-            is GameEventArgument -> org.bukkit.Registry.GAME_EVENT.get(getId(context, argument.name, Registry.GAME_EVENT_REGISTRY))
-            is StructureTypeArgument -> throwArgumentVersionException(argument)
-            is PotionEffectTypeArgument -> throwArgumentVersionException(argument)
-            is BlockTypeArgument -> throwArgumentVersionException(argument)
-            is ItemTypeArgument -> throwArgumentVersionException(argument)
-            is CatTypeArgument -> throwArgumentVersionException(argument)
-            is FrogVariantArgument -> throwArgumentVersionException(argument)
-            is VillagerProfessionArgument -> org.bukkit.Registry.VILLAGER_PROFESSION.get(getId(context, argument.name, Registry.VILLAGER_PROFESSION_REGISTRY))
-            is VillagerTypeArgument -> org.bukkit.Registry.VILLAGER_TYPE.get(getId(context, argument.name, Registry.VILLAGER_TYPE_REGISTRY))
-            is MapDecorationTypeArgument -> throwArgumentVersionException(argument)
-            is InventoryTypeArgument -> getInventoryType(resolveKey(context, argument.name, Registry.MENU_REGISTRY).value())
-            is AttributeArgument -> org.bukkit.Registry.ATTRIBUTE.get(getId(context, argument.name, Registry.ATTRIBUTE_REGISTRY))
-            is FluidArgument -> org.bukkit.Registry.FLUID.get(getId(context, argument.name, Registry.FLUID_REGISTRY))
-            is SoundArgument -> org.bukkit.Registry.SOUNDS.get(getId(context, argument.name, Registry.SOUND_EVENT_REGISTRY))
-            is BiomeArgument -> org.bukkit.Registry.BIOME.get(getId(context, argument.name, Registry.BIOME_REGISTRY))
-            is StructureArgument -> throwArgumentVersionException(argument)
-            is TrimMaterialArgument -> throwArgumentVersionException(argument)
-            is TrimPatternArgument -> throwArgumentVersionException(argument)
-            is DamageTypeArgument -> throwArgumentVersionException(argument)
-            is WolfVariantArgument -> throwArgumentVersionException(argument)
-            is PatternTypeArgument -> throwArgumentVersionException(argument)
-            is ArtArgument -> throwArgumentVersionException(argument)
-            is InstrumentArgument -> throwArgumentVersionException(argument)
-            is EntityTypeArgument -> org.bukkit.Registry.ENTITY_TYPE.get(getId(context, argument.name, Registry.ENTITY_TYPE_REGISTRY))
-            is PotionArgument -> throwArgumentVersionException(argument)
-            is MemoryKeyArgument -> org.bukkit.Registry.MEMORY_MODULE_TYPE.get(getId(context, argument.name, Registry.MEMORY_MODULE_TYPE_REGISTRY))
             else -> throw UnsupportedArgumentException(argument)
         }
     }
@@ -270,75 +205,6 @@ object ArgumentHelper {
         val argument = arguments[name] ?: return null
         val range = StringRange.between(argument.range.start, context.input.length)
         return range.get(context.input)
-    }
-
-    private fun getInventoryType(menu: MenuType<*>): InventoryType = when (menu) {
-        MenuType.GENERIC_9x1 -> InventoryType.CHEST
-        MenuType.GENERIC_9x2 -> InventoryType.CHEST
-        MenuType.GENERIC_9x3 -> InventoryType.CHEST
-        MenuType.GENERIC_9x4 -> InventoryType.CHEST
-        MenuType.GENERIC_9x5 -> InventoryType.CHEST
-        MenuType.GENERIC_9x6 -> InventoryType.CHEST
-        MenuType.GENERIC_3x3 -> InventoryType.WORKBENCH
-        MenuType.ANVIL -> InventoryType.ANVIL
-        MenuType.BEACON -> InventoryType.BEACON
-        MenuType.BLAST_FURNACE -> InventoryType.BLAST_FURNACE
-        MenuType.BREWING_STAND -> InventoryType.BREWING
-        MenuType.CRAFTING -> InventoryType.CRAFTING
-        MenuType.ENCHANTMENT -> InventoryType.ENCHANTING
-        MenuType.FURNACE -> InventoryType.FURNACE
-        MenuType.GRINDSTONE -> InventoryType.GRINDSTONE
-        MenuType.HOPPER -> InventoryType.HOPPER
-        MenuType.LECTERN -> InventoryType.LECTERN
-        MenuType.LOOM -> InventoryType.LOOM
-        MenuType.MERCHANT -> InventoryType.MERCHANT
-        MenuType.SHULKER_BOX -> InventoryType.SHULKER_BOX
-        MenuType.SMITHING -> InventoryType.SMITHING
-        MenuType.SMOKER -> InventoryType.SMOKER
-        MenuType.CARTOGRAPHY_TABLE -> InventoryType.CARTOGRAPHY
-        MenuType.STONECUTTER -> InventoryType.STONECUTTER
-        else -> throw IllegalStateException("No inventory type found! This is not intentional behaviour, please contact the developers.")
-    }
-
-    @Throws(CommandSyntaxException::class)
-    private fun <T> getRegistryKey(
-        context: CommandContext<CommandSourceStack>,
-        name: String,
-        registryRef: ResourceKey<Registry<T>>
-    ): ResourceKey<T> {
-        val resourceKey = context.getArgument(name, ResourceKey::class.java)
-        val optional = resourceKey.cast(registryRef)
-        return optional.orElseThrow {
-            INVALID_EXCEPTION.create(resourceKey)
-        }
-    }
-
-    private fun <T> getRegistry(
-        context: CommandContext<CommandSourceStack>,
-        registryRef: ResourceKey<out Registry<T>>
-    ): Registry<T> {
-        return context.source.server.registryAccess().registryOrThrow(registryRef)
-    }
-
-    @Throws(CommandSyntaxException::class)
-    private fun <T> resolveKey(
-        context: CommandContext<CommandSourceStack>,
-        name: String,
-        registryRef: ResourceKey<Registry<T>>
-    ): Holder<T> {
-        val resourceKey = getRegistryKey(context, name, registryRef)
-        return getRegistry(context, registryRef).getHolder(resourceKey)
-            .orElseThrow { INVALID_EXCEPTION.create(resourceKey.location()) }
-    }
-
-    @Throws(CommandSyntaxException::class)
-    private fun <T> getId(
-        context: CommandContext<CommandSourceStack>,
-        name: String,
-        registryRef: ResourceKey<Registry<T>>
-    ): NamespacedKey {
-        val key = resolveKey(context, name, registryRef).unwrapKey().orElseThrow { INVALID_EXCEPTION.create(registryRef.location()) }.registry()
-        return NamespacedKey(key.namespace, key.path)
     }
 
     private fun brigadier(type: StringType): StringArgumentType = when (type) {

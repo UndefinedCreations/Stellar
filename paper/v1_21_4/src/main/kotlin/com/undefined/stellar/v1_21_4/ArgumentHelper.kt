@@ -4,8 +4,6 @@ import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.context.ParsedArgument
 import com.mojang.brigadier.context.StringRange
-import com.mojang.brigadier.exceptions.CommandSyntaxException
-import com.mojang.brigadier.exceptions.DynamicCommandExceptionType
 import com.undefined.stellar.argument.basic.StringType
 import com.undefined.stellar.argument.entity.EntityDisplayType
 import com.undefined.stellar.argument.world.LocationArgument
@@ -19,11 +17,7 @@ import net.minecraft.commands.arguments.coordinates.Vec2Argument
 import net.minecraft.commands.arguments.coordinates.Vec3Argument
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
-import net.minecraft.core.Holder
-import net.minecraft.core.Registry
 import net.minecraft.core.particles.*
-import net.minecraft.network.chat.Component
-import net.minecraft.resources.ResourceKey
 import net.minecraft.server.level.ColumnPos
 import net.minecraft.world.inventory.MenuType
 import net.minecraft.world.level.Level
@@ -78,50 +72,6 @@ object ArgumentHelper {
         MenuType.CARTOGRAPHY_TABLE -> InventoryType.CARTOGRAPHY
         MenuType.STONECUTTER -> InventoryType.STONECUTTER
         else -> throw IllegalStateException("No inventory type found! This is not intentional behaviour, please contact the developers.")
-    }
-
-    @Throws(CommandSyntaxException::class)
-    fun <T> getRegistryKey(
-        context: CommandContext<CommandSourceStack>,
-        name: String,
-        registryRef: ResourceKey<Registry<T>>,
-        invalidException: DynamicCommandExceptionType
-    ): ResourceKey<T> {
-        val resourceKey = context.getArgument(name, ResourceKey::class.java)
-        val optional = resourceKey.cast(registryRef)
-        return optional.orElseThrow {
-            invalidException.create(resourceKey)
-        }
-    }
-
-    fun <T> getRegistry(
-        context: CommandContext<CommandSourceStack>,
-        registryRef: ResourceKey<out Registry<T>>
-    ): Registry<T> {
-        return context.source.server.registryAccess().lookupOrThrow(registryRef)
-    }
-
-    @Throws(CommandSyntaxException::class)
-    fun <T> resolveKey(
-        context: CommandContext<CommandSourceStack>,
-        name: String,
-        registryRef: ResourceKey<Registry<T>>
-    ): Holder.Reference<T> {
-        val invalidException = DynamicCommandExceptionType { argument ->
-            Component.translatableEscape("argument.resource_or_id.invalid", argument)
-        }
-        val resourceKey = getRegistryKey(context, name, registryRef, invalidException)
-        return getRegistry(context, registryRef).get(resourceKey).orElseThrow { invalidException.create(resourceKey.location()) }
-    }
-
-    @Throws(CommandSyntaxException::class)
-    fun <T> getId(
-        context: CommandContext<CommandSourceStack>,
-        name: String,
-        registryRef: ResourceKey<Registry<T>>
-    ): NamespacedKey {
-        val key = resolveKey(context, name, registryRef).key().location()
-        return NamespacedKey(key.namespace, key.path)
     }
 
     fun brigadier(type: StringType): StringArgumentType = when (type) {

@@ -35,7 +35,6 @@ import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.SharedSuggestionProvider
 import net.minecraft.commands.arguments.*
-import net.minecraft.commands.arguments.DimensionArgument
 import net.minecraft.commands.arguments.EntityAnchorArgument
 import net.minecraft.commands.arguments.EntityArgument
 import net.minecraft.commands.arguments.ParticleArgument
@@ -80,11 +79,8 @@ object ArgumentHelper {
         return arguments
     }
 
-    fun getRequiredArgumentBuilder(argument: AbstractStellarArgument<*, *>): RequiredArgumentBuilder<CommandSourceStack, *> {
-        val argumentBuilder: RequiredArgumentBuilder<CommandSourceStack, *> = RequiredArgumentBuilder.argument(argument.name, getArgumentType(argument))
-        getSuggestions(argument)?.let { argumentBuilder.suggests(it) }
-        return argumentBuilder
-    }
+    fun getRequiredArgumentBuilder(argument: AbstractStellarArgument<*, *>): RequiredArgumentBuilder<CommandSourceStack, *> =
+        RequiredArgumentBuilder.argument(argument.name, getArgumentType(argument))
 
     private fun <T : AbstractStellarArgument<*, *>> getSuggestions(argument: T): SuggestionProvider<CommandSourceStack>? =
         when (argument) {
@@ -183,7 +179,7 @@ object ArgumentHelper {
             is FrogVariantArgument -> throwArgumentVersionException(argument)
             is VillagerProfessionArgument -> ResourceLocationArgument.id()
             is VillagerTypeArgument -> ResourceLocationArgument.id()
-            is MapDecorationTypeArgument -> throwArgumentVersionException(argument)
+            is MapCursorTypeArgument -> throwArgumentVersionException(argument)
             is InventoryTypeArgument -> throwArgumentVersionException(argument)
             is AttributeArgument -> ResourceLocationArgument.id()
             is FluidArgument -> ResourceLocationArgument.id()
@@ -198,7 +194,7 @@ object ArgumentHelper {
             is ArtArgument -> throwArgumentVersionException(argument)
             is InstrumentArgument -> throwArgumentVersionException(argument)
             is EntityTypeArgument -> ResourceLocationArgument.id()
-            is PotionArgument -> throwArgumentVersionException(argument)
+            is PotionTypeArgument -> throwArgumentVersionException(argument)
             is MemoryKeyArgument -> ResourceLocationArgument.id()
             else -> throw UnsupportedArgumentException(argument)
         }
@@ -279,7 +275,7 @@ object ArgumentHelper {
             is FrogVariantArgument -> throwArgumentVersionException(argument)
             is VillagerProfessionArgument -> org.bukkit.Registry.VILLAGER_PROFESSION.get(getId(context, argument.name))
             is VillagerTypeArgument -> org.bukkit.Registry.VILLAGER_TYPE.get(getId(context, argument.name))
-            is MapDecorationTypeArgument -> throwArgumentVersionException(argument)
+            is MapCursorTypeArgument -> throwArgumentVersionException(argument)
             is InventoryTypeArgument -> getInventoryType(Registry.MENU.getOrThrow(ResourceKey.create(Registry.MENU_REGISTRY, ResourceLocationArgument.getId(context, argument.name))))
             is AttributeArgument -> org.bukkit.Registry.ATTRIBUTE.get(getId(context, argument.name))
             is FluidArgument -> org.bukkit.Registry.FLUID.get(getId(context, argument.name))
@@ -294,7 +290,7 @@ object ArgumentHelper {
             is ArtArgument -> throwArgumentVersionException(argument)
             is InstrumentArgument -> throwArgumentVersionException(argument)
             is EntityTypeArgument -> org.bukkit.Registry.ENTITY_TYPE.get(getId(context, argument.name))
-            is PotionArgument -> throwArgumentVersionException(argument)
+            is PotionTypeArgument -> throwArgumentVersionException(argument)
             is MemoryKeyArgument -> org.bukkit.Registry.MEMORY_MODULE_TYPE.get(getId(context, argument.name))
             else -> throw UnsupportedArgumentException(argument)
         }

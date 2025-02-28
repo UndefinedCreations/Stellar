@@ -5,7 +5,6 @@ import com.undefined.stellar.AbstractStellarCommand
 import com.undefined.stellar.StellarCommands
 import com.undefined.stellar.registrar.AbstractCommandRegistrar
 import com.undefined.stellar.util.getPrivateField
-import com.undefined.stellar.v1_16_3.BrigadierCommandHelper
 import net.minecraft.server.v1_16_R2.CommandListenerWrapper
 import net.minecraft.server.v1_16_R2.MinecraftServer
 import org.bukkit.command.Command

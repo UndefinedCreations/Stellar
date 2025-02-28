@@ -11,14 +11,14 @@ import java.util.concurrent.CompletableFuture
 
 open class ListArgument<T, R>(
     val type: AbstractStellarArgument<*, R>,
-    val list: CommandContext<CommandSender>.() -> Collection<T>,
+    val list: CommandContext<CommandSender>.() -> Iterable<T>,
     val converter: CommandContext<CommandSender>.(T) -> Suggestion? = { Suggestion.withText(it.toString()) },
     val parse: CommandContext<CommandSender>.(R) -> T?,
     val async: Boolean = false
 ) : AbstractStellarArgument<ListArgument<T, R>, T>(type.parent, type.name) {
 
     constructor(type: AbstractStellarArgument<*, R>,
-                list: Collection<T>,
+                list: Iterable<T>,
                 converter: CommandContext<CommandSender>.(T) -> Suggestion? = { Suggestion.withText(it.toString()) },
                 parse: CommandContext<CommandSender>.(R) -> T?,
                 async: Boolean = true) : this(type, { list }, converter, parse, async)
@@ -33,11 +33,11 @@ open class ListArgument<T, R>(
     override val suggestions: MutableList<StellarSuggestion<*>>
         get() = (super.suggestions + StellarSuggestion(CommandSender::class) { input ->
             if (async)
-                CompletableFuture.supplyAsync { getSuggestionList(this).filter { it.text.startsWith(input, true) } }
+                CompletableFuture.supplyAsync { getSuggestionList(this, input) }
             else
-                CompletableFuture.completedFuture(getSuggestionList(this).filter { it.text.startsWith(input, true) })
+                CompletableFuture.completedFuture(getSuggestionList(this, input))
         }).toMutableList()
 
-    fun getSuggestionList(context: CommandContext<CommandSender>): List<Suggestion> = list(context).mapNotNull { converter(context, it) }
+    open fun getSuggestionList(context: CommandContext<CommandSender>, input: String): List<Suggestion> = list(context).mapNotNull { converter(context, it) }.filter { it.text.startsWith(input, true) }
 
 }

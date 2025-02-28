@@ -53,7 +53,7 @@ abstract class AbstractStellarArgument<T, R>(val parent: AbstractStellarCommand<
         return addSuggestions(suggestions.map { Suggestion(it, "") })
     }
 
-    inline fun <reified C : CommandSender> addFutureSuggestion(noinline suggestion: CommandContext<C>.(input: String) -> CompletableFuture<Collection<Suggestion>>): T {
+    inline fun <reified C : CommandSender> addFutureSuggestion(noinline suggestion: CommandContext<C>.(input: String) -> CompletableFuture<Iterable<Suggestion>>): T {
         suggestions.add(StellarSuggestion(C::class, suggestion))
         return this as T
     }

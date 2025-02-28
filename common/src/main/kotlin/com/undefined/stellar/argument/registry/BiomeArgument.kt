@@ -1,7 +1,7 @@
 package com.undefined.stellar.argument.registry
 
 import com.undefined.stellar.AbstractStellarCommand
-import com.undefined.stellar.argument.AbstractStellarArgument
+import org.bukkit.Registry
 import org.bukkit.block.Biome
 
-class BiomeArgument(parent: AbstractStellarCommand<*>, name: String) : AbstractStellarArgument<BiomeArgument, Biome>(parent, name)
+class BiomeArgument(parent: AbstractStellarCommand<*>, name: String) : RegistryArgument<Registry<Biome>, Biome>(parent, name, Registry.BIOME)

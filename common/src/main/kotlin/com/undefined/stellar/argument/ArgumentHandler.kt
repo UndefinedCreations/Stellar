@@ -32,7 +32,9 @@ import com.undefined.stellar.argument.world.LocationType
 import com.undefined.stellar.data.argument.CommandContext
 import com.undefined.stellar.data.suggestion.Suggestion
 import org.bukkit.Bukkit
+import org.bukkit.Keyed
 import org.bukkit.OfflinePlayer
+import org.bukkit.Registry
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.jetbrains.annotations.ApiStatus
@@ -379,6 +381,22 @@ open class ArgumentHandler {
             )
         }
 
+    fun <R : Registry<K>, K : Keyed> addRegistryArgument(
+        name: String,
+        registry: R,
+        converter: CommandContext<CommandSender>.(K) -> String = { it.key.toString() },
+        async: Boolean = false
+    ): RegistryArgument<*, K> =
+        addArgument { RegistryArgument(base, name, registry, { Suggestion.withText(converter(this, it)) }, async) }
+
+    fun <R : Registry<K>, K : Keyed> addAdvancedRegistryArgument(
+        name: String,
+        registry: R,
+        converter: CommandContext<CommandSender>.(K) -> Suggestion = { Suggestion.withText(it.key.toString()) },
+        async: Boolean = false
+    ): RegistryArgument<*, K> =
+        addArgument { RegistryArgument(base, name, registry, converter, async) }
+
     fun addGameEventArgument(name: String): GameEventArgument =
         addArgument { GameEventArgument(base, name) }
 
@@ -406,8 +424,8 @@ open class ArgumentHandler {
     fun addVillagerTypeArgument(name: String): VillagerTypeArgument =
         addArgument { VillagerTypeArgument(base, name) }
 
-    fun addMapDecorationType(name: String): MapDecorationTypeArgument =
-        addArgument { MapDecorationTypeArgument(base, name) }
+    fun addMapCursorTypeArgument(name: String): MapCursorTypeArgument =
+        addArgument { MapCursorTypeArgument(base, name) }
 
     fun addInventoryTypeArgument(name: String): InventoryTypeArgument =
         addArgument { InventoryTypeArgument(base, name) }
@@ -451,8 +469,8 @@ open class ArgumentHandler {
     fun addEntityTypeArgument(name: String): EntityTypeArgument =
         addArgument { EntityTypeArgument(base, name) }
 
-    fun addPotionArgument(name: String): PotionArgument =
-        addArgument { PotionArgument(base, name) }
+    fun addPotionTypeArgument(name: String): PotionTypeArgument =
+        addArgument { PotionTypeArgument(base, name) }
 
     fun addMemoryKeyArgument(name: String): MemoryKeyArgument =
         addArgument { MemoryKeyArgument(base, name) }

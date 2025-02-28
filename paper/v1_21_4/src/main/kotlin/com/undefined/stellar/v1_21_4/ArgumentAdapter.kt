@@ -16,7 +16,6 @@ import com.undefined.stellar.argument.item.ItemSlotsArgument
 import com.undefined.stellar.argument.math.AxisArgument
 import com.undefined.stellar.argument.misc.NamespacedKeyArgument
 import com.undefined.stellar.argument.misc.UUIDArgument
-import com.undefined.stellar.argument.registry.*
 import com.undefined.stellar.argument.scoreboard.DisplaySlotArgument
 import com.undefined.stellar.argument.scoreboard.ScoreHolderType
 import com.undefined.stellar.argument.structure.MirrorArgument
@@ -38,7 +37,6 @@ import net.minecraft.commands.arguments.coordinates.*
 import net.minecraft.commands.arguments.item.ItemArgument
 import net.minecraft.commands.arguments.item.ItemPredicateArgument
 import net.minecraft.core.BlockPos
-import net.minecraft.core.registries.Registries
 import net.minecraft.network.chat.Component
 import net.minecraft.server.MinecraftServer
 import net.minecraft.world.level.block.state.pattern.BlockInWorld
@@ -125,32 +123,6 @@ object ArgumentAdapter {
             is HeightMapArgument -> HeightmapTypeArgument.heightmap()
             is com.undefined.stellar.argument.structure.LootTableArgument -> LootTableArgument.lootTable(COMMAND_BUILD_CONTEXT)
             is UUIDArgument -> UuidArgument.uuid()
-            is GameEventArgument -> ResourceKeyArgument.key(Registries.GAME_EVENT)
-            is StructureTypeArgument -> ResourceKeyArgument.key(Registries.STRUCTURE_TYPE)
-            is PotionEffectTypeArgument -> ResourceKeyArgument.key(Registries.MOB_EFFECT)
-            is BlockTypeArgument -> ResourceKeyArgument.key(Registries.BLOCK_TYPE)
-            is ItemTypeArgument -> ResourceKeyArgument.key(Registries.ITEM)
-            is CatTypeArgument -> ResourceKeyArgument.key(Registries.CAT_VARIANT)
-            is FrogVariantArgument -> ResourceKeyArgument.key(Registries.FROG_VARIANT)
-            is VillagerProfessionArgument -> ResourceKeyArgument.key(Registries.VILLAGER_PROFESSION)
-            is VillagerTypeArgument -> ResourceKeyArgument.key(Registries.VILLAGER_TYPE)
-            is MapDecorationTypeArgument -> ResourceKeyArgument.key(Registries.MAP_DECORATION_TYPE)
-            is InventoryTypeArgument -> ResourceKeyArgument.key(Registries.MENU)
-            is AttributeArgument -> ResourceKeyArgument.key(Registries.ATTRIBUTE)
-            is FluidArgument -> ResourceKeyArgument.key(Registries.FLUID)
-            is SoundArgument -> ResourceKeyArgument.key(Registries.SOUND_EVENT)
-            is BiomeArgument -> ResourceKeyArgument.key(Registries.BIOME)
-            is StructureArgument -> ResourceKeyArgument.key(Registries.STRUCTURE)
-            is TrimMaterialArgument -> ResourceKeyArgument.key(Registries.TRIM_MATERIAL)
-            is TrimPatternArgument -> ResourceKeyArgument.key(Registries.TRIM_PATTERN)
-            is DamageTypeArgument -> ResourceKeyArgument.key(Registries.DAMAGE_TYPE)
-            is WolfVariantArgument -> ResourceKeyArgument.key(Registries.WOLF_VARIANT)
-            is PatternTypeArgument -> ResourceKeyArgument.key(Registries.BANNER_PATTERN)
-            is ArtArgument -> ResourceKeyArgument.key(Registries.PAINTING_VARIANT)
-            is InstrumentArgument -> ResourceKeyArgument.key(Registries.INSTRUMENT)
-            is EntityTypeArgument -> ResourceKeyArgument.key(Registries.ENTITY_TYPE)
-            is PotionArgument -> ResourceKeyArgument.key(Registries.POTION)
-            is MemoryKeyArgument -> ResourceKeyArgument.key(Registries.MEMORY_MODULE_TYPE)
             else -> throw UnsupportedArgumentException(argument)
         }
 
@@ -223,32 +195,6 @@ object ArgumentAdapter {
             is HeightMapArgument -> HeightMap.valueOf(HeightmapTypeArgument.getHeightmap(context, argument.name).name)
             is com.undefined.stellar.argument.structure.LootTableArgument -> LootTableArgument.getLootTable(context, argument.name).value().craftLootTable
             is UUIDArgument -> UuidArgument.getUuid(context, argument.name)
-            is GameEventArgument -> Registry.GAME_EVENT.getOrThrow(ArgumentHelper.getId(context, argument.name, Registries.GAME_EVENT))
-            is StructureTypeArgument -> Registry.STRUCTURE_TYPE.getOrThrow(ArgumentHelper.getId(context, argument.name, Registries.STRUCTURE_TYPE))
-            is PotionEffectTypeArgument -> Registry.EFFECT.getOrThrow(ArgumentHelper.getId(context, argument.name, Registries.MOB_EFFECT))
-            is BlockTypeArgument -> Registry.BLOCK.getOrThrow(ArgumentHelper.getId(context, argument.name, Registries.BLOCK_TYPE))
-            is ItemTypeArgument -> Registry.ITEM.getOrThrow(ArgumentHelper.getId(context, argument.name, Registries.ITEM))
-            is CatTypeArgument -> Registry.CAT_VARIANT.getOrThrow(ArgumentHelper.getId(context, argument.name, Registries.CAT_VARIANT))
-            is FrogVariantArgument -> Registry.FROG_VARIANT.getOrThrow(ArgumentHelper.getId(context, argument.name, Registries.FROG_VARIANT))
-            is VillagerProfessionArgument -> Registry.VILLAGER_PROFESSION.getOrThrow(ArgumentHelper.getId(context, argument.name, Registries.VILLAGER_PROFESSION))
-            is VillagerTypeArgument -> Registry.VILLAGER_TYPE.getOrThrow(ArgumentHelper.getId(context, argument.name, Registries.VILLAGER_TYPE))
-            is MapDecorationTypeArgument -> Registry.MAP_DECORATION_TYPE.getOrThrow(ArgumentHelper.getId(context, argument.name, Registries.MAP_DECORATION_TYPE))
-            is InventoryTypeArgument -> ArgumentHelper.getInventoryType(ArgumentHelper.resolveKey(context, argument.name, Registries.MENU).value())
-            is AttributeArgument -> Registry.ATTRIBUTE.getOrThrow(ArgumentHelper.getId(context, argument.name, Registries.ATTRIBUTE))
-            is FluidArgument -> Registry.FLUID.getOrThrow(ArgumentHelper.getId(context, argument.name, Registries.FLUID))
-            is SoundArgument -> Registry.SOUNDS.getOrThrow(ArgumentHelper.getId(context, argument.name, Registries.SOUND_EVENT))
-            is BiomeArgument -> Registry.BIOME.getOrThrow(ArgumentHelper.getId(context, argument.name, Registries.BIOME))
-            is StructureArgument -> Registry.STRUCTURE.getOrThrow(ArgumentHelper.getId(context, argument.name, Registries.STRUCTURE))
-            is TrimMaterialArgument -> Registry.TRIM_MATERIAL.getOrThrow(ArgumentHelper.getId(context, argument.name, Registries.TRIM_MATERIAL))
-            is TrimPatternArgument -> Registry.TRIM_PATTERN.getOrThrow(ArgumentHelper.getId(context, argument.name, Registries.TRIM_PATTERN))
-            is DamageTypeArgument -> Registry.DAMAGE_TYPE.getOrThrow(ArgumentHelper.getId(context, argument.name, Registries.DAMAGE_TYPE))
-            is WolfVariantArgument -> Registry.WOLF_VARIANT.getOrThrow(ArgumentHelper.getId(context, argument.name, Registries.WOLF_VARIANT))
-            is PatternTypeArgument -> Registry.BANNER_PATTERN.getOrThrow(ArgumentHelper.getId(context, argument.name, Registries.BANNER_PATTERN))
-            is ArtArgument -> Registry.ART.getOrThrow(ArgumentHelper.getId(context, argument.name, Registries.PAINTING_VARIANT))
-            is InstrumentArgument -> Registry.INSTRUMENT.getOrThrow(ArgumentHelper.getId(context, argument.name, Registries.INSTRUMENT))
-            is EntityTypeArgument -> Registry.ENTITY_TYPE.getOrThrow(ArgumentHelper.getId(context, argument.name, Registries.ENTITY_TYPE))
-            is PotionArgument -> Registry.POTION.getOrThrow(ArgumentHelper.getId(context, argument.name, Registries.POTION))
-            is MemoryKeyArgument -> Registry.MEMORY_MODULE_TYPE.getOrThrow(ArgumentHelper.getId(context, argument.name, Registries.MEMORY_MODULE_TYPE))
             else -> throw UnsupportedArgumentException(argument)
         }
     }

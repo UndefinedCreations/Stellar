@@ -1,7 +1,7 @@
 package com.undefined.stellar.argument.registry
 
 import com.undefined.stellar.AbstractStellarCommand
-import com.undefined.stellar.argument.AbstractStellarArgument
 import org.bukkit.Art
+import org.bukkit.Registry
 
-class ArtArgument(parent: AbstractStellarCommand<*>, name: String) : AbstractStellarArgument<ArtArgument, Art>(parent, name)
+class ArtArgument(parent: AbstractStellarCommand<*>, name: String) : RegistryArgument<Registry<Art>, Art>(parent, name, Registry.ART)

@@ -1,7 +1,6 @@
 package com.undefined.stellar.data.argument
 
 import org.bukkit.command.CommandSender
-import java.lang.IndexOutOfBoundsException
 
 typealias GreedyCommandNode = List<String>
 

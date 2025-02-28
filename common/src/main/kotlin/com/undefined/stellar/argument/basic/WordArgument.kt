@@ -1,10 +1,8 @@
 package com.undefined.stellar.argument.basic
 
-import com.undefined.stellar.data.argument.CommandContext
 import com.undefined.stellar.data.argument.PhraseCommandContext
 import com.undefined.stellar.data.execution.PhraseStellarExecution
 import com.undefined.stellar.data.execution.PhraseStellarRunnable
-import com.undefined.stellar.data.execution.StellarExecution
 import com.undefined.stellar.data.suggestion.PhraseStellarSuggestion
 import com.undefined.stellar.data.suggestion.Suggestion
 import org.bukkit.command.CommandSender

@@ -1,7 +1,7 @@
 package com.undefined.stellar.argument.registry
 
 import com.undefined.stellar.AbstractStellarCommand
-import com.undefined.stellar.argument.AbstractStellarArgument
+import org.bukkit.Registry
 import org.bukkit.entity.Villager
 
-class VillagerTypeArgument(parent: AbstractStellarCommand<*>, name: String) : AbstractStellarArgument<VillagerTypeArgument, Villager.Type>(parent, name)
+class VillagerTypeArgument(parent: AbstractStellarCommand<*>, name: String) : RegistryArgument<Registry<Villager.Type>, Villager.Type>(parent, name, Registry.VILLAGER_TYPE)

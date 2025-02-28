@@ -45,6 +45,6 @@ abstract class CustomArgument<R, T>(
     open fun <T> runnable(context: CommandContext<CommandSender>, value: T): Boolean = true
     open fun <T> failureExecution(context: CommandContext<CommandSender>, value: T) {}
     open fun requirement(context: CommandSender): Boolean = true
-    open fun listSuggestions(context: CommandContext<CommandSender>): CompletableFuture<Collection<Suggestion>> = CompletableFuture.completedFuture(listOf())
+    open fun listSuggestions(context: CommandContext<CommandSender>): CompletableFuture<Iterable<Suggestion>> = CompletableFuture.completedFuture(listOf())
 
 }
