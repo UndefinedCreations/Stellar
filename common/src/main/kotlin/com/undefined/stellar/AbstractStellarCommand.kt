@@ -40,7 +40,7 @@ abstract class AbstractStellarCommand<T>(
     @ApiStatus.Internal open val failureMessages: MutableList<Component> = mutableListOf()
     @ApiStatus.Internal open val globalFailureMessages: MutableList<Component> = mutableListOf()
     @ApiStatus.Internal open val failureExecutions: MutableList<StellarExecution<*>> = mutableListOf()
-    @ApiStatus.Internal open var hideDefaultFailureMessages: HideDefaultFailureMessages = HideDefaultFailureMessages(false, false)
+    @ApiStatus.Internal open var hideDefaultFailureMessages: HideDefaultFailureMessages = HideDefaultFailureMessages(hide = false, global = false)
     @ApiStatus.Internal open val requirements: MutableList<StellarRequirement<*>> = mutableListOf()
     @ApiStatus.Internal open val permissionRequirements: MutableList<PermissionStellarRequirement> = mutableListOf()
     @ApiStatus.Internal open val executions: MutableList<StellarExecution<*>> = mutableListOf()
@@ -50,8 +50,8 @@ abstract class AbstractStellarCommand<T>(
     init {
         if (this !is AbstractStellarArgument<*, *>) {
             if (aliases.isNotEmpty()) information["Aliases"] = aliases.joinToString(", ")
-            if (usage.isNotEmpty()) information["Usage"] = usage
-            if (description.isNotEmpty()) information["Description"] = description
+            if (usage.isNotBlank()) information["Usage"] = usage
+            if (description.isNotBlank()) information["Description"] = description
         }
     }
 

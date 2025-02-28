@@ -4,7 +4,7 @@ import org.bukkit.plugin.java.JavaPlugin
 
 abstract class BaseStellarCommand(val name: String, permission: String = "", val aliases: List<String> = listOf()) {
 
-    open val permissions: List<String> = listOf(permission)
+    open val permissions: MutableList<String> = mutableListOf(permission)
     open val description: String = ""
 
     var hasInitializedArguments = false
@@ -25,8 +25,8 @@ abstract class BaseStellarCommand(val name: String, permission: String = "", val
     open fun arguments(): List<StellarArgument> = listOf()
 
     fun createCommand(init: StellarCommand.() -> Unit): StellarCommand {
-        val command = StellarCommand(name, permissions)
-        command.setDescription(description)
+        val command = StellarCommand(name, permissions = permissions.toList())
+        if (description.isNotBlank()) command.setDescription(description)
         command.addAliases(*aliases.toTypedArray())
         command.init()
         return command

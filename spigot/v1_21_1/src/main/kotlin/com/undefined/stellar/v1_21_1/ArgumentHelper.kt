@@ -16,6 +16,7 @@ import com.undefined.stellar.argument.item.ItemSlotArgument
 import com.undefined.stellar.argument.item.ItemSlotsArgument
 import com.undefined.stellar.argument.misc.NamespacedKeyArgument
 import com.undefined.stellar.argument.misc.UUIDArgument
+import com.undefined.stellar.argument.registry.RegistryArgument
 import com.undefined.stellar.argument.structure.MirrorArgument
 import com.undefined.stellar.argument.world.EnvironmentArgument
 import com.undefined.stellar.argument.world.HeightMapArgument
@@ -165,8 +166,7 @@ object ArgumentHelper {
             }
             is com.undefined.stellar.argument.text.ColorArgument -> ChatColor.getByChar(ColorArgument.getColor(context, argument.name).char)
             is com.undefined.stellar.argument.text.ComponentArgument ->  GsonComponentSerializer.gson().deserialize(Component.Serializer.toJson(ComponentArgument.getComponent(context, argument.name), COMMAND_BUILD_CONTEXT))
-            is com.undefined.stellar.argument.text.StyleArgument ->  GsonComponentSerializer.gson().deserialize(
-                getArgumentInput(context, argument.name) ?: return null).style()
+            is com.undefined.stellar.argument.text.StyleArgument ->  GsonComponentSerializer.gson().deserialize(getArgumentInput(context, argument.name) ?: return null).style()
             is com.undefined.stellar.argument.text.MessageArgument ->  GsonComponentSerializer.gson().deserialize(Component.Serializer.toJson(MessageArgument.getMessage(context, argument.name), COMMAND_BUILD_CONTEXT))
             is com.undefined.stellar.argument.scoreboard.ObjectiveArgument ->  Bukkit.getScoreboardManager()!!.mainScoreboard.getObjective(ObjectiveArgument.getObjective(context, argument.name).name)
             is com.undefined.stellar.argument.scoreboard.ObjectiveCriteriaArgument ->  ObjectiveCriteriaArgument.getCriteria(context, argument.name).name
