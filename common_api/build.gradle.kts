@@ -12,5 +12,5 @@ repositories {
 dependencies {
     compileOnly(libs.spigot)
     compileOnly(libs.brigadier)
-    api(libs.authlib)
+    compileOnly(project(":common"))
 }
