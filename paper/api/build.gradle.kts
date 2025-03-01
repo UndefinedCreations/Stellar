@@ -1,5 +1,6 @@
 plugins {
     id("setup")
+    id("com.gradleup.shadow") version "8.3.5"
 }
 
 repositories {
