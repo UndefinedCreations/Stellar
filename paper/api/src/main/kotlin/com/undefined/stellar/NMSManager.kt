@@ -24,34 +24,42 @@ object NMSManager {
 
     fun register(command: StellarCommand, plugin: JavaPlugin) {
         Stellar.commands.add(command)
-        val builder = getLiteralArgumentBuilder(command)
+        val builder = getLiteralArgumentBuilder(command, plugin)
         nms.register(builder)
     }
 
     fun getStellarCommand(command: String): AbstractStellarCommand<*>? = commands.firstOrNull { it.name == command } // TODO add aliases
 
-    private fun getLiteralArgumentBuilder(command: AbstractStellarCommand<*>): LiteralArgumentBuilder<Any> {
+    private fun getLiteralArgumentBuilder(command: AbstractStellarCommand<*>, plugin: JavaPlugin): LiteralArgumentBuilder<Any> {
         val builder: LiteralArgumentBuilder<Any> = LiteralArgumentBuilder.literal(command.name)
-        handleArguments(command, builder)
-        handleCommandFunctions(command, builder)
+        handleArguments(command, builder, plugin)
+        handleCommandFunctions(command, builder, plugin)
         return builder
     }
 
-    private fun getRequiredArgumentBuilder(argument: AbstractStellarArgument<*, *>): RequiredArgumentBuilder<Any, *> {
+    private fun getRequiredArgumentBuilder(argument: AbstractStellarArgument<*, *>, plugin: JavaPlugin): RequiredArgumentBuilder<Any, *> {
         val builder: RequiredArgumentBuilder<Any, *> = RequiredArgumentBuilder.argument(argument.name, argument.argumentType ?: nms.getArgumentType(argument))
-        handleArguments(argument, builder)
-        handleCommandFunctions(argument, builder)
+        handleArguments(argument, builder, plugin)
+        handleCommandFunctions(argument, builder, plugin)
         return builder
     }
 
-    private fun handleArguments(command: AbstractStellarCommand<*>, builder: ArgumentBuilder<Any, *>) {
+    private fun handleArguments(command: AbstractStellarCommand<*>, builder: ArgumentBuilder<Any, *>, plugin: JavaPlugin) {
         for (argument in command.arguments)
-            if (argument is LiteralArgument) builder.then(getLiteralArgumentBuilder(argument)) else builder.then(getRequiredArgumentBuilder(argument))
+            if (argument is LiteralArgument) builder.then(getLiteralArgumentBuilder(argument, plugin)) else builder.then(getRequiredArgumentBuilder(argument, plugin))
     }
 
-    private fun handleCommandFunctions(command: AbstractStellarCommand<*>, builder: ArgumentBuilder<Any, *>) {
+    private fun handleCommandFunctions(command: AbstractStellarCommand<*>, builder: ArgumentBuilder<Any, *>, plugin: JavaPlugin) {
         builder.executes { context ->
-            for (execution in command.executions) execution(CommandContextAdapter.getStellarCommandContext(context))
+            val stellarContext = CommandContextAdapter.getStellarCommandContext(context)
+
+            for (execution in command.executions.filter { it.async })
+                execution(stellarContext)
+
+            Bukkit.getScheduler().runTask(plugin, Runnable {
+                val syncExecutions = command.executions.filter { !it.async }
+                for (execution in syncExecutions) execution(stellarContext)
+            })
             1
         }
     }

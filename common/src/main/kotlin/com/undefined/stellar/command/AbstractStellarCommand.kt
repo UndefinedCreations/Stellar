@@ -3,6 +3,7 @@ package com.undefined.stellar.command
 import com.undefined.stellar.argument.AbstractStellarArgument
 import com.undefined.stellar.data.argument.CommandContext
 import com.undefined.stellar.data.execution.StellarExecution
+import com.undefined.stellar.data.execution.StellarRunnable
 import org.bukkit.command.CommandSender
 import org.bukkit.plugin.java.JavaPlugin
 
@@ -18,7 +19,11 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
     }
 
     inline fun <reified C : CommandSender> addExecution(noinline execution: CommandContext<C>.() -> Unit): T = apply {
-        executions.add(StellarExecution(C::class, execution))
+        executions.add(StellarExecution(C::class, execution, false))
+    } as T
+
+    inline fun <reified C : CommandSender> addAsyncExecution(noinline execution: CommandContext<C>.() -> Unit): T = apply {
+        executions.add(StellarExecution(C::class, execution, true))
     } as T
 
     abstract fun register(plugin: JavaPlugin): T
