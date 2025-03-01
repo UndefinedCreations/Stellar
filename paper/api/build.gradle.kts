@@ -1,11 +1,9 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     `java-library`
-    kotlin("jvm") version "1.9.22"
+    kotlin("jvm") version "2.1.0"
     id("com.gradleup.shadow") version "8.3.5"
-}
-
-repositories {
-    maven("https://repo.papermc.io/repository/maven-public/")
 }
 
 val versionVar = version
@@ -15,31 +13,14 @@ val artifactIdVar = "stellar"
 group = groupIdVar
 version = versionVar
 
-publishing {
-    publications {
-        register<MavenPublication>("maven") {
-            groupId = groupIdVar
-            artifactId = artifactIdVar
-            version = versionVar.toString()
-
-            from(components["java"])
-        }
-    }
-}
-
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.21.3-R0.1-SNAPSHOT")
-    api(project(":paper:common"))
+    compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
     implementation(project(":paper:v1_21_4"))
-    implementation(kotlin("reflect"))
 }
 
 tasks {
-    shadowJar {
-        archiveClassifier = "paper"
-    }
     compileKotlin {
-        kotlinOptions.jvmTarget = "1.8"
+        compilerOptions.jvmTarget = JvmTarget.JVM_21
     }
     compileJava {
         options.release = 8
