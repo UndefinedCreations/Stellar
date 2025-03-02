@@ -3,24 +3,25 @@ package com.undefined.stellar
 import com.mojang.brigadier.builder.ArgumentBuilder
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.builder.RequiredArgumentBuilder
+import com.mojang.brigadier.context.StringRange
+import com.mojang.brigadier.suggestion.Suggestion as BrigadierSuggestion
+import com.mojang.brigadier.suggestion.Suggestions
 import com.undefined.stellar.argument.AbstractStellarArgument
 import com.undefined.stellar.argument.LiteralArgument
 import com.undefined.stellar.command.AbstractStellarCommand
 import com.undefined.stellar.data.argument.ArgumentHelper
-import com.undefined.stellar.data.argument.CommandContext
 import com.undefined.stellar.data.argument.MojangAdapter
-import com.undefined.stellar.data.execution.StellarExecution
+import com.undefined.stellar.data.suggestion.Suggestion
 import com.undefined.stellar.exception.UnsupportedVersionException
 import com.undefined.stellar.v1_21_4.NMS1_21_4
 import org.bukkit.Bukkit
-import org.bukkit.command.CommandSender
 import org.bukkit.plugin.java.JavaPlugin
+import java.util.concurrent.CompletableFuture
 
 object NMSManager {
 
     val nms: NMS by lazy { versions[version] ?: throw UnsupportedVersionException(versions.keys) }
 
-    val commands: MutableList<AbstractStellarCommand<*>> = mutableListOf()
     private val version by lazy { Bukkit.getBukkitVersion().split("-")[0] }
     private val versions: Map<String, NMS> = mapOf(
         "1.21.4" to NMS1_21_4
@@ -31,8 +32,6 @@ object NMSManager {
         val builder = getLiteralArgumentBuilder(command, plugin)
         nms.register(builder)
     }
-
-    fun getStellarCommand(command: String): AbstractStellarCommand<*>? = commands.firstOrNull { it.name == command } // TODO add aliases
 
     private fun getLiteralArgumentBuilder(command: AbstractStellarCommand<*>, plugin: JavaPlugin): LiteralArgumentBuilder<Any> {
         val builder: LiteralArgumentBuilder<Any> = LiteralArgumentBuilder.literal(command.name)
@@ -54,28 +53,45 @@ object NMSManager {
     }
 
     private fun handleCommandFunctions(command: AbstractStellarCommand<*>, builder: ArgumentBuilder<Any, *>, plugin: JavaPlugin) {
+        handleExecutions(command, builder, plugin)
+        handleSuggestions(command, builder, plugin)
+    }
+
+    private fun handleExecutions(command: AbstractStellarCommand<*>, builder: ArgumentBuilder<Any, *>, plugin: JavaPlugin) {
+        if (command.executions.isEmpty() && command.runnables.isEmpty()) return
         builder.executes { context ->
             val stellarContext = MojangAdapter.getStellarCommandContext(context)
 
             for (runnable in command.runnables.filter { it.async }) runnable(stellarContext)
             val arguments = ArgumentHelper.getArguments(command, context)
-            for (argument in arguments) {
-                println("argument: ${argument.name}")
-                for (runnable in argument.runnables.filter { it.async }) runnable(stellarContext)
-            }
+            for (argument in arguments) for (runnable in argument.runnables.filter { it.async }) runnable(stellarContext)
 
             for (execution in command.executions.filter { it.async }) execution(stellarContext)
 
             Bukkit.getScheduler().runTask(plugin, Runnable {
                 for (runnable in command.runnables.filter { !it.async }) runnable(stellarContext)
-                for (argument in arguments) {
-                    println("argument: ${argument.name}")
-                    for (runnable in argument.runnables.filter { !it.async }) runnable(stellarContext)
-                }
+                for (argument in arguments) for (runnable in argument.runnables.filter { !it.async }) runnable(stellarContext)
 
                 for (execution in command.executions.filter { !it.async }) execution(stellarContext)
             })
             1
+        }
+    }
+
+    private fun handleSuggestions(command: AbstractStellarCommand<*>, argumentBuilder: ArgumentBuilder<Any, *>, plugin: JavaPlugin) {
+        if (command !is AbstractStellarArgument<*, *> || command.suggestions.isEmpty() || argumentBuilder !is RequiredArgumentBuilder<Any, *>) return
+        argumentBuilder.suggests { context, builder ->
+            val stellarContext = MojangAdapter.getStellarCommandContext(context)
+            val range = StringRange.between(builder.start, builder.input.length)
+
+            CompletableFuture.supplyAsync {
+                val suggestions: MutableList<Suggestion> = mutableListOf()
+                for (suggestion in command.suggestions) suggestions.addAll(suggestion.get(stellarContext, builder.remaining).get())
+                Suggestions(range, suggestions.map { suggestion ->
+                    if (suggestion.tooltip == null || suggestion.tooltip!!.isBlank()) BrigadierSuggestion(range, suggestion.text)
+                    else BrigadierSuggestion(range, suggestion.text) { suggestion.tooltip }
+                })
+            }
         }
     }
 

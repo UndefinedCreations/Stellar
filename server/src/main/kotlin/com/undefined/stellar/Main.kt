@@ -8,15 +8,12 @@ import org.bukkit.plugin.java.JavaPlugin
 class Main : JavaPlugin() {
 
     override fun onEnable() {
-        val cmd = StellarCommand("test")
+        StellarCommand("test")
             .addArgument(StringArgument("string"))
-            .addAsyncRunnable<Player> {
-                sender.sendMessage("runnable: ${Thread.currentThread().name}")
-                true
-            }
-            .addArgument(LiteralArgument("a"))
+            .addSuggestion("test", "a!")
+            .addArgument(LiteralArgument("b"))
             .addExecution<Player> {
-                sender.sendMessage("execution: ${Thread.currentThread().name}")
+                sender.sendMessage("string: ${getArgument<String>("string")}")
             }
             .register(this)
     }
