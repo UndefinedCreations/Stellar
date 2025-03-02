@@ -9,12 +9,12 @@ object ArgumentHelper {
     fun getArguments(
         baseCommand: AbstractStellarCommand<*>,
         context: CommandContext<Any>,
-        currentIndex: Int = 1,
+        currentIndex: Int,
         listOfArguments: List<AbstractStellarArgument<*, *>> = emptyList()
     ): List<AbstractStellarArgument<*, *>> {
-        if (listOfArguments.size == context.nodes.size - 1) return listOfArguments
+        val currentNodeName = context.nodes.getOrNull(currentIndex)?.node?.name ?: return listOfArguments
         for (argument in baseCommand.arguments)
-            if (argument.name == context.nodes[currentIndex].node.name)
+            if (argument.name == currentNodeName || currentNodeName in argument.aliases)
                 return getArguments(argument, context, currentIndex + 1, listOfArguments + argument)
         return emptyList()
     }

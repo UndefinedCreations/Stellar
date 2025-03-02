@@ -14,7 +14,7 @@ abstract class AbstractStellarArgument<T : AbstractStellarArgument<T, *>, R>(nam
 
     open lateinit var parent: AbstractStellarCommand<*>
 
-    val suggestions: MutableList<StellarSuggestion<*>> = mutableListOf()
+    val suggestions: MutableSet<StellarSuggestion<*>> = mutableSetOf()
 
     fun addSuggestions(vararg suggestions: Suggestion): T = apply {
         this.suggestions.add(StellarSuggestion(CommandSender::class) { CompletableFuture.completedFuture(suggestions.toList()) })

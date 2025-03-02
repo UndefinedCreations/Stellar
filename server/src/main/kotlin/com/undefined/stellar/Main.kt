@@ -9,9 +9,11 @@ class Main : JavaPlugin() {
 
     override fun onEnable() {
         StellarCommand("test")
+            .addAlias("a")
             .addArgument(StringArgument("string"))
             .addSuggestion("test", "a!")
             .addArgument(LiteralArgument("b"))
+            .addAlias("a")
             .addExecution<Player> {
                 sender.sendMessage("string: ${getArgument<String>("string")}")
             }

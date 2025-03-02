@@ -10,9 +10,14 @@ import org.bukkit.plugin.java.JavaPlugin
 @Suppress("UNCHECKED_CAST")
 abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: String) {
 
-    val arguments: MutableList<AbstractStellarArgument<*, *>> = mutableListOf()
-    val executions: MutableList<StellarExecution<*>> = mutableListOf()
-    val runnables: MutableList<StellarRunnable<*>> = mutableListOf()
+    val aliases: MutableSet<String> = mutableSetOf()
+    val arguments: MutableSet<AbstractStellarArgument<*, *>> = mutableSetOf()
+    val executions: MutableSet<StellarExecution<*>> = mutableSetOf()
+    val runnables: MutableSet<StellarRunnable<*>> = mutableSetOf()
+
+    fun addAlias(alias: String): T = apply { aliases.add(alias) } as T
+    fun addAliases(vararg alias: String): T = apply { aliases.addAll(alias) } as T
+    fun clearAliases(): T = apply { aliases.clear() } as T
 
     fun <T : AbstractStellarArgument<T, *>> addArgument(argument: T): T = argument.apply {
         argument.parent = this@AbstractStellarCommand

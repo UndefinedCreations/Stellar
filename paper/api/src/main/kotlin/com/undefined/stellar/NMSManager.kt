@@ -30,11 +30,15 @@ object NMSManager {
     fun register(command: StellarCommand, plugin: JavaPlugin) {
         Stellar.commands.add(command)
         val builder = getLiteralArgumentBuilder(command, plugin)
-        nms.register(builder)
+        val dispatcher = nms.getCommandDispatcher()
+        val mainNode = dispatcher.register(builder)
+
+        for (name in command.aliases + "${plugin.description.name}:${command.name}")
+            dispatcher.register(LiteralArgumentBuilder.literal<Any>(name).redirect(mainNode))
     }
 
-    private fun getLiteralArgumentBuilder(command: AbstractStellarCommand<*>, plugin: JavaPlugin): LiteralArgumentBuilder<Any> {
-        val builder: LiteralArgumentBuilder<Any> = LiteralArgumentBuilder.literal(command.name)
+    private fun getLiteralArgumentBuilder(command: AbstractStellarCommand<*>, plugin: JavaPlugin, name: String = command.name): LiteralArgumentBuilder<Any> {
+        val builder: LiteralArgumentBuilder<Any> = LiteralArgumentBuilder.literal(name)
         handleArguments(command, builder, plugin)
         handleCommandFunctions(command, builder, plugin)
         return builder
@@ -49,36 +53,36 @@ object NMSManager {
 
     private fun handleArguments(command: AbstractStellarCommand<*>, builder: ArgumentBuilder<Any, *>, plugin: JavaPlugin) {
         for (argument in command.arguments)
-            if (argument is LiteralArgument) builder.then(getLiteralArgumentBuilder(argument, plugin)) else builder.then(getRequiredArgumentBuilder(argument, plugin))
+            if (argument is LiteralArgument) for (name in argument.aliases + argument.name) builder.then(getLiteralArgumentBuilder(argument, plugin, name))
+            else builder.then(getRequiredArgumentBuilder(argument, plugin))
     }
 
     private fun handleCommandFunctions(command: AbstractStellarCommand<*>, builder: ArgumentBuilder<Any, *>, plugin: JavaPlugin) {
         handleExecutions(command, builder, plugin)
-        handleSuggestions(command, builder, plugin)
+        handleSuggestions(command, builder)
     }
 
     private fun handleExecutions(command: AbstractStellarCommand<*>, builder: ArgumentBuilder<Any, *>, plugin: JavaPlugin) {
         if (command.executions.isEmpty() && command.runnables.isEmpty()) return
         builder.executes { context ->
             val stellarContext = MojangAdapter.getStellarCommandContext(context)
+            val rootNodeName = context.rootNode.name.takeIf { it.isNotBlank() }
 
             for (runnable in command.runnables.filter { it.async }) runnable(stellarContext)
-            val arguments = ArgumentHelper.getArguments(command, context)
+            val arguments = ArgumentHelper.getArguments(command, context, if (rootNodeName != null) 0 else 1)
             for (argument in arguments) for (runnable in argument.runnables.filter { it.async }) runnable(stellarContext)
-
             for (execution in command.executions.filter { it.async }) execution(stellarContext)
 
             Bukkit.getScheduler().runTask(plugin, Runnable {
                 for (runnable in command.runnables.filter { !it.async }) runnable(stellarContext)
                 for (argument in arguments) for (runnable in argument.runnables.filter { !it.async }) runnable(stellarContext)
-
                 for (execution in command.executions.filter { !it.async }) execution(stellarContext)
             })
             1
         }
     }
 
-    private fun handleSuggestions(command: AbstractStellarCommand<*>, argumentBuilder: ArgumentBuilder<Any, *>, plugin: JavaPlugin) {
+    private fun handleSuggestions(command: AbstractStellarCommand<*>, argumentBuilder: ArgumentBuilder<Any, *>) {
         if (command !is AbstractStellarArgument<*, *> || command.suggestions.isEmpty() || argumentBuilder !is RequiredArgumentBuilder<Any, *>) return
         argumentBuilder.suggests { context, builder ->
             val stellarContext = MojangAdapter.getStellarCommandContext(context)
