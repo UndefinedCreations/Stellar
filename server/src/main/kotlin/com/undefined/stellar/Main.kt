@@ -10,9 +10,13 @@ class Main : JavaPlugin() {
     override fun onEnable() {
         val cmd = StellarCommand("test")
             .addArgument(StringArgument("string"))
+            .addAsyncRunnable<Player> {
+                sender.sendMessage("runnable: ${Thread.currentThread().name}")
+                true
+            }
             .addArgument(LiteralArgument("a"))
             .addExecution<Player> {
-                sender.sendMessage("this works!")
+                sender.sendMessage("execution: ${Thread.currentThread().name}")
             }
             .register(this)
     }

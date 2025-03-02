@@ -6,10 +6,14 @@ import com.mojang.brigadier.builder.RequiredArgumentBuilder
 import com.undefined.stellar.argument.AbstractStellarArgument
 import com.undefined.stellar.argument.LiteralArgument
 import com.undefined.stellar.command.AbstractStellarCommand
-import com.undefined.stellar.data.argument.CommandContextAdapter
+import com.undefined.stellar.data.argument.ArgumentHelper
+import com.undefined.stellar.data.argument.CommandContext
+import com.undefined.stellar.data.argument.MojangAdapter
+import com.undefined.stellar.data.execution.StellarExecution
 import com.undefined.stellar.exception.UnsupportedVersionException
 import com.undefined.stellar.v1_21_4.NMS1_21_4
 import org.bukkit.Bukkit
+import org.bukkit.command.CommandSender
 import org.bukkit.plugin.java.JavaPlugin
 
 object NMSManager {
@@ -51,14 +55,25 @@ object NMSManager {
 
     private fun handleCommandFunctions(command: AbstractStellarCommand<*>, builder: ArgumentBuilder<Any, *>, plugin: JavaPlugin) {
         builder.executes { context ->
-            val stellarContext = CommandContextAdapter.getStellarCommandContext(context)
+            val stellarContext = MojangAdapter.getStellarCommandContext(context)
 
-            for (execution in command.executions.filter { it.async })
-                execution(stellarContext)
+            for (runnable in command.runnables.filter { it.async }) runnable(stellarContext)
+            val arguments = ArgumentHelper.getArguments(command, context)
+            for (argument in arguments) {
+                println("argument: ${argument.name}")
+                for (runnable in argument.runnables.filter { it.async }) runnable(stellarContext)
+            }
+
+            for (execution in command.executions.filter { it.async }) execution(stellarContext)
 
             Bukkit.getScheduler().runTask(plugin, Runnable {
-                val syncExecutions = command.executions.filter { !it.async }
-                for (execution in syncExecutions) execution(stellarContext)
+                for (runnable in command.runnables.filter { !it.async }) runnable(stellarContext)
+                for (argument in arguments) {
+                    println("argument: ${argument.name}")
+                    for (runnable in argument.runnables.filter { !it.async }) runnable(stellarContext)
+                }
+
+                for (execution in command.executions.filter { !it.async }) execution(stellarContext)
             })
             1
         }

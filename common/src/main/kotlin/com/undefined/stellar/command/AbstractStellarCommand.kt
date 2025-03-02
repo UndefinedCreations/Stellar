@@ -12,6 +12,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
 
     val arguments: MutableList<AbstractStellarArgument<*, *>> = mutableListOf()
     val executions: MutableList<StellarExecution<*>> = mutableListOf()
+    val runnables: MutableList<StellarRunnable<*>> = mutableListOf()
 
     fun <T : AbstractStellarArgument<T, *>> addArgument(argument: T): T = argument.apply {
         argument.parent = this@AbstractStellarCommand
@@ -24,6 +25,14 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
 
     inline fun <reified C : CommandSender> addAsyncExecution(noinline execution: CommandContext<C>.() -> Unit): T = apply {
         executions.add(StellarExecution(C::class, execution, true))
+    } as T
+
+    inline fun <reified C : CommandSender> addRunnable(noinline runnable: CommandContext<C>.() -> Boolean): T = apply {
+        runnables.add(StellarRunnable(C::class, runnable, false))
+    } as T
+
+    inline fun <reified C : CommandSender> addAsyncRunnable(noinline runnable: CommandContext<C>.() -> Boolean): T = apply {
+        runnables.add(StellarRunnable(C::class, runnable, true))
     } as T
 
     abstract fun register(plugin: JavaPlugin): T
