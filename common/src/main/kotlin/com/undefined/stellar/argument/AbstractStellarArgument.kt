@@ -35,7 +35,11 @@ abstract class AbstractStellarArgument<T : AbstractStellarArgument<T, *>, R>(nam
         suggestions.add(StellarSuggestion(C::class) { CompletableFuture.completedFuture(suggestion(this, it)) })
     } as T
 
-    @Suppress("UNCHECKED_CAST")
+    override fun setInformation(name: String, text: String): T = apply { parent.setInformation(name, text) } as T
+    override fun setDescription(text: String): T = apply { parent.setDescription(text) } as T
+    override fun setUsageText(text: String): T = apply { parent.setUsageText(text) } as T
+    override fun clearInformation(): T = apply { parent.clearInformation() } as T
+
     override fun register(plugin: JavaPlugin): T = apply { parent.register(plugin) } as T
 
 }

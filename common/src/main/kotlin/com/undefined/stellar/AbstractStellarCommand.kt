@@ -4,11 +4,11 @@ import com.undefined.stellar.argument.AbstractStellarArgument
 import com.undefined.stellar.data.argument.CommandContext
 import com.undefined.stellar.data.execution.StellarExecution
 import com.undefined.stellar.data.execution.StellarRunnable
-import com.undefined.stellar.data.requirement.PermissionLevel
 import com.undefined.stellar.data.requirement.StellarRequirement
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
+import java.util.*
 
 @Suppress("UNCHECKED_CAST")
 abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: String) {
@@ -63,6 +63,11 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
     inline fun <reified C : CommandSender> addAsyncRunnable(noinline runnable: CommandContext<C>.() -> Boolean): T = apply {
         runnables.add(StellarRunnable(C::class, runnable, true))
     } as T
+
+    abstract fun setInformation(name: String, text: String): T
+    abstract fun setDescription(text: String): T
+    abstract fun setUsageText(text: String): T
+    abstract fun clearInformation(): T
 
     abstract fun register(plugin: JavaPlugin): T
 

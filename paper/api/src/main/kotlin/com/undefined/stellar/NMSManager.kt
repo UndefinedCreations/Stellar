@@ -9,6 +9,7 @@ import com.undefined.stellar.argument.AbstractStellarArgument
 import com.undefined.stellar.argument.LiteralArgument
 import com.undefined.stellar.data.argument.ArgumentHelper
 import com.undefined.stellar.data.argument.MojangAdapter
+import com.undefined.stellar.data.help.StellarCommandHelpTopic
 import com.undefined.stellar.data.suggestion.Suggestion
 import com.undefined.stellar.exception.UnsupportedVersionException
 import com.undefined.stellar.v1_21_4.NMS1_21_4
@@ -34,6 +35,10 @@ object NMSManager {
 
         for (name in command.aliases + "${plugin.description.name}:${command.name}")
             dispatcher.register(LiteralArgumentBuilder.literal<Any>(name).redirect(mainNode))
+
+        Bukkit.getServer().helpMap.addTopic(StellarCommandHelpTopic(command.name, command.information["Description"] ?: "", command.information.reversed()) {
+            command.requirements.all { it(this) }
+        })
     }
 
     private fun getLiteralArgumentBuilder(command: AbstractStellarCommand<*>, plugin: JavaPlugin, name: String = command.name): LiteralArgumentBuilder<Any> {
