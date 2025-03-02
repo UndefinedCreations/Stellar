@@ -12,6 +12,7 @@ import com.undefined.stellar.data.argument.MojangAdapter
 import com.undefined.stellar.data.help.StellarCommandHelpTopic
 import com.undefined.stellar.data.suggestion.Suggestion
 import com.undefined.stellar.exception.UnsupportedVersionException
+import com.undefined.stellar.listener.StellarListener
 import com.undefined.stellar.v1_21_4.NMS1_21_4
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
@@ -28,6 +29,8 @@ object NMSManager {
     )
 
     fun register(command: StellarCommand, plugin: JavaPlugin) {
+        if (!StellarListener.hasBeenInitialized) Bukkit.getPluginManager().registerEvents(StellarListener, plugin).also { StellarListener.hasBeenInitialized = true }
+
         Stellar.commands.add(command)
         val builder = getLiteralArgumentBuilder(command, plugin)
         val dispatcher = nms.getCommandDispatcher()

@@ -9,6 +9,10 @@ class Main : JavaPlugin() {
 
     override fun onEnable() {
         StellarCommand("test")
+            .hideDefaultFailureMessages()
+            .addGlobalFailureExecution<Player> {
+                sender.sendMessage("failure!")
+            }
             .addRequirement(3)
             .addAlias("a")
             .addArgument(StringArgument("string"))

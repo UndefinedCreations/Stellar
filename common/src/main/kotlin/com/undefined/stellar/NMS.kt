@@ -11,4 +11,5 @@ interface NMS {
     fun getArgumentType(argument: AbstractStellarArgument<*, *>): ArgumentType<*>
     fun getBukkitSender(source: Any): CommandSender
     fun hasPermission(player: Player, level: Int): Boolean
+    fun getCommandSourceStack(sender: CommandSender): Any
 }

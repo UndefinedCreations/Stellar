@@ -3,6 +3,7 @@ package com.undefined.stellar.argument
 import com.mojang.brigadier.arguments.ArgumentType
 import com.undefined.stellar.AbstractStellarCommand
 import com.undefined.stellar.data.argument.CommandContext
+import com.undefined.stellar.data.execution.StellarExecution
 import com.undefined.stellar.data.suggestion.StellarSuggestion
 import com.undefined.stellar.data.suggestion.Suggestion
 import org.bukkit.command.CommandSender
@@ -13,7 +14,8 @@ import java.util.concurrent.CompletableFuture
 abstract class AbstractStellarArgument<T : AbstractStellarArgument<T, *>, R>(name: String, val argumentType: ArgumentType<R>? = null) : AbstractStellarCommand<T>(name) {
 
     open lateinit var parent: AbstractStellarCommand<*>
-
+    override val globalFailureExecutions: MutableSet<StellarExecution<*>>
+        get() = parent.globalFailureExecutions
     val suggestions: MutableSet<StellarSuggestion<*>> = mutableSetOf()
 
     fun addSuggestions(vararg suggestions: Suggestion): T = apply {
@@ -34,6 +36,8 @@ abstract class AbstractStellarArgument<T : AbstractStellarArgument<T, *>, R>(nam
     inline fun <reified C : CommandSender> addSuggestion(noinline suggestion: CommandContext<C>.(input: String) -> List<Suggestion>): T = apply {
         suggestions.add(StellarSuggestion(C::class) { CompletableFuture.completedFuture(suggestion(this, it)) })
     } as T
+
+    override fun hasGlobalHiddenDefaultFailureMessages(): Boolean = parent.hasGlobalHiddenDefaultFailureMessages()
 
     override fun setInformation(name: String, text: String): T = apply { parent.setInformation(name, text) } as T
     override fun setDescription(text: String): T = apply { parent.setDescription(text) } as T
