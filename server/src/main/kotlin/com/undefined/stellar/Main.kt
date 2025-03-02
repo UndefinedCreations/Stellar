@@ -9,6 +9,7 @@ class Main : JavaPlugin() {
 
     override fun onEnable() {
         StellarCommand("test")
+            .addRequirement(3)
             .addAlias("a")
             .addArgument(StringArgument("string"))
             .addSuggestion("test", "a!")

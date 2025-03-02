@@ -2,7 +2,7 @@ package com.undefined.stellar.data.argument
 
 import com.mojang.brigadier.context.CommandContext
 import com.undefined.stellar.argument.AbstractStellarArgument
-import com.undefined.stellar.command.AbstractStellarCommand
+import com.undefined.stellar.AbstractStellarCommand
 
 object ArgumentHelper {
 

@@ -2,12 +2,13 @@ package com.undefined.stellar.v1_21_4
 
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.arguments.ArgumentType
-import com.mojang.brigadier.context.CommandContext
 import com.undefined.stellar.NMS
 import com.undefined.stellar.argument.AbstractStellarArgument
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.server.MinecraftServer
 import org.bukkit.command.CommandSender
+import org.bukkit.craftbukkit.entity.CraftPlayer
+import org.bukkit.entity.Player
 
 @Suppress("UNCHECKED_CAST")
 object NMS1_21_4 : NMS {
@@ -18,6 +19,8 @@ object NMS1_21_4 : NMS {
         TODO()
     }
 
-    override fun getBukkitSender(context: CommandContext<Any>): CommandSender = (context as CommandContext<CommandSourceStack>).source.bukkitSender
+    override fun getBukkitSender(source: Any): CommandSender = (source as CommandSourceStack).bukkitSender
+
+    override fun hasPermission(player: Player, level: Int): Boolean = (player as CraftPlayer).handle.hasPermissions(level)
 
 }

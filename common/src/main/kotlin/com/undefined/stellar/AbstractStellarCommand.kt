@@ -1,16 +1,22 @@
-package com.undefined.stellar.command
+package com.undefined.stellar
 
 import com.undefined.stellar.argument.AbstractStellarArgument
 import com.undefined.stellar.data.argument.CommandContext
 import com.undefined.stellar.data.execution.StellarExecution
 import com.undefined.stellar.data.execution.StellarRunnable
+import com.undefined.stellar.data.requirement.PermissionLevel
+import com.undefined.stellar.data.requirement.StellarRequirement
 import org.bukkit.command.CommandSender
+import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
 
 @Suppress("UNCHECKED_CAST")
 abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: String) {
 
+    lateinit var nms: NMS
+
     val aliases: MutableSet<String> = mutableSetOf()
+    val requirements: MutableList<StellarRequirement<*>> = mutableListOf()
     val arguments: MutableSet<AbstractStellarArgument<*, *>> = mutableSetOf()
     val executions: MutableSet<StellarExecution<*>> = mutableSetOf()
     val runnables: MutableSet<StellarRunnable<*>> = mutableSetOf()
@@ -23,6 +29,24 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
         argument.parent = this@AbstractStellarCommand
         this@AbstractStellarCommand.arguments.add(argument)
     }
+
+    inline fun <reified C : CommandSender> addRequirement(noinline requirement: C.() -> Boolean): T = apply {
+        requirements.add(StellarRequirement(C::class, requirement))
+    } as T
+
+    fun addRequirement(permission: String): T = addRequirement<CommandSender> { hasPermission(permission) }
+
+    /**
+     * Note: this only applies to players, not all command senders.
+     */
+    fun addRequirement(level: Int): T = addRequirement<Player> { nms.hasPermission(this, level) }
+
+    fun addRequirements(vararg permissions: String): T = addRequirement<CommandSender> { permissions.all { hasPermission(it) } }
+
+    /**
+     * Note: this only applies to players, not all command senders.
+     */
+    fun addRequirements(vararg levels: Int): T = addRequirement<Player> { levels.all { nms.hasPermission(this, it) } }
 
     inline fun <reified C : CommandSender> addExecution(noinline execution: CommandContext<C>.() -> Unit): T = apply {
         executions.add(StellarExecution(C::class, execution, false))

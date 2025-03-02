@@ -5,7 +5,7 @@ import com.undefined.stellar.NMSManager
 import com.undefined.stellar.Stellar
 import com.undefined.stellar.argument.AbstractStellarArgument
 import com.undefined.stellar.argument.LiteralArgument
-import com.undefined.stellar.command.AbstractStellarCommand
+import com.undefined.stellar.AbstractStellarCommand
 import com.undefined.stellar.exception.DuplicateArgumentNameException
 import org.bukkit.command.CommandSender
 import java.lang.IllegalStateException
@@ -25,7 +25,7 @@ object MojangAdapter {
                 Pair(argument.name) { context.getArgument(argument.name, Any::class.java) }
             } as CommandNode
 
-        return CommandContext(parsedArguments, NMSManager.nms.getBukkitSender(context), input)
+        return CommandContext(parsedArguments, NMSManager.nms.getBukkitSender(context.source), input)
     }
 
 }

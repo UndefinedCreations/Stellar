@@ -4,11 +4,9 @@ import com.mojang.brigadier.builder.ArgumentBuilder
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.builder.RequiredArgumentBuilder
 import com.mojang.brigadier.context.StringRange
-import com.mojang.brigadier.suggestion.Suggestion as BrigadierSuggestion
 import com.mojang.brigadier.suggestion.Suggestions
 import com.undefined.stellar.argument.AbstractStellarArgument
 import com.undefined.stellar.argument.LiteralArgument
-import com.undefined.stellar.command.AbstractStellarCommand
 import com.undefined.stellar.data.argument.ArgumentHelper
 import com.undefined.stellar.data.argument.MojangAdapter
 import com.undefined.stellar.data.suggestion.Suggestion
@@ -17,6 +15,7 @@ import com.undefined.stellar.v1_21_4.NMS1_21_4
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
 import java.util.concurrent.CompletableFuture
+import com.mojang.brigadier.suggestion.Suggestion as BrigadierSuggestion
 
 object NMSManager {
 
@@ -38,6 +37,7 @@ object NMSManager {
     }
 
     private fun getLiteralArgumentBuilder(command: AbstractStellarCommand<*>, plugin: JavaPlugin, name: String = command.name): LiteralArgumentBuilder<Any> {
+        command.nms = nms
         val builder: LiteralArgumentBuilder<Any> = LiteralArgumentBuilder.literal(name)
         handleArguments(command, builder, plugin)
         handleCommandFunctions(command, builder, plugin)
@@ -45,6 +45,7 @@ object NMSManager {
     }
 
     private fun getRequiredArgumentBuilder(argument: AbstractStellarArgument<*, *>, plugin: JavaPlugin): RequiredArgumentBuilder<Any, *> {
+        argument.nms = nms
         val builder: RequiredArgumentBuilder<Any, *> = RequiredArgumentBuilder.argument(argument.name, argument.argumentType ?: nms.getArgumentType(argument))
         handleArguments(argument, builder, plugin)
         handleCommandFunctions(argument, builder, plugin)
@@ -60,6 +61,7 @@ object NMSManager {
     private fun handleCommandFunctions(command: AbstractStellarCommand<*>, builder: ArgumentBuilder<Any, *>, plugin: JavaPlugin) {
         handleExecutions(command, builder, plugin)
         handleSuggestions(command, builder)
+        handleRequirements(command, builder)
     }
 
     private fun handleExecutions(command: AbstractStellarCommand<*>, builder: ArgumentBuilder<Any, *>, plugin: JavaPlugin) {
@@ -96,6 +98,13 @@ object NMSManager {
                     else BrigadierSuggestion(range, suggestion.text) { suggestion.tooltip }
                 })
             }
+        }
+    }
+
+    private fun handleRequirements(command: AbstractStellarCommand<*>, builder: ArgumentBuilder<Any, *>) {
+        builder.requires { source ->
+            val sender = nms.getBukkitSender(source)
+            command.requirements.all { it(sender) }
         }
     }
 
