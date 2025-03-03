@@ -104,7 +104,6 @@ object NMS1_21_4 : NMS {
         // Player
         is GameModeArgument -> BrigadierGameModeArgument.gameMode()
         is GameProfileArgument -> BrigadierGameProfileArgument.gameProfile()
-
         else -> throw UnsupportedArgumentException(argument)
     }
 
@@ -141,7 +140,7 @@ object NMS1_21_4 : NMS {
             is TimeArgument -> IntegerArgumentType.getInteger(context, argument.name)
 
             // Misc
-            is NamespacedKeyArgument -> NamespacedKey(ResourceLocationArgument.getId(context, argument.name).namespace, ResourceLocationArgument.getId(context, argument.name).path)
+            is NamespacedKeyArgument -> ResourceLocationArgument.getId(context, argument.name).let { NamespacedKey(it.namespace, it.path) }
             is UUIDArgument -> UuidArgument.getUuid(context, argument.name)
 
             // Player

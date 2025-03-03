@@ -6,6 +6,7 @@ import com.mojang.brigadier.builder.RequiredArgumentBuilder
 import com.mojang.brigadier.context.StringRange
 import com.mojang.brigadier.suggestion.Suggestions
 import com.undefined.stellar.argument.LiteralArgument
+import com.undefined.stellar.argument.list.ListArgument
 import com.undefined.stellar.data.argument.ArgumentHelper
 import com.undefined.stellar.data.argument.MojangAdapter
 import com.undefined.stellar.data.help.StellarCommandHelpTopic
@@ -54,7 +55,7 @@ object NMSManager {
 
     private fun getRequiredArgumentBuilder(argument: AbstractStellarArgument<*, *>, plugin: JavaPlugin): RequiredArgumentBuilder<Any, *> {
         argument.nms = nms
-        val builder: RequiredArgumentBuilder<Any, *> = RequiredArgumentBuilder.argument(argument.name, argument.argumentType ?: nms.getArgumentType(argument))
+        val builder: RequiredArgumentBuilder<Any, *> = RequiredArgumentBuilder.argument(argument.name, argument.argumentType ?: nms.getArgumentType(if (argument is ListArgument<*, *>) argument.base else argument))
         handleArguments(argument, builder, plugin)
         handleCommandFunctions(argument, builder, plugin)
         return builder
