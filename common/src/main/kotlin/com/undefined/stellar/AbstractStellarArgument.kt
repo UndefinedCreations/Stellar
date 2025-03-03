@@ -1,7 +1,6 @@
-package com.undefined.stellar.argument
+package com.undefined.stellar
 
 import com.mojang.brigadier.arguments.ArgumentType
-import com.undefined.stellar.AbstractStellarCommand
 import com.undefined.stellar.data.argument.CommandContext
 import com.undefined.stellar.data.execution.StellarExecution
 import com.undefined.stellar.data.suggestion.StellarSuggestion

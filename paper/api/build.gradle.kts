@@ -12,5 +12,5 @@ dependencies {
     compileOnly(libs.brigadier)
     api(project(":common"))
     api(project(":common_api"))
-    implementation(project(":paper:v1_21_4"))
+    implementation(project(":paper:v1_21_4", "reobf"))
 }

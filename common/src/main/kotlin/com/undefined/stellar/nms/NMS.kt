@@ -1,14 +1,16 @@
-package com.undefined.stellar
+package com.undefined.stellar.nms
 
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.arguments.ArgumentType
-import com.undefined.stellar.argument.AbstractStellarArgument
+import com.mojang.brigadier.context.CommandContext
+import com.undefined.stellar.AbstractStellarArgument
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
 interface NMS {
     fun getCommandDispatcher(): CommandDispatcher<Any>
     fun getArgumentType(argument: AbstractStellarArgument<*, *>): ArgumentType<*>
+    fun parseArgument(ctx: CommandContext<Any>, argument: AbstractStellarArgument<*, *>): Any?
     fun getBukkitSender(source: Any): CommandSender
     fun hasPermission(player: Player, level: Int): Boolean
     fun getCommandSourceStack(sender: CommandSender): Any

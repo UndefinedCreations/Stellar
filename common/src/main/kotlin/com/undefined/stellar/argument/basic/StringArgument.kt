@@ -1,7 +1,7 @@
 package com.undefined.stellar.argument.basic
 
 import com.mojang.brigadier.arguments.StringArgumentType
-import com.undefined.stellar.argument.AbstractStellarArgument
+import com.undefined.stellar.AbstractStellarArgument
 
 class StringArgument(name: String, type: StringType = StringType.WORD) : AbstractStellarArgument<StringArgument, String>(name, type.argumentType)
 

@@ -3,7 +3,7 @@ package com.undefined.stellar.data.argument
 import com.mojang.brigadier.context.CommandContext as BrigadierCommandContext
 import com.undefined.stellar.NMSManager
 import com.undefined.stellar.Stellar
-import com.undefined.stellar.argument.AbstractStellarArgument
+import com.undefined.stellar.AbstractStellarArgument
 import com.undefined.stellar.argument.LiteralArgument
 import com.undefined.stellar.AbstractStellarCommand
 import com.undefined.stellar.exception.DuplicateArgumentNameException
@@ -22,7 +22,7 @@ object MojangAdapter {
 
         val parsedArguments: CommandNode =
             arguments.associate<AbstractStellarArgument<*, *>, String, (CommandContext<CommandSender>) -> Any?> { argument ->
-                Pair(argument.name) { context.getArgument(argument.name, Any::class.java) }
+                Pair(argument.name) { NMSManager.nms.parseArgument(context, argument) ?: context.getArgument(argument.name, Any::class.java) }
             } as CommandNode
 
         return CommandContext(parsedArguments, NMSManager.nms.getBukkitSender(context.source), input)
