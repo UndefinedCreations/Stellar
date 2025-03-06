@@ -6,6 +6,6 @@ brigadier = "1.3.10"
 
 [libraries]
 spigot = { module = "org.spigotmc:spigot-api", version.ref = "spigot" }
-papermc = { module = "org.spigotmc:spigot-api", version.ref = "papermc" }
+papermc = { module = "io.papermc.paper:paper-api", version.ref = "papermc" }
 authlib = { module = "com.mojang:authlib", version.ref = "authlib" }
 brigadier = { module = "com.mojang:brigadier", version.ref = "brigadier" }

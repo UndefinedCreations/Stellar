@@ -7,7 +7,7 @@ paperweight.reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArt
 
 dependencies {
     paperweight.paperDevBundle("1.21.4-R0.1-SNAPSHOT")
-    compileOnly(project(":common"))
+    compileOnly(project(":paper:lib"))
 }
 
 tasks {

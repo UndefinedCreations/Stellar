@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-    compileOnly(libs.spigot)
+    compileOnly(libs.papermc)
     compileOnly(libs.brigadier)
-    compileOnly(libs.authlib)
+    api(project(":common"))
 }

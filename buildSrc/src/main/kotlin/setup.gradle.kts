@@ -11,6 +11,15 @@ version = "0.1.0"
 repositories {
     mavenCentral()
     mavenLocal()
+    maven("https://repo.papermc.io/repository/maven-public/")
+    maven {
+        name = "minecraft-repo"
+        url = uri("https://libraries.minecraft.net/")
+    }
+    maven {
+        name = "spigot-repo"
+        url = uri("https://hub.spigotmc.org/nexus/content/repositories/snapshots")
+    }
 }
 
 dependencies {
