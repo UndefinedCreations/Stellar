@@ -20,6 +20,9 @@ import com.undefined.stellar.argument.misc.UUIDArgument
 import com.undefined.stellar.argument.player.GameModeArgument
 import com.undefined.stellar.argument.player.GameProfileArgument
 import com.undefined.stellar.argument.scoreboard.*
+import com.undefined.stellar.argument.structure.LootTableArgument
+import com.undefined.stellar.argument.structure.MirrorArgument
+import com.undefined.stellar.argument.structure.StructureRotationArgument
 import com.undefined.stellar.data.argument.EntityAnchor
 import com.undefined.stellar.data.argument.Operation
 import com.undefined.stellar.data.exception.UnsupportedArgumentException
@@ -50,6 +53,8 @@ import net.minecraft.world.phys.Vec3
 import org.bukkit.Bukkit
 import org.bukkit.Keyed
 import org.bukkit.block.Block
+import org.bukkit.block.structure.Mirror
+import org.bukkit.block.structure.StructureRotation
 import org.bukkit.command.CommandSender
 import org.bukkit.craftbukkit.block.data.CraftBlockData
 import org.bukkit.craftbukkit.entity.CraftPlayer
@@ -72,6 +77,7 @@ import net.minecraft.commands.arguments.ObjectiveArgument as BrigadierObjectiveA
 import net.minecraft.commands.arguments.ObjectiveCriteriaArgument as BrigadierObjectiveCriteriaArgument
 import net.minecraft.commands.arguments.TeamArgument as BrigadierTeamArgument
 import net.minecraft.commands.arguments.ScoreHolderArgument as BrigadierScoreHolderArgument
+import net.minecraft.commands.arguments.ResourceOrIdArgument.LootTableArgument as BrigadierLootTableArgument
 
 @Suppress("UNCHECKED_CAST")
 object NMS1_21_4 : NMS {
@@ -135,6 +141,11 @@ object NMS1_21_4 : NMS {
             ScoreHolderType.MULTIPLE -> BrigadierScoreHolderArgument.scoreHolders()
         }
         is TeamArgument -> BrigadierTeamArgument.team()
+
+        // Structure
+        is LootTableArgument -> BrigadierLootTableArgument.lootTable(COMMAND_BUILD_CONTEXT)
+        is MirrorArgument -> TemplateMirrorArgument.templateMirror()
+        is StructureRotationArgument -> TemplateRotationArgument.templateRotation()
         else -> throw UnsupportedArgumentException(argument)
     }
 
@@ -184,6 +195,11 @@ object NMS1_21_4 : NMS {
                 ScoreHolderType.MULTIPLE -> BrigadierScoreHolderArgument.getNames(context, argument.name).map { it.scoreboardName }
             }
             is TeamArgument -> Bukkit.getScoreboardManager().mainScoreboard.getTeam(BrigadierTeamArgument.getTeam(context, argument.name).name)
+
+            // Structure
+            is LootTableArgument -> BrigadierLootTableArgument.getLootTable(context, argument.name).value().craftLootTable
+            is MirrorArgument -> Mirror.valueOf(TemplateMirrorArgument.getMirror(context, argument.name).name)
+            is StructureRotationArgument -> StructureRotation.valueOf(TemplateRotationArgument.getRotation(context, argument.name).name)
             else -> null
         }
     }
