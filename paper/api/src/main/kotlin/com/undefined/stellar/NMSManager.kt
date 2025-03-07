@@ -16,6 +16,8 @@ import com.undefined.stellar.listener.StellarListener
 import com.undefined.stellar.nms.NMS
 import com.undefined.stellar.v1_21_4.NMS1_21_4
 import org.bukkit.Bukkit
+import org.bukkit.command.Command
+import org.bukkit.command.CommandMap
 import org.bukkit.plugin.java.JavaPlugin
 import java.util.concurrent.CompletableFuture
 import com.mojang.brigadier.suggestion.Suggestion as BrigadierSuggestion
@@ -28,6 +30,13 @@ object NMSManager {
     private val versions: Map<String, NMS> = mapOf(
         "1.21.4" to NMS1_21_4
     )
+
+    fun unregister(name: String, plugin: JavaPlugin) {
+        val map = plugin.server.pluginManager.javaClass.getDeclaredField("commandMap").apply { isAccessible = true }[this] as CommandMap
+        val knownCommands: HashMap<String, Command> = map.knownCommands as HashMap<String, Command>
+        for ((key, value) in knownCommands) if (key == name) value.unregister(map)
+        knownCommands.remove(name)
+    }
 
     fun register(command: StellarCommand, plugin: JavaPlugin) {
         if (!StellarListener.hasBeenInitialized) Bukkit.getPluginManager().registerEvents(StellarListener, plugin).also { StellarListener.hasBeenInitialized = true }

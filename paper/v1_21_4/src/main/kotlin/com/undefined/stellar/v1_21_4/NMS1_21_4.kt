@@ -251,10 +251,7 @@ object NMS1_21_4 : NMS {
                 LocationType.PRECISE_LOCATION_3D -> vec3ToLocation(Vec3Argument.getVec3(context, argument.name), context.source.level.world)
                 LocationType.PRECISE_LOCATION_2D -> vec2ToLocation(Vec2Argument.getVec2(context, argument.name), context.source.level.world)
             }
-            is ParticleArgument -> {
-                val options = BrigadierParticleArgument.getParticle(context, argument.name)
-                getParticleData(context, CraftParticle.minecraftToBukkit(options.type), options)
-            }
+            is ParticleArgument -> BrigadierParticleArgument.getParticle(context, argument.name).also { getParticleData(context, CraftParticle.minecraftToBukkit(it.type), it) }
             else -> null
         }
     }
