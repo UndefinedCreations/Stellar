@@ -19,6 +19,7 @@ import com.undefined.stellar.argument.misc.RegistryArgument
 import com.undefined.stellar.argument.misc.UUIDArgument
 import com.undefined.stellar.argument.player.GameModeArgument
 import com.undefined.stellar.argument.player.GameProfileArgument
+import com.undefined.stellar.argument.scoreboard.*
 import com.undefined.stellar.data.argument.EntityAnchor
 import com.undefined.stellar.data.argument.Operation
 import com.undefined.stellar.data.exception.UnsupportedArgumentException
@@ -40,25 +41,23 @@ import net.minecraft.commands.arguments.item.ItemArgument
 import net.minecraft.commands.arguments.item.ItemPredicateArgument
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Registry
-import net.minecraft.core.registries.Registries
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceKey
-import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.MinecraftServer
-import net.minecraft.world.entity.animal.CatVariant
 import net.minecraft.world.level.block.state.pattern.BlockInWorld
 import net.minecraft.world.phys.Vec2
 import net.minecraft.world.phys.Vec3
+import org.bukkit.Bukkit
 import org.bukkit.Keyed
 import org.bukkit.block.Block
 import org.bukkit.command.CommandSender
 import org.bukkit.craftbukkit.block.data.CraftBlockData
 import org.bukkit.craftbukkit.entity.CraftPlayer
 import org.bukkit.craftbukkit.inventory.CraftItemStack
+import org.bukkit.craftbukkit.scoreboard.CraftScoreboardTranslations
 import org.bukkit.craftbukkit.util.CraftNamespacedKey
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import java.util.*
 import java.util.function.Predicate
 import net.minecraft.commands.arguments.AngleArgument as BrigadierAngleArgument
 import net.minecraft.commands.arguments.EntityAnchorArgument as BrigadierEntityAnchorArgument
@@ -69,6 +68,10 @@ import net.minecraft.commands.arguments.OperationArgument as BrigadierOperationA
 import net.minecraft.commands.arguments.TimeArgument as BrigadierTimeArgument
 import net.minecraft.commands.arguments.blocks.BlockPredicateArgument as BrigadierBlockPredicateArgument
 import net.minecraft.commands.arguments.coordinates.RotationArgument as BrigadierRotationArgument
+import net.minecraft.commands.arguments.ObjectiveArgument as BrigadierObjectiveArgument
+import net.minecraft.commands.arguments.ObjectiveCriteriaArgument as BrigadierObjectiveCriteriaArgument
+import net.minecraft.commands.arguments.TeamArgument as BrigadierTeamArgument
+import net.minecraft.commands.arguments.ScoreHolderArgument as BrigadierScoreHolderArgument
 
 @Suppress("UNCHECKED_CAST")
 object NMS1_21_4 : NMS {
@@ -113,14 +116,8 @@ object NMS1_21_4 : NMS {
         // Misc
         is NamespacedKeyArgument -> ResourceLocationArgument.id()
         is RegistryArgument -> {
-//            val registry = ResourceKey::class.java.getDeclaredConstructor(ResourceLocation::class.java, ResourceLocation::class.java)
-//                .apply { isAccessible = true }
-//                .newInstance(Registries.ROOT_REGISTRY_NAME, ResourceLocation.withDefaultNamespace(RegistryArgument.registryNames[argument.registry]!!)) as ResourceKey<Registry<CatVariant>>
-//            println(registry.toString())
             val byRegistryKey = PaperRegistries::class.java.getDeclaredField("BY_REGISTRY_KEY").apply { isAccessible = true }[null] as Map<RegistryKey<*>, RegistryEntry<*, *>>
             val registry = (byRegistryKey[argument.registry] ?: throw IllegalArgumentException("${argument.registry} doesn't have an mc registry ResourceKey")).mcKey() as ResourceKey<out Registry<Any>>
-            println(registry.toString())
-
             ResourceArgument.resource(COMMAND_BUILD_CONTEXT, registry)
         }
         is UUIDArgument -> UuidArgument.uuid()
@@ -128,6 +125,16 @@ object NMS1_21_4 : NMS {
         // Player
         is GameModeArgument -> BrigadierGameModeArgument.gameMode()
         is GameProfileArgument -> BrigadierGameProfileArgument.gameProfile()
+
+        // Scoreboard
+        is DisplaySlotArgument -> ScoreboardSlotArgument.displaySlot()
+        is ObjectiveArgument -> BrigadierObjectiveArgument.objective()
+        is ObjectiveCriteriaArgument -> BrigadierObjectiveCriteriaArgument.criteria()
+        is ScoreHolderArgument -> when (argument.type) {
+            ScoreHolderType.SINGLE -> BrigadierScoreHolderArgument.scoreHolder()
+            ScoreHolderType.MULTIPLE -> BrigadierScoreHolderArgument.scoreHolders()
+        }
+        is TeamArgument -> BrigadierTeamArgument.team()
         else -> throw UnsupportedArgumentException(argument)
     }
 
@@ -137,9 +144,7 @@ object NMS1_21_4 : NMS {
             // Block
             is BlockDataArgument -> CraftBlockData.fromData(BlockStateArgument.getBlock(context, argument.name).state)
             is BlockPredicateArgument -> { block: Block ->
-                BrigadierBlockPredicateArgument.getBlockPredicate(context, argument.name).test(
-                    BlockInWorld(context.source.level, BlockPos(block.x, block.y, block.z), true)
-                )
+                BrigadierBlockPredicateArgument.getBlockPredicate(context, argument.name).test(BlockInWorld(context.source.level, BlockPos(block.x, block.y, block.z), true))
             }
 
             // Entity
@@ -164,12 +169,21 @@ object NMS1_21_4 : NMS {
             // Misc
             is NamespacedKeyArgument -> CraftNamespacedKey.fromMinecraft(ResourceLocationArgument.getId(context, argument.name))
             is RegistryArgument -> RegistryAccess.registryAccess().getRegistry(argument.registry as RegistryKey<Keyed>).getOrThrow(Key.key(NMSHelper.getArgumentInput(context, argument.name)!!))
-
             is UUIDArgument -> UuidArgument.getUuid(context, argument.name)
 
             // Player
             is GameModeArgument -> BrigadierGameModeArgument.getGameMode(context, argument.name)
             is GameProfileArgument -> BrigadierGameProfileArgument.getGameProfiles(context, argument.name)
+
+            // Scoreboard
+            is DisplaySlotArgument -> CraftScoreboardTranslations.toBukkitSlot(ScoreboardSlotArgument.getDisplaySlot(context, argument.name))
+            is ObjectiveArgument -> Bukkit.getScoreboardManager().mainScoreboard.getObjective(BrigadierObjectiveArgument.getObjective(context, argument.name).name)
+            is ObjectiveCriteriaArgument -> BrigadierObjectiveCriteriaArgument.getCriteria(context, argument.name).name
+            is ScoreHolderArgument -> when (argument.type) {
+                ScoreHolderType.SINGLE -> BrigadierScoreHolderArgument.getName(context, argument.name).scoreboardName
+                ScoreHolderType.MULTIPLE -> BrigadierScoreHolderArgument.getNames(context, argument.name).map { it.scoreboardName }
+            }
+            is TeamArgument -> Bukkit.getScoreboardManager().mainScoreboard.getTeam(BrigadierTeamArgument.getTeam(context, argument.name).name)
             else -> null
         }
     }
@@ -179,7 +193,6 @@ object NMS1_21_4 : NMS {
     override fun hasPermission(player: Player, level: Int): Boolean = (player as CraftPlayer).handle.hasPermissions(level)
 
     override fun getCommandSourceStack(sender: CommandSender): Any {
-        val a: ClosedFloatingPointRange<Double> = 0.1..1.0
         val overworld = MinecraftServer.getServer().overworld()
         return CommandSourceStack(
             Source(sender),
