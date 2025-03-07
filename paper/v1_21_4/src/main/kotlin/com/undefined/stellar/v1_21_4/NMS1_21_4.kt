@@ -23,6 +23,10 @@ import com.undefined.stellar.argument.scoreboard.*
 import com.undefined.stellar.argument.structure.LootTableArgument
 import com.undefined.stellar.argument.structure.MirrorArgument
 import com.undefined.stellar.argument.structure.StructureRotationArgument
+import com.undefined.stellar.argument.text.ColorArgument
+import com.undefined.stellar.argument.text.ComponentArgument
+import com.undefined.stellar.argument.text.MessageArgument
+import com.undefined.stellar.argument.text.StyleArgument
 import com.undefined.stellar.data.argument.EntityAnchor
 import com.undefined.stellar.data.argument.Operation
 import com.undefined.stellar.data.exception.UnsupportedArgumentException
@@ -34,6 +38,8 @@ import io.papermc.paper.registry.RegistryAccess
 import io.papermc.paper.registry.RegistryKey
 import io.papermc.paper.registry.entry.RegistryEntry
 import net.kyori.adventure.key.Key
+import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import net.minecraft.commands.CommandBuildContext
 import net.minecraft.commands.CommandSource
 import net.minecraft.commands.CommandSourceStack
@@ -51,6 +57,7 @@ import net.minecraft.world.level.block.state.pattern.BlockInWorld
 import net.minecraft.world.phys.Vec2
 import net.minecraft.world.phys.Vec3
 import org.bukkit.Bukkit
+import org.bukkit.ChatColor
 import org.bukkit.Keyed
 import org.bukkit.block.Block
 import org.bukkit.block.structure.Mirror
@@ -78,6 +85,10 @@ import net.minecraft.commands.arguments.ObjectiveCriteriaArgument as BrigadierOb
 import net.minecraft.commands.arguments.TeamArgument as BrigadierTeamArgument
 import net.minecraft.commands.arguments.ScoreHolderArgument as BrigadierScoreHolderArgument
 import net.minecraft.commands.arguments.ResourceOrIdArgument.LootTableArgument as BrigadierLootTableArgument
+import net.minecraft.commands.arguments.ColorArgument as BrigadierColorArgument
+import net.minecraft.commands.arguments.ComponentArgument as BrigadierComponentArgument
+import net.minecraft.commands.arguments.StyleArgument as BrigadierStyleArgument
+import net.minecraft.commands.arguments.MessageArgument as BrigadierMessageArgument
 
 @Suppress("UNCHECKED_CAST")
 object NMS1_21_4 : NMS {
@@ -146,6 +157,12 @@ object NMS1_21_4 : NMS {
         is LootTableArgument -> BrigadierLootTableArgument.lootTable(COMMAND_BUILD_CONTEXT)
         is MirrorArgument -> TemplateMirrorArgument.templateMirror()
         is StructureRotationArgument -> TemplateRotationArgument.templateRotation()
+
+        // Text
+        is ColorArgument -> BrigadierColorArgument.color()
+        is ComponentArgument -> BrigadierComponentArgument.textComponent(COMMAND_BUILD_CONTEXT)
+        is MessageArgument -> BrigadierMessageArgument.message()
+        is StyleArgument -> BrigadierStyleArgument.style(COMMAND_BUILD_CONTEXT)
         else -> throw UnsupportedArgumentException(argument)
     }
 
@@ -200,6 +217,12 @@ object NMS1_21_4 : NMS {
             is LootTableArgument -> BrigadierLootTableArgument.getLootTable(context, argument.name).value().craftLootTable
             is MirrorArgument -> Mirror.valueOf(TemplateMirrorArgument.getMirror(context, argument.name).name)
             is StructureRotationArgument -> StructureRotation.valueOf(TemplateRotationArgument.getRotation(context, argument.name).name)
+
+            // Text
+            is ColorArgument -> ChatColor.getByChar(BrigadierColorArgument.getColor(context, argument.name).char)
+            is ComponentArgument -> GsonComponentSerializer.gson().deserialize(Component.Serializer.toJson(BrigadierComponentArgument.getComponent(context, argument.name), COMMAND_BUILD_CONTEXT))
+            is MessageArgument -> GsonComponentSerializer.gson().deserialize(Component.Serializer.toJson(BrigadierMessageArgument.getMessage(context, argument.name), COMMAND_BUILD_CONTEXT))
+            is StyleArgument -> GsonComponentSerializer.gson().deserialize(NMSHelper.getArgumentInput(context, argument.name) ?: return null).style()
             else -> null
         }
     }
