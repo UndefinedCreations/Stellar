@@ -27,8 +27,10 @@ import com.undefined.stellar.argument.text.ColorArgument
 import com.undefined.stellar.argument.text.ComponentArgument
 import com.undefined.stellar.argument.text.MessageArgument
 import com.undefined.stellar.argument.text.StyleArgument
+import com.undefined.stellar.argument.world.*
 import com.undefined.stellar.data.argument.EntityAnchor
 import com.undefined.stellar.data.argument.Operation
+import com.undefined.stellar.data.argument.ParticleData
 import com.undefined.stellar.data.exception.UnsupportedArgumentException
 import com.undefined.stellar.nms.NMS
 import com.undefined.stellar.nms.NMSHelper
@@ -45,24 +47,28 @@ import net.minecraft.commands.CommandSource
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.arguments.*
 import net.minecraft.commands.arguments.blocks.BlockStateArgument
-import net.minecraft.commands.arguments.coordinates.SwizzleArgument
+import net.minecraft.commands.arguments.coordinates.*
 import net.minecraft.commands.arguments.item.ItemArgument
 import net.minecraft.commands.arguments.item.ItemPredicateArgument
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Registry
+import net.minecraft.core.particles.*
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceKey
 import net.minecraft.server.MinecraftServer
+import net.minecraft.server.level.ColumnPos
+import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.pattern.BlockInWorld
+import net.minecraft.world.level.gameevent.BlockPositionSource
 import net.minecraft.world.phys.Vec2
 import net.minecraft.world.phys.Vec3
-import org.bukkit.Bukkit
-import org.bukkit.ChatColor
-import org.bukkit.Keyed
+import org.bukkit.*
 import org.bukkit.block.Block
+import org.bukkit.block.data.BlockData
 import org.bukkit.block.structure.Mirror
 import org.bukkit.block.structure.StructureRotation
 import org.bukkit.command.CommandSender
+import org.bukkit.craftbukkit.CraftParticle
 import org.bukkit.craftbukkit.block.data.CraftBlockData
 import org.bukkit.craftbukkit.entity.CraftPlayer
 import org.bukkit.craftbukkit.inventory.CraftItemStack
@@ -89,6 +95,7 @@ import net.minecraft.commands.arguments.ColorArgument as BrigadierColorArgument
 import net.minecraft.commands.arguments.ComponentArgument as BrigadierComponentArgument
 import net.minecraft.commands.arguments.StyleArgument as BrigadierStyleArgument
 import net.minecraft.commands.arguments.MessageArgument as BrigadierMessageArgument
+import net.minecraft.commands.arguments.ParticleArgument as BrigadierParticleArgument
 
 @Suppress("UNCHECKED_CAST")
 object NMS1_21_4 : NMS {
@@ -163,6 +170,17 @@ object NMS1_21_4 : NMS {
         is ComponentArgument -> BrigadierComponentArgument.textComponent(COMMAND_BUILD_CONTEXT)
         is MessageArgument -> BrigadierMessageArgument.message()
         is StyleArgument -> BrigadierStyleArgument.style(COMMAND_BUILD_CONTEXT)
+
+        // World
+        is EnvironmentArgument -> DimensionArgument.dimension()
+        is HeightMapArgument -> HeightmapTypeArgument.heightmap()
+        is LocationArgument -> when (argument.type) {
+            LocationType.LOCATION_3D -> BlockPosArgument.blockPos()
+            LocationType.LOCATION_2D -> ColumnPosArgument.columnPos()
+            LocationType.PRECISE_LOCATION_3D -> Vec3Argument.vec3()
+            LocationType.PRECISE_LOCATION_2D -> Vec2Argument.vec2()
+        }
+        is ParticleArgument -> BrigadierParticleArgument.particle(COMMAND_BUILD_CONTEXT)
         else -> throw UnsupportedArgumentException(argument)
     }
 
@@ -223,6 +241,20 @@ object NMS1_21_4 : NMS {
             is ComponentArgument -> GsonComponentSerializer.gson().deserialize(Component.Serializer.toJson(BrigadierComponentArgument.getComponent(context, argument.name), COMMAND_BUILD_CONTEXT))
             is MessageArgument -> GsonComponentSerializer.gson().deserialize(Component.Serializer.toJson(BrigadierMessageArgument.getMessage(context, argument.name), COMMAND_BUILD_CONTEXT))
             is StyleArgument -> GsonComponentSerializer.gson().deserialize(NMSHelper.getArgumentInput(context, argument.name) ?: return null).style()
+
+            // World
+            is EnvironmentArgument -> DimensionArgument.getDimension(context, argument.name).world.environment
+            is HeightMapArgument -> HeightMap.valueOf(HeightmapTypeArgument.getHeightmap(context, argument.name).name)
+            is LocationArgument -> when (argument.type) {
+                LocationType.LOCATION_3D -> blockPosToLocation(BlockPosArgument.getBlockPos(context, argument.name), context.source.level.world)
+                LocationType.LOCATION_2D -> columnPosToLocation(ColumnPosArgument.getColumnPos(context, argument.name), context.source.level.world)
+                LocationType.PRECISE_LOCATION_3D -> vec3ToLocation(Vec3Argument.getVec3(context, argument.name), context.source.level.world)
+                LocationType.PRECISE_LOCATION_2D -> vec2ToLocation(Vec2Argument.getVec2(context, argument.name), context.source.level.world)
+            }
+            is ParticleArgument -> {
+                val options = BrigadierParticleArgument.getParticle(context, argument.name)
+                getParticleData(context, CraftParticle.minecraftToBukkit(options.type), options)
+            }
             else -> null
         }
     }
@@ -252,6 +284,64 @@ object NMS1_21_4 : NMS {
         override fun acceptsFailure(): Boolean = true
         override fun shouldInformAdmins(): Boolean = false
         override fun getBukkitSender(stack: CommandSourceStack): CommandSender = this.sender
+    }
+
+    private fun blockPosToLocation(block: BlockPos, world: World) = Location(world, block.x.toDouble(), block.y.toDouble(), block.z.toDouble())
+    private fun columnPosToLocation(column: ColumnPos, world: World) = Location(world, column.x.toDouble(), 0.0, column.z.toDouble())
+    private fun vec3ToLocation(vec: Vec3, world: World) = Location(world, vec.x, vec.y, vec.z)
+    private fun vec2ToLocation(vec: Vec2, world: World) = Location(world, vec.x.toDouble(), 0.0, vec.y.toDouble())
+
+    private fun getParticleData(context: CommandContext<CommandSourceStack>, particle: Particle, options: ParticleOptions): ParticleData<*> = when (options) {
+        is SimpleParticleType -> ParticleData(particle, null)
+        is BlockParticleOption -> ParticleData<BlockData>(particle, CraftBlockData.fromData(options.state))
+        is DustColorTransitionOptions -> {
+            val fromColor = Color.fromRGB(
+                (options.fromColor.x() * 255.0f).toInt(),
+                (options.fromColor.y() * 255.0f).toInt(),
+                (options.fromColor.z() * 255.0f).toInt()
+            )
+            val toColor = Color.fromRGB(
+                (options.toColor.x() * 255.0f).toInt(),
+                (options.toColor.y() * 255.0f).toInt(),
+                (options.toColor.z() * 255.0f).toInt()
+            )
+            ParticleData(particle, Particle.DustTransition(fromColor, toColor, options.scale))
+        }
+        is DustParticleOptions -> ParticleData(
+            particle,
+            Particle.DustOptions(
+                Color.fromRGB(
+                    (options.color.x() * 255.0f).toInt(),
+                    (options.color.y() * 255.0f).toInt(), (options.color.z() * 255.0f).toInt()
+                ), options.scale)
+        )
+        is ItemParticleOption -> ParticleData<ItemStack>(
+            particle,
+            CraftItemStack.asBukkitCopy(options.item)
+        )
+        is VibrationParticleOption -> {
+            val level: Level = context.source.level
+            val destination: Vibration.Destination
+
+            if (options.destination is BlockPositionSource) {
+                val to: Vec3 = options.destination.getPosition(level).get()
+                destination = Vibration.Destination.BlockDestination(Location(level.world, to.x(), to.y(), to.z()))
+                ParticleData(particle, Vibration(destination, options.arrivalInTicks))
+            } else {
+                ParticleData(particle, null)
+            }
+        }
+        is ShriekParticleOption -> ParticleData(particle, options.delay)
+        is SculkChargeParticleOptions -> ParticleData(particle, options.roll())
+        is ColorParticleOption -> {
+            val color = Color.fromARGB(
+                (options.alpha * 255.0f).toInt(),
+                (options.red * 255.0f).toInt(),
+                (options.green * 255.0f).toInt(),
+                (options.blue * 255.0f).toInt())
+            ParticleData(particle, color)
+        }
+        else -> ParticleData(particle, null)
     }
 
 }
