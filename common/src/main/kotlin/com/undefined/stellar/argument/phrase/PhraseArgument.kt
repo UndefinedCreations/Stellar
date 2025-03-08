@@ -31,9 +31,6 @@ class PhraseArgument(name: String) : StringArgument(name, StringType.PHRASE) {
                 prevChar = it
                 it == ' '
             }
-            sender.sendMessage("input: ${greedyContext.phraseInput}")
-            sender.sendMessage("amount of spaces: $amountOfSpaces")
-            sender.sendMessage("offset: ${greedyContext.phraseInput.length}")
 
             setSuggestionOffset(greedyContext.phraseInput.length)
             val suggestions: MutableList<Suggestion> = mutableListOf()

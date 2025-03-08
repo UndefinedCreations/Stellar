@@ -15,7 +15,6 @@ class EnumArgument<T : Enum<T>>(
     converter: CommandSender.(Enum<T>) -> Suggestion? = { Suggestion.withText(it.name) },
     parse: CommandSender.(String) -> Enum<T>? = { input ->
         try {
-            println("parse: ${input.uppercase()}")
             valueOf(enum.java as Class<out Enum<*>>, input.uppercase()) as Enum<T>
         } catch (e: IllegalArgumentException) {
             null
