@@ -31,7 +31,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
     fun addAliases(vararg alias: String): T = apply { aliases.addAll(alias) } as T
     fun clearAliases(): T = apply { aliases.clear() } as T
 
-    fun <T : AbstractStellarArgument<T, *>> addArgument(argument: T): T = argument.apply {
+    fun <T : AbstractStellarArgument<*, *>> addArgument(argument: T): T = argument.apply {
         argument.parent = this@AbstractStellarCommand
         this@AbstractStellarCommand.arguments.add(argument)
     }

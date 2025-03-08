@@ -16,6 +16,10 @@ abstract class AbstractStellarArgument<T : AbstractStellarArgument<T, *>, R>(nam
     override val globalFailureExecutions: MutableSet<StellarExecution<*>>
         get() = parent.globalFailureExecutions
     open val suggestions: MutableSet<StellarSuggestion<*>> = mutableSetOf()
+    open var suggestionOffset: Int = 0
+
+    fun addSuggestionOffset(offset: Int): T = apply { suggestionOffset += offset } as T
+    fun setSuggestionOffset(offset: Int): T = apply { suggestionOffset = offset } as T
 
     fun addSuggestions(vararg suggestions: Suggestion): T = apply {
         this.suggestions.add(StellarSuggestion(CommandSender::class) { CompletableFuture.completedFuture(suggestions.toList()) })
