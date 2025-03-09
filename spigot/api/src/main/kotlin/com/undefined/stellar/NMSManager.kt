@@ -34,8 +34,8 @@ object NMSManager {
         "1.21.4" to NMS1_21_4
     )
 
-    fun unregister(name: String, plugin: JavaPlugin) {
-        val map = SimplePluginManager::class.java.getField("commandMap").apply { isAccessible = true }[plugin.server.pluginManager] as SimpleCommandMap
+    fun unregister(name: String) {
+        val map = Bukkit.getServer().javaClass.getDeclaredField("commandMap").apply { isAccessible = true }[Bukkit.getServer()] as SimpleCommandMap
         val knownCommands: HashMap<String, Command> = SimpleCommandMap::class.java.getDeclaredField("knownCommands").apply { isAccessible = true }[map] as HashMap<String, Command>
         for ((key, value) in knownCommands) if (key == name) value.unregister(map)
         knownCommands.remove(name)

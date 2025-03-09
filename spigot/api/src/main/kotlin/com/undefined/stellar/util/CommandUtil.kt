@@ -30,4 +30,6 @@ fun command(name: String, permissions: List<String>): StellarCommand = command(n
 fun command(name: String, permissions: List<String>, aliases: List<String>): StellarCommand = command(name, "", permissions, aliases)
 fun command(name: String): StellarCommand = command(name, "")
 
-fun unregisterCommand(name: String, plugin: JavaPlugin) = NMSManager.unregister(name, plugin)
+fun unregisterCommand(vararg names: String) {
+    for (name in names) NMSManager.unregister(name)
+}
