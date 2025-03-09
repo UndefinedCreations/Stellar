@@ -15,6 +15,7 @@ import com.undefined.stellar.argument.item.ItemStackArgument
 import com.undefined.stellar.argument.item.ItemStackPredicateArgument
 import com.undefined.stellar.argument.math.*
 import com.undefined.stellar.argument.misc.NamespacedKeyArgument
+import com.undefined.stellar.argument.misc.RegistryArgument
 import com.undefined.stellar.argument.misc.UUIDArgument
 import com.undefined.stellar.argument.player.GameModeArgument
 import com.undefined.stellar.argument.player.GameProfileArgument
@@ -46,6 +47,8 @@ import net.minecraft.commands.arguments.item.ItemPredicateArgument
 import net.minecraft.core.BlockPos
 import net.minecraft.core.particles.*
 import net.minecraft.network.chat.Component
+import net.minecraft.resources.ResourceKey
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ColumnPos
 import net.minecraft.world.level.Level
@@ -66,6 +69,7 @@ import org.bukkit.craftbukkit.v1_21_R3.inventory.CraftItemStack
 import org.bukkit.craftbukkit.v1_21_R3.util.CraftNamespacedKey
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.scoreboard.DisplaySlot
 import java.util.function.Predicate
 import net.minecraft.commands.arguments.AngleArgument as BrigadierAngleArgument
@@ -88,7 +92,7 @@ import net.minecraft.commands.arguments.TimeArgument as BrigadierTimeArgument
 import net.minecraft.commands.arguments.blocks.BlockPredicateArgument as BrigadierBlockPredicateArgument
 import net.minecraft.commands.arguments.coordinates.RotationArgument as BrigadierRotationArgument
 
-@Suppress("UNCHECKED_CAST")
+@Suppress("UNCHECKED_CAST", "DEPRECATION")
 object NMS1_21_4 : NMS {
 
     private val COMMAND_BUILD_CONTEXT: CommandBuildContext by lazy {
@@ -100,7 +104,7 @@ object NMS1_21_4 : NMS {
 
     override fun getCommandDispatcher(): CommandDispatcher<Any> = MinecraftServer.getServer().functions.dispatcher as CommandDispatcher<Any>
 
-    override fun getArgumentType(argument: AbstractStellarArgument<*, *>): ArgumentType<*> = when (argument) {
+    override fun getArgumentType(argument: AbstractStellarArgument<*, *>, plugin: JavaPlugin): ArgumentType<*> = when (argument) {
         // Block
         is BlockDataArgument -> BlockStateArgument.block(COMMAND_BUILD_CONTEXT)
         is BlockPredicateArgument -> BrigadierBlockPredicateArgument.blockPredicate(COMMAND_BUILD_CONTEXT)
@@ -130,11 +134,7 @@ object NMS1_21_4 : NMS {
 
         // Misc
         is NamespacedKeyArgument -> ResourceLocationArgument.id()
-//        is RegistryArgument -> {
-//            val byRegistryKey = PaperRegistries::class.java.getDeclaredField("BY_REGISTRY_KEY").apply { isAccessible = true }[null] as Map<RegistryKey<*>, RegistryEntry<*, *>>
-//            val registry = (byRegistryKey[argument.registry] ?: throw IllegalArgumentException("${argument.registry} doesn't have an mc registry ResourceKey")).mcKey() as ResourceKey<out Registry<Any>>
-//            ResourceArgument.resource(COMMAND_BUILD_CONTEXT, registry)
-//        }
+        is RegistryArgument -> ResourceArgument.resource(COMMAND_BUILD_CONTEXT, ResourceKey.createRegistryKey<Keyed>(ResourceLocation.withDefaultNamespace(RegistryArgument.registryNames[argument.registry] ?: throw IllegalArgumentException("Could not find registry!"))))
         is UUIDArgument -> UuidArgument.uuid()
 
         // Player
@@ -205,7 +205,9 @@ object NMS1_21_4 : NMS {
 
             // Misc
             is NamespacedKeyArgument -> CraftNamespacedKey.fromMinecraft(ResourceLocationArgument.getId(context, argument.name))
-//            is RegistryArgument -> RegistryAccess.registryAccess().getRegistry(argument.registry as RegistryKey<Keyed>).getOrThrow(Key.key(NMSHelper.getArgumentInput(context, argument.name)!!))
+            is RegistryArgument -> {
+                argument.registry.getOrThrow(NamespacedKey.fromString(NMSHelper.getArgumentInput(context, argument.name)!!)!!)
+            }
             is UUIDArgument -> UuidArgument.getUuid(context, argument.name)
 
             // Player

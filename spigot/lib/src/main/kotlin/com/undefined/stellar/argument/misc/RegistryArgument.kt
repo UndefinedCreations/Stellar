@@ -1,45 +1,44 @@
 package com.undefined.stellar.argument.misc
 
 import com.undefined.stellar.AbstractStellarArgument
-import org.bukkit.NamespacedKey
+import org.bukkit.Registry
 
-//@Suppress("UnstableApiUsage", "DEPRECATION")
-//class RegistryArgument(
-//    name: String,
-//    val registry: RegistryKey<*>,
-//) : AbstractStellarArgument<RegistryArgument, NamespacedKey>(name) {
-//    companion object {
-//        val registryNames: Map<RegistryKey<*>, String> = mapOf(
-//            RegistryKey.GAME_EVENT to "game_event",
-//            RegistryKey.STRUCTURE_TYPE to "worldgen/structure_type",
-//            RegistryKey.MOB_EFFECT to "mob_effect",
-//            RegistryKey.BLOCK to "block",
-//            RegistryKey.ITEM to "item",
-//            RegistryKey.CAT_VARIANT to "cat_variant",
-//            RegistryKey.FROG_VARIANT to "frog_variant",
-//            RegistryKey.VILLAGER_PROFESSION to "villager_profession",
-//            RegistryKey.VILLAGER_TYPE to "villager_type",
-//            RegistryKey.MAP_DECORATION_TYPE to "map_decoration_type",
-//            RegistryKey.MENU to "menu",
-//            RegistryKey.ATTRIBUTE to "attribute",
-//            RegistryKey.FLUID to "fluid",
-//            RegistryKey.SOUND_EVENT to "sound_event",
-//            RegistryKey.DATA_COMPONENT_TYPE to "data_component_type",
-//            RegistryKey.BIOME to "worldgen/biome",
-//            RegistryKey.STRUCTURE to "worldgen/structure",
-//            RegistryKey.TRIM_MATERIAL to "trim_material",
-//            RegistryKey.TRIM_PATTERN to "trim_pattern",
-//            RegistryKey.DAMAGE_TYPE to "damage_type",
-//            RegistryKey.WOLF_VARIANT to "wolf_variant",
-//            RegistryKey.ENCHANTMENT to "enchantment",
-//            RegistryKey.JUKEBOX_SONG to "jukebox_song",
-//            RegistryKey.BANNER_PATTERN to "banner_pattern",
-//            RegistryKey.PAINTING_VARIANT to "painting_variant",
-//            RegistryKey.INSTRUMENT to "instrument",
-//            RegistryKey.ENTITY_TYPE to "entity_type",
-//            RegistryKey.PARTICLE_TYPE to "particle_type",
-//            RegistryKey.POTION to "potion",
-//            RegistryKey.MEMORY_MODULE_TYPE to "memory_module_type",
-//        )
-//    }
-//}
+@Suppress("UnstableApiUsage")
+class RegistryArgument(
+    name: String,
+    val registry: Registry<*>,
+) : AbstractStellarArgument<RegistryArgument, Any>(name) {
+    companion object {
+        val registryNames: Map<Registry<*>, String> = mapOf(
+            Registry.GAME_EVENT to "game_event",
+            Registry.STRUCTURE_TYPE to "worldgen/structure_type",
+            Registry.EFFECT to "mob_effect",
+            Registry.BLOCK to "block",
+            Registry.ITEM to "item",
+            Registry.CAT_VARIANT to "cat_variant",
+            Registry.FROG_VARIANT to "frog_variant",
+            Registry.VILLAGER_PROFESSION to "villager_profession",
+            Registry.VILLAGER_TYPE to "villager_type",
+            Registry.MAP_DECORATION_TYPE to "map_decoration_type",
+            Registry.MENU to "menu",
+            Registry.ATTRIBUTE to "attribute",
+            Registry.FLUID to "fluid",
+            Registry.SOUNDS to "sound_event",
+            Registry.BIOME to "worldgen/biome",
+            Registry.STRUCTURE to "worldgen/structure",
+            Registry.TRIM_MATERIAL to "trim_material",
+            Registry.TRIM_PATTERN to "trim_pattern",
+            Registry.DAMAGE_TYPE to "damage_type",
+            Registry.WOLF_VARIANT to "wolf_variant",
+            Registry.ENCHANTMENT to "enchantment",
+            Registry.JUKEBOX_SONG to "jukebox_song",
+            Registry.BANNER_PATTERN to "banner_pattern",
+            Registry.ART to "painting_variant",
+            Registry.INSTRUMENT to "instrument",
+            Registry.ENTITY_TYPE to "entity_type",
+            Registry.PARTICLE_TYPE to "particle_type",
+            Registry.POTION to "potion",
+            Registry.MEMORY_MODULE_TYPE to "memory_module_type",
+        )
+    }
+}

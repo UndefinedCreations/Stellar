@@ -11,7 +11,10 @@ version = "0.1.0"
 repositories {
     mavenCentral()
     mavenLocal()
-    maven("https://repo.papermc.io/repository/maven-public/")
+    maven {
+        name = "paper-repo"
+        url = uri("https://repo.papermc.io/repository/maven-public/")
+    }
     maven {
         name = "minecraft-repo"
         url = uri("https://libraries.minecraft.net/")
@@ -23,10 +26,10 @@ repositories {
 }
 
 dependencies {
-    implementation("net.kyori:adventure-api:4.17.0")
-    implementation("net.kyori:adventure-text-minimessage:4.17.0")
-    implementation("net.kyori:adventure-platform-bukkit:4.3.4")
-    implementation("net.kyori:adventure-text-serializer-legacy:4.17.0")
+    compileOnly("net.kyori:adventure-api:4.17.0")
+    compileOnly("net.kyori:adventure-text-minimessage:4.17.0")
+    compileOnly("net.kyori:adventure-platform-bukkit:4.3.4")
+    compileOnly("net.kyori:adventure-text-serializer-legacy:4.17.0")
 }
 
 tasks {

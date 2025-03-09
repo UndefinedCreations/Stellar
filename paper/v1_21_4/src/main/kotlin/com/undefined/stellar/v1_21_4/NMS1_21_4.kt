@@ -76,6 +76,7 @@ import org.bukkit.craftbukkit.scoreboard.CraftScoreboardTranslations
 import org.bukkit.craftbukkit.util.CraftNamespacedKey
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import org.bukkit.plugin.java.JavaPlugin
 import java.util.function.Predicate
 import net.minecraft.commands.arguments.AngleArgument as BrigadierAngleArgument
 import net.minecraft.commands.arguments.EntityAnchorArgument as BrigadierEntityAnchorArgument
@@ -109,7 +110,7 @@ object NMS1_21_4 : NMS {
 
     override fun getCommandDispatcher(): CommandDispatcher<Any> = MinecraftServer.getServer().functions.dispatcher as CommandDispatcher<Any>
 
-    override fun getArgumentType(argument: AbstractStellarArgument<*, *>): ArgumentType<*> = when (argument) {
+    override fun getArgumentType(argument: AbstractStellarArgument<*, *>, plugin: JavaPlugin): ArgumentType<*> = when (argument) {
         // Block
         is BlockDataArgument -> BlockStateArgument.block(COMMAND_BUILD_CONTEXT)
         is BlockPredicateArgument -> BrigadierBlockPredicateArgument.blockPredicate(COMMAND_BUILD_CONTEXT)
