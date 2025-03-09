@@ -18,6 +18,8 @@ import com.undefined.stellar.v1_21_4.NMS1_21_4
 import org.bukkit.Bukkit
 import org.bukkit.command.Command
 import org.bukkit.command.CommandMap
+import org.bukkit.command.SimpleCommandMap
+import org.bukkit.plugin.PluginManager
 import org.bukkit.plugin.java.JavaPlugin
 import java.util.concurrent.CompletableFuture
 import com.mojang.brigadier.suggestion.Suggestion as BrigadierSuggestion
@@ -32,9 +34,8 @@ object NMSManager {
     )
 
     fun unregister(name: String, plugin: JavaPlugin) {
-        val map = plugin.server.pluginManager.javaClass.getDeclaredField("commandMap").apply { isAccessible = true }[this] as CommandMap
-        val knownCommands: HashMap<String, Command> = map.knownCommands as HashMap<String, Command>
-        for ((key, value) in knownCommands) if (key == name) value.unregister(map)
+        val knownCommands: HashMap<String, Command> = plugin.server.commandMap.knownCommands as HashMap<String, Command>
+        for ((key, value) in knownCommands) if (key == name) value.unregister(plugin.server.commandMap)
         knownCommands.remove(name)
     }
 
