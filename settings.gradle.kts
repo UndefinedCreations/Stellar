@@ -5,4 +5,7 @@ include(
     ":paper:lib",
     ":paper:api",
     ":paper:v1_21_4",
+    ":spigot:lib",
+    ":spigot:api",
+    ":spigot:v1_21_4",
 )
