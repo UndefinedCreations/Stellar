@@ -40,7 +40,6 @@ import io.papermc.paper.registry.RegistryAccess
 import io.papermc.paper.registry.RegistryKey
 import io.papermc.paper.registry.entry.RegistryEntry
 import net.kyori.adventure.key.Key
-import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import net.minecraft.commands.CommandBuildContext
 import net.minecraft.commands.CommandSource
@@ -98,7 +97,7 @@ import net.minecraft.commands.arguments.StyleArgument as BrigadierStyleArgument
 import net.minecraft.commands.arguments.MessageArgument as BrigadierMessageArgument
 import net.minecraft.commands.arguments.ParticleArgument as BrigadierParticleArgument
 
-@Suppress("UNCHECKED_CAST")
+@Suppress("UNCHECKED_CAST", "DEPRECATION")
 object NMS1_21_4 : NMS {
 
     private val COMMAND_BUILD_CONTEXT: CommandBuildContext by lazy {

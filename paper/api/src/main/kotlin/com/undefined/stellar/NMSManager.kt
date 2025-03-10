@@ -17,9 +17,6 @@ import com.undefined.stellar.nms.NMS
 import com.undefined.stellar.v1_21_4.NMS1_21_4
 import org.bukkit.Bukkit
 import org.bukkit.command.Command
-import org.bukkit.command.CommandMap
-import org.bukkit.command.SimpleCommandMap
-import org.bukkit.plugin.PluginManager
 import org.bukkit.plugin.java.JavaPlugin
 import java.util.concurrent.CompletableFuture
 import com.mojang.brigadier.suggestion.Suggestion as BrigadierSuggestion
@@ -33,9 +30,9 @@ object NMSManager {
         "1.21.4" to NMS1_21_4
     )
 
-    fun unregister(name: String, plugin: JavaPlugin) {
-        val knownCommands: HashMap<String, Command> = plugin.server.commandMap.knownCommands as HashMap<String, Command>
-        for ((key, value) in knownCommands) if (key == name) value.unregister(plugin.server.commandMap)
+    fun unregister(name: String) {
+        val knownCommands: HashMap<String, Command> = Bukkit.getServer().commandMap.knownCommands as HashMap<String, Command>
+        for ((key, value) in knownCommands) if (key == name) value.unregister(Bukkit.getServer().commandMap)
         knownCommands.remove(name)
     }
 
@@ -47,10 +44,10 @@ object NMSManager {
         val dispatcher = nms.getCommandDispatcher()
         val mainNode = dispatcher.register(builder)
 
-        for (name in command.aliases + "${plugin.description.name}:${command.name}")
+        for (name in command.aliases + "${plugin.pluginMeta.name}:${command.name}")
             dispatcher.register(LiteralArgumentBuilder.literal<Any>(name).redirect(mainNode))
 
-        Bukkit.getServer().helpMap.addTopic(StellarCommandHelpTopic(command.name, command.information["Description"] ?: "", command.information.reversed()) {
+        Bukkit.getServer().helpMap.addTopic(StellarCommandHelpTopic(command.name, command.information["Description"] ?: "", command.information.entries.associateBy({ it.value }) { it.key }) {
             command.requirements.all { it(this) }
         })
     }

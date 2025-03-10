@@ -1,12 +1,12 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    id("java")
+    java
     kotlin("jvm")
 }
 
-group = "com.undefined"
-version = "0.1.0"
+group = properties["group"]!!
+version = properties["version"]!!
 
 repositories {
     mavenCentral()
@@ -42,8 +42,6 @@ tasks {
 }
 
 java {
-    withSourcesJar()
-    withJavadocJar()
     disableAutoTargetJvm()
 }
 

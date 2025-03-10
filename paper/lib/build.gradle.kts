@@ -1,5 +1,7 @@
 plugins {
     id("setup")
+    `maven-publish`
+    `publishing-convention`
 }
 
 dependencies {

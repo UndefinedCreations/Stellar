@@ -7,12 +7,19 @@ plugins {
     id("com.gradleup.shadow") version "8.3.5"
 }
 
+repositories {
+    maven {
+        name = "undefined-repo"
+        url = uri("https://repo.undefinedcreations.com/releases")
+    }
+}
+
 val versionVar = version
 val groupIdVar = "com.undefined"
 
 dependencies {
-    compileOnly("org.spigotmc:spigot-api:1.21.4-R0.1-SNAPSHOT")
-    implementation(project(":spigot:api"))
+    compileOnly(libs.papermc)
+    implementation("com.undefined:stellar:0.1.26:paper")
 }
 
 tasks {
@@ -32,7 +39,7 @@ tasks {
         minecraftVersion("1.21.4")
         serverFolderName { "run" }
         acceptMojangEula()
-        serverType(ServerType.SPIGOT)
+        serverType(ServerType.PAPERMC)
     }
 }
 
