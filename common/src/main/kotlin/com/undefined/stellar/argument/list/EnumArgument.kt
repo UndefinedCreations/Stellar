@@ -13,15 +13,14 @@ class EnumArgument<T : Enum<T>>(
     name: String,
     val enum: KClass<out Enum<T>>,
     converter: CommandSender.(Enum<T>) -> Suggestion? = { Suggestion.withText(it.name) },
-    parse: CommandSender.(String) -> Enum<T>? = { input ->
-        try {
-            valueOf(enum.java as Class<out Enum<*>>, input.uppercase()) as Enum<T>
-        } catch (e: IllegalArgumentException) {
-            null
-        }
-    },
     async: Boolean = true,
-) : ListArgument<Enum<T>, String>(StringArgument(name, StringType.WORD), enum.java.enumConstants.toList(), converter, parse, async) {
+) : ListArgument<Enum<T>, String>(StringArgument(name, StringType.WORD), enum.java.enumConstants.toList(), converter, { input ->
+    try {
+        valueOf(enum.java as Class<out Enum<*>>, input.uppercase()) as Enum<T>
+    } catch (e: IllegalArgumentException) {
+        null
+    }
+}, async) {
     fun valueOf(name: String): Enum<T>? =
         try {
             valueOf(enum.java as Class<out Enum<*>>, name) as Enum<T>
