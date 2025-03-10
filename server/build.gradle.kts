@@ -19,7 +19,7 @@ val groupIdVar = "com.undefined"
 
 dependencies {
     compileOnly(libs.papermc)
-    implementation("com.undefined:stellar:0.1.26:paper")
+    implementation(project(":paper:api"))
 }
 
 tasks {
