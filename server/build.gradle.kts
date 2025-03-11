@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     id("setup")
+    `java-library`
     id("com.undefinedcreations.runServer") version "0.1.6"
     id("com.gradleup.shadow") version "8.3.5"
 }
@@ -28,6 +29,7 @@ tasks {
     }
     shadowJar {
         archiveFileName.set("Stellar-shadow.jar")
+        outputs.upToDateWhen { false }
     }
     compileKotlin {
         compilerOptions.jvmTarget = JvmTarget.JVM_21

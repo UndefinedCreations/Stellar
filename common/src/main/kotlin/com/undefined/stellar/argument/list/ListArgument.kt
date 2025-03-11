@@ -3,7 +3,7 @@ package com.undefined.stellar.argument.list
 import com.undefined.stellar.AbstractStellarArgument
 import com.undefined.stellar.data.argument.CommandContext
 import com.undefined.stellar.data.exception.UnsupportedArgumentTypeException
-import com.undefined.stellar.data.suggestion.StellarSuggestion
+import com.undefined.stellar.data.suggestion.ExecutableSuggestion
 import com.undefined.stellar.data.suggestion.Suggestion
 import org.bukkit.command.CommandSender
 import org.jetbrains.annotations.ApiStatus
@@ -32,10 +32,10 @@ open class ListArgument<T, R>(
     @Suppress("UNCHECKED_CAST")
     @ApiStatus.Internal fun parseInternal(sender: CommandSender, value: Any): T? = parse(sender, value as R)
 
-    override val suggestions: MutableSet<StellarSuggestion<*>>
-        get() = (super.suggestions + StellarSuggestion(CommandSender::class) { input ->
-            if (async) CompletableFuture.supplyAsync { getSuggestionList(this, input) }
-            else CompletableFuture.completedFuture(getSuggestionList(this, input))
+    override val suggestions: MutableSet<ExecutableSuggestion<*>>
+        get() = (super.suggestions + ExecutableSuggestion(CommandSender::class) { context, input ->
+            if (async) CompletableFuture.supplyAsync { getSuggestionList(context, input) }
+            else CompletableFuture.completedFuture(getSuggestionList(context, input))
         }).toMutableSet()
 
     open fun getSuggestionList(context: CommandContext<CommandSender>, input: String): List<Suggestion> =

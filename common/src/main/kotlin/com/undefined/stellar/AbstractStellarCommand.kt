@@ -31,8 +31,11 @@ import com.undefined.stellar.data.argument.CommandContext
 import com.undefined.stellar.data.argument.EnumFormatting
 import com.undefined.stellar.data.execution.StellarExecution
 import com.undefined.stellar.data.execution.StellarRunnable
+import com.undefined.stellar.data.execution.ExecutableExecution
+import com.undefined.stellar.data.execution.ExecutableRunnable
 import com.undefined.stellar.data.failure.HideDefaultFailureMessages
 import com.undefined.stellar.data.requirement.StellarRequirement
+import com.undefined.stellar.data.requirement.ExecutableRequirement
 import com.undefined.stellar.data.suggestion.Suggestion
 import com.undefined.stellar.nms.NMS
 import com.undefined.stellar.nms.NMSHelper
@@ -42,6 +45,7 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
+import org.jetbrains.annotations.ApiStatus
 
 /**
  * This is the base of any command, whether it's an argument or a root command.
@@ -54,12 +58,12 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
     lateinit var nms: NMS
 
     val aliases: MutableSet<String> = mutableSetOf()
-    val requirements: MutableList<StellarRequirement<*>> = mutableListOf()
+    val requirements: MutableList<ExecutableRequirement<*>> = mutableListOf()
     val arguments: MutableSet<AbstractStellarArgument<*, *>> = mutableSetOf()
-    val executions: MutableSet<StellarExecution<*>> = mutableSetOf()
-    val runnables: MutableSet<StellarRunnable<*>> = mutableSetOf()
-    val failureExecutions: MutableSet<StellarExecution<*>> = mutableSetOf()
-    open val globalFailureExecutions: MutableSet<StellarExecution<*>> = mutableSetOf()
+    val executions: MutableSet<ExecutableExecution<*>> = mutableSetOf()
+    val runnables: MutableSet<ExecutableRunnable<*>> = mutableSetOf()
+    val failureExecutions: MutableSet<ExecutableExecution<*>> = mutableSetOf()
+    open val globalFailureExecutions: MutableSet<ExecutableExecution<*>> = mutableSetOf()
     var hideDefaultFailureMessages: HideDefaultFailureMessages = HideDefaultFailureMessages(hide = false, global = false)
 
     /**
@@ -76,14 +80,25 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
     fun clearAliases(): T = apply { aliases.clear() } as T
 
     /**
-     * Adds a requirement that must be met for the command to be available to the player.
+     * Adds a requirement that must be met for the command to be available to the player. Only works in Kotlin.
      *
      * @param C The type of CommandSender.
      * @param requirement The condition that must be met.
      * @return The modified command object.
      */
     inline fun <reified C : CommandSender> addRequirement(noinline requirement: C.() -> Boolean): T = apply {
-        requirements.add(StellarRequirement(C::class, requirement))
+        requirements.add(ExecutableRequirement(C::class, requirement))
+    } as T
+
+    /**
+     * Adds a requirement that must be met for the command to be available to the player. Also works in Java.
+     *
+     * @param C The type of CommandSender.
+     * @param requirement The condition that must be met.
+     * @return The modified command object.
+     */
+    fun addRequirement(requirement: StellarRequirement<CommandSender>): T = apply {
+        requirements.add(ExecutableRequirement(CommandSender::class, requirement))
     } as T
 
     /**
@@ -123,69 +138,129 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
     fun addRequirements(vararg levels: Int): T = addRequirement<Player> { levels.all { NMSHelper.hasPermission(this, it) } }
 
     /**
-     * Adds an executor to the command.
+     * Adds an execution to the command. Only works in Kotlin.
      *
      * @param C The type of CommandSender.
      * @param execution The execution block.
      * @return The modified command object.
      */
     inline fun <reified C : CommandSender> addExecution(noinline execution: CommandContext<C>.() -> Unit): T = apply {
-        executions.add(StellarExecution(C::class, execution, false))
+        executions.add(ExecutableExecution(C::class, execution, false))
     } as T
 
     /**
-     * Adds an async executor to the command.
+     * Adds an execution to the command. Also works in Java.
+     *
+     * @param execution The execution block.
+     * @return The modified command object.
+     */
+    fun addExecution(execution: StellarExecution<CommandSender>): T = apply {
+        executions.add(ExecutableExecution(CommandSender::class, execution, false))
+    } as T
+
+    /**
+     * Adds an async execution to the command. Only works in Kotlin.
      *
      * @param C The type of CommandSender.
      * @param execution The execution block.
      * @return The modified command object.
      */
     inline fun <reified C : CommandSender> addAsyncExecution(noinline execution: CommandContext<C>.() -> Unit): T = apply {
-        executions.add(StellarExecution(C::class, execution, true))
+        executions.add(ExecutableExecution(C::class, execution, true))
     } as T
 
     /**
-     * Adds a runnable to the command.
+     * Adds an async execution to the command. Also works in Java.
+     *
+     * @param execution The execution block.
+     * @return The modified command object.
+     */
+    fun addAsyncExecution(execution: StellarExecution<CommandSender>): T = apply {
+        executions.add(ExecutableExecution(CommandSender::class, execution, true))
+    } as T
+
+    /**
+     * Adds a runnable to the command. Only works in Kotlin.
      *
      * @param C The type of CommandSender.
      * @param runnable The execution block.
      * @return The modified command object.
      */
     inline fun <reified C : CommandSender> addRunnable(noinline runnable: CommandContext<C>.() -> Boolean): T = apply {
-        runnables.add(StellarRunnable(C::class, runnable, false))
+        runnables.add(ExecutableRunnable(C::class, runnable, false))
     } as T
 
     /**
-     * Adds an runnable to the command.
+     * Adds a runnable to the command. Also works in Java.
+     *
+     * @param runnable The execution block.
+     * @return The modified command object.
+     */
+    fun addRunnable(runnable: StellarRunnable<CommandSender>): T = apply {
+        runnables.add(ExecutableRunnable(CommandSender::class, runnable, false))
+    } as T
+
+    /**
+     * Adds an async runnable to the command. Only works in Kotlin.
      *
      * @param C The type of CommandSender.
      * @param runnable The execution block.
      * @return The modified command object.
      */
     inline fun <reified C : CommandSender> addAsyncRunnable(noinline runnable: CommandContext<C>.() -> Boolean): T = apply {
-        runnables.add(StellarRunnable(C::class, runnable, true))
+        runnables.add(ExecutableRunnable(C::class, runnable, true))
     } as T
 
     /**
-     * Adds a failure execution to the command to be displayed when the command fails.
+     * Adds an async runnable to the command. Also works in Java.
+     *
+     * @param runnable The execution block.
+     * @return The modified command object.
+     */
+    fun addAsyncRunnable(runnable: StellarRunnable<CommandSender>): T = apply {
+        runnables.add(ExecutableRunnable(CommandSender::class, runnable, true))
+    } as T
+
+    /**
+     * Adds a failure execution to the command to be displayed when the command fails. Only works in Kotlin.
      *
      * @param C The type of CommandSender.
      * @param execution The execution block.
      * @return The modified command object.
      */
     inline fun <reified C : CommandSender> addFailureExecution(noinline execution: CommandContext<C>.() -> Unit): T = apply {
-        failureExecutions.add(StellarExecution(C::class, execution, false))
+        failureExecutions.add(ExecutableExecution(C::class, execution, false))
     } as T
 
     /**
-     * Adds a failure execution to the _root_ command to be displayed when the command fails.
+     * Adds a failure execution to the command to be displayed when the command fails. Also works in Java.
+     *
+     * @param execution The execution block.
+     * @return The modified command object.
+     */
+    fun addFailureExecution(execution: StellarExecution<CommandSender>): T = apply {
+        failureExecutions.add(ExecutableExecution(CommandSender::class, execution, false))
+    } as T
+
+    /**
+     * Adds a failure execution to the _root_ command to be displayed when the command fails. Only works in Kotlin.
      *
      * @param C The type of CommandSender.
      * @param execution The execution block.
      * @return The modified command object.
      */
     inline fun <reified C : CommandSender> addGlobalFailureExecution(noinline execution: CommandContext<C>.() -> Unit): T = apply {
-        globalFailureExecutions.add(StellarExecution(C::class, execution, false))
+        globalFailureExecutions.add(ExecutableExecution(C::class, execution, false))
+    } as T
+
+    /**
+     * Adds a failure execution to the _root_ command to be displayed when the command fails. Also works in Java.
+     *
+     * @param execution The execution block.
+     * @return The modified command object.
+     */
+    fun addGlobalFailureExecution(execution: StellarExecution<CommandSender>): T = apply {
+        globalFailureExecutions.add(ExecutableExecution(CommandSender::class, execution, false))
     } as T
 
     /**
@@ -195,7 +270,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @return The modified command object.
      */
     fun addFailureMessage(message: Component): T = apply {
-        failureExecutions.add(StellarExecution(CommandSender::class, { sender.sendMessage(LegacyComponentSerializer.legacyAmpersand().serialize(message)) }, false))
+        failureExecutions.add(ExecutableExecution(CommandSender::class, { it.sender.sendMessage(LegacyComponentSerializer.legacyAmpersand().serialize(message)) }, false))
     } as T
 
     /**
@@ -205,7 +280,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @return The modified command object.
      */
     fun addGlobalFailureMessage(message: Component): T = apply {
-        globalFailureExecutions.add(StellarExecution(CommandSender::class, { sender.sendMessage(LegacyComponentSerializer.legacyAmpersand().serialize(message)) }, false))
+        globalFailureExecutions.add(ExecutableExecution(CommandSender::class, { it.sender.sendMessage(LegacyComponentSerializer.legacyAmpersand().serialize(message)) }, false))
     } as T
 
     /**
@@ -216,7 +291,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      */
     fun addFailureMessage(message: String): T = apply {
         val component = MiniMessage.miniMessage().deserialize(message)
-        failureExecutions.add(StellarExecution(CommandSender::class, { sender.sendMessage(LegacyComponentSerializer.legacyAmpersand().serialize(component)) }, false))
+        failureExecutions.add(ExecutableExecution(CommandSender::class, { it.sender.sendMessage(LegacyComponentSerializer.legacyAmpersand().serialize(component)) }, false))
     } as T
 
     /**
@@ -227,7 +302,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      */
     fun addGlobalFailureMessage(message: String): T = apply {
         val component = MiniMessage.miniMessage().deserialize(message)
-        globalFailureExecutions.add(StellarExecution(CommandSender::class, { sender.sendMessage(LegacyComponentSerializer.legacyAmpersand().serialize(component)) }, false))
+        globalFailureExecutions.add(ExecutableExecution(CommandSender::class, { it.sender.sendMessage(LegacyComponentSerializer.legacyAmpersand().serialize(component)) }, false))
     } as T
 
     /**
@@ -237,11 +312,12 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param global Whether to apply it on the root command.
      * @return The modified command object.
      */
+    @JvmOverloads
     fun hideDefaultFailureMessages(hide: Boolean = true, global: Boolean = false): T = apply {
         hideDefaultFailureMessages = HideDefaultFailureMessages(hide, global)
     } as T
 
-//    @ApiStatus.Internal TODO import
+    @ApiStatus.Internal
     open fun hasGlobalHiddenDefaultFailureMessages(): Boolean = hideDefaultFailureMessages.hide && hideDefaultFailureMessages.global
 
     /**
@@ -298,6 +374,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param maximum The maximum allowed value (default: [Double.MAX_VALUE]).
      * @return The created [DoubleArgument].
      */
+    @JvmOverloads
     fun addDoubleArgument(name: String, minimum: Double = Double.MIN_VALUE, maximum: Double = Double.MAX_VALUE): DoubleArgument = addArgument(DoubleArgument(name, minimum, maximum))
     /**
      * Adds a [FloatArgument] to the command with the given name.
@@ -306,6 +383,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param maximum The maximum allowed value (default: [Float.MAX_VALUE]).
      * @return The created [FloatArgument].
      */
+    @JvmOverloads
     fun addFloatArgument(name: String, minimum: Float = Float.MIN_VALUE, maximum: Float = Float.MAX_VALUE): FloatArgument = addArgument(FloatArgument(name, minimum, maximum))
     /**
      * Adds an [IntegerArgument] to the command with the given name.
@@ -314,6 +392,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param maximum The maximum allowed value (default: [Int.MAX_VALUE]).
      * @return The created [IntegerArgument].
      */
+    @JvmOverloads
     fun addIntegerArgument(name: String, minimum: Int = Int.MIN_VALUE, maximum: Int = Int.MAX_VALUE): IntegerArgument = addArgument(IntegerArgument(name, minimum, maximum))
     /**
      * Adds a [LongArgument] to the command with the given name.
@@ -322,11 +401,13 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param maximum The maximum allowed value (default: [Long.MAX_VALUE]).
      * @return The created [LongArgument].
      */
+    @JvmOverloads
     fun addLongArgument(name: String, minimum: Long = Long.MIN_VALUE, maximum: Long = Long.MAX_VALUE): LongArgument = addArgument(LongArgument(name, minimum, maximum))
     /**
      * Adds a [StringArgument] to the command with the given name.
      * @return The created [StringArgument].
      */
+    @JvmOverloads
     fun addStringArgument(name: String, type: StringType = StringType.WORD): StringArgument = addArgument(StringArgument(name, type))
 
     // Block
