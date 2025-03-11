@@ -72,6 +72,7 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.scoreboard.DisplaySlot
 import java.util.function.Predicate
+import kotlin.reflect.full.memberProperties
 import net.minecraft.commands.arguments.AngleArgument as BrigadierAngleArgument
 import net.minecraft.commands.arguments.ColorArgument as BrigadierColorArgument
 import net.minecraft.commands.arguments.ComponentArgument as BrigadierComponentArgument
@@ -249,7 +250,7 @@ object NMS1_21_4 : NMS {
         }
     }
 
-    override fun getBukkitSender(source: Any): CommandSender = (source as CommandSourceStack).bukkitSender
+    override fun getBukkitSender(source: Any): CommandSender = source::class.memberProperties.firstOrNull { it.name == "bukkitSender" }?.getter?.call(source) as CommandSender
 
     override fun hasPermission(player: Player, level: Int): Boolean = (player as CraftPlayer).handle.hasPermissions(level)
 

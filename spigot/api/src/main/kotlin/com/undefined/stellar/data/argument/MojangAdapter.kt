@@ -8,6 +8,7 @@ import com.undefined.stellar.argument.LiteralArgument
 import com.undefined.stellar.AbstractStellarCommand
 import com.undefined.stellar.argument.list.ListArgument
 import com.undefined.stellar.exception.DuplicateArgumentNameException
+import com.undefined.stellar.nms.NMSHelper
 import org.bukkit.command.CommandSender
 import java.lang.IllegalStateException
 
@@ -16,7 +17,7 @@ object MojangAdapter {
     fun getStellarCommandContext(context: BrigadierCommandContext<Any>): CommandContext<CommandSender> {
         val input = context.input.removePrefix("/")
         val rootNodeName = context.rootNode.name.takeIf { it.isNotBlank() }
-        val sender = NMSManager.nms.getBukkitSender(context.source)
+        val sender = NMSHelper.getBukkitSender(context.source)
 
         val baseCommand: AbstractStellarCommand<*> = Stellar.getStellarCommand(rootNodeName ?: context.nodes[0].node.name) ?: throw IllegalStateException("Could not find command!")
         val arguments = ArgumentHelper.getArguments(baseCommand, context, if (rootNodeName != null) 0 else 1)

@@ -14,6 +14,7 @@ import com.undefined.stellar.data.suggestion.Suggestion
 import com.undefined.stellar.exception.UnsupportedVersionException
 import com.undefined.stellar.listener.StellarListener
 import com.undefined.stellar.nms.NMS
+import com.undefined.stellar.nms.NMSHelper
 import com.undefined.stellar.v1_21_4.NMS1_21_4
 import org.bukkit.Bukkit
 import org.bukkit.command.Command
@@ -120,7 +121,7 @@ object NMSManager {
 
     private fun handleRequirements(command: AbstractStellarCommand<*>, builder: ArgumentBuilder<Any, *>) {
         builder.requires { source ->
-            val sender = nms.getBukkitSender(source)
+            val sender = NMSHelper.getBukkitSender(source)
             command.requirements.all { it(sender) }
         }
     }

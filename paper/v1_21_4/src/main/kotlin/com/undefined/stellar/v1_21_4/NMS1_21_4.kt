@@ -77,6 +77,8 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
 import java.util.function.Predicate
+import kotlin.reflect.full.memberFunctions
+import kotlin.reflect.full.memberProperties
 import net.minecraft.commands.arguments.AngleArgument as BrigadierAngleArgument
 import net.minecraft.commands.arguments.EntityAnchorArgument as BrigadierEntityAnchorArgument
 import net.minecraft.commands.arguments.EntityArgument as BrigadierEntityArgument
@@ -255,8 +257,6 @@ object NMS1_21_4 : NMS {
             else -> null
         }
     }
-
-    override fun getBukkitSender(source: Any): CommandSender = (source as CommandSourceStack).bukkitSender
 
     override fun hasPermission(player: Player, level: Int): Boolean = (player as CraftPlayer).handle.hasPermissions(level)
 
