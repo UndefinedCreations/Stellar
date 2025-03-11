@@ -1,5 +1,6 @@
 package com.undefined.stellar
 
+import com.undefined.stellar.argument.LiteralArgument
 import com.undefined.stellar.argument.basic.*
 import com.undefined.stellar.argument.block.BlockDataArgument
 import com.undefined.stellar.argument.block.BlockPredicateArgument
@@ -360,6 +361,17 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
         argument.parent = this@AbstractStellarCommand
         this@AbstractStellarCommand.arguments.add(argument)
     }
+
+    /**
+     * Adds a [LiteralArgument] to the command with the given name.
+     * @return The created [BooleanArgument].
+     */
+    fun addArgument(name: String): LiteralArgument = addArgument(LiteralArgument(name))
+    /**
+     * Adds a [LiteralArgument] to the command with the given name.
+     * @return The created [BooleanArgument].
+     */
+    fun addLiteralArgument(name: String): LiteralArgument = addArgument(LiteralArgument(name))
 
     // Basic
     /**

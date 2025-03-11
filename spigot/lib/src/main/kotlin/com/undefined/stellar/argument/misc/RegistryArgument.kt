@@ -1,6 +1,7 @@
 package com.undefined.stellar.argument.misc
 
 import com.undefined.stellar.AbstractStellarArgument
+import com.undefined.stellar.AbstractStellarCommand
 import org.bukkit.Registry
 
 @Suppress("UnstableApiUsage")
@@ -42,3 +43,9 @@ class RegistryArgument(
         )
     }
 }
+
+/**
+ * Adds a [RegistryArgument] to the command with the given name and [Registry].
+ * @return The created [RegistryArgument].
+ */
+fun AbstractStellarCommand<*>.addRegistryArgument(name: String, registry: Registry<*>): RegistryArgument = addArgument(RegistryArgument(name, registry))
