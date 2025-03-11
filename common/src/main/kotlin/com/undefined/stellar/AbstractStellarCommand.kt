@@ -35,6 +35,7 @@ import com.undefined.stellar.data.failure.HideDefaultFailureMessages
 import com.undefined.stellar.data.requirement.StellarRequirement
 import com.undefined.stellar.data.suggestion.Suggestion
 import com.undefined.stellar.nms.NMS
+import com.undefined.stellar.nms.NMSHelper
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
@@ -101,7 +102,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param level The required permission level.
      * @return The modified command object.
      */
-    fun addRequirement(level: Int): T = addRequirement<Player> { nms.hasPermission(this, level) }
+    fun addRequirement(level: Int): T = addRequirement<Player> { NMSHelper.hasPermission(this, level) }
 
     /**
      * Adds multiple Bukkit permission requirements for the command to be available to the player.
@@ -119,7 +120,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param levels The required permission levels.
      * @return The modified command object.
      */
-    fun addRequirements(vararg levels: Int): T = addRequirement<Player> { levels.all { nms.hasPermission(this, it) } }
+    fun addRequirements(vararg levels: Int): T = addRequirement<Player> { levels.all { NMSHelper.hasPermission(this, it) } }
 
     /**
      * Adds an executor to the command.

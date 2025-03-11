@@ -250,10 +250,6 @@ object NMS1_21_4 : NMS {
         }
     }
 
-    override fun getBukkitSender(source: Any): CommandSender = source::class.memberProperties.firstOrNull { it.name == "bukkitSender" }?.getter?.call(source) as CommandSender
-
-    override fun hasPermission(player: Player, level: Int): Boolean = (player as CraftPlayer).handle.hasPermissions(level)
-
     override fun getCommandSourceStack(sender: CommandSender): Any {
         val overworld = MinecraftServer.getServer().overworld()
         return CommandSourceStack(

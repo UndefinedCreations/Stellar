@@ -12,6 +12,5 @@ interface NMS {
     fun getCommandDispatcher(): CommandDispatcher<Any>
     fun getArgumentType(argument: AbstractStellarArgument<*, *>, plugin: JavaPlugin): ArgumentType<*>
     fun parseArgument(ctx: CommandContext<Any>, argument: AbstractStellarArgument<*, *>): Any?
-    fun hasPermission(player: Player, level: Int): Boolean
     fun getCommandSourceStack(sender: CommandSender): Any
 }
