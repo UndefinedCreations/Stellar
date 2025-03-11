@@ -363,15 +363,15 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
     }
 
     /**
-     * Adds a [LiteralArgument] to the command with the given name.
+     * Adds a [LiteralArgument] to the command with the given name and aliases.
      * @return The created [BooleanArgument].
      */
-    fun addArgument(name: String): LiteralArgument = addArgument(LiteralArgument(name))
+    fun addArgument(name: String, vararg aliases: String): LiteralArgument = addArgument(LiteralArgument(name).apply { addAliases(*aliases) })
     /**
-     * Adds a [LiteralArgument] to the command with the given name.
+     * Adds a [LiteralArgument] to the command with the given name and aliases.
      * @return The created [BooleanArgument].
      */
-    fun addLiteralArgument(name: String): LiteralArgument = addArgument(LiteralArgument(name))
+    fun addLiteralArgument(name: String, vararg aliases: String): LiteralArgument = addArgument(LiteralArgument(name).apply { addAliases(*aliases) })
 
     // Basic
     /**
