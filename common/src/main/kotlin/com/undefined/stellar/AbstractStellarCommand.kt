@@ -276,33 +276,107 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
     abstract fun register(plugin: JavaPlugin): T
 
     // Arguments
+    /**
+     * Adds the given argument to the command and return the argument.
+     */
     fun <T : AbstractStellarArgument<*, *>> addArgument(argument: T): T = argument.apply {
         argument.parent = this@AbstractStellarCommand
         this@AbstractStellarCommand.arguments.add(argument)
     }
 
     // Basic
+    /**
+     * Adds a [BooleanArgument] to the command with the given name.
+     * @return The created [BooleanArgument].
+     */
     fun addBooleanArgument(name: String): BooleanArgument = addArgument(BooleanArgument(name))
+    /**
+     * Adds a [DoubleArgument] to the command with the given name.
+     *
+     * @param minimum The minimum allowed value (default: [Double.MIN_VALUE]).
+     * @param maximum The maximum allowed value (default: [Double.MAX_VALUE]).
+     * @return The created [DoubleArgument].
+     */
     fun addDoubleArgument(name: String, minimum: Double = Double.MIN_VALUE, maximum: Double = Double.MAX_VALUE): DoubleArgument = addArgument(DoubleArgument(name, minimum, maximum))
+    /**
+     * Adds a [FloatArgument] to the command with the given name.
+     *
+     * @param minimum The minimum allowed value (default: [Float.MIN_VALUE]).
+     * @param maximum The maximum allowed value (default: [Float.MAX_VALUE]).
+     * @return The created [FloatArgument].
+     */
     fun addFloatArgument(name: String, minimum: Float = Float.MIN_VALUE, maximum: Float = Float.MAX_VALUE): FloatArgument = addArgument(FloatArgument(name, minimum, maximum))
+    /**
+     * Adds an [IntegerArgument] to the command with the given name.
+     *
+     * @param minimum The minimum allowed value (default: [Int.MIN_VALUE]).
+     * @param maximum The maximum allowed value (default: [Int.MAX_VALUE]).
+     * @return The created [IntegerArgument].
+     */
     fun addIntegerArgument(name: String, minimum: Int = Int.MIN_VALUE, maximum: Int = Int.MAX_VALUE): IntegerArgument = addArgument(IntegerArgument(name, minimum, maximum))
+    /**
+     * Adds a [LongArgument] to the command with the given name.
+     *
+     * @param minimum The minimum allowed value (default: [Long.MIN_VALUE]).
+     * @param maximum The maximum allowed value (default: [Long.MAX_VALUE]).
+     * @return The created [LongArgument].
+     */
     fun addLongArgument(name: String, minimum: Long = Long.MIN_VALUE, maximum: Long = Long.MAX_VALUE): LongArgument = addArgument(LongArgument(name, minimum, maximum))
+    /**
+     * Adds a [StringArgument] to the command with the given name.
+     * @return The created [StringArgument].
+     */
     fun addStringArgument(name: String, type: StringType = StringType.WORD): StringArgument = addArgument(StringArgument(name, type))
 
     // Block
+    /**
+     * Adds a [BlockDataArgument] to the command with the given name.
+     * @return The created [BlockDataArgument].
+     */
     fun addBlockDataArgument(name: String): BlockDataArgument = addArgument(BlockDataArgument(name))
+    /**
+     * Adds a [BlockPredicateArgument] to the command with the given name.
+     * @return The created [BlockPredicateArgument].
+     */
     fun addBlockPredicateArgument(name: String): BlockPredicateArgument = addArgument(BlockPredicateArgument(name))
 
     // Entity
+    /**
+     * Adds an [EntityAnchorArgument] to the command with the given name.
+     * @return The created [EntityAnchorArgument].
+     */
     fun addEntityAnchorArgument(name: String): EntityAnchorArgument = addArgument(EntityAnchorArgument(name))
+    /**
+     * Adds an [EntityArgument] to the command with the given name.
+     * @return The created [EntityArgument].
+     */
     fun addEntityArgument(name: String, type: EntityDisplayType): EntityArgument = addArgument(EntityArgument(name, type))
 
     // Item
+    /**
+     * Adds an [ItemSlotArgument] to the command with the given name.
+     * @return The created [ItemSlotArgument].
+     */
     fun addItemSlotArgument(name: String, multiple: Boolean = false): ItemSlotArgument = addArgument(ItemSlotArgument(name, multiple))
+    /**
+     * Adds an [ItemStackArgument] to the command with the given name.
+     * @return The created [ItemStackArgument].
+     */
     fun addItemStackArgument(name: String): ItemStackArgument = addArgument(ItemStackArgument(name))
+    /**
+     * Adds an [ItemStackPredicateArgument] to the command with the given name.
+     * @return The created [ItemStackPredicateArgument].
+     */
     fun addItemStackPredicateArgument(name: String): ItemStackPredicateArgument = addArgument(ItemStackPredicateArgument(name))
 
     // List
+    /**
+     * Adds an [EnumArgument] to the command with the given name.
+     *
+     * @param converter A function to convert an enum value into a [Suggestion] (default: uses the enum's name).
+     * @param async Whether the _suggestions_ should be gotten asynchronously (default: `true`).
+     * @return The created [EnumArgument].
+     */
     inline fun <reified T : Enum<T>> addEnumArgument(
         name: String,
         noinline converter: CommandSender.(Enum<T>) -> Suggestion? = {
@@ -311,12 +385,28 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
         async: Boolean = true,
     ): EnumArgument<T> = addArgument(EnumArgument(name, T::class, converter, async))
 
+    /**
+     * Adds an [EnumArgument] to the command with the given name.
+     *
+     * @param formatting The formatting style for the enum names (default: [EnumFormatting.LOWERCASE]).
+     * @param async Whether the _suggestions_ should be gotten asynchronously (default: `true`).
+     * @return The created [EnumArgument].
+     */
     inline fun <reified T : Enum<T>> addEnumArgument(
         name: String,
         formatting: EnumFormatting = EnumFormatting.LOWERCASE,
         async: Boolean = true,
     ): EnumArgument<T> = addArgument(EnumArgument(name, T::class, { Suggestion.withText(formatting.action(it.name)) }, async))
 
+    /**
+     * Adds a [ListArgument] to the command with the given name.
+     *
+     * @param list The list of possible values.
+     * @param converter A function to convert a value into a [Suggestion] (default: uses `toString()`).
+     * @param parse A function to parse a string into type `T`.
+     * @param async Whether the _suggestions_ should be gotten asynchronously (default: `false`).
+     * @return The created [ListArgument].
+     */
     fun <T> addAdvancedListArgument(
         name: String,
         list: List<T>,
@@ -325,6 +415,16 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
         async: Boolean = false,
     ): ListArgument<T, String> = addArgument(ListArgument(StringArgument(name, StringType.WORD), list, converter, parse, async))
 
+    /**
+     * Adds a [ListArgument] to the command wrapped around the given [AbstractStellarCommand].
+     *
+     * @param type The base argument the list is wrapped around to.
+     * @param list The list of possible values.
+     * @param converter A function to convert a value into a [Suggestion] (default: uses `toString()`).
+     * @param parse A function to parse a string into type `T`.
+     * @param async Whether the _suggestions_ should be gotten asynchronously (default: `false`).
+     * @return The created [ListArgument].
+     */
     fun <T, R> addAdvancedListArgument(
         type: AbstractStellarArgument<*, R>,
         list: List<T>,
@@ -333,6 +433,15 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
         async: Boolean = false,
     ): ListArgument<T, R> = addArgument(ListArgument(type, list, converter, parse, async))
 
+    /**
+     * Adds a [ListArgument] to the command with the given name.
+     *
+     * @param list A function returning the list of possible values.
+     * @param converter A function to convert a value into a [Suggestion] (default: uses `toString()`).
+     * @param parse A function to parse a string into type `T`.
+     * @param async Whether the _suggestions_ should be gotten asynchronously (default: `false`).
+     * @return The created [ListArgument].
+     */
     fun <T> addAdvancedListArgument(
         name: String,
         list: CommandContext<CommandSender>.() -> List<T>,
@@ -341,6 +450,16 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
         async: Boolean = false,
     ): ListArgument<T, String> = addArgument(ListArgument(StringArgument(name, StringType.WORD), list, converter, parse, async))
 
+    /**
+     * Adds a [ListArgument] to the command wrapped around the given [AbstractStellarCommand].
+     *
+     * @param type The base argument the list is wrapped around to.
+     * @param list A function returning the list of possible values.
+     * @param converter A function to convert a value into a [Suggestion] (default: uses `toString()`).
+     * @param parse A function to parse a string into type `T`.
+     * @param async Whether the _suggestions_ should be gotten asynchronously (default: `false`).
+     * @return The created [ListArgument].
+     */
     fun <T, R> addAdvancedListArgument(
         type: AbstractStellarArgument<*, R>,
         list: CommandContext<CommandSender>.() -> List<T>,
@@ -349,6 +468,15 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
         async: Boolean = false,
     ): ListArgument<T, R> = addArgument(ListArgument(type, list, converter, parse, async))
 
+    /**
+     * Adds a [ListArgument] to the command with the given name.
+     *
+     * @param list The list of possible values.
+     * @param converter A function to convert a value into a [String] (default: uses `toString()`).
+     * @param parse A function to parse a string into type `T`.
+     * @param async Whether the _suggestions_ should be gotten asynchronously (default: `false`).
+     * @return The created [ListArgument].
+     */
     fun <T> addListArgument(
         name: String,
         list: List<T>,
@@ -357,6 +485,16 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
         async: Boolean = false,
     ): ListArgument<T, String> = addArgument(ListArgument(StringArgument(name, StringType.WORD), list, { converter(it)?.let { Suggestion.withText(it) } }, parse, async))
 
+    /**
+     * Adds a [ListArgument] to the command wrapped around the given [AbstractStellarCommand].
+     *
+     * @param type The base argument the list is wrapped around to.
+     * @param list The list of possible values.
+     * @param converter A function to convert a value into a [String] (default: uses `toString()`).
+     * @param parse A function to parse a string into type `T`.
+     * @param async Whether the _suggestions_ should be gotten asynchronously (default: `false`).
+     * @return The created [ListArgument].
+     */
     fun <T, R> addListArgument(
         type: AbstractStellarArgument<*, R>,
         list: List<T>,
@@ -365,6 +503,15 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
         async: Boolean = false,
     ): ListArgument<T, R> = addArgument(ListArgument(type, list, { converter(it)?.let { Suggestion.withText(it) } }, parse, async))
 
+    /**
+     * Adds a [ListArgument] to the command with the given name.
+     *
+     * @param list A function returning the list of possible values.
+     * @param converter A function to convert a value into a [String] (default: uses `toString()`).
+     * @param parse A function to parse a string into type `T`.
+     * @param async Whether the _suggestions_ should be gotten asynchronously (default: `false`).
+     * @return The created [ListArgument].
+     */
     fun <T> addListArgument(
         name: String,
         list: CommandContext<CommandSender>.() -> List<T>,
@@ -373,6 +520,16 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
         async: Boolean = false,
     ): ListArgument<T, String> = addArgument(ListArgument(StringArgument(name, StringType.WORD), list, { converter(it)?.let { Suggestion.withText(it) } }, parse, async))
 
+    /**
+     * Adds a [ListArgument] to the command wrapped around the given [AbstractStellarCommand].
+     *
+     * @param type The base argument the list is wrapped around to.
+     * @param list A function returning the list of possible values.
+     * @param converter A function to convert a value into a [String] (default: uses `toString()`).
+     * @param parse A function to parse a string into type `T`.
+     * @param async Whether the _suggestions_ should be gotten asynchronously (default: `false`).
+     * @return The created [ListArgument].
+     */
     fun <T, R> addListArgument(
         type: AbstractStellarArgument<*, R>,
         list: CommandContext<CommandSender>.() -> List<T>,
@@ -381,50 +538,195 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
         async: Boolean = false,
     ): ListArgument<T, R> = addArgument(ListArgument(type, list, { converter(it)?.let { Suggestion.withText(it) } }, parse, async))
 
+    /**
+     * Adds an [OnlinePlayersArgument] to the command with the given name. It is a list of all currently online players.
+     *
+     * @param filter A function to filter players (default: allows all players).
+     * @param async Whether the _suggestions_ should be gotten asynchronously (default: `false`).
+     * @return The created [OnlinePlayersArgument], which returns a [Player] when parsed.
+     */
     fun addOnlinePlayersArgument(name: String, filter: (Player) -> Boolean = { true }, async: Boolean = false): OnlinePlayersArgument = addArgument(OnlinePlayersArgument(name, filter, async))
 
     // Math
+    /**
+     * Adds an [AngleArgument] to the command with the given name.
+     * @return The created [AngleArgument].
+     */
     fun addAngleArgument(name: String): AngleArgument = addArgument(AngleArgument(name))
+
+    /**
+     * Adds an [AxisArgument] to the command with the given name.
+     * @return The created [AxisArgument].
+     */
     fun addAxisArgument(name: String): AxisArgument = addArgument(AxisArgument(name))
+
+    /**
+     * Adds a [DoubleRangeArgument] to the command with the given name.
+     * @return The created [DoubleRangeArgument].
+     */
     fun addDoubleRangeArgument(name: String): DoubleRangeArgument = addArgument(DoubleRangeArgument(name))
+
+    /**
+     * Adds an [IntRangeArgument] to the command with the given name.
+     * @return The created [IntRangeArgument].
+     */
     fun addIntRangeArgument(name: String): IntRangeArgument = addArgument(IntRangeArgument(name))
+
+    /**
+     * Adds an [OperationArgument] to the command with the given name.
+     * @return The created [OperationArgument].
+     */
     fun addOperationArgument(name: String): OperationArgument = addArgument(OperationArgument(name))
+
+    /**
+     * Adds a [RotationArgument] to the command with the given name.
+     * @return The created [RotationArgument].
+     */
     fun addRotationArgument(name: String): RotationArgument = addArgument(RotationArgument(name))
+
+    /**
+     * Adds a [TimeArgument] to the command with the given name.
+     *
+     * @param minimum The minimum allowed time value (default: `0`).
+     * @return The created [TimeArgument].
+     */
     fun addTimeArgument(name: String, minimum: Int = 0): TimeArgument = addArgument(TimeArgument(name, minimum))
 
     // Misc
+    /**
+     * Adds a [NamespacedKeyArgument] to the command with the given name.
+     * @return The created [NamespacedKeyArgument].
+     */
     fun addNamespacedKeyArgument(name: String): NamespacedKeyArgument = addArgument(NamespacedKeyArgument(name))
+
+    /**
+     * Adds a [UUIDArgument] to the command with the given name.
+     * @return The created [UUIDArgument].
+     */
     fun addUUIDArgument(name: String): UUIDArgument = addArgument(UUIDArgument(name))
 
     // Phrase
+    /**
+     * Adds a [PhraseArgument] to the command with the given name.
+     * @return The created [PhraseArgument].
+     */
     fun addPhraseArgument(name: String): PhraseArgument = addArgument(PhraseArgument(name))
 
-    // Player
+// Player
+    /**
+     * Adds a [GameModeArgument] to the command with the given name.
+     * @return The created [GameModeArgument].
+     */
     fun addGameModeArgument(name: String): GameModeArgument = addArgument(GameModeArgument(name))
+
+    /**
+     * Adds a [GameProfileArgument] to the command with the given name.
+     * @return The created [GameProfileArgument].
+     */
     fun addGameProfileArgument(name: String): GameProfileArgument = addArgument(GameProfileArgument(name))
 
     // Scoreboard
+    /**
+     * Adds a [DisplaySlotArgument] to the command with the given name.
+     * @return The created [DisplaySlotArgument].
+     */
     fun addDisplaySlotArgument(name: String): DisplaySlotArgument = addArgument(DisplaySlotArgument(name))
+
+    /**
+     * Adds an [ObjectiveArgument] to the command with the given name.
+     * @return The created [ObjectiveArgument].
+     */
     fun addObjectiveArgument(name: String): ObjectiveArgument = addArgument(ObjectiveArgument(name))
+
+    /**
+     * Adds an [ObjectiveCriteriaArgument] to the command with the given name.
+     * @return The created [ObjectiveCriteriaArgument].
+     */
     fun addObjectiveCriteriaArgument(name: String): ObjectiveCriteriaArgument = addArgument(ObjectiveCriteriaArgument(name))
+
+    /**
+     * Adds a [ScoreHolderArgument] to the command with the given name.
+     *
+     * @param type The type of score holder.
+     * @return The created [ScoreHolderArgument].
+     */
     fun addScoreHolderArgument(name: String, type: ScoreHolderType): ScoreHolderArgument = addArgument(ScoreHolderArgument(name, type))
+
+    /**
+     * Adds a [TeamArgument] to the command with the given name.
+     * @return The created [TeamArgument].
+     */
     fun addTeamArgument(name: String): TeamArgument = addArgument(TeamArgument(name))
 
     // Structure
+    /**
+     * Adds a [LootTableArgument] to the command with the given name.
+     * @return The created [LootTableArgument].
+     */
     fun addLootTableArgument(name: String): LootTableArgument = addArgument(LootTableArgument(name))
+
+    /**
+     * Adds a [MirrorArgument] to the command with the given name.
+     * @return The created [MirrorArgument].
+     */
     fun addMirrorArgument(name: String): MirrorArgument = addArgument(MirrorArgument(name))
+
+    /**
+     * Adds a [StructureRotationArgument] to the command with the given name.
+     * @return The created [StructureRotationArgument].
+     */
     fun addStructureRotationArgument(name: String): StructureRotationArgument = addArgument(StructureRotationArgument(name))
 
     // Text
+    /**
+     * Adds a [ColorArgument] to the command with the given name.
+     * @return The created [ColorArgument].
+     */
     fun addColorArgument(name: String): ColorArgument = addArgument(ColorArgument(name))
+
+    /**
+     * Adds a [ComponentArgument] to the command with the given name.
+     * @return The created [ComponentArgument].
+     */
     fun addComponentArgument(name: String): ComponentArgument = addArgument(ComponentArgument(name))
+
+    /**
+     * Adds a [MessageArgument] to the command with the given name.
+     * @return The created [MessageArgument].
+     */
     fun addMessageArgument(name: String): MessageArgument = addArgument(MessageArgument(name))
+
+    /**
+     * Adds a [StyleArgument] to the command with the given name.
+     * @return The created [StyleArgument].
+     */
     fun addStyleArgument(name: String): StyleArgument = addArgument(StyleArgument(name))
 
     // World
+    /**
+     * Adds an [EnvironmentArgument] to the command with the given name.
+     * @return The created [EnvironmentArgument].
+     */
     fun addEnvironmentArgument(name: String): EnvironmentArgument = addArgument(EnvironmentArgument(name))
+
+    /**
+     * Adds a [HeightMapArgument] to the command with the given name.
+     * @return The created [HeightMapArgument].
+     */
     fun addHeightMapArgument(name: String): HeightMapArgument = addArgument(HeightMapArgument(name))
+
+    /**
+     * Adds a [LocationArgument] to the command with the given name.
+     *
+     * @param type The type of location.
+     * @return The created [LocationArgument].
+     */
     fun addLocationArgument(name: String, type: LocationType): LocationArgument = addArgument(LocationArgument(name, type))
+
+    /**
+     * Adds a [ParticleArgument] to the command with the given name.
+     * @return The created [ParticleArgument].
+     */
     fun addParticleArgument(name: String): ParticleArgument = addArgument(ParticleArgument(name))
 
 }
