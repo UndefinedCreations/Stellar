@@ -1,7 +1,6 @@
 package com.undefined.stellar.argument.misc
 
 import com.undefined.stellar.AbstractStellarArgument
-import org.bukkit.NamespacedKey
-import java.util.UUID
+import java.util.*
 
 class UUIDArgument(name: String) : AbstractStellarArgument<UUIDArgument, UUID>(name)

@@ -30,13 +30,13 @@ import com.undefined.stellar.argument.text.StyleArgument
 import com.undefined.stellar.argument.world.*
 import com.undefined.stellar.data.argument.CommandContext
 import com.undefined.stellar.data.argument.EnumFormatting
-import com.undefined.stellar.data.execution.StellarExecution
-import com.undefined.stellar.data.execution.StellarRunnable
 import com.undefined.stellar.data.execution.ExecutableExecution
 import com.undefined.stellar.data.execution.ExecutableRunnable
+import com.undefined.stellar.data.execution.StellarExecution
+import com.undefined.stellar.data.execution.StellarRunnable
 import com.undefined.stellar.data.failure.HideDefaultFailureMessages
-import com.undefined.stellar.data.requirement.StellarRequirement
 import com.undefined.stellar.data.requirement.ExecutableRequirement
+import com.undefined.stellar.data.requirement.StellarRequirement
 import com.undefined.stellar.data.suggestion.Suggestion
 import com.undefined.stellar.nms.NMS
 import com.undefined.stellar.nms.NMSHelper

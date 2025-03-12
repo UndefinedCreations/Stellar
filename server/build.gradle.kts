@@ -3,7 +3,6 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     id("setup")
-    `java-library`
     id("com.undefinedcreations.runServer") version "0.1.6"
     id("com.gradleup.shadow") version "8.3.5"
 }

@@ -13,8 +13,7 @@ object NMSHelper {
         val field = CommandContext::class.java.getDeclaredField("arguments").also { it.isAccessible = true }
         val arguments: Map<String, ParsedArgument<Any, *>> = field.get(context) as Map<String, ParsedArgument<Any, *>>
         val argument = arguments[name] ?: return null
-        val range = StringRange.between(argument.range.start, context.input.length)
-        return range.get(context.input)
+        return argument.range.get(context.input)
     }
 
     fun getBukkitSender(source: Any): CommandSender = source.javaClass.getDeclaredMethod("getBukkitSender")(source) as CommandSender

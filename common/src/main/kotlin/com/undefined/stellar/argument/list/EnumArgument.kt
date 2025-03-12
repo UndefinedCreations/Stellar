@@ -2,7 +2,6 @@ package com.undefined.stellar.argument.list
 
 import com.undefined.stellar.argument.basic.StringArgument
 import com.undefined.stellar.argument.basic.StringType
-import com.undefined.stellar.data.argument.CommandContext
 import com.undefined.stellar.data.suggestion.Suggestion
 import org.bukkit.command.CommandSender
 import java.lang.Enum.valueOf

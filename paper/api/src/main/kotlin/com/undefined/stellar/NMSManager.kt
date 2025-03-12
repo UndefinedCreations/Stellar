@@ -45,7 +45,7 @@ object NMSManager {
         val dispatcher = nms.getCommandDispatcher()
         val mainNode = dispatcher.register(builder)
 
-        for (name in command.aliases + "${plugin.pluginMeta.name}:${command.name}")
+        for (name in command.aliases + "${plugin.pluginMeta.name.lowercase()}:${command.name}")
             dispatcher.register(LiteralArgumentBuilder.literal<Any>(name).redirect(mainNode))
 
         Bukkit.getServer().helpMap.addTopic(StellarCommandHelpTopic(command.name, command.information["Description"] ?: "", command.information.entries.associateBy({ it.value }) { it.key }) {

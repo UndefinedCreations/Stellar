@@ -4,18 +4,14 @@ import org.bukkit.plugin.java.JavaPlugin
 
 abstract class BaseStellarCommand(val name: String, val description: String = "", val permissions: List<String> = listOf()) {
 
-    var hasInitializedArguments = false
-        private set
     private var hasBeenRegistered = false
 
     val command: StellarCommand by lazy {
-        setup().apply { addRequirements(*permissions.toTypedArray()) }
-    }
-
-    private fun initializeArguments() {
-        if (hasInitializedArguments) return
-        hasInitializedArguments = true
-        for (argument in arguments()) command.addArgument(argument.getFullArgument())
+        setup().apply {
+            setDescription(description)
+            addRequirements(*permissions.toTypedArray())
+//            for (argument in arguments()) addArgument(argument.fullArgument)
+        }
     }
 
     abstract fun setup(): StellarCommand
@@ -23,20 +19,14 @@ abstract class BaseStellarCommand(val name: String, val description: String = ""
 
     fun createCommand(init: StellarCommand.() -> Unit): StellarCommand {
         val command = StellarCommand(name, permissions)
-        command.setDescription(description)
         command.init()
-        return command
-    }
-
-    fun getFullCommand(): StellarCommand {
-        initializeArguments()
         return command
     }
 
     fun register(plugin: JavaPlugin) {
         if (hasBeenRegistered) return
-        getFullCommand().register(plugin)
         hasBeenRegistered = true
+        command.register(plugin)
     }
 
 }
