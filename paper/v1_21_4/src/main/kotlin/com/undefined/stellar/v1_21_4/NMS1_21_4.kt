@@ -258,7 +258,7 @@ object NMS1_21_4 : NMS {
             Vec3.atLowerCornerOf(overworld.sharedSpawnPos),
             Vec2.ZERO,
             overworld,
-            (sender as CraftPlayer).handle.permissionLevel,
+            (sender as? CraftPlayer)?.handle?.permissionLevel ?: 4,
             sender.name,
             Component.literal(sender.name),
             MinecraftServer.getServer(),
