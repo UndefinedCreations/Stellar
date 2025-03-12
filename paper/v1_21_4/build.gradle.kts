@@ -2,7 +2,6 @@ plugins {
     id("setup")
     id("io.papermc.paperweight.userdev")
     `maven-publish`
-    `publishing-convention`
 }
 
 paperweight.reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArtifactConfiguration.REOBF_PRODUCTION

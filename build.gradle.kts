@@ -7,8 +7,8 @@ plugins {
 dependencies {
     compileOnly(libs.spigot)
     compileOnly(libs.brigadier)
+    api(project(":paper:lib"))
     api(project(":spigot:lib"))
-    api(project(":spigot:v1_21_4"))
 }
 
 tasks {
@@ -16,4 +16,9 @@ tasks {
         exclude("**/kotlin/**")
         archiveClassifier = ""
     }
+}
+
+java {
+    withSourcesJar()
+    withJavadocJar()
 }
