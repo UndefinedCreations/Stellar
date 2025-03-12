@@ -41,6 +41,7 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
+import org.jetbrains.annotations.ApiStatus
 
 /**
  * This is the base of any command, whether it's an argument or a root command.
@@ -52,14 +53,14 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
 
     lateinit var nms: NMS
 
-    val aliases: MutableSet<String> = mutableSetOf()
-    val requirements: MutableList<StellarRequirement<*>> = mutableListOf()
-    val arguments: MutableSet<AbstractStellarArgument<*, *>> = mutableSetOf()
-    val executions: MutableSet<StellarExecution<*>> = mutableSetOf()
-    val runnables: MutableSet<StellarRunnable<*>> = mutableSetOf()
-    val failureExecutions: MutableSet<StellarExecution<*>> = mutableSetOf()
-    open val globalFailureExecutions: MutableSet<StellarExecution<*>> = mutableSetOf()
-    var hideDefaultFailureMessages: HideDefaultFailureMessages = HideDefaultFailureMessages(hide = false, global = false)
+    @ApiStatus.Internal val aliases: MutableSet<String> = mutableSetOf()
+    @ApiStatus.Internal val requirements: MutableList<StellarRequirement<*>> = mutableListOf()
+    @ApiStatus.Internal val arguments: MutableSet<AbstractStellarArgument<*, *>> = mutableSetOf()
+    @ApiStatus.Internal val executions: MutableSet<StellarExecution<*>> = mutableSetOf()
+    @ApiStatus.Internal val runnables: MutableSet<StellarRunnable<*>> = mutableSetOf()
+    @ApiStatus.Internal val failureExecutions: MutableSet<StellarExecution<*>> = mutableSetOf()
+    @ApiStatus.Internal open val globalFailureExecutions: MutableSet<StellarExecution<*>> = mutableSetOf()
+    @ApiStatus.Internal var hideDefaultFailureMessages: HideDefaultFailureMessages = HideDefaultFailureMessages(hide = false, global = false)
 
     /**
      * Add a command alias in addition to the existing command aliases.
