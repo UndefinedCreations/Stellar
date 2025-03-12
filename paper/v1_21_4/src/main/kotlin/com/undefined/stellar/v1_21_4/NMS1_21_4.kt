@@ -35,6 +35,7 @@ import com.undefined.stellar.data.exception.UnsupportedArgumentException
 import com.undefined.stellar.nms.NMS
 import com.undefined.stellar.nms.NMSHelper
 import io.papermc.paper.adventure.PaperAdventure
+import io.papermc.paper.command.brigadier.PaperCommands
 import io.papermc.paper.registry.PaperRegistries
 import io.papermc.paper.registry.RegistryAccess
 import io.papermc.paper.registry.RegistryKey
@@ -73,39 +74,33 @@ import org.bukkit.craftbukkit.entity.CraftPlayer
 import org.bukkit.craftbukkit.inventory.CraftItemStack
 import org.bukkit.craftbukkit.scoreboard.CraftScoreboardTranslations
 import org.bukkit.craftbukkit.util.CraftNamespacedKey
-import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
 import java.util.function.Predicate
 import net.minecraft.commands.arguments.AngleArgument as BrigadierAngleArgument
+import net.minecraft.commands.arguments.ColorArgument as BrigadierColorArgument
+import net.minecraft.commands.arguments.ComponentArgument as BrigadierComponentArgument
 import net.minecraft.commands.arguments.EntityAnchorArgument as BrigadierEntityAnchorArgument
 import net.minecraft.commands.arguments.EntityArgument as BrigadierEntityArgument
 import net.minecraft.commands.arguments.GameModeArgument as BrigadierGameModeArgument
 import net.minecraft.commands.arguments.GameProfileArgument as BrigadierGameProfileArgument
+import net.minecraft.commands.arguments.MessageArgument as BrigadierMessageArgument
+import net.minecraft.commands.arguments.ObjectiveArgument as BrigadierObjectiveArgument
+import net.minecraft.commands.arguments.ObjectiveCriteriaArgument as BrigadierObjectiveCriteriaArgument
 import net.minecraft.commands.arguments.OperationArgument as BrigadierOperationArgument
+import net.minecraft.commands.arguments.ParticleArgument as BrigadierParticleArgument
+import net.minecraft.commands.arguments.ResourceOrIdArgument.LootTableArgument as BrigadierLootTableArgument
+import net.minecraft.commands.arguments.ScoreHolderArgument as BrigadierScoreHolderArgument
+import net.minecraft.commands.arguments.StyleArgument as BrigadierStyleArgument
+import net.minecraft.commands.arguments.TeamArgument as BrigadierTeamArgument
 import net.minecraft.commands.arguments.TimeArgument as BrigadierTimeArgument
 import net.minecraft.commands.arguments.blocks.BlockPredicateArgument as BrigadierBlockPredicateArgument
 import net.minecraft.commands.arguments.coordinates.RotationArgument as BrigadierRotationArgument
-import net.minecraft.commands.arguments.ObjectiveArgument as BrigadierObjectiveArgument
-import net.minecraft.commands.arguments.ObjectiveCriteriaArgument as BrigadierObjectiveCriteriaArgument
-import net.minecraft.commands.arguments.TeamArgument as BrigadierTeamArgument
-import net.minecraft.commands.arguments.ScoreHolderArgument as BrigadierScoreHolderArgument
-import net.minecraft.commands.arguments.ResourceOrIdArgument.LootTableArgument as BrigadierLootTableArgument
-import net.minecraft.commands.arguments.ColorArgument as BrigadierColorArgument
-import net.minecraft.commands.arguments.ComponentArgument as BrigadierComponentArgument
-import net.minecraft.commands.arguments.StyleArgument as BrigadierStyleArgument
-import net.minecraft.commands.arguments.MessageArgument as BrigadierMessageArgument
-import net.minecraft.commands.arguments.ParticleArgument as BrigadierParticleArgument
 
 @Suppress("UNCHECKED_CAST", "DEPRECATION")
 object NMS1_21_4 : NMS {
 
-    private val COMMAND_BUILD_CONTEXT: CommandBuildContext by lazy {
-        CommandBuildContext.simple(
-            MinecraftServer.getServer().registryAccess(),
-            MinecraftServer.getServer().worldData.dataConfiguration.enabledFeatures()
-        )
-    }
+    private val COMMAND_BUILD_CONTEXT: CommandBuildContext = PaperCommands.INSTANCE.buildContext
 
     override fun getCommandDispatcher(): CommandDispatcher<Any> = MinecraftServer.getServer().functions.dispatcher as CommandDispatcher<Any>
 
@@ -256,10 +251,6 @@ object NMS1_21_4 : NMS {
         }
     }
 
-    override fun getBukkitSender(source: Any): CommandSender = (source as CommandSourceStack).bukkitSender
-
-    override fun hasPermission(player: Player, level: Int): Boolean = (player as CraftPlayer).handle.hasPermissions(level)
-
     override fun getCommandSourceStack(sender: CommandSender): Any {
         val overworld = MinecraftServer.getServer().overworld()
         return CommandSourceStack(
@@ -267,7 +258,7 @@ object NMS1_21_4 : NMS {
             Vec3.atLowerCornerOf(overworld.sharedSpawnPos),
             Vec2.ZERO,
             overworld,
-            (sender as CraftPlayer).handle.permissionLevel,
+            (sender as? CraftPlayer)?.handle?.permissionLevel ?: 4,
             sender.name,
             Component.literal(sender.name),
             MinecraftServer.getServer(),

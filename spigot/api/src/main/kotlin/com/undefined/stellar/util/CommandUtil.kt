@@ -2,8 +2,6 @@ package com.undefined.stellar.util
 
 import com.undefined.stellar.NMSManager
 import com.undefined.stellar.StellarCommand
-import com.undefined.stellar.exception.UnsupportedVersionException
-import org.bukkit.plugin.java.JavaPlugin
 
 fun command(name: String, description: String, permissions: List<String>, aliases: List<String>, builder: StellarCommand.() -> Unit): StellarCommand {
     val command = StellarCommand(name, permissions, aliases)

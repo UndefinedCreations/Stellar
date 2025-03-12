@@ -1,6 +1,5 @@
 package com.undefined.stellar.listener
 
-import com.mojang.brigadier.context.CommandContext as BrigadierCommandContext
 import com.undefined.stellar.AbstractStellarCommand
 import com.undefined.stellar.NMSManager
 import com.undefined.stellar.Stellar
@@ -11,6 +10,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerCommandPreprocessEvent
 import org.bukkit.event.server.ServerCommandEvent
+import com.mojang.brigadier.context.CommandContext as BrigadierCommandContext
 
 object StellarListener : Listener {
 

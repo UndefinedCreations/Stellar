@@ -14,6 +14,7 @@ import com.undefined.stellar.data.suggestion.Suggestion
 import com.undefined.stellar.exception.UnsupportedVersionException
 import com.undefined.stellar.listener.StellarListener
 import com.undefined.stellar.nms.NMS
+import com.undefined.stellar.nms.NMSHelper
 import com.undefined.stellar.v1_21_4.NMS1_21_4
 import org.bukkit.Bukkit
 import org.bukkit.command.Command
@@ -44,7 +45,7 @@ object NMSManager {
         val dispatcher = nms.getCommandDispatcher()
         val mainNode = dispatcher.register(builder)
 
-        for (name in command.aliases + "${plugin.pluginMeta.name}:${command.name}")
+        for (name in command.aliases + "${plugin.pluginMeta.name.lowercase()}:${command.name}")
             dispatcher.register(LiteralArgumentBuilder.literal<Any>(name).redirect(mainNode))
 
         Bukkit.getServer().helpMap.addTopic(StellarCommandHelpTopic(command.name, command.information["Description"] ?: "", command.information.entries.associateBy({ it.value }) { it.key }) {
@@ -120,7 +121,7 @@ object NMSManager {
 
     private fun handleRequirements(command: AbstractStellarCommand<*>, builder: ArgumentBuilder<Any, *>) {
         builder.requires { source ->
-            val sender = nms.getBukkitSender(source)
+            val sender = NMSHelper.getBukkitSender(source)
             command.requirements.all { it(sender) }
         }
     }

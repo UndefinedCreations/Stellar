@@ -2,7 +2,9 @@ package com.undefined.stellar
 
 import com.mojang.brigadier.arguments.ArgumentType
 import com.undefined.stellar.data.argument.CommandContext
-import com.undefined.stellar.data.execution.StellarExecution
+import com.undefined.stellar.data.execution.ExecutableExecution
+import com.undefined.stellar.data.suggestion.ExecutableSuggestion
+import com.undefined.stellar.data.suggestion.SimpleStellarSuggestion
 import com.undefined.stellar.data.suggestion.StellarSuggestion
 import com.undefined.stellar.data.suggestion.Suggestion
 import org.bukkit.command.CommandSender
@@ -23,10 +25,10 @@ abstract class AbstractStellarArgument<T : AbstractStellarArgument<T, *>, R>(nam
      * Represents the parent command, whether it's a command or an argument. This is automatically set internally.
      */
     open lateinit var parent: AbstractStellarCommand<*>
-    override val globalFailureExecutions: MutableSet<StellarExecution<*>>
+    override val globalFailureExecutions: MutableSet<ExecutableExecution<*>>
         get() = parent.globalFailureExecutions
-    @ApiStatus.Internal open val suggestions: MutableSet<StellarSuggestion<*>> = mutableSetOf()
-    @ApiStatus.Internal open var suggestionOffset: Int = 0
+    open val suggestions: MutableSet<ExecutableSuggestion<*>> = mutableSetOf()
+    open var suggestionOffset: Int = 0
 
     /**
      * Adds a suggestion offset on top of the current offset.
@@ -43,7 +45,7 @@ abstract class AbstractStellarArgument<T : AbstractStellarArgument<T, *>, R>(nam
      * Adds multiple [Suggestion] on top of the current suggestions.
      */
     fun addSuggestions(vararg suggestions: Suggestion): T = apply {
-        this.suggestions.add(StellarSuggestion(CommandSender::class) { CompletableFuture.completedFuture(suggestions.toList()) })
+        this.suggestions.add(ExecutableSuggestion(CommandSender::class) { _, _ -> CompletableFuture.completedFuture(suggestions.toList()) })
     } as T
 
     /**
@@ -59,21 +61,33 @@ abstract class AbstractStellarArgument<T : AbstractStellarArgument<T, *>, R>(nam
      * Adds a function  that returns a list of suggestions in a [CompletableFuture] on top of the current suggestions.
      */
     inline fun <reified C : CommandSender> addFutureSuggestion(noinline suggestion: CommandContext<C>.(input: String) -> CompletableFuture<Iterable<Suggestion>>): T = apply {
-        suggestions.add(StellarSuggestion(C::class, suggestion))
+        suggestions.add(ExecutableSuggestion(C::class, suggestion))
     } as T
 
     /**
      * Adds an async function that returns a list of [Suggestion] on top of the current suggestions.
      */
     inline fun <reified C : CommandSender> addAsyncSuggestion(noinline suggestion: CommandContext<C>.(input: String) -> List<Suggestion>): T = apply {
-        suggestions.add(StellarSuggestion(C::class) { CompletableFuture.supplyAsync { suggestion(this, it) } })
+        suggestions.add(ExecutableSuggestion(C::class) { context, input -> CompletableFuture.supplyAsync { suggestion(context, input) } })
     } as T
 
     /**
      * Adds a function that returns a list of [Suggestion] on top of the current suggestions.
      */
     inline fun <reified C : CommandSender> addSuggestion(noinline suggestion: CommandContext<C>.(input: String) -> List<Suggestion>): T = apply {
-        suggestions.add(StellarSuggestion(C::class) { CompletableFuture.completedFuture(suggestion(this, it)) })
+        suggestions.add(ExecutableSuggestion(C::class) { context, input -> CompletableFuture.completedFuture(suggestion(context, input)) })
+    } as T
+
+    fun addFutureSuggestion(suggestion: StellarSuggestion<CommandSender>): T = apply {
+        suggestions.add(ExecutableSuggestion(CommandSender::class, suggestion))
+    } as T
+
+    fun addAsyncSuggestion(suggestion: SimpleStellarSuggestion<CommandSender>): T = apply {
+        suggestions.add(ExecutableSuggestion(CommandSender::class) { context, input -> CompletableFuture.supplyAsync { suggestion(context, input) } })
+    } as T
+
+    fun addSuggestion(suggestion: SimpleStellarSuggestion<CommandSender>): T = apply {
+        suggestions.add(ExecutableSuggestion(CommandSender::class) { context, input -> CompletableFuture.completedFuture(suggestion(context, input)) })
     } as T
 
     override fun hasGlobalHiddenDefaultFailureMessages(): Boolean = parent.hasGlobalHiddenDefaultFailureMessages()

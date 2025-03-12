@@ -2,8 +2,6 @@ package com.undefined.stellar.util
 
 import com.undefined.stellar.NMSManager
 import com.undefined.stellar.StellarCommand
-import com.undefined.stellar.exception.UnsupportedVersionException
-import org.bukkit.plugin.java.JavaPlugin
 
 /**
  * Creates a new command with the specified parameters and a builder function.

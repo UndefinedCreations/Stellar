@@ -67,7 +67,6 @@ import org.bukkit.craftbukkit.v1_21_R3.block.data.CraftBlockData
 import org.bukkit.craftbukkit.v1_21_R3.entity.CraftPlayer
 import org.bukkit.craftbukkit.v1_21_R3.inventory.CraftItemStack
 import org.bukkit.craftbukkit.v1_21_R3.util.CraftNamespacedKey
-import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.scoreboard.DisplaySlot
@@ -205,9 +204,7 @@ object NMS1_21_4 : NMS {
 
             // Misc
             is NamespacedKeyArgument -> CraftNamespacedKey.fromMinecraft(ResourceLocationArgument.getId(context, argument.name))
-            is RegistryArgument -> {
-                argument.registry.getOrThrow(NamespacedKey.fromString(NMSHelper.getArgumentInput(context, argument.name)!!)!!)
-            }
+            is RegistryArgument -> argument.registry.getOrThrow(NamespacedKey.fromString(NMSHelper.getArgumentInput(context, argument.name)!!)!!)
             is UUIDArgument -> UuidArgument.getUuid(context, argument.name)
 
             // Player
@@ -249,10 +246,6 @@ object NMS1_21_4 : NMS {
         }
     }
 
-    override fun getBukkitSender(source: Any): CommandSender = (source as CommandSourceStack).bukkitSender
-
-    override fun hasPermission(player: Player, level: Int): Boolean = (player as CraftPlayer).handle.hasPermissions(level)
-
     override fun getCommandSourceStack(sender: CommandSender): Any {
         val overworld = MinecraftServer.getServer().overworld()
         return CommandSourceStack(
@@ -260,7 +253,7 @@ object NMS1_21_4 : NMS {
             Vec3.atLowerCornerOf(overworld.sharedSpawnPos),
             Vec2.ZERO,
             overworld,
-            (sender as CraftPlayer).handle.permissionLevel,
+            (sender as? CraftPlayer)?.handle?.permissionLevel ?: 4,
             sender.name,
             Component.literal(sender.name),
             MinecraftServer.getServer(),

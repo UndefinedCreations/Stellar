@@ -28,6 +28,7 @@ tasks {
     }
     shadowJar {
         archiveFileName.set("Stellar-shadow.jar")
+        outputs.upToDateWhen { false }
     }
     compileKotlin {
         compilerOptions.jvmTarget = JvmTarget.JVM_21
