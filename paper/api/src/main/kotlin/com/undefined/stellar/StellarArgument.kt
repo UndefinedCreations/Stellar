@@ -1,12 +1,10 @@
 package com.undefined.stellar
 
-abstract class StellarArgument(val type: AbstractStellarArgument<*, *>, val permissions: List<String>) {
-
-    constructor(type: AbstractStellarArgument<*, *>, vararg permissions: String) : this(type, permissions.toList())
+abstract class StellarArgument(val type: AbstractStellarArgument<*, *>, vararg val permissions: String) {
 
     val fullArgument: AbstractStellarArgument<*, *> by lazy {
         setup().apply {
-            addRequirements(*permissions.toTypedArray())
+            addRequirements(*permissions)
             for (argument in arguments()) addArgument(argument.fullArgument)
         }
     }
