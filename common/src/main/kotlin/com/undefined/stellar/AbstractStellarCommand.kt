@@ -465,6 +465,176 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
 
     // List
     /**
+     * Adds a [ListArgument] to the command with the given name. It uses its [StringArgument] as a base wrapper.
+     *
+     * @param list A function return a list of possible values.
+     * @param tooltip A function that assigns each suggestion with a tooltip. If the value is null, it will not add a tooltip.
+     * @param type The [StringType] it will use in the [StringArgument].
+     * @return The created [ListArgument].
+     */
+    fun addListArgument(
+        name: String,
+        list: CommandContext<CommandSender>.() -> List<String>,
+        tooltip: (String) -> String? = { null },
+        type: StringType = StringType.WORD
+    ): ListArgument<String, String> = addArgument(ListArgument(StringArgument(name, type), list, { Suggestion.create(it, tooltip(it)) }, { it }))
+
+    /**
+     * Adds a [ListArgument] to the command with the given name. It uses its [StringArgument] as a base wrapper.
+     *
+     * @param list The list of possible values.
+     * @param tooltip A function that assigns each suggestion with a tooltip. If the value is null, it will not add a tooltip.
+     * @param type The [StringType] it will use in the [StringArgument].
+     * @return The created [ListArgument].
+     */
+    fun addListArgument(
+        name: String,
+        list: List<String>,
+        tooltip: (String) -> String? = { null },
+        type: StringType = StringType.WORD
+    ): ListArgument<String, String> = addArgument(ListArgument(StringArgument(name, type), list, { Suggestion.create(it, tooltip(it)) }, { it }))
+
+    /**
+     * Adds a [ListArgument] to the command with the given name.
+     *
+     * @param list The list of possible values.
+     * @param parse A function to parse the returned [String] into type `T`.
+     * @param converter A function to convert a value into a [String] (default: uses `toString()`).
+     * @param async Whether the _suggestions_ should be gotten asynchronously (default: `false`).
+     * @return The created [ListArgument].
+     */
+    fun <T> addListArgument(
+        name: String,
+        list: List<T>,
+        parse: CommandSender.(String) -> T,
+        converter: CommandSender.(T) -> String? = { it.toString() },
+        async: Boolean = false,
+    ): ListArgument<T, String> = addArgument(ListArgument(StringArgument(name, StringType.WORD), list, { converter(it)?.let { Suggestion.withText(it) } }, parse, async))
+
+    /**
+     * Adds a [ListArgument] to the command with the given name.
+     *
+     * @param list A function returning the list of possible values.
+     * @param parse A function to parse the returned [String] into type `T`.
+     * @param converter A function to convert a value into a [String] (default: uses `toString()`).
+     * @param async Whether the _suggestions_ should be gotten asynchronously (default: `false`).
+     * @return The created [ListArgument].
+     */
+    fun <T> addListArgument(
+        name: String,
+        list: CommandContext<CommandSender>.() -> List<T>,
+        parse: CommandSender.(String) -> T,
+        converter: CommandSender.(T) -> String? = { it.toString() },
+        async: Boolean = false,
+    ): ListArgument<T, String> = addArgument(ListArgument(StringArgument(name, StringType.WORD), list, { converter(it)?.let { Suggestion.withText(it) } }, parse, async))
+
+    /**
+     * Adds a [ListArgument] to the command wrapped around the given [AbstractStellarCommand].
+     *
+     * @param type The base argument the list is wrapped around to.
+     * @param list The list of possible values.
+     * @param parse A function to parse the returned [String] into type `T`.
+     * @param converter A function to convert a value into a [String] (default: uses `toString()`).
+     * @param async Whether the _suggestions_ should be gotten asynchronously (default: `false`).
+     * @return The created [ListArgument].
+     */
+    fun <T, R> addListArgument(
+        type: AbstractStellarArgument<*, R>,
+        list: List<T>,
+        parse: CommandSender.(R) -> T,
+        converter: CommandSender.(T) -> String? = { it.toString() },
+        async: Boolean = false,
+    ): ListArgument<T, R> = addArgument(ListArgument(type, list, { converter(it)?.let { Suggestion.withText(it) } }, parse, async))
+
+    /**
+     * Adds a [ListArgument] to the command wrapped around the given [AbstractStellarCommand].
+     *
+     * @param type The base argument the list is wrapped around to.
+     * @param list A function returning the list of possible values.
+     * @param parse A function to parse the returned [String] into type `T`.
+     * @param converter A function to convert a value into a [String] (default: uses `toString()`).
+     * @param async Whether the _suggestions_ should be gotten asynchronously (default: `false`).
+     * @return The created [ListArgument].
+     */
+    fun <T, R> addListArgument(
+        type: AbstractStellarArgument<*, R>,
+        list: CommandContext<CommandSender>.() -> List<T>,
+        parse: CommandSender.(R) -> T,
+        converter: CommandSender.(T) -> String? = { it.toString() },
+        async: Boolean = false,
+    ): ListArgument<T, R> = addArgument(ListArgument(type, list, { converter(it)?.let { Suggestion.withText(it) } }, parse, async))
+
+    /**
+     * Adds a [ListArgument] to the command with the given name.
+     *
+     * @param list The list of possible values.
+     * @param parse A function to parse the returned [String] into type `T`.
+     * @param converter A function to convert a value into a [Suggestion] (default: uses `toString()`).
+     * @param async Whether the _suggestions_ should be gotten asynchronously (default: `false`).
+     * @return The created [ListArgument].
+     */
+    fun <T> addAdvancedListArgument(
+        name: String,
+        list: List<T>,
+        parse: CommandSender.(String) -> T,
+        converter: CommandSender.(T) -> Suggestion? = { Suggestion.withText(it.toString()) },
+        async: Boolean = false,
+    ): ListArgument<T, String> = addArgument(ListArgument(StringArgument(name, StringType.WORD), list, converter, parse, async))
+
+    /**
+     * Adds a [ListArgument] to the command with the given name.
+     *
+     * @param list A function returning the list of possible values.
+     * @param parse A function to parse the returned [String] into type `T`.
+     * @param converter A function to convert a value into a [Suggestion] (default: uses `toString()`).
+     * @param async Whether the _suggestions_ should be gotten asynchronously (default: `false`).
+     * @return The created [ListArgument].
+     */
+    fun <T> addAdvancedListArgument(
+        name: String,
+        list: CommandContext<CommandSender>.() -> List<T>,
+        parse: CommandSender.(String) -> T,
+        converter: CommandSender.(T) -> Suggestion? = { Suggestion.withText(it.toString()) },
+        async: Boolean = false,
+    ): ListArgument<T, String> = addArgument(ListArgument(StringArgument(name, StringType.WORD), list, converter, parse, async))
+
+    /**
+     * Adds a [ListArgument] to the command wrapped around the given [AbstractStellarCommand].
+     *
+     * @param type The base argument the list is wrapped around to.
+     * @param list The list of possible values.
+     * @param parse A function to parse the returned [String] into type `T`.
+     * @param converter A function to convert a value into a [Suggestion] (default: uses `toString()`).
+     * @param async Whether the _suggestions_ should be gotten asynchronously (default: `false`).
+     * @return The created [ListArgument].
+     */
+    fun <T, R> addAdvancedListArgument(
+        type: AbstractStellarArgument<*, R>,
+        list: List<T>,
+        parse: CommandSender.(R) -> T,
+        converter: CommandSender.(T) -> Suggestion? = { Suggestion.withText(it.toString()) },
+        async: Boolean = false,
+    ): ListArgument<T, R> = addArgument(ListArgument(type, list, converter, parse, async))
+
+    /**
+     * Adds a [ListArgument] to the command wrapped around the given [AbstractStellarCommand].
+     *
+     * @param type The base argument the list is wrapped around to.
+     * @param list A function returning the list of possible values.
+     * @param parse A function to parse the returned [String] into type `T`.
+     * @param converter A function to convert a value into a [Suggestion] (default: uses `toString()`).
+     * @param async Whether the _suggestions_ should be gotten asynchronously (default: `false`).
+     * @return The created [ListArgument].
+     */
+    fun <T, R> addAdvancedListArgument(
+        type: AbstractStellarArgument<*, R>,
+        list: CommandContext<CommandSender>.() -> List<T>,
+        parse: CommandSender.(R) -> T,
+        converter: CommandSender.(T) -> Suggestion? = { Suggestion.withText(it.toString()) },
+        async: Boolean = false,
+    ): ListArgument<T, R> = addArgument(ListArgument(type, list, converter, parse, async))
+
+    /**
      * Adds an [EnumArgument] to the command with the given name.
      *
      * @param converter A function to convert an enum value into a [Suggestion] (default: uses the enum's name).
@@ -491,146 +661,6 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
         formatting: EnumFormatting = EnumFormatting.LOWERCASE,
         async: Boolean = true,
     ): EnumArgument<T> = addArgument(EnumArgument(name, T::class, { Suggestion.withText(formatting.action(it.name)) }, async))
-
-    /**
-     * Adds a [ListArgument] to the command with the given name.
-     *
-     * @param list The list of possible values.
-     * @param converter A function to convert a value into a [Suggestion] (default: uses `toString()`).
-     * @param parse A function to parse a string into type `T`.
-     * @param async Whether the _suggestions_ should be gotten asynchronously (default: `false`).
-     * @return The created [ListArgument].
-     */
-    fun <T> addAdvancedListArgument(
-        name: String,
-        list: List<T>,
-        converter: CommandSender.(T) -> Suggestion? = { Suggestion.withText(it.toString()) },
-        parse: CommandSender.(String) -> T,
-        async: Boolean = false,
-    ): ListArgument<T, String> = addArgument(ListArgument(StringArgument(name, StringType.WORD), list, converter, parse, async))
-
-    /**
-     * Adds a [ListArgument] to the command wrapped around the given [AbstractStellarCommand].
-     *
-     * @param type The base argument the list is wrapped around to.
-     * @param list The list of possible values.
-     * @param converter A function to convert a value into a [Suggestion] (default: uses `toString()`).
-     * @param parse A function to parse a string into type `T`.
-     * @param async Whether the _suggestions_ should be gotten asynchronously (default: `false`).
-     * @return The created [ListArgument].
-     */
-    fun <T, R> addAdvancedListArgument(
-        type: AbstractStellarArgument<*, R>,
-        list: List<T>,
-        converter: CommandSender.(T) -> Suggestion? = { Suggestion.withText(it.toString()) },
-        parse: CommandSender.(R) -> T,
-        async: Boolean = false,
-    ): ListArgument<T, R> = addArgument(ListArgument(type, list, converter, parse, async))
-
-    /**
-     * Adds a [ListArgument] to the command with the given name.
-     *
-     * @param list A function returning the list of possible values.
-     * @param converter A function to convert a value into a [Suggestion] (default: uses `toString()`).
-     * @param parse A function to parse a string into type `T`.
-     * @param async Whether the _suggestions_ should be gotten asynchronously (default: `false`).
-     * @return The created [ListArgument].
-     */
-    fun <T> addAdvancedListArgument(
-        name: String,
-        list: CommandContext<CommandSender>.() -> List<T>,
-        converter: CommandSender.(T) -> Suggestion? = { Suggestion.withText(it.toString()) },
-        parse: CommandSender.(String) -> T,
-        async: Boolean = false,
-    ): ListArgument<T, String> = addArgument(ListArgument(StringArgument(name, StringType.WORD), list, converter, parse, async))
-
-    /**
-     * Adds a [ListArgument] to the command wrapped around the given [AbstractStellarCommand].
-     *
-     * @param type The base argument the list is wrapped around to.
-     * @param list A function returning the list of possible values.
-     * @param converter A function to convert a value into a [Suggestion] (default: uses `toString()`).
-     * @param parse A function to parse a string into type `T`.
-     * @param async Whether the _suggestions_ should be gotten asynchronously (default: `false`).
-     * @return The created [ListArgument].
-     */
-    fun <T, R> addAdvancedListArgument(
-        type: AbstractStellarArgument<*, R>,
-        list: CommandContext<CommandSender>.() -> List<T>,
-        converter: CommandSender.(T) -> Suggestion? = { Suggestion.withText(it.toString()) },
-        parse: CommandSender.(R) -> T,
-        async: Boolean = false,
-    ): ListArgument<T, R> = addArgument(ListArgument(type, list, converter, parse, async))
-
-    /**
-     * Adds a [ListArgument] to the command with the given name.
-     *
-     * @param list The list of possible values.
-     * @param converter A function to convert a value into a [String] (default: uses `toString()`).
-     * @param parse A function to parse a string into type `T`.
-     * @param async Whether the _suggestions_ should be gotten asynchronously (default: `false`).
-     * @return The created [ListArgument].
-     */
-    fun <T> addListArgument(
-        name: String,
-        list: List<T>,
-        converter: CommandSender.(T) -> String? = { it.toString() },
-        parse: CommandSender.(String) -> T,
-        async: Boolean = false,
-    ): ListArgument<T, String> = addArgument(ListArgument(StringArgument(name, StringType.WORD), list, { converter(it)?.let { Suggestion.withText(it) } }, parse, async))
-
-    /**
-     * Adds a [ListArgument] to the command wrapped around the given [AbstractStellarCommand].
-     *
-     * @param type The base argument the list is wrapped around to.
-     * @param list The list of possible values.
-     * @param converter A function to convert a value into a [String] (default: uses `toString()`).
-     * @param parse A function to parse a string into type `T`.
-     * @param async Whether the _suggestions_ should be gotten asynchronously (default: `false`).
-     * @return The created [ListArgument].
-     */
-    fun <T, R> addListArgument(
-        type: AbstractStellarArgument<*, R>,
-        list: List<T>,
-        converter: CommandSender.(T) -> String? = { it.toString() },
-        parse: CommandSender.(R) -> T,
-        async: Boolean = false,
-    ): ListArgument<T, R> = addArgument(ListArgument(type, list, { converter(it)?.let { Suggestion.withText(it) } }, parse, async))
-
-    /**
-     * Adds a [ListArgument] to the command with the given name.
-     *
-     * @param list A function returning the list of possible values.
-     * @param converter A function to convert a value into a [String] (default: uses `toString()`).
-     * @param parse A function to parse a string into type `T`.
-     * @param async Whether the _suggestions_ should be gotten asynchronously (default: `false`).
-     * @return The created [ListArgument].
-     */
-    fun <T> addListArgument(
-        name: String,
-        list: CommandContext<CommandSender>.() -> List<T>,
-        converter: CommandSender.(T) -> String? = { it.toString() },
-        parse: CommandSender.(String) -> T,
-        async: Boolean = false,
-    ): ListArgument<T, String> = addArgument(ListArgument(StringArgument(name, StringType.WORD), list, { converter(it)?.let { Suggestion.withText(it) } }, parse, async))
-
-    /**
-     * Adds a [ListArgument] to the command wrapped around the given [AbstractStellarCommand].
-     *
-     * @param type The base argument the list is wrapped around to.
-     * @param list A function returning the list of possible values.
-     * @param converter A function to convert a value into a [String] (default: uses `toString()`).
-     * @param parse A function to parse a string into type `T`.
-     * @param async Whether the _suggestions_ should be gotten asynchronously (default: `false`).
-     * @return The created [ListArgument].
-     */
-    fun <T, R> addListArgument(
-        type: AbstractStellarArgument<*, R>,
-        list: CommandContext<CommandSender>.() -> List<T>,
-        converter: CommandSender.(T) -> String? = { it.toString() },
-        parse: CommandSender.(R) -> T,
-        async: Boolean = false,
-    ): ListArgument<T, R> = addArgument(ListArgument(type, list, { converter(it)?.let { Suggestion.withText(it) } }, parse, async))
 
     /**
      * Adds an [OnlinePlayersArgument] to the command with the given name. It is a list of all currently online players.
