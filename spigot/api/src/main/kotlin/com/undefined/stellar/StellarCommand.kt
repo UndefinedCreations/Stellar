@@ -1,44 +1,49 @@
 package com.undefined.stellar
 
-import com.undefined.stellar.data.events.StellarCommandRegisterEvent
-import com.undefined.stellar.data.requirement.PermissionStellarRequirement
-import com.undefined.stellar.exception.UnsupportedVersionException
-import com.undefined.stellar.manager.CommandManager
-import com.undefined.stellar.util.NMSVersion
-import org.bukkit.Bukkit
-import org.bukkit.command.CommandSender
 import org.bukkit.plugin.java.JavaPlugin
-import org.jetbrains.annotations.ApiStatus
+import java.util.*
 
-class StellarCommand(name: String, permissions: List<String> = listOf(), aliases: List<String> = listOf()) : AbstractStellarCommand<StellarCommand>(name.lowercase()) {
+/**
+ * This is the base of any command, e.g. /op <target>, op would be the base command.
+ *
+ * @param name The name of the command.
+ * @param permissions An `Iterable` of Bukkit string permissions to be applied as a requirement.
+ * @param aliases An `Iterable` of name aliases.
+ */
+class StellarCommand(name: String, permissions: Iterable<String> = listOf(), aliases: Iterable<String> = listOf()) : AbstractStellarCommand<StellarCommand>(name) {
 
-    constructor(name: String, aliases: List<String>) : this(name, permissions = listOf(), aliases = aliases)
-    constructor(name: String, permission: String, aliases: List<String> = listOf()) : this(name, listOf(permission), aliases)
+    val information: SortedMap<String, String> = sortedMapOf()
+
+    /**
+     * This is the base of any command, e.g. /op <target>, op would be the base command.
+     *
+     * @param name The name of the command.
+     * @param aliases An `Iterable` of name aliases.
+     */
+    constructor(name: String, aliases: Iterable<String>) : this(name, permissions = listOf(), aliases = aliases)
+    /**
+     * This is the base of any command, e.g. /op <target>, op would be the base command.
+     *
+     * @param name The name of the command.
+     * @param permission A single Bukkit permission to be applied as a requirement.
+     * @param aliases An `Iterable` of name aliases.
+     */
+    constructor(name: String, permission: String, aliases: Iterable<String> = listOf()) : this(name, listOf(permission), aliases)
 
     init {
-        this.permissionRequirements.addAll(permissions.map { PermissionStellarRequirement(1, it) })
-        this.aliases.addAll(aliases)
+        setDescription("A command made with Stellar.")
+        addRequirements(*permissions.toList().toTypedArray())
+        addAliases(*aliases.toList().toTypedArray())
     }
 
-    private var registered = false
+    override fun setInformation(name: String, text: String): StellarCommand = apply { information[name] = text }
+    override fun setDescription(text: String): StellarCommand = setInformation("Description", text)
+    override fun setUsageText(text: String): StellarCommand = setInformation("Usage", text)
+    override fun clearInformation(): StellarCommand = apply { aliases.clear() }
 
-    override fun register(plugin: JavaPlugin) {
-        if (registered) return
-        registered = true
-        StellarCommands.commands.add(this)
-        CommandManager.initialize(plugin)
-        val registrar = (CommandManager.registrars[NMSVersion.version] ?: throw UnsupportedVersionException()).objectInstance
-        registrar?.register(this, plugin)
-        for (execution in this.registerExecutions) execution()
-        Bukkit.getPluginManager().callEvent(StellarCommandRegisterEvent(this))
-    }
-
-    companion object {
-        @ApiStatus.Internal
-        fun parseAndReturnCancelled(sender: CommandSender, input: String): Boolean {
-            val registrar = (CommandManager.registrars[NMSVersion.version] ?: throw UnsupportedVersionException()).objectInstance
-            return registrar?.handleCommandFailure(sender, input) ?: false
-        }
+    override fun register(plugin: JavaPlugin) = apply {
+        if (aliases.isNotEmpty()) setInformation("Aliases", aliases.joinToString())
+        NMSManager.register(this, plugin)
     }
 
 }

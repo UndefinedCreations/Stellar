@@ -1,12 +1,12 @@
 package com.undefined.stellar.argument.basic
 
-import com.undefined.stellar.AbstractStellarCommand
-import com.undefined.stellar.argument.AbstractStellarArgument
+import com.mojang.brigadier.arguments.StringArgumentType
+import com.undefined.stellar.AbstractStellarArgument
 
-class StringArgument(parent: AbstractStellarCommand<*>, name: String, val type: StringType) : AbstractStellarArgument<StringArgument, String>(parent, name)
+open class StringArgument(name: String, type: StringType = StringType.WORD) : AbstractStellarArgument<StringArgument, String>(name, type.argumentType)
 
-enum class StringType(vararg val examples: String) {
-    WORD(*arrayOf("word", "words_with_underscores")),
-    QUOTABLE_PHRASE(*arrayOf("\"quoted phrase\"", "word", "\"\"")),
-    PHRASE(*arrayOf("word", "words with spaces", "\"and symbols\""));
+enum class StringType(internal val argumentType: StringArgumentType, vararg val examples: String) {
+    WORD(StringArgumentType.word(), *arrayOf("word", "words_with_underscores")),
+    QUOTABLE_PHRASE(StringArgumentType.string(), *arrayOf("\"quoted phrase\"", "word", "\"\"")),
+    PHRASE(StringArgumentType.greedyString(), *arrayOf("word", "words with spaces", "\"and symbols\""));
 }

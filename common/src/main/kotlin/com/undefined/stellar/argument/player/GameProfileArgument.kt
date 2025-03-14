@@ -1,7 +1,6 @@
 package com.undefined.stellar.argument.player
 
 import com.mojang.authlib.GameProfile
-import com.undefined.stellar.AbstractStellarCommand
-import com.undefined.stellar.argument.AbstractStellarArgument
+import com.undefined.stellar.AbstractStellarArgument
 
-class GameProfileArgument(parent: AbstractStellarCommand<*>, name: String) : AbstractStellarArgument<GameProfileArgument, GameProfile>(parent, name)
+class GameProfileArgument(name: String) : AbstractStellarArgument<GameProfileArgument, GameProfile>(name)

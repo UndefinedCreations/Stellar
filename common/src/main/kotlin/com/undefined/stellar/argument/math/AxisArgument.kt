@@ -1,6 +1,5 @@
 package com.undefined.stellar.argument.math
 
-import com.undefined.stellar.AbstractStellarCommand
-import com.undefined.stellar.argument.AbstractStellarArgument
+import com.undefined.stellar.AbstractStellarArgument
 
-class AxisArgument(parent: AbstractStellarCommand<*>, name: String) : AbstractStellarArgument<AxisArgument, Float>(parent, name)
+class AxisArgument(name: String) : AbstractStellarArgument<AxisArgument, Float>(name)

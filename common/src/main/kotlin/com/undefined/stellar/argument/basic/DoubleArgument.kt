@@ -1,6 +1,6 @@
 package com.undefined.stellar.argument.basic
 
-import com.undefined.stellar.AbstractStellarCommand
-import com.undefined.stellar.argument.AbstractStellarArgument
+import com.mojang.brigadier.arguments.DoubleArgumentType
+import com.undefined.stellar.AbstractStellarArgument
 
-class DoubleArgument(parent: AbstractStellarCommand<*>, name: String, val min: Double, val max: Double) : AbstractStellarArgument<DoubleArgument, Double>(parent, name)
+class DoubleArgument(name: String, minimum: Double = Double.MIN_VALUE, maximum: Double = Double.MAX_VALUE) : AbstractStellarArgument<DoubleArgument, Double>(name, DoubleArgumentType.doubleArg(minimum, maximum))

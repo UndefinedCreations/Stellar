@@ -1,7 +1,6 @@
 package com.undefined.stellar.argument.misc
 
-import com.undefined.stellar.AbstractStellarCommand
-import com.undefined.stellar.argument.AbstractStellarArgument
+import com.undefined.stellar.AbstractStellarArgument
 import java.util.*
 
-class UUIDArgument(parent: AbstractStellarCommand<*>, name: String) : AbstractStellarArgument<UUIDArgument, UUID>(parent, name)
+class UUIDArgument(name: String) : AbstractStellarArgument<UUIDArgument, UUID>(name)

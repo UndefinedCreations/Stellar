@@ -1,9 +1,7 @@
 package com.undefined.stellar.data.argument
 
-import com.undefined.stellar.exception.ArgumentCastMismatchException
+import com.undefined.stellar.data.exception.ArgumentCastMismatchException
 import org.bukkit.command.CommandSender
-
-typealias CommandNode = HashMap<String, (CommandContext<CommandSender>) -> Any?>
 
 @Suppress("UNCHECKED_CAST", "UNUSED")
 class CommandContext<T : CommandSender>(val arguments: CommandNode, val sender: T, val input: String) {

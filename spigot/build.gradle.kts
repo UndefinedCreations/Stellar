@@ -1,14 +1,5 @@
 plugins {
     java
-    kotlin("jvm") version "1.9.22"
-    id("com.gradleup.shadow") version "8.3.5"
-}
-
-allprojects {
-    repositories {
-        maven {
-            name = "spigotmc-repo"
-            url = uri("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
-        }
-    }
+    id("setup")
+    id("com.undefinedcreations.mapper") version "1.1.1" apply false
 }

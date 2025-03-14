@@ -1,6 +1,6 @@
 package com.undefined.stellar.argument.basic
 
-import com.undefined.stellar.AbstractStellarCommand
-import com.undefined.stellar.argument.AbstractStellarArgument
+import com.mojang.brigadier.arguments.BoolArgumentType
+import com.undefined.stellar.AbstractStellarArgument
 
-class BooleanArgument(parent: AbstractStellarCommand<*>, name: String) : AbstractStellarArgument<BooleanArgument, Boolean>(parent, name)
+class BooleanArgument(name: String) : AbstractStellarArgument<BooleanArgument, Boolean>(name, BoolArgumentType.bool())

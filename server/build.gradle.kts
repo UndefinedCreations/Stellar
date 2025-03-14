@@ -1,22 +1,26 @@
 import com.undefinedcreations.runServer.ServerType
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    kotlin("jvm") version "1.9.22"
+    id("setup")
     id("com.undefinedcreations.runServer") version "0.1.6"
     id("com.gradleup.shadow") version "8.3.5"
 }
 
 repositories {
-    maven("https://repo.papermc.io/repository/maven-public/")
+    maven {
+        name = "undefined-repo"
+        url = uri("https://repo.undefinedcreations.com/releases")
+    }
 }
 
 val versionVar = version
 val groupIdVar = "com.undefined"
-val artifactIdVar = "stellar"
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
-    implementation(project(":spigot:api"))
+    compileOnly(libs.papermc)
+//    implementation(project(":paper:api"))
+    implementation("com.undefined:stellar:0.1.37:paper")
 }
 
 tasks {
@@ -25,15 +29,16 @@ tasks {
     }
     shadowJar {
         archiveFileName.set("Stellar-shadow.jar")
+        outputs.upToDateWhen { false }
     }
     compileKotlin {
-        kotlinOptions.jvmTarget = "21"
+        compilerOptions.jvmTarget = JvmTarget.JVM_21
     }
     compileJava {
         options.release = 21
     }
     runServer {
-        minecraftVersion("1.21.1")
+        minecraftVersion("1.21.4")
         serverFolderName { "run" }
         acceptMojangEula()
         serverType(ServerType.PAPERMC)

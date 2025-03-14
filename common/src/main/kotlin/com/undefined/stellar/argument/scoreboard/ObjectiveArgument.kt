@@ -1,7 +1,6 @@
 package com.undefined.stellar.argument.scoreboard
 
-import com.undefined.stellar.AbstractStellarCommand
-import com.undefined.stellar.argument.AbstractStellarArgument
+import com.undefined.stellar.AbstractStellarArgument
 import org.bukkit.scoreboard.Objective
 
-class ObjectiveArgument(parent: AbstractStellarCommand<*>, name: String) : AbstractStellarArgument<ObjectiveArgument, Objective>(parent, name)
+class ObjectiveArgument(name: String) : AbstractStellarArgument<ObjectiveArgument, Objective>(name)

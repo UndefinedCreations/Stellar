@@ -1,6 +1,5 @@
 package com.undefined.stellar.argument.item
 
-import com.undefined.stellar.AbstractStellarCommand
-import com.undefined.stellar.argument.AbstractStellarArgument
+import com.undefined.stellar.AbstractStellarArgument
 
-class ItemSlotArgument(parent: AbstractStellarCommand<*>, name: String) : AbstractStellarArgument<ItemSlotArgument, Int>(parent, name)
+class ItemSlotArgument(name: String, val multiple: Boolean = false) : AbstractStellarArgument<ItemSlotArgument, Int>(name)

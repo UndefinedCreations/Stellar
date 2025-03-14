@@ -1,7 +1,6 @@
 package com.undefined.stellar.argument.world
 
-import com.undefined.stellar.AbstractStellarCommand
-import com.undefined.stellar.argument.AbstractStellarArgument
+import com.undefined.stellar.AbstractStellarArgument
 import org.bukkit.Particle
 
-class ParticleArgument(parent: AbstractStellarCommand<*>, name: String) : AbstractStellarArgument<ParticleArgument, Particle>(parent, name)
+class ParticleArgument(name: String) : AbstractStellarArgument<ParticleArgument, Particle>(name)

@@ -1,6 +1,6 @@
 package com.undefined.stellar.argument.basic
 
-import com.undefined.stellar.AbstractStellarCommand
-import com.undefined.stellar.argument.AbstractStellarArgument
+import com.mojang.brigadier.arguments.LongArgumentType
+import com.undefined.stellar.AbstractStellarArgument
 
-class LongArgument(parent: AbstractStellarCommand<*>, name: String, val min: Long, val max: Long) : AbstractStellarArgument<LongArgument, Long>(parent, name)
+class LongArgument(name: String, minimum: Long = Long.MIN_VALUE, maximum: Long = Long.MAX_VALUE) : AbstractStellarArgument<LongArgument, Long>(name, LongArgumentType.longArg(minimum, maximum))

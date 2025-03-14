@@ -1,9 +1,8 @@
 package com.undefined.stellar.argument.scoreboard
 
-import com.undefined.stellar.AbstractStellarCommand
-import com.undefined.stellar.argument.AbstractStellarArgument
+import com.undefined.stellar.AbstractStellarArgument
 
-class ScoreHolderArgument(parent: AbstractStellarCommand<*>, name: String, val type: ScoreHolderType) : AbstractStellarArgument<ScoreHolderArgument, String>(parent, name)
+class ScoreHolderArgument(name: String, val type: ScoreHolderType) : AbstractStellarArgument<ScoreHolderArgument, String>(name)
 
 enum class ScoreHolderType {
     SINGLE,

@@ -1,6 +1,5 @@
 package com.undefined.stellar.argument.math
 
-import com.undefined.stellar.AbstractStellarCommand
-import com.undefined.stellar.argument.AbstractStellarArgument
+import com.undefined.stellar.AbstractStellarArgument
 
-class TimeArgument(parent: AbstractStellarCommand<*>, name: String, val minimum: Int) : AbstractStellarArgument<TimeArgument, Long>(parent, name)
+class TimeArgument(name: String, val minimum: Int = 0) : AbstractStellarArgument<TimeArgument, Int>(name)

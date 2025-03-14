@@ -1,6 +1,6 @@
 package com.undefined.stellar.argument.basic
 
-import com.undefined.stellar.AbstractStellarCommand
-import com.undefined.stellar.argument.AbstractStellarArgument
+import com.mojang.brigadier.arguments.FloatArgumentType
+import com.undefined.stellar.AbstractStellarArgument
 
-class FloatArgument(parent: AbstractStellarCommand<*>, name: String, val min: Float, val max: Float) : AbstractStellarArgument<FloatArgument, Float>(parent, name)
+class FloatArgument(name: String, minimum: Float = Float.MIN_VALUE, maximum: Float = Float.MAX_VALUE) : AbstractStellarArgument<FloatArgument, Float>(name, FloatArgumentType.floatArg(minimum, maximum))

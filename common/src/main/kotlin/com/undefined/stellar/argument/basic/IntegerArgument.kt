@@ -1,6 +1,6 @@
 package com.undefined.stellar.argument.basic
 
-import com.undefined.stellar.AbstractStellarCommand
-import com.undefined.stellar.argument.AbstractStellarArgument
+import com.mojang.brigadier.arguments.IntegerArgumentType
+import com.undefined.stellar.AbstractStellarArgument
 
-class IntegerArgument(parent: AbstractStellarCommand<*>, name: String, val min: Int, val max: Int) : AbstractStellarArgument<IntegerArgument, Int>(parent, name)
+class IntegerArgument(name: String, minimum: Int = Int.MIN_VALUE, maximum: Int = Int.MAX_VALUE) : AbstractStellarArgument<IntegerArgument, Int>(name, IntegerArgumentType.integer(minimum, maximum))
