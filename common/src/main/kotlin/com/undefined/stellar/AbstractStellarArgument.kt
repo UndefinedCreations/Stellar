@@ -58,34 +58,43 @@ abstract class AbstractStellarArgument<T : AbstractStellarArgument<T, *>, R>(nam
     fun addSuggestion(title: String, tooltip: String? = null): T = addSuggestions(Suggestion.create(title, tooltip))
 
     /**
-     * Adds a function  that returns a list of suggestions in a [CompletableFuture] on top of the current suggestions.
+     * Adds a function  that returns a list of suggestions in a [CompletableFuture] on top of the current suggestions. Only works in Kotlin.
      */
     inline fun <reified C : CommandSender> addFutureSuggestion(noinline suggestion: CommandContext<C>.(input: String) -> CompletableFuture<Iterable<Suggestion>>): T = apply {
         suggestions.add(ExecutableSuggestion(C::class, suggestion))
     } as T
 
     /**
-     * Adds an async function that returns a list of [Suggestion] on top of the current suggestions.
+     * Adds an async function that returns a list of [Suggestion] on top of the current suggestions. Only works in Kotlin.
      */
     inline fun <reified C : CommandSender> addAsyncSuggestion(noinline suggestion: CommandContext<C>.(input: String) -> List<Suggestion>): T = apply {
         suggestions.add(ExecutableSuggestion(C::class) { context, input -> CompletableFuture.supplyAsync { suggestion(context, input) } })
     } as T
 
     /**
-     * Adds a function that returns a list of [Suggestion] on top of the current suggestions.
+     * Adds a function that returns a list of [Suggestion] on top of the current suggestions. Only works in Kotlin.
      */
     inline fun <reified C : CommandSender> addSuggestion(noinline suggestion: CommandContext<C>.(input: String) -> List<Suggestion>): T = apply {
         suggestions.add(ExecutableSuggestion(C::class) { context, input -> CompletableFuture.completedFuture(suggestion(context, input)) })
     } as T
 
+    /**
+     * Adds a function that returns a list of [Suggestion] on top of the current suggestions.
+     */
     fun addFutureSuggestion(suggestion: StellarSuggestion<CommandSender>): T = apply {
         suggestions.add(ExecutableSuggestion(CommandSender::class, suggestion))
     } as T
 
+    /**
+     * Adds a function that returns a list of [Suggestion] on top of the current suggestions.
+     */
     fun addAsyncSuggestion(suggestion: SimpleStellarSuggestion<CommandSender>): T = apply {
         suggestions.add(ExecutableSuggestion(CommandSender::class) { context, input -> CompletableFuture.supplyAsync { suggestion(context, input) } })
     } as T
 
+    /**
+     * Adds a function that returns a list of [Suggestion] on top of the current suggestions.
+     */
     fun addSuggestion(suggestion: SimpleStellarSuggestion<CommandSender>): T = apply {
         suggestions.add(ExecutableSuggestion(CommandSender::class) { context, input -> CompletableFuture.completedFuture(suggestion(context, input)) })
     } as T

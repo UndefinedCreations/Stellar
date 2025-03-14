@@ -14,7 +14,8 @@ class Main : JavaPlugin() {
 
     override fun onEnable() {
         unregisterCommand("enchant")
-        EnchantCommand.register(this)
+        StellarCommand("test")
+            .addListArgument("test", listOf())
     }
 
 }

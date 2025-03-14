@@ -472,6 +472,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param type The [StringType] it will use in the [StringArgument].
      * @return The created [ListArgument].
      */
+    @JvmOverloads
     fun addListArgument(
         name: String,
         list: CommandContext<CommandSender>.() -> List<String>,
@@ -487,6 +488,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param type The [StringType] it will use in the [StringArgument].
      * @return The created [ListArgument].
      */
+    @JvmOverloads
     fun addListArgument(
         name: String,
         list: List<String>,
@@ -503,6 +505,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param async Whether the _suggestions_ should be gotten asynchronously (default: `false`).
      * @return The created [ListArgument].
      */
+    @JvmOverloads
     fun <T> addListArgument(
         name: String,
         list: List<T>,
@@ -520,6 +523,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param async Whether the _suggestions_ should be gotten asynchronously (default: `false`).
      * @return The created [ListArgument].
      */
+    @JvmOverloads
     fun <T> addListArgument(
         name: String,
         list: CommandContext<CommandSender>.() -> List<T>,
@@ -538,6 +542,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param async Whether the _suggestions_ should be gotten asynchronously (default: `false`).
      * @return The created [ListArgument].
      */
+    @JvmOverloads
     fun <T, R> addListArgument(
         type: AbstractStellarArgument<*, R>,
         list: List<T>,
@@ -556,6 +561,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param async Whether the _suggestions_ should be gotten asynchronously (default: `false`).
      * @return The created [ListArgument].
      */
+    @JvmOverloads
     fun <T, R> addListArgument(
         type: AbstractStellarArgument<*, R>,
         list: CommandContext<CommandSender>.() -> List<T>,
@@ -573,6 +579,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param async Whether the _suggestions_ should be gotten asynchronously (default: `false`).
      * @return The created [ListArgument].
      */
+    @JvmOverloads
     fun <T> addAdvancedListArgument(
         name: String,
         list: List<T>,
@@ -590,6 +597,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param async Whether the _suggestions_ should be gotten asynchronously (default: `false`).
      * @return The created [ListArgument].
      */
+    @JvmOverloads
     fun <T> addAdvancedListArgument(
         name: String,
         list: CommandContext<CommandSender>.() -> List<T>,
@@ -608,6 +616,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param async Whether the _suggestions_ should be gotten asynchronously (default: `false`).
      * @return The created [ListArgument].
      */
+    @JvmOverloads
     fun <T, R> addAdvancedListArgument(
         type: AbstractStellarArgument<*, R>,
         list: List<T>,
@@ -626,6 +635,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param async Whether the _suggestions_ should be gotten asynchronously (default: `false`).
      * @return The created [ListArgument].
      */
+    @JvmOverloads
     fun <T, R> addAdvancedListArgument(
         type: AbstractStellarArgument<*, R>,
         list: CommandContext<CommandSender>.() -> List<T>,
@@ -641,6 +651,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param async Whether the _suggestions_ should be gotten asynchronously (default: `true`).
      * @return The created [EnumArgument].
      */
+    @JvmOverloads
     inline fun <reified T : Enum<T>> addEnumArgument(
         name: String,
         noinline converter: CommandSender.(Enum<T>) -> Suggestion? = {
