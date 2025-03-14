@@ -47,7 +47,8 @@ publishing {
     }
 }
 
-java {
-    withSourcesJar()
-    withJavadocJar()
+tasks {
+    jar {
+        archiveClassifier = "dev"
+    }
 }

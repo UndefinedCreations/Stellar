@@ -1,6 +1,5 @@
 plugins {
     id("setup")
-    `publishing-convention`
     id("com.undefinedcreations.mapper")
 }
 
