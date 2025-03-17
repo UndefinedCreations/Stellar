@@ -94,7 +94,6 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
     /**
      * Adds a requirement that must be met for the command to be available to the player. Also works in Java.
      *
-     * @param C The type of CommandSender.
      * @param requirement The condition that must be met.
      * @return The modified command object.
      */
@@ -680,6 +679,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param async Whether the _suggestions_ should be gotten asynchronously (default: `false`).
      * @return The created [OnlinePlayersArgument], which returns a [Player] when parsed.
      */
+    @JvmOverloads
     fun addOnlinePlayersArgument(name: String, filter: (Player) -> Boolean = { true }, async: Boolean = false): OnlinePlayersArgument = addArgument(OnlinePlayersArgument(name, filter, async))
 
     // Math
@@ -725,6 +725,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param minimum The minimum allowed time value (default: `0`).
      * @return The created [TimeArgument].
      */
+    @JvmOverloads
     fun addTimeArgument(name: String, minimum: Int = 0): TimeArgument = addArgument(TimeArgument(name, minimum))
 
     // Misc
