@@ -19,11 +19,4 @@ class EnumArgument<T : Enum<T>>(
     } catch (e: IllegalArgumentException) {
         null
     }
-}, async) {
-    fun valueOf(name: String): Enum<T>? =
-        try {
-            valueOf(enum.java as Class<out Enum<*>>, name) as Enum<T>
-        } catch (e: IllegalArgumentException) {
-            null
-        }
-}
+}, async)
