@@ -47,6 +47,7 @@ import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
 import org.jetbrains.annotations.ApiStatus
+import java.lang.Enum.valueOf
 
 /**
  * This is the base of any command, whether it's an argument or a root command.
@@ -646,7 +647,10 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
     /**
      * Adds an [EnumArgument] to the command with the given name.
      *
-     * @param converter A function to convert an enum value into a [Suggestion] (default: uses the enum's name).
+     * @param converter A function providing a [CommandSender] and an [Enum] instance from the [enum], returning the [Suggestion] sent to the player.
+     * If the [Suggestion] is null, then it will be filtered out (default: uses the `name` property.
+     * This is useful when you wish to get the argument input and process the information yourself.
+     * @param parse A function providing a [CommandSender] and the argument input, returning the parsed [Enum] (default: `enum.valueOf(input.uppercase())`).
      * @param async Whether the _suggestions_ should be gotten asynchronously (default: `true`).
      * @return The created [EnumArgument].
      */
@@ -656,8 +660,15 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
         noinline converter: CommandSender.(Enum<T>) -> Suggestion? = {
             Suggestion.withText(it.name)
         },
+        noinline parse: CommandSender.(String) -> Enum<T>? = { input ->
+            try {
+                valueOf(Enum::class.java as Class<out Enum<*>>, input.uppercase()) as Enum<T>
+            } catch (e: IllegalArgumentException) {
+                null
+            }
+        },
         async: Boolean = true,
-    ): EnumArgument<T> = addArgument(EnumArgument(name, T::class, converter, async))
+    ): EnumArgument<T> = addArgument(EnumArgument(name, T::class, converter, parse, async))
 
     /**
      * Adds an [EnumArgument] to the command with the given name.
@@ -670,7 +681,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
         name: String,
         formatting: EnumFormatting = EnumFormatting.LOWERCASE,
         async: Boolean = true,
-    ): EnumArgument<T> = addArgument(EnumArgument(name, T::class, { Suggestion.withText(formatting.action(it.name)) }, async))
+    ): EnumArgument<T> = addArgument(EnumArgument(name, T::class, { Suggestion.withText(formatting.action(it.name)) }, async = async))
 
     /**
      * Adds an [OnlinePlayersArgument] to the command with the given name. It is a list of all currently online players.
