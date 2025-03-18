@@ -707,13 +707,13 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
     fun addAxisArgument(name: String): AxisArgument = addArgument(AxisArgument(name))
 
     /**
-     * Adds a [DoubleRangeArgument] to the command with the given name.
+     * Adds a [DoubleRangeArgument] to the command with the given name. Only works in Kotlin.
      * @return The created [DoubleRangeArgument].
      */
     fun addDoubleRangeArgument(name: String): DoubleRangeArgument = addArgument(DoubleRangeArgument(name))
 
     /**
-     * Adds an [IntRangeArgument] to the command with the given name.
+     * Adds an [IntRangeArgument] to the command with the given name. Only works in Kotlin.
      * @return The created [IntRangeArgument].
      */
     fun addIntRangeArgument(name: String): IntRangeArgument = addArgument(IntRangeArgument(name))
