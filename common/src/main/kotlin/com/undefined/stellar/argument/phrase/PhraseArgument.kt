@@ -6,9 +6,15 @@ import com.undefined.stellar.data.argument.CommandContext
 import com.undefined.stellar.data.phrase.PhraseCommandContext
 import com.undefined.stellar.data.suggestion.Suggestion
 import org.bukkit.command.CommandSender
+import org.jetbrains.annotations.ApiStatus
 
+/**
+ * An extension of [StringArgument] with [StringType.PHRASE] which allows you to input a phrase and handle each word independently.
+ * This allows you to add word suggestions, word executions and word runnables.
+ */
 class PhraseArgument(name: String) : StringArgument(name, StringType.PHRASE) {
 
+    @ApiStatus.Internal
     val words: HashMap<Int, WordArgument> = hashMapOf()
 
     init {
@@ -41,53 +47,113 @@ class PhraseArgument(name: String) : StringArgument(name, StringType.PHRASE) {
         }
     }
 
-    fun onWord(index: Int, init: WordArgument.() -> Unit): PhraseArgument {
+    /**
+     * Creates a [WordArgument] at the [index], that you can configure with [init].
+     * @return The modified [PhraseArgument] instance.
+     */
+    fun createWordArgument(index: Int, init: WordArgument.() -> Unit = {}): PhraseArgument {
         val word = WordArgument()
         word.init()
         words[index] = word
         return this
     }
 
-    inline fun <reified C : CommandSender> setWordExecution(index: Int, noinline execution: PhraseCommandContext<C>.() -> Unit): PhraseArgument =
-        getOrCreateWord(index) {
-            setExecution(execution)
-        }
-
-    inline fun <reified C : CommandSender> addWordExecution(index: Int, noinline execution: PhraseCommandContext<C>.() -> Unit): PhraseArgument =
-        getOrCreateWord(index) { addExecution(execution) }
-
-    inline fun <reified C : CommandSender> addAsyncWordExecution(index: Int, noinline execution: PhraseCommandContext<C>.() -> Unit): PhraseArgument =
-        getOrCreateWord(index) { addAsyncExecution(execution) }
-
-    inline fun <reified C : CommandSender> setWordRunnable(index: Int, noinline runnable: PhraseCommandContext<C>.() -> Boolean): PhraseArgument =
-        getOrCreateWord(index) {
-            setRunnable(runnable)
-        }
-
-    inline fun <reified C : CommandSender> addWordRunnable(index: Int, noinline runnable: PhraseCommandContext<C>.() -> Boolean): PhraseArgument =
-        getOrCreateWord(index) { addRunnable(runnable) }
-
-    fun setWordSuggestions(index: Int, vararg suggestions: Suggestion): PhraseArgument =
-        getOrCreateWord(index) { setSuggestions(*suggestions) }
-
-    fun addWordSuggestions(index: Int, vararg suggestions: Suggestion): PhraseArgument =
-        getOrCreateWord(index) { addSuggestions(*suggestions) }
-
-    fun addWordSuggestions(index: Int, vararg suggestions: String): PhraseArgument =
-        getOrCreateWord(index) { addSuggestions(*suggestions) }
-
-    fun addWordSuggestions(index: Int, suggestions: List<Suggestion>): PhraseArgument =
-        getOrCreateWord(index) { addSuggestions(suggestions) }
-
-    fun addWordSuggestionsWithoutTooltip(index: Int, suggestions: List<String>): PhraseArgument =
-        getOrCreateWord(index) { addSuggestionsWithoutWordArgumentTooltip(suggestions) }
-
-    inline fun getOrCreateWord(index: Int, function: WordArgument.() -> Unit): PhraseArgument {
+    /**
+     * Gets the [WordArgument] with the specified [index] if it exists, otherwise creates one.
+     * You can then configure the [WordArgument] with [function].
+     *
+     * @return The modified [PhraseArgument] instance.
+     */
+    inline fun getOrCreateWordArgument(index: Int, function: WordArgument.() -> Unit = {}): PhraseArgument {
         words[index]?.apply { function() } ?: run {
             words[index] = WordArgument().apply { function() }
         }
         return this
     }
+
+    /**
+     * Sets the execution for the [WordArgument] at [index].
+     *
+     * @return The modified [PhraseArgument] instance.
+     */
+    inline fun <reified C : CommandSender> setWordExecution(index: Int, noinline execution: PhraseCommandContext<C>.() -> Unit): PhraseArgument =
+        getOrCreateWordArgument(index) {
+            setExecution(execution)
+        }
+
+    /**
+     * Adds an execution to the [WordArgument] at [index].
+     *
+     * @return The modified [PhraseArgument] instance.
+     */
+    inline fun <reified C : CommandSender> addWordExecution(index: Int, noinline execution: PhraseCommandContext<C>.() -> Unit): PhraseArgument =
+        getOrCreateWordArgument(index) { addExecution(execution) }
+
+    /**
+     * Adds an async execution to the [WordArgument] at [index].
+     *
+     * @return The modified [PhraseArgument] instance.
+     */
+    inline fun <reified C : CommandSender> addAsyncWordExecution(index: Int, noinline execution: PhraseCommandContext<C>.() -> Unit): PhraseArgument =
+        getOrCreateWordArgument(index) { addAsyncExecution(execution) }
+
+    /**
+     * Sets the runnable for the [WordArgument] at [index].
+     *
+     * @return The modified [PhraseArgument] instance.
+     */
+    inline fun <reified C : CommandSender> setWordRunnable(index: Int, noinline runnable: PhraseCommandContext<C>.() -> Boolean): PhraseArgument =
+        getOrCreateWordArgument(index) {
+            setRunnable(runnable)
+        }
+
+    /**
+     * Adds a runnable to the [WordArgument] at [index].
+     *
+     * @return The modified [PhraseArgument] instance.
+     */
+    inline fun <reified C : CommandSender> addWordRunnable(index: Int, noinline runnable: PhraseCommandContext<C>.() -> Boolean): PhraseArgument =
+        getOrCreateWordArgument(index) { addRunnable(runnable) }
+
+    /**
+     * Sets the word suggestions for the [WordArgument] at [index].
+     *
+     * @return The modified [PhraseArgument] instance.
+     */
+    fun setWordSuggestions(index: Int, vararg suggestions: Suggestion): PhraseArgument =
+        getOrCreateWordArgument(index) { setSuggestions(*suggestions) }
+
+    /**
+     * Adds word suggestions to the [WordArgument] at [index].
+     *
+     * @return The modified [PhraseArgument] instance.
+     */
+    fun addWordSuggestions(index: Int, vararg suggestions: Suggestion): PhraseArgument =
+        getOrCreateWordArgument(index) { addSuggestions(*suggestions) }
+
+    /**
+     * Adds word suggestions to the [WordArgument] at [index].
+     *
+     * @return The modified [PhraseArgument] instance.
+     */
+    fun addWordSuggestions(index: Int, vararg suggestions: String): PhraseArgument =
+        getOrCreateWordArgument(index) { addSuggestions(*suggestions) }
+
+    /**
+     * Adds a list of word suggestions to the [WordArgument] at [index].
+     *
+     * @return The modified [PhraseArgument] instance.
+     */
+    fun addWordSuggestions(index: Int, suggestions: List<Suggestion>): PhraseArgument =
+        getOrCreateWordArgument(index) { addSuggestions(suggestions) }
+
+    /**
+     * Adds a list of word suggestions to the [WordArgument] at [index] solely through a list of [String] that represent the titles.
+     *
+     * @return The modified [PhraseArgument] instance.
+     */
+    fun addWordSuggestionsWithoutTooltip(index: Int, suggestions: List<String>): PhraseArgument =
+        getOrCreateWordArgument(index) { addSuggestionsWithoutWordArgumentTooltip(suggestions) }
 
     private fun getPhraseCommandContext(context: CommandContext<CommandSender>): PhraseCommandContext<CommandSender> {
         val input = context.input.removePrefix("/")
