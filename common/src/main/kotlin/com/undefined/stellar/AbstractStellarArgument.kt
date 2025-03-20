@@ -3,10 +3,7 @@ package com.undefined.stellar
 import com.mojang.brigadier.arguments.ArgumentType
 import com.undefined.stellar.data.argument.CommandContext
 import com.undefined.stellar.data.execution.ExecutableExecution
-import com.undefined.stellar.data.suggestion.ExecutableSuggestion
-import com.undefined.stellar.data.suggestion.SimpleStellarSuggestion
-import com.undefined.stellar.data.suggestion.StellarSuggestion
-import com.undefined.stellar.data.suggestion.Suggestion
+import com.undefined.stellar.data.suggestion.*
 import org.bukkit.command.CommandSender
 import org.bukkit.plugin.java.JavaPlugin
 import org.jetbrains.annotations.ApiStatus
@@ -46,6 +43,13 @@ abstract class AbstractStellarArgument<T : AbstractStellarArgument<T, *>, R>(nam
      */
     fun addSuggestions(vararg suggestions: Suggestion): T = apply {
         this.suggestions.add(ExecutableSuggestion(CommandSender::class) { _, _ -> CompletableFuture.completedFuture(suggestions.toList()) })
+    } as T
+
+    /**
+     * Adds multiple [Suggestion] with the titles defined in [suggestions] on top of the current suggestions.
+     */
+    fun addSuggestions(vararg suggestions: String): T = apply {
+        this.suggestions.add(ExecutableSuggestion(CommandSender::class) { _, _ -> CompletableFuture.completedFuture(suggestions.map { it.toSuggestion() }) })
     } as T
 
     /**
