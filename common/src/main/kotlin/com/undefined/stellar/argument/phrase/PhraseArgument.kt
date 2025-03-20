@@ -4,6 +4,8 @@ import com.undefined.stellar.argument.basic.StringArgument
 import com.undefined.stellar.argument.basic.StringType
 import com.undefined.stellar.data.argument.CommandContext
 import com.undefined.stellar.data.phrase.PhraseCommandContext
+import com.undefined.stellar.data.phrase.PhraseExecution
+import com.undefined.stellar.data.phrase.PhraseFunction
 import com.undefined.stellar.data.suggestion.Suggestion
 import org.bukkit.command.CommandSender
 import org.jetbrains.annotations.ApiStatus
@@ -48,10 +50,10 @@ class PhraseArgument(name: String) : StringArgument(name, StringType.PHRASE) {
     }
 
     /**
-     * Creates a [WordArgument] at the [index], that you can configure with [init].
+     * Creates a [WordArgument] at the [index], that you can configure with [init]. Only works in Kotlin.
      * @return The modified [PhraseArgument] instance.
      */
-    fun createWordArgument(index: Int, init: WordArgument.() -> Unit = {}): PhraseArgument {
+	inline fun addWordArgument(index: Int, init: WordArgument.() -> Unit = {}): PhraseArgument {
         val word = WordArgument()
         word.init()
         words[index] = word
@@ -59,8 +61,22 @@ class PhraseArgument(name: String) : StringArgument(name, StringType.PHRASE) {
     }
 
     /**
+     * Creates a [WordArgument] at the [index], that you can configure with [init].
+     * @return The modified [PhraseArgument] instance.
+     */
+    @JvmOverloads
+    fun addWordArgument(index: Int, init: PhraseFunction = PhraseFunction {}): PhraseArgument {
+        val word = WordArgument()
+        init(word)
+        words[index] = word
+        return this
+    }
+
+    /**
      * Gets the [WordArgument] with the specified [index] if it exists, otherwise creates one.
      * You can then configure the [WordArgument] with [function].
+     *
+     * This only works in Kotlin.
      *
      * @return The modified [PhraseArgument] instance.
      */
@@ -72,7 +88,20 @@ class PhraseArgument(name: String) : StringArgument(name, StringType.PHRASE) {
     }
 
     /**
-     * Sets the execution for the [WordArgument] at [index].
+     * Gets the [WordArgument] with the specified [index] if it exists, otherwise creates one.
+     * You can then configure the [WordArgument] with [function].
+     *
+     * @return The modified [PhraseArgument] instance.
+     */
+    fun getOrCreateWordArgument(index: Int, function: PhraseFunction = PhraseFunction {}): PhraseArgument {
+        words[index]?.apply { function(this) } ?: run {
+            words[index] = WordArgument().apply { function(this) }
+        }
+        return this
+    }
+
+    /**
+     * Sets the execution for the [WordArgument] at [index]. Only works in Kotlin.
      *
      * @return The modified [PhraseArgument] instance.
      */
@@ -82,7 +111,17 @@ class PhraseArgument(name: String) : StringArgument(name, StringType.PHRASE) {
         }
 
     /**
-     * Adds an execution to the [WordArgument] at [index].
+     * Sets the execution for the [WordArgument] at [index].
+     *
+     * @return The modified [PhraseArgument] instance.
+     */
+    fun setWordExecution(index: Int, execution: PhraseExecution<CommandSender>): PhraseArgument =
+        getOrCreateWordArgument(index) {
+            setExecution(execution)
+        }
+
+    /**
+     * Adds an execution to the [WordArgument] at [index]. Only works in Kotlin.
      *
      * @return The modified [PhraseArgument] instance.
      */
@@ -90,7 +129,15 @@ class PhraseArgument(name: String) : StringArgument(name, StringType.PHRASE) {
         getOrCreateWordArgument(index) { addExecution(execution) }
 
     /**
-     * Adds an async execution to the [WordArgument] at [index].
+     * Adds an execution to the [WordArgument] at [index].
+     *
+     * @return The modified [PhraseArgument] instance.
+     */
+    fun addWordExecution(index: Int, execution: PhraseExecution<CommandSender>): PhraseArgument =
+        getOrCreateWordArgument(index) { addExecution(execution) }
+
+    /**
+     * Adds an async execution to the [WordArgument] at [index]. Only works in Kotlin.
      *
      * @return The modified [PhraseArgument] instance.
      */
@@ -98,7 +145,15 @@ class PhraseArgument(name: String) : StringArgument(name, StringType.PHRASE) {
         getOrCreateWordArgument(index) { addAsyncExecution(execution) }
 
     /**
-     * Sets the runnable for the [WordArgument] at [index].
+     * Adds an async execution to the [WordArgument] at [index].
+     *
+     * @return The modified [PhraseArgument] instance.
+     */
+    fun addAsyncWordExecution(index: Int, execution: PhraseExecution<CommandSender>): PhraseArgument =
+        getOrCreateWordArgument(index) { addAsyncExecution(execution) }
+
+    /**
+     * Sets the runnable for the [WordArgument] at [index]. Only works in Kotlin.
      *
      * @return The modified [PhraseArgument] instance.
      */
@@ -108,11 +163,29 @@ class PhraseArgument(name: String) : StringArgument(name, StringType.PHRASE) {
         }
 
     /**
-     * Adds a runnable to the [WordArgument] at [index].
+     * Sets the runnable for the [WordArgument] at [index].
+     *
+     * @return The modified [PhraseArgument] instance.
+     */
+    fun setWordRunnable(index: Int, runnable: PhraseCommandContext<CommandSender>.() -> Boolean): PhraseArgument =
+        getOrCreateWordArgument(index) {
+            setRunnable(runnable)
+        }
+
+    /**
+     * Adds a runnable to the [WordArgument] at [index]. Only works in Kotlin.
      *
      * @return The modified [PhraseArgument] instance.
      */
     inline fun <reified C : CommandSender> addWordRunnable(index: Int, noinline runnable: PhraseCommandContext<C>.() -> Boolean): PhraseArgument =
+        getOrCreateWordArgument(index) { addRunnable(runnable) }
+
+    /**
+     * Adds a runnable to the [WordArgument] at [index].
+     *
+     * @return The modified [PhraseArgument] instance.
+     */
+    fun addWordRunnable(index: Int, runnable: PhraseCommandContext<CommandSender>.() -> Boolean): PhraseArgument =
         getOrCreateWordArgument(index) { addRunnable(runnable) }
 
     /**
