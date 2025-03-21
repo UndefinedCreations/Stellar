@@ -4,7 +4,9 @@ import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
 import org.bukkit.command.ConsoleCommandSender
 import org.bukkit.help.HelpTopic
+import org.jetbrains.annotations.ApiStatus
 
+@ApiStatus.Internal
 class StellarCommandHelpTopic(
     name: String,
     description: String,

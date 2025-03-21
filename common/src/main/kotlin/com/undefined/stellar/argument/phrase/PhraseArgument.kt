@@ -212,22 +212,6 @@ class PhraseArgument(name: String) : StringArgument(name, StringType.PHRASE) {
     fun addWordSuggestions(index: Int, vararg suggestions: String): PhraseArgument =
         getOrCreateWordArgument(index) { addSuggestions(*suggestions) }
 
-    /**
-     * Adds a list of word suggestions to the [WordArgument] at [index].
-     *
-     * @return The modified [PhraseArgument] instance.
-     */
-    fun addWordSuggestions(index: Int, suggestions: List<Suggestion>): PhraseArgument =
-        getOrCreateWordArgument(index) { addSuggestions(suggestions) }
-
-    /**
-     * Adds a list of word suggestions to the [WordArgument] at [index] solely through a list of [String] that represent the titles.
-     *
-     * @return The modified [PhraseArgument] instance.
-     */
-    fun addWordSuggestionsWithoutTooltip(index: Int, suggestions: List<String>): PhraseArgument =
-        getOrCreateWordArgument(index) { addSuggestionsWithoutWordArgumentTooltip(suggestions) }
-
     private fun getPhraseCommandContext(context: CommandContext<CommandSender>): PhraseCommandContext<CommandSender> {
         val input = context.input.removePrefix("/")
         val words = input.split(' ').toMutableList()
