@@ -11,7 +11,7 @@ import com.undefined.stellar.data.argument.ArgumentHelper
 import com.undefined.stellar.data.argument.MojangAdapter
 import com.undefined.stellar.data.help.StellarCommandHelpTopic
 import com.undefined.stellar.data.suggestion.Suggestion
-import com.undefined.stellar.exception.UnsupportedVersionException
+import com.undefined.stellar.data.exception.UnsupportedVersionException
 import com.undefined.stellar.listener.StellarListener
 import com.undefined.stellar.nms.NMS
 import com.undefined.stellar.nms.NMSHelper

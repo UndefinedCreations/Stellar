@@ -1,4 +1,4 @@
-package com.undefined.stellar.exception
+package com.undefined.stellar.data.exception
 
 /**
  * This exception is thrown when there are multiple arguments with the same name.

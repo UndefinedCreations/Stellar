@@ -6,7 +6,7 @@ import com.undefined.stellar.NMSManager
 import com.undefined.stellar.Stellar
 import com.undefined.stellar.argument.LiteralArgument
 import com.undefined.stellar.argument.list.ListArgument
-import com.undefined.stellar.exception.DuplicateArgumentNameException
+import com.undefined.stellar.data.exception.DuplicateArgumentNameException
 import com.undefined.stellar.nms.NMSHelper
 import org.bukkit.command.CommandSender
 import com.mojang.brigadier.context.CommandContext as BrigadierCommandContext

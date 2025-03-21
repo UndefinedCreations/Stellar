@@ -1,4 +1,4 @@
-package com.undefined.stellar.exception
+package com.undefined.stellar.data.exception
 
 /**
  * This exception is thrown whenever this API does not support a feature or entirely on a specific Minecraft version.
