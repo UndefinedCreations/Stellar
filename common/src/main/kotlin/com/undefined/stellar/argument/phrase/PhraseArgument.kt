@@ -6,6 +6,7 @@ import com.undefined.stellar.data.argument.CommandContext
 import com.undefined.stellar.data.phrase.PhraseCommandContext
 import com.undefined.stellar.data.phrase.PhraseExecution
 import com.undefined.stellar.data.phrase.PhraseFunction
+import com.undefined.stellar.data.phrase.PhraseRunnable
 import com.undefined.stellar.data.suggestion.Suggestion
 import org.bukkit.command.CommandSender
 import org.jetbrains.annotations.ApiStatus
@@ -167,7 +168,7 @@ class PhraseArgument(name: String) : StringArgument(name, StringType.PHRASE) {
      *
      * @return The modified [PhraseArgument] instance.
      */
-    fun setWordRunnable(index: Int, runnable: PhraseCommandContext<CommandSender>.() -> Boolean): PhraseArgument =
+    fun setWordRunnable(index: Int, runnable: PhraseRunnable<CommandSender>): PhraseArgument =
         getOrCreateWordArgument(index) {
             setRunnable(runnable)
         }
@@ -185,7 +186,7 @@ class PhraseArgument(name: String) : StringArgument(name, StringType.PHRASE) {
      *
      * @return The modified [PhraseArgument] instance.
      */
-    fun addWordRunnable(index: Int, runnable: PhraseCommandContext<CommandSender>.() -> Boolean): PhraseArgument =
+    fun addWordRunnable(index: Int, runnable: PhraseRunnable<CommandSender>): PhraseArgument =
         getOrCreateWordArgument(index) { addRunnable(runnable) }
 
     /**

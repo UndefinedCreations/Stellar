@@ -33,15 +33,15 @@ class WordArgument {
      * @return The modified [WordArgument] instance.
      */
     inline fun <reified C : CommandSender> addSuggestion(noinline suggestion: PhraseCommandContext<C>.() -> Iterable<Suggestion>): WordArgument = apply {
-        suggestions.add(PhraseExecutableSuggestion(C::class) { suggestion(this) })
+        suggestions.add(PhraseExecutableSuggestion(C::class) { suggestion(it) })
     }
 
     /**
      * Adds a function that returns a list of [Suggestion] on top of the current suggestions. Only works in Kotlin.
      * @return The modified [WordArgument] instance.
      */
-    fun addSuggestion(suggestion: PhraseCommandContext<CommandSender>.() -> Iterable<Suggestion>): WordArgument = apply {
-        suggestions.add(PhraseExecutableSuggestion(CommandSender::class) { suggestion(this) })
+    fun addSuggestion(suggestion: SimplePhraseSuggestion<CommandSender>): WordArgument = apply {
+        suggestions.add(PhraseExecutableSuggestion(CommandSender::class) { suggestion(it) })
     }
 
     /**
@@ -165,9 +165,9 @@ class WordArgument {
      * Replaces all runnables with [runnable].
      * @return The modified [WordArgument] instance.
      */
-    fun setRunnable(runnable: PhraseCommandContext<CommandSender>.() -> Boolean): WordArgument {
+    fun setRunnable(runnable: PhraseRunnable<CommandSender>): WordArgument {
         runnables.clear()
-        return addRunnable<CommandSender>(runnable)
+        return addRunnable(runnable)
     }
 
     /**
@@ -183,7 +183,7 @@ class WordArgument {
      * Adds [runnable] on top of the other runnables.
      * @return The modified [WordArgument] instance.
      */
-    fun addRunnable(runnable: PhraseCommandContext<CommandSender>.() -> Boolean): WordArgument {
+    fun addRunnable(runnable: PhraseRunnable<CommandSender>): WordArgument {
         runnables.add(PhraseExecutableRunnable(CommandSender::class, runnable))
         return this
     }
