@@ -22,9 +22,12 @@ abstract class AbstractStellarArgument<T : AbstractStellarArgument<T, *>, R>(nam
      * Represents the parent command, whether it's a command or an argument. This is automatically set internally.
      */
     open lateinit var parent: AbstractStellarCommand<*>
+
     override val globalFailureExecutions: MutableSet<ExecutableExecution<*>>
         get() = parent.globalFailureExecutions
+    @ApiStatus.Internal
     open val suggestions: MutableSet<ExecutableSuggestion<*>> = mutableSetOf()
+    @ApiStatus.Internal
     open var suggestionOffset: Int = 0
 
     /**
@@ -32,6 +35,7 @@ abstract class AbstractStellarArgument<T : AbstractStellarArgument<T, *>, R>(nam
      * The suggestion offset represents how many additional letters it will take for suggestions to appear.
      */
     fun addSuggestionOffset(offset: Int): T = apply { suggestionOffset += offset } as T
+
     /**
      * Sets the current suggestion offset amount to this offset.
      * The suggestion offset represents how many additional letters it will take for suggestions to appear.

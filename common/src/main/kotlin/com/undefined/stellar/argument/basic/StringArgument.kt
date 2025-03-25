@@ -5,6 +5,7 @@ import com.undefined.stellar.AbstractStellarArgument
 
 /**
  * An argument that allows you to type a string, as allowed by its [StringType], and returns that [String].
+ * @since 1.13
  */
 open class StringArgument(name: String, type: StringType = StringType.WORD) : AbstractStellarArgument<StringArgument, String>(name, type.argumentType)
 

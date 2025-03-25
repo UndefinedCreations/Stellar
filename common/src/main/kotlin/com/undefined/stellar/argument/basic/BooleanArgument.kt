@@ -5,5 +5,6 @@ import com.undefined.stellar.AbstractStellarArgument
 
 /**
  * An argument that allows you to type either `true` or `false`, and returns a primitive type of `boolean`.
+ * @since 1.13
  */
 class BooleanArgument(name: String) : AbstractStellarArgument<BooleanArgument, Boolean>(name, BoolArgumentType.bool())

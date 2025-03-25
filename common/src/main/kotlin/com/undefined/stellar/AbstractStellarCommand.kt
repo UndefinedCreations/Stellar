@@ -57,25 +57,36 @@ import java.lang.Enum.valueOf
 @Suppress("UNCHECKED_CAST")
 abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: String) {
 
+    @ApiStatus.Internal
     lateinit var nms: NMS
 
+    @ApiStatus.Internal
     val aliases: MutableSet<String> = mutableSetOf()
+    @ApiStatus.Internal
     val requirements: MutableList<ExecutableRequirement<*>> = mutableListOf()
+    @ApiStatus.Internal
     val arguments: MutableSet<AbstractStellarArgument<*, *>> = mutableSetOf()
+    @ApiStatus.Internal
     val executions: MutableSet<ExecutableExecution<*>> = mutableSetOf()
+    @ApiStatus.Internal
     val runnables: MutableSet<ExecutableRunnable<*>> = mutableSetOf()
+    @ApiStatus.Internal
     val failureExecutions: MutableSet<ExecutableExecution<*>> = mutableSetOf()
+    @ApiStatus.Internal
     open val globalFailureExecutions: MutableSet<ExecutableExecution<*>> = mutableSetOf()
+    @ApiStatus.Internal
     var hideDefaultFailureMessages: HideDefaultFailureMessages = HideDefaultFailureMessages(hide = false, global = false)
 
     /**
      * Add a command alias in addition to the existing command aliases.
      */
     fun addAlias(alias: String): T = apply { aliases.add(alias) } as T
+
     /**
      * Adds command aliases in addition to the existing command aliases.
      */
     fun addAliases(vararg aliases: String): T = apply { this.aliases.addAll(aliases) } as T
+
     /**
      * Clears all command aliases.
      */
