@@ -15,7 +15,7 @@ import com.undefined.stellar.data.exception.UnsupportedVersionException
 import com.undefined.stellar.listener.StellarListener
 import com.undefined.stellar.nms.NMS
 import com.undefined.stellar.nms.NMSHelper
-import com.undefined.stellar.v1_21_4.NMS1_21_4
+import com.undefined.stellar.internal.NMS1_21_4
 import org.bukkit.Bukkit
 import org.bukkit.command.Command
 import org.bukkit.plugin.java.JavaPlugin

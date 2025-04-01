@@ -1,4 +1,4 @@
-package com.undefined.stellar.v1_21_4
+package com.undefined.stellar.internal
 
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.arguments.ArgumentType
@@ -92,7 +92,7 @@ import net.minecraft.commands.arguments.blocks.BlockPredicateArgument as Brigadi
 import net.minecraft.commands.arguments.coordinates.RotationArgument as BrigadierRotationArgument
 
 @Suppress("UNCHECKED_CAST", "DEPRECATION")
-object NMS1_21_4 : NMS {
+object NMS1_21_1 : NMS {
 
     private val COMMAND_BUILD_CONTEXT: CommandBuildContext by lazy {
         CommandBuildContext.simple(
@@ -301,7 +301,7 @@ object NMS1_21_4 : NMS {
                     (options.color.y() * 255.0f).toInt(), (options.color.z() * 255.0f).toInt()
                 ), options.scale)
         )
-        is ItemParticleOption -> ParticleData<ItemStack>(
+        is ItemParticleOption -> ParticleData(
             particle,
             CraftItemStack.asBukkitCopy(options.item)
         )
