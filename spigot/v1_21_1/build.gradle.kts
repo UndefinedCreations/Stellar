@@ -7,12 +7,3 @@ dependencies {
     echo("1.21.1", printDebug = true)
     compileOnly(project(":spigot:lib"))
 }
-
-tasks {
-    jar {
-        finalizedBy(remap)
-    }
-    remap {
-        minecraftVersion("1.21.4")
-    }
-}
