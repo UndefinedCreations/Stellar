@@ -1,9 +1,10 @@
 plugins {
     id("setup")
-    id("com.undefinedcreations.mapper")
+    id("com.undefinedcreations.echo")
 }
 
 dependencies {
+    echo("1.21.4", printDebug = true)
     compileOnly("org.spigotmc:spigot:1.21.4-R0.1-SNAPSHOT:remapped-mojang")
     compileOnly(project(":spigot:lib"))
 }

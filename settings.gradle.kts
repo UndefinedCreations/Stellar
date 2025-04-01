@@ -8,4 +8,5 @@ include(
     ":spigot:lib",
     ":spigot:api",
     ":spigot:v1_21_4",
+    ":spigot:v1_21_3",
 )
