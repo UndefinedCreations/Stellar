@@ -51,6 +51,7 @@ import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ColumnPos
+import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.pattern.BlockInWorld
 import net.minecraft.world.level.gameevent.BlockPositionSource
@@ -62,11 +63,11 @@ import org.bukkit.block.data.BlockData
 import org.bukkit.block.structure.Mirror
 import org.bukkit.block.structure.StructureRotation
 import org.bukkit.command.CommandSender
-import org.bukkit.craftbukkit.v1_21_R3.CraftParticle
-import org.bukkit.craftbukkit.v1_21_R3.block.data.CraftBlockData
-import org.bukkit.craftbukkit.v1_21_R3.entity.CraftPlayer
-import org.bukkit.craftbukkit.v1_21_R3.inventory.CraftItemStack
-import org.bukkit.craftbukkit.v1_21_R3.util.CraftNamespacedKey
+import org.bukkit.craftbukkit.v1_21_R2.CraftParticle
+import org.bukkit.craftbukkit.v1_21_R2.block.data.CraftBlockData
+import org.bukkit.craftbukkit.v1_21_R2.entity.CraftPlayer
+import org.bukkit.craftbukkit.v1_21_R2.inventory.CraftItemStack
+import org.bukkit.craftbukkit.v1_21_R2.util.CraftNamespacedKey
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.scoreboard.DisplaySlot
@@ -248,12 +249,14 @@ object NMS1_21_3 : NMS {
 
     override fun getCommandSourceStack(sender: CommandSender): Any {
         val overworld = MinecraftServer.getServer().overworld()
+        val serverPlayer: ServerPlayer? = (sender as? CraftPlayer)?.handle
+        val permissionLevel = serverPlayer?.gameProfile?.let { serverPlayer.server.getProfilePermissions(it) } ?: 4
         return CommandSourceStack(
             Source(sender),
             Vec3.atLowerCornerOf(overworld.sharedSpawnPos),
             Vec2.ZERO,
             overworld,
-            (sender as? CraftPlayer)?.handle?.permissionLevel ?: 4,
+            permissionLevel,
             sender.name,
             Component.literal(sender.name),
             MinecraftServer.getServer(),
