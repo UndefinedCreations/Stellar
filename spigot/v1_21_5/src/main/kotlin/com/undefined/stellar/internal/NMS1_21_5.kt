@@ -208,7 +208,7 @@ object NMS1_21_5 : NMS {
             is UUIDArgument -> UuidArgument.getUuid(context, argument.name)
 
             // Player
-            is GameModeArgument -> BrigadierGameModeArgument.getGameMode(context, argument.name)
+            is GameModeArgument -> GameMode.getByValue(BrigadierGameModeArgument.getGameMode(context, argument.name).id)
             is GameProfileArgument -> BrigadierGameProfileArgument.getGameProfiles(context, argument.name)
 
             // Scoreboard
