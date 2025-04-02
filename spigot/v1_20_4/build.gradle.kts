@@ -4,6 +4,6 @@ plugins {
 }
 
 dependencies {
-    echo("1.20.5", printDebug = true)
+    echo("1.20.4", printDebug = true)
     compileOnly(project(":spigot:lib"))
 }

@@ -63,11 +63,11 @@ import org.bukkit.block.data.BlockData
 import org.bukkit.block.structure.Mirror
 import org.bukkit.block.structure.StructureRotation
 import org.bukkit.command.CommandSender
-import org.bukkit.craftbukkit.v1_20_R4.CraftParticle
-import org.bukkit.craftbukkit.v1_20_R4.block.data.CraftBlockData
-import org.bukkit.craftbukkit.v1_20_R4.entity.CraftPlayer
-import org.bukkit.craftbukkit.v1_20_R4.inventory.CraftItemStack
-import org.bukkit.craftbukkit.v1_20_R4.util.CraftNamespacedKey
+import org.bukkit.craftbukkit.v1_20_R3.CraftParticle
+import org.bukkit.craftbukkit.v1_20_R3.block.data.CraftBlockData
+import org.bukkit.craftbukkit.v1_20_R3.entity.CraftPlayer
+import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack
+import org.bukkit.craftbukkit.v1_20_R3.util.CraftNamespacedKey
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.scoreboard.DisplaySlot
@@ -84,7 +84,6 @@ import net.minecraft.commands.arguments.ObjectiveArgument as BrigadierObjectiveA
 import net.minecraft.commands.arguments.ObjectiveCriteriaArgument as BrigadierObjectiveCriteriaArgument
 import net.minecraft.commands.arguments.OperationArgument as BrigadierOperationArgument
 import net.minecraft.commands.arguments.ParticleArgument as BrigadierParticleArgument
-import net.minecraft.commands.arguments.ResourceOrIdArgument.LootTableArgument as BrigadierLootTableArgument
 import net.minecraft.commands.arguments.ScoreHolderArgument as BrigadierScoreHolderArgument
 import net.minecraft.commands.arguments.StyleArgument as BrigadierStyleArgument
 import net.minecraft.commands.arguments.TeamArgument as BrigadierTeamArgument
@@ -93,7 +92,7 @@ import net.minecraft.commands.arguments.blocks.BlockPredicateArgument as Brigadi
 import net.minecraft.commands.arguments.coordinates.RotationArgument as BrigadierRotationArgument
 
 @Suppress("UNCHECKED_CAST", "DEPRECATION")
-object NMS1_20_6 : NMS {
+object NMS1_20_4 : NMS {
 
     private val COMMAND_BUILD_CONTEXT: CommandBuildContext by lazy {
         CommandBuildContext.simple(
@@ -121,7 +120,6 @@ object NMS1_20_6 : NMS {
         // Item
         is ItemStackArgument -> ItemArgument.item(COMMAND_BUILD_CONTEXT)
         is ItemStackPredicateArgument -> ItemPredicateArgument.itemPredicate(COMMAND_BUILD_CONTEXT)
-        is ItemSlotArgument -> if (argument.multiple) SlotsArgument.slots() else SlotArgument.slot()
 
         // Math
         is AngleArgument -> BrigadierAngleArgument.angle()
@@ -152,15 +150,14 @@ object NMS1_20_6 : NMS {
         is TeamArgument -> BrigadierTeamArgument.team()
 
         // Structure
-        is LootTableArgument -> BrigadierLootTableArgument.lootTable(COMMAND_BUILD_CONTEXT)
         is MirrorArgument -> TemplateMirrorArgument.templateMirror()
         is StructureRotationArgument -> TemplateRotationArgument.templateRotation()
 
         // Text
         is ColorArgument -> BrigadierColorArgument.color()
-        is ComponentArgument -> BrigadierComponentArgument.textComponent(COMMAND_BUILD_CONTEXT)
+        is ComponentArgument -> BrigadierComponentArgument.textComponent()
         is MessageArgument -> BrigadierMessageArgument.message()
-        is StyleArgument -> BrigadierStyleArgument.style(COMMAND_BUILD_CONTEXT)
+        is StyleArgument -> BrigadierStyleArgument.style()
 
         // World
         is EnvironmentArgument -> DimensionArgument.dimension()
@@ -192,7 +189,6 @@ object NMS1_20_6 : NMS {
             // Item
             is ItemStackArgument -> CraftItemStack.asBukkitCopy(ItemArgument.getItem(context, argument.name).createItemStack(1, false))
             is ItemStackPredicateArgument -> Predicate<ItemStack> { ItemPredicateArgument.getItemPredicate(context, argument.name).test(CraftItemStack.asNMSCopy(it)) }
-            is ItemSlotArgument -> if (argument.multiple) SlotsArgument.getSlots(context, argument.name).slots().toList() else SlotArgument.getSlot(context, argument.name)
 
             // Math
             is AngleArgument -> BrigadierAngleArgument.getAngle(context, argument.name)
@@ -223,14 +219,13 @@ object NMS1_20_6 : NMS {
             is TeamArgument -> Bukkit.getScoreboardManager()!!.mainScoreboard.getTeam(BrigadierTeamArgument.getTeam(context, argument.name).name)
 
             // Structure
-            is LootTableArgument -> BrigadierLootTableArgument.getLootTable(context, argument.name).value().craftLootTable
             is MirrorArgument -> Mirror.valueOf(TemplateMirrorArgument.getMirror(context, argument.name).name)
             is StructureRotationArgument -> StructureRotation.valueOf(TemplateRotationArgument.getRotation(context, argument.name).name)
 
             // Text
             is ColorArgument -> ChatColor.getByChar(BrigadierColorArgument.getColor(context, argument.name).char)
-            is ComponentArgument -> GsonComponentSerializer.gson().deserialize(Component.Serializer.toJson(BrigadierComponentArgument.getComponent(context, argument.name), COMMAND_BUILD_CONTEXT))
-            is MessageArgument -> GsonComponentSerializer.gson().deserialize(Component.Serializer.toJson(BrigadierMessageArgument.getMessage(context, argument.name), COMMAND_BUILD_CONTEXT))
+            is ComponentArgument -> GsonComponentSerializer.gson().deserialize(Component.Serializer.toJson(BrigadierComponentArgument.getComponent(context, argument.name)))
+            is MessageArgument -> GsonComponentSerializer.gson().deserialize(Component.Serializer.toJson(BrigadierMessageArgument.getMessage(context, argument.name)))
             is StyleArgument -> GsonComponentSerializer.gson().deserialize(NMSHelper.getArgumentInput(context, argument.name) ?: return null).style()
 
             // World
@@ -273,7 +268,7 @@ object NMS1_20_6 : NMS {
     }
 
     fun asAdventure(component: Component): net.kyori.adventure.text.Component =
-        GsonComponentSerializer.gson().deserialize(Component.Serializer.toJson(component, COMMAND_BUILD_CONTEXT))
+        GsonComponentSerializer.gson().deserialize(Component.Serializer.toJson(component))
 
     private fun blockPosToLocation(block: BlockPos, world: World) = Location(world, block.x.toDouble(), block.y.toDouble(), block.z.toDouble())
     private fun columnPosToLocation(column: ColumnPos, world: World) = Location(world, column.x.toDouble(), 0.0, column.z.toDouble())
@@ -322,14 +317,6 @@ object NMS1_20_6 : NMS {
         }
         is ShriekParticleOption -> ParticleData(particle, options.delay)
         is SculkChargeParticleOptions -> ParticleData(particle, options.roll())
-        is ColorParticleOption -> {
-            val color = Color.fromARGB(
-                (options.alpha * 255.0f).toInt(),
-                (options.red * 255.0f).toInt(),
-                (options.green * 255.0f).toInt(),
-                (options.blue * 255.0f).toInt())
-            ParticleData(particle, color)
-        }
         else -> ParticleData(particle, null)
     }
 
