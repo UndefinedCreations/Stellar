@@ -69,6 +69,7 @@ import org.bukkit.craftbukkit.v1_20_R2.util.CraftNamespacedKey
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.scoreboard.DisplaySlot
+import java.util.*
 import java.util.function.Predicate
 import net.minecraft.commands.arguments.AngleArgument as BrigadierAngleArgument
 import net.minecraft.commands.arguments.ColorArgument as BrigadierColorArgument
@@ -192,7 +193,9 @@ object NMS1_20_2 : NMS {
             is DoubleRangeArgument -> RangeArgument.Floats.getRange(context, argument.name).let { it.min.orElse(1.0)..it.max.orElse(2.0) }
             is IntRangeArgument -> RangeArgument.Ints.getRange(context, argument.name).let { it.min.orElse(1)..it.max.orElse(2) }
             is OperationArgument -> Operation.getOperation(NMSHelper.getArgumentInput(context, argument.name) ?: return null)
-            is RotationArgument -> BrigadierRotationArgument.getRotation(context, argument.name)
+            is RotationArgument -> BrigadierRotationArgument.getRotation(context, argument.name).getRotation(context.source).let {
+                Location(context.source.level.world, 0.0, 0.0, 0.0, it.x, it.y)
+            }
             is TimeArgument -> IntegerArgumentType.getInteger(context, argument.name)
 
             // Misc
