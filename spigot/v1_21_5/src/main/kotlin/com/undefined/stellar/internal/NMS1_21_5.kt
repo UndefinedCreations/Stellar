@@ -5,6 +5,7 @@ import com.mojang.brigadier.arguments.ArgumentType
 import com.mojang.brigadier.arguments.IntegerArgumentType
 import com.mojang.brigadier.context.CommandContext
 import com.undefined.stellar.AbstractStellarArgument
+import com.undefined.stellar.argument.basic.StringArgument
 import com.undefined.stellar.argument.block.BlockDataArgument
 import com.undefined.stellar.argument.block.BlockPredicateArgument
 import com.undefined.stellar.argument.entity.EntityAnchorArgument
@@ -106,6 +107,9 @@ object NMS1_21_5 : NMS {
     override fun getCommandDispatcher(): CommandDispatcher<Any> = MinecraftServer.getServer().functions.dispatcher as CommandDispatcher<Any>
 
     override fun getArgumentType(argument: AbstractStellarArgument<*, *>, plugin: JavaPlugin): ArgumentType<*> = when (argument) {
+        // Basic
+        is StringArgument -> BrigadierScoreHolderArgument.scoreHolder()
+
         // Block
         is BlockDataArgument -> BlockStateArgument.block(COMMAND_BUILD_CONTEXT)
         is BlockPredicateArgument -> BrigadierBlockPredicateArgument.blockPredicate(COMMAND_BUILD_CONTEXT)
@@ -179,6 +183,9 @@ object NMS1_21_5 : NMS {
     override fun parseArgument(ctx: CommandContext<Any>, argument: AbstractStellarArgument<*, *>): Any? {
         val context: CommandContext<CommandSourceStack> = ctx as CommandContext<CommandSourceStack>
         return when (argument) {
+            // Basic
+            is StringArgument -> NMSHelper.getArgumentInput(context, argument.name)
+
             // Block
             is BlockDataArgument -> CraftBlockData.fromData(BlockStateArgument.getBlock(context, argument.name).state)
             is BlockPredicateArgument -> Predicate<Block> { block: Block ->
