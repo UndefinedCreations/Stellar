@@ -2,7 +2,6 @@ package com.undefined.stellar.argument.block
 
 import com.undefined.stellar.AbstractStellarArgument
 import org.bukkit.block.Block
-import org.bukkit.block.data.BlockData
 import java.util.function.Predicate
 
 /**
