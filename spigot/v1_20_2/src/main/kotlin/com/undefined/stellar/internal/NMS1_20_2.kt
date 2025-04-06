@@ -173,7 +173,7 @@ object NMS1_20_2 : NMS {
         return when (argument) {
             // Block
             is BlockDataArgument -> CraftBlockData.fromData(BlockStateArgument.getBlock(context, argument.name).state)
-            is BlockPredicateArgument -> { block: Block ->
+            is BlockPredicateArgument -> Predicate<Block> { block: Block ->
                 BrigadierBlockPredicateArgument.getBlockPredicate(context, argument.name).test(BlockInWorld(context.source.level, BlockPos(block.x, block.y, block.z), true))
             }
 
@@ -188,7 +188,7 @@ object NMS1_20_2 : NMS {
 
             // Math
             is AngleArgument -> BrigadierAngleArgument.getAngle(context, argument.name)
-            is AxisArgument -> SwizzleArgument.getSwizzle(context, argument.name)
+            is AxisArgument -> SwizzleArgument.getSwizzle(context, argument.name).map { Axis.valueOf(it.name) }
             is DoubleRangeArgument -> RangeArgument.Floats.getRange(context, argument.name).let { it.min.orElse(1.0)..it.max.orElse(2.0) }
             is IntRangeArgument -> RangeArgument.Ints.getRange(context, argument.name).let { it.min.orElse(1)..it.max.orElse(2) }
             is OperationArgument -> Operation.getOperation(NMSHelper.getArgumentInput(context, argument.name) ?: return null)

@@ -19,6 +19,8 @@ val groupIdVar = "com.undefined"
 
 dependencies {
     compileOnly(libs.papermc)
+    implementation("net.kyori:adventure-api:4.20.0")
+    implementation("net.kyori:adventure-platform-bukkit:4.3.4")
     implementation(project(":paper:api"))
 //    implementation("com.undefined:stellar:0.1.37:paper")
 }
