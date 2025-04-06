@@ -189,7 +189,7 @@ object NMS1_20_1 : NMS {
 
             // Math
             is AngleArgument -> BrigadierAngleArgument.getAngle(context, argument.name)
-            is AxisArgument -> SwizzleArgument.getSwizzle(context, argument.name).map { Axis.valueOf(it.name) }
+            is AxisArgument -> SwizzleArgument.getSwizzle(context, argument.name).mapTo(EnumSet.noneOf(Axis::class.java)) { Axis.valueOf(it.name) }
             is DoubleRangeArgument -> RangeArgument.Floats.getRange(context, argument.name).let { (it.min ?: 1.0)..(it.max ?: 2.0) }
             is IntRangeArgument -> RangeArgument.Ints.getRange(context, argument.name).let { (it.min ?: 1)..(it.max ?: 2) }
             is OperationArgument -> Operation.getOperation(NMSHelper.getArgumentInput(context, argument.name) ?: return null)

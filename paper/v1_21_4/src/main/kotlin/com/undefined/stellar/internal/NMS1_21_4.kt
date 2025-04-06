@@ -76,6 +76,7 @@ import org.bukkit.craftbukkit.scoreboard.CraftScoreboardTranslations
 import org.bukkit.craftbukkit.util.CraftNamespacedKey
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
+import java.util.EnumSet
 import java.util.function.Predicate
 import net.minecraft.commands.arguments.AngleArgument as BrigadierAngleArgument
 import net.minecraft.commands.arguments.ColorArgument as BrigadierColorArgument
@@ -200,7 +201,7 @@ object NMS1_21_4 : NMS {
 
             // Math
             is AngleArgument -> BrigadierAngleArgument.getAngle(context, argument.name)
-            is AxisArgument -> SwizzleArgument.getSwizzle(context, argument.name).map { Axis.valueOf(it.name) }
+            is AxisArgument -> SwizzleArgument.getSwizzle(context, argument.name).mapTo(EnumSet.noneOf(Axis::class.java)) { Axis.valueOf(it.name) }
             is DoubleRangeArgument -> RangeArgument.Floats.getRange(context, argument.name).let { it.min.orElse(1.0)..it.max.orElse(2.0) }
             is IntRangeArgument -> RangeArgument.Ints.getRange(context, argument.name).let { it.min.orElse(1)..it.max.orElse(2) }
             is OperationArgument -> Operation.getOperation(NMSHelper.getArgumentInput(context, argument.name) ?: return null)
