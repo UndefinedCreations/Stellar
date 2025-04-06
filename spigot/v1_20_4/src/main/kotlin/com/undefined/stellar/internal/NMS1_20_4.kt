@@ -230,7 +230,7 @@ object NMS1_20_4 : NMS {
             is ComponentArgument -> GsonComponentSerializer.gson().deserialize(Component.Serializer.toJson(BrigadierComponentArgument.getComponent(context, argument.name)))
             is MessageArgument -> GsonComponentSerializer.gson().deserialize(Component.Serializer.toJson(BrigadierMessageArgument.getMessage(context, argument.name)))
             is StyleArgument -> GsonComponentSerializer.gson().deserialize(Component.Serializer.toJson(
-                Component.empty().withStyle(BrigadierStyleArgument.getStyle(context, argument.name)), COMMAND_BUILD_CONTEXT
+                Component.empty().withStyle(BrigadierStyleArgument.getStyle(context, argument.name))
             )).style()
 
             // World

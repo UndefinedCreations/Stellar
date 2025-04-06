@@ -1,7 +1,5 @@
 package com.undefined.stellar.internal
 
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.arguments.ArgumentType
 import com.mojang.brigadier.arguments.IntegerArgumentType
@@ -56,7 +54,6 @@ import net.minecraft.core.BlockPos
 import net.minecraft.core.Registry
 import net.minecraft.core.particles.*
 import net.minecraft.network.chat.Component
-import net.minecraft.network.chat.Style
 import net.minecraft.resources.ResourceKey
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ColumnPos
