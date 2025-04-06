@@ -1,5 +1,7 @@
 package com.undefined.stellar.internal
 
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.arguments.ArgumentType
 import com.mojang.brigadier.arguments.IntegerArgumentType
@@ -54,6 +56,7 @@ import net.minecraft.core.BlockPos
 import net.minecraft.core.Registry
 import net.minecraft.core.particles.*
 import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.Style
 import net.minecraft.resources.ResourceKey
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ColumnPos
@@ -238,7 +241,9 @@ object NMS1_21_4 : NMS {
             is ColorArgument -> ChatColor.getByChar(BrigadierColorArgument.getColor(context, argument.name).char)
             is ComponentArgument -> GsonComponentSerializer.gson().deserialize(Component.Serializer.toJson(BrigadierComponentArgument.getComponent(context, argument.name), COMMAND_BUILD_CONTEXT))
             is MessageArgument -> GsonComponentSerializer.gson().deserialize(Component.Serializer.toJson(BrigadierMessageArgument.getMessage(context, argument.name), COMMAND_BUILD_CONTEXT))
-            is StyleArgument -> GsonComponentSerializer.gson().deserialize(NMSHelper.getArgumentInput(context, argument.name) ?: return null).style()
+            is StyleArgument -> GsonComponentSerializer.gson().deserialize(Component.Serializer.toJson(
+                Component.empty().withStyle(BrigadierStyleArgument.getStyle(context, argument.name)), COMMAND_BUILD_CONTEXT
+            )).style()
 
             // World
             is EnvironmentArgument -> DimensionArgument.getDimension(context, argument.name).world.environment
