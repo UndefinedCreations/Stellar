@@ -5,6 +5,7 @@ plugins {
     `publishing-convention`
     id("com.gradleup.shadow") version "8.3.5"
     id("org.jetbrains.dokka") version "2.0.0"
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.14" apply false
 }
 
 dependencies {

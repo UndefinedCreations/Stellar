@@ -472,7 +472,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * Adds an [ItemStackPredicateArgument] to the command with the given name.
      * @return The created [ItemStackPredicateArgument].
      */
-    fun addItemStackPredicateArgument(name: String): ItemStackPredicateArgument = addArgument(ItemStackPredicateArgument(name))
+    fun addItemPredicateArgument(name: String): ItemStackPredicateArgument = addArgument(ItemStackPredicateArgument(name))
 
     // List
     /**
@@ -770,7 +770,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      */
     fun addPhraseArgument(name: String): PhraseArgument = addArgument(PhraseArgument(name))
 
-// Player
+    // Player
     /**
      * Adds a [GameModeArgument] to the command with the given name.
      * @return The created [GameModeArgument].
@@ -880,11 +880,5 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @return The created [LocationArgument].
      */
     fun addLocationArgument(name: String, type: LocationType): LocationArgument = addArgument(LocationArgument(name, type))
-
-    /**
-     * Adds a [ParticleArgument] to the command with the given name.
-     * @return The created [ParticleArgument].
-     */
-    fun addParticleArgument(name: String): ParticleArgument = addArgument(ParticleArgument(name))
 
 }

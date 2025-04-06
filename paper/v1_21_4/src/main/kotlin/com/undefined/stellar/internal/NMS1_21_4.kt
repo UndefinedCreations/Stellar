@@ -246,7 +246,7 @@ object NMS1_21_4 : NMS {
                 LocationType.PRECISE_LOCATION_3D -> vec3ToLocation(Vec3Argument.getVec3(context, argument.name), context.source.level.world)
                 LocationType.PRECISE_LOCATION_2D -> vec2ToLocation(Vec2Argument.getVec2(context, argument.name), context.source.level.world)
             }
-            is ParticleArgument -> BrigadierParticleArgument.getParticle(context, argument.name).also { getParticleData(context, CraftParticle.minecraftToBukkit(it.type), it) }
+            is ParticleArgument -> BrigadierParticleArgument.getParticle(context, argument.name).let { getParticleData(context, CraftParticle.minecraftToBukkit(it.type), it) }
             else -> null
         }
     }
@@ -279,7 +279,7 @@ object NMS1_21_4 : NMS {
     private fun vec3ToLocation(vec: Vec3, world: World) = Location(world, vec.x, vec.y, vec.z)
     private fun vec2ToLocation(vec: Vec2, world: World) = Location(world, vec.x.toDouble(), 0.0, vec.y.toDouble())
 
-    private fun getParticleData(context: CommandContext<CommandSourceStack>, particle: Particle, options: ParticleOptions): ParticleData<*> = when (options) {
+    fun getParticleData(context: CommandContext<CommandSourceStack>, particle: Particle, options: ParticleOptions): ParticleData<*> = when (options) {
         is SimpleParticleType -> ParticleData(particle, null)
         is BlockParticleOption -> ParticleData<BlockData>(particle, CraftBlockData.fromData(options.state))
         is DustColorTransitionOptions -> {
