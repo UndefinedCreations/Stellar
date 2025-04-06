@@ -10,7 +10,6 @@ import com.undefined.stellar.argument.block.BlockPredicateArgument
 import com.undefined.stellar.argument.entity.EntityAnchorArgument
 import com.undefined.stellar.argument.entity.EntityArgument
 import com.undefined.stellar.argument.entity.EntityDisplayType
-import com.undefined.stellar.argument.item.ItemSlotArgument
 import com.undefined.stellar.argument.item.ItemStackArgument
 import com.undefined.stellar.argument.item.ItemStackPredicateArgument
 import com.undefined.stellar.argument.math.*
@@ -20,7 +19,6 @@ import com.undefined.stellar.argument.misc.UUIDArgument
 import com.undefined.stellar.argument.player.GameModeArgument
 import com.undefined.stellar.argument.player.GameProfileArgument
 import com.undefined.stellar.argument.scoreboard.*
-import com.undefined.stellar.argument.structure.LootTableArgument
 import com.undefined.stellar.argument.structure.MirrorArgument
 import com.undefined.stellar.argument.structure.StructureRotationArgument
 import com.undefined.stellar.argument.text.ColorArgument
@@ -67,6 +65,7 @@ import org.bukkit.craftbukkit.v1_20_R3.CraftParticle
 import org.bukkit.craftbukkit.v1_20_R3.block.data.CraftBlockData
 import org.bukkit.craftbukkit.v1_20_R3.entity.CraftPlayer
 import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack
+import org.bukkit.craftbukkit.v1_20_R3.scoreboard.CraftCriteria
 import org.bukkit.craftbukkit.v1_20_R3.util.CraftNamespacedKey
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
@@ -214,7 +213,7 @@ object NMS1_20_4 : NMS {
             // Scoreboard
             is DisplaySlotArgument -> DisplaySlot.valueOf(ScoreboardSlotArgument.getDisplaySlot(context, argument.name).serializedName)
             is ObjectiveArgument -> Bukkit.getScoreboardManager()!!.mainScoreboard.getObjective(BrigadierObjectiveArgument.getObjective(context, argument.name).name)
-            is ObjectiveCriteriaArgument -> BrigadierObjectiveCriteriaArgument.getCriteria(context, argument.name).name
+            is ObjectiveCriteriaArgument -> CraftCriteria.getFromBukkit(BrigadierObjectiveCriteriaArgument.getCriteria(context, argument.name).name)
             is ScoreHolderArgument -> when (argument.type) {
                 ScoreHolderType.SINGLE -> BrigadierScoreHolderArgument.getName(context, argument.name).scoreboardName
                 ScoreHolderType.MULTIPLE -> BrigadierScoreHolderArgument.getNames(context, argument.name).map { it.scoreboardName }

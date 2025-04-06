@@ -64,6 +64,7 @@ import org.bukkit.craftbukkit.v1_20_R2.CraftParticle
 import org.bukkit.craftbukkit.v1_20_R2.block.data.CraftBlockData
 import org.bukkit.craftbukkit.v1_20_R2.entity.CraftPlayer
 import org.bukkit.craftbukkit.v1_20_R2.inventory.CraftItemStack
+import org.bukkit.craftbukkit.v1_20_R2.scoreboard.CraftCriteria
 import org.bukkit.craftbukkit.v1_20_R2.util.CraftNamespacedKey
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
@@ -209,7 +210,7 @@ object NMS1_20_2 : NMS {
             // Scoreboard
             is DisplaySlotArgument -> DisplaySlot.valueOf(ScoreboardSlotArgument.getDisplaySlot(context, argument.name).serializedName)
             is ObjectiveArgument -> Bukkit.getScoreboardManager()!!.mainScoreboard.getObjective(BrigadierObjectiveArgument.getObjective(context, argument.name).name)
-            is ObjectiveCriteriaArgument -> BrigadierObjectiveCriteriaArgument.getCriteria(context, argument.name).name
+            is ObjectiveCriteriaArgument -> CraftCriteria.getFromBukkit(BrigadierObjectiveCriteriaArgument.getCriteria(context, argument.name).name)
             is ScoreHolderArgument -> when (argument.type) {
                 ScoreHolderType.SINGLE -> BrigadierScoreHolderArgument.getName(context, argument.name)
                 ScoreHolderType.MULTIPLE -> BrigadierScoreHolderArgument.getNames(context, argument.name)
