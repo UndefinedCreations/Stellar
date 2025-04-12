@@ -217,7 +217,7 @@ class PhraseArgument(name: String) : StringArgument(name, StringType.PHRASE) {
         val input = context.input.removePrefix("/")
         val words = input.split(' ').toMutableList()
 
-        val totalOtherArguments = context.arguments.size - 1
+        val totalOtherArguments = context.args.size - 1
         for (i in (0..totalOtherArguments)) words.removeFirst()
 
         return PhraseCommandContext(context, words, context.sender, input.substring(input.indexOf(' ')), input)
