@@ -702,7 +702,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @return The created [OnlinePlayersArgument], which returns a [Player] when parsed.
      */
     @JvmOverloads
-    fun addOnlinePlayersArgument(name: String, filter: CommandSender.(Player) -> Boolean = { true }, async: Boolean = false): OnlinePlayersArgument = addArgument(OnlinePlayersArgument(name, filter, async))
+    fun addOnlinePlayersArgument(name: String, filter: CommandSender.(Player) -> Boolean = { it != this }, async: Boolean = false): OnlinePlayersArgument = addArgument(OnlinePlayersArgument(name, filter, async))
 
     // Math
     /**
