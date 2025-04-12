@@ -697,12 +697,12 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
     /**
      * Adds an [OnlinePlayersArgument] to the command with the given name. It is a list of all currently online players.
      *
-     * @param filter A function to filter players (default: allows all players).
+     * @param filter A function to filter players (default: exclude sender).
      * @param async Whether the _suggestions_ should be gotten asynchronously (default: `false`).
      * @return The created [OnlinePlayersArgument], which returns a [Player] when parsed.
      */
     @JvmOverloads
-    fun addOnlinePlayersArgument(name: String, filter: (Player) -> Boolean = { true }, async: Boolean = false): OnlinePlayersArgument = addArgument(OnlinePlayersArgument(name, filter, async))
+    fun addOnlinePlayersArgument(name: String, filter: CommandSender.(Player) -> Boolean = { true }, async: Boolean = false): OnlinePlayersArgument = addArgument(OnlinePlayersArgument(name, filter, async))
 
     // Math
     /**

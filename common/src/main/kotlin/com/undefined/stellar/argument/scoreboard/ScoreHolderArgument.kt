@@ -17,6 +17,7 @@ enum class ScoreHolderType {
      * Allows you to only select _one_ score holder.
      */
     SINGLE,
+
     /**
      * Allows you to select any number of score holders.
      */

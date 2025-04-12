@@ -4,6 +4,7 @@ import com.undefined.stellar.argument.basic.StringArgument
 import com.undefined.stellar.argument.basic.StringType
 import com.undefined.stellar.data.suggestion.Suggestion
 import org.bukkit.Bukkit
+import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
 /**
@@ -13,10 +14,10 @@ import org.bukkit.entity.Player
  * @param filter A function passing in a [Player] and returning a `boolean`. It filters any players that return `false`.
  * @param async Whether the _suggestions_ should be gotten asynchronously (default: `false`).
  */
-class OnlinePlayersArgument(name: String, filter: (Player) -> Boolean = { true }, async: Boolean = false) : ListArgument<Player, String>(
+class OnlinePlayersArgument(name: String, filter: CommandSender.(Player) -> Boolean = { true }, async: Boolean = false) : ListArgument<Player, String>(
     StringArgument(name, StringType.WORD),
     Bukkit.getServer().onlinePlayers,
-    { it.takeIf(filter)?.let { Suggestion.withText(it.name) } ?: Suggestion.empty() },
+    { it.takeIf { filter(this, it) }?.let { Suggestion.withText(it.name) } ?: Suggestion.empty() },
     { Bukkit.getPlayer(it) },
     async,
 )
