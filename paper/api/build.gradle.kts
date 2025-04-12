@@ -9,7 +9,7 @@ dependencies {
     compileOnly(libs.papermc)
     compileOnly(libs.brigadier)
     api(project(":paper:lib"))
-    api(project(":paper:v1_21_4", "reobf"))
+    api(project(":paper:v1_21_4"))
 }
 
 tasks {

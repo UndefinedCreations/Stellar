@@ -208,7 +208,9 @@ object NMS1_20_1 : NMS {
 
             // Misc
             is NamespacedKeyArgument -> CraftNamespacedKey.fromMinecraft(ResourceLocationArgument.getId(context, argument.name))
-            is RegistryArgument -> argument.registry.getOrThrow(NamespacedKey.fromString(NMSHelper.getArgumentInput(context, argument.name)!!)!!)
+            is RegistryArgument -> NamespacedKey.fromString(NMSHelper.getArgumentInput(context, argument.name)!!)!!.let { key ->
+                argument.registry.get(key) ?: throw IllegalArgumentException("No ${RegistryArgument.registryNames[argument.registry]} registry entry found for key $key.")
+            }
             is UUIDArgument -> UuidArgument.getUuid(context, argument.name)
 
             // Player

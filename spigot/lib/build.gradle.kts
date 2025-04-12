@@ -1,5 +1,6 @@
 plugins {
     id("setup")
+    `publishing-convention`
 }
 
 dependencies {

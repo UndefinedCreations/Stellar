@@ -1,6 +1,7 @@
 plugins {
     id("setup")
     id("com.undefinedcreations.echo")
+    `publishing-convention`
 }
 
 dependencies {
