@@ -91,7 +91,7 @@ object NMSManager {
     }
 
     private fun handleExecutions(command: AbstractStellarCommand<*>, builder: ArgumentBuilder<Any, *>, plugin: JavaPlugin) {
-        if (command.executions.isEmpty() && command.runnables.isEmpty()) return
+        if (command.executions.isEmpty()) return
         builder.executes { context ->
             val stellarContext = MojangAdapter.getStellarCommandContext(context)
             val rootNodeName = context.rootNode.name.takeIf { it.isNotBlank() }
