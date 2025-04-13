@@ -20,7 +20,7 @@ import kotlin.reflect.KProperty
 class CommandContext<T : CommandSender>(val args: CommandNode, val sender: T, val input: String) {
 
     /**
-     * A delegate operator function that gets the argument with [name], in the type as specified by [T].
+     * A delegate operator function that gets the argument with the name of the property, in the type as specified by [T].
      *
      * @throws NoSuchElementException If the argument cannot be found.
      * @throws ArgumentCastMismatchException If the argument cannot be cast into [T].

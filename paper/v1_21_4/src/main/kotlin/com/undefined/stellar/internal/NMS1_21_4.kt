@@ -78,7 +78,7 @@ import org.bukkit.craftbukkit.scoreboard.CraftScoreboardTranslations
 import org.bukkit.craftbukkit.util.CraftNamespacedKey
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
-import java.util.EnumSet
+import java.util.*
 import java.util.function.Predicate
 import net.minecraft.commands.arguments.AngleArgument as BrigadierAngleArgument
 import net.minecraft.commands.arguments.ColorArgument as BrigadierColorArgument

@@ -1,9 +1,9 @@
 package com.undefined.stellar.argument.phrase
 
 import com.undefined.stellar.AbstractStellarArgument
-import com.undefined.stellar.data.argument.CommandContext
 import com.undefined.stellar.data.phrase.*
-import com.undefined.stellar.data.suggestion.*
+import com.undefined.stellar.data.suggestion.Suggestion
+import com.undefined.stellar.data.suggestion.toSuggestion
 import org.bukkit.command.CommandSender
 import org.jetbrains.annotations.ApiStatus
 import java.util.concurrent.CompletableFuture

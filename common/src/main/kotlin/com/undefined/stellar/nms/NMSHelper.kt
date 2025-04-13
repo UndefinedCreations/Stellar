@@ -2,7 +2,6 @@ package com.undefined.stellar.nms
 
 import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.context.ParsedArgument
-import com.mojang.brigadier.context.StringRange
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 

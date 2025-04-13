@@ -1,8 +1,10 @@
 package com.undefined.stellar.data.argument
 
+import com.undefined.stellar.argument.entity.EntityAnchorArgument
+import com.undefined.stellar.data.argument.EntityAnchor.EYES
+import com.undefined.stellar.data.argument.EntityAnchor.FEET
 import org.bukkit.Location
 import org.bukkit.entity.LivingEntity
-import com.undefined.stellar.argument.entity.EntityAnchorArgument
 
 /**
  * An enum that has two possible values: [FEET] and [EYES]. This argument is used to calculate the offset of a location as if from at the feet or eyes.

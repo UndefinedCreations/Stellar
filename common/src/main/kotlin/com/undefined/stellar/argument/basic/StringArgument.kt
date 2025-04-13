@@ -2,7 +2,6 @@ package com.undefined.stellar.argument.basic
 
 import com.mojang.brigadier.arguments.StringArgumentType
 import com.undefined.stellar.AbstractStellarArgument
-import com.undefined.stellar.argument.scoreboard.ScoreHolderArgument
 
 /**
  * An argument that allows you to type a string, as allowed by its [StringType], and returns that [String].
