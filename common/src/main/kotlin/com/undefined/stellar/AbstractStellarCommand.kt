@@ -332,38 +332,6 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
     @ApiStatus.Internal
     open fun hasGlobalHiddenDefaultFailureMessages(): Boolean = hideDefaultFailureMessages.hide && hideDefaultFailureMessages.global
 
-    /**
-     * Adds or sets a piece of information with the given name and text.
-     * It will be stored as information, to be displayed as a help topic.
-     * @return The modified command object.
-     */
-    abstract fun setInformation(name: String, text: String): T
-    /**
-     * Sets the description of this command with the given text.
-     * It will be stored as information, to be displayed as a help topic.
-     * @return The modified command object.
-     */
-    abstract fun setDescription(text: String): T
-    /**
-     * Sets the usage text of this command with the given text.
-     * It will be stored as information, to be displayed as a help topic.
-     * @return The modified command object.
-     */
-    abstract fun setUsageText(text: String): T
-    /**
-     * Clears all the information.
-     * @return The modified command object.
-     */
-    abstract fun clearInformation(): T
-
-    /**
-     * Registeres the command with the given plugin.
-     *
-     * @param plugin The given `JavaPlugin` instance.
-     * @return The registered command object.
-     */
-    abstract fun register(plugin: JavaPlugin): T
-
     // Arguments
     /**
      * Adds the given argument to the command and return the argument.
@@ -378,6 +346,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @return The created [BooleanArgument].
      */
     fun addArgument(name: String, vararg aliases: String): LiteralArgument = addArgument(LiteralArgument(name).apply { addAliases(*aliases) })
+
     /**
      * Adds a [LiteralArgument] to the command with the given name and aliases.
      * @return The created [BooleanArgument].
@@ -390,6 +359,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @return The created [BooleanArgument].
      */
     fun addBooleanArgument(name: String): BooleanArgument = addArgument(BooleanArgument(name))
+
     /**
      * Adds a [DoubleArgument] to the command with the given name.
      *
@@ -399,6 +369,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      */
     @JvmOverloads
     fun addDoubleArgument(name: String, minimum: Double = Double.MIN_VALUE, maximum: Double = Double.MAX_VALUE): DoubleArgument = addArgument(DoubleArgument(name, minimum, maximum))
+
     /**
      * Adds a [FloatArgument] to the command with the given name.
      *
@@ -408,6 +379,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      */
     @JvmOverloads
     fun addFloatArgument(name: String, minimum: Float = Float.MIN_VALUE, maximum: Float = Float.MAX_VALUE): FloatArgument = addArgument(FloatArgument(name, minimum, maximum))
+
     /**
      * Adds an [IntegerArgument] to the command with the given name.
      *
@@ -417,6 +389,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      */
     @JvmOverloads
     fun addIntegerArgument(name: String, minimum: Int = Int.MIN_VALUE, maximum: Int = Int.MAX_VALUE): IntegerArgument = addArgument(IntegerArgument(name, minimum, maximum))
+
     /**
      * Adds a [LongArgument] to the command with the given name.
      *
@@ -426,6 +399,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      */
     @JvmOverloads
     fun addLongArgument(name: String, minimum: Long = Long.MIN_VALUE, maximum: Long = Long.MAX_VALUE): LongArgument = addArgument(LongArgument(name, minimum, maximum))
+
     /**
      * Adds a [StringArgument] to the command with the given name.
      * @return The created [StringArgument].
@@ -439,6 +413,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @return The created [BlockDataArgument].
      */
     fun addBlockDataArgument(name: String): BlockDataArgument = addArgument(BlockDataArgument(name))
+
     /**
      * Adds a [BlockPredicateArgument] to the command with the given name.
      * @return The created [BlockPredicateArgument].
@@ -451,6 +426,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @return The created [EntityAnchorArgument].
      */
     fun addEntityAnchorArgument(name: String): EntityAnchorArgument = addArgument(EntityAnchorArgument(name))
+
     /**
      * Adds an [EntityArgument] to the command with the given name.
      * @return The created [EntityArgument].
@@ -463,11 +439,13 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @return The created [ItemSlotArgument].
      */
     fun addItemSlotArgument(name: String, multiple: Boolean = false): ItemSlotArgument = addArgument(ItemSlotArgument(name, multiple))
+
     /**
      * Adds an [ItemStackArgument] to the command with the given name.
      * @return The created [ItemStackArgument].
      */
     fun addItemStackArgument(name: String): ItemStackArgument = addArgument(ItemStackArgument(name))
+
     /**
      * Adds an [ItemStackPredicateArgument] to the command with the given name.
      * @return The created [ItemStackPredicateArgument].
@@ -880,5 +858,40 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @return The created [LocationArgument].
      */
     fun addLocationArgument(name: String, type: LocationType): LocationArgument = addArgument(LocationArgument(name, type))
+
+    /**
+     * Adds or sets a piece of information with the given name and text.
+     * It will be stored as information, to be displayed as a help topic.
+     * @return The modified command object.
+     */
+    abstract fun setInformation(name: String, text: String): T
+
+    /**
+     * Sets the description of this command with the given text.
+     * It will be stored as information, to be displayed as a help topic.
+     * @return The modified command object.
+     */
+    abstract fun setDescription(text: String): T
+
+    /**
+     * Sets the usage text of this command with the given text.
+     * It will be stored as information, to be displayed as a help topic.
+     * @return The modified command object.
+     */
+    abstract fun setUsageText(text: String): T
+
+    /**
+     * Clears all the information.
+     * @return The modified command object.
+     */
+    abstract fun clearInformation(): T
+
+    /**
+     * Registers the command with the given plugin.
+     *
+     * @param plugin The given `JavaPlugin` instance.
+     * @return The registered command object.
+     */
+    abstract fun register(plugin: JavaPlugin): T
 
 }
