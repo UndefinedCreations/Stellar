@@ -86,15 +86,18 @@ object NMSManager {
         builder.executes { context ->
             val stellarContext = MojangAdapter.getStellarCommandContext(context)
             val rootNodeName = context.rootNode.name.takeIf { it.isNotBlank() }
+            val baseCommand = Stellar.getStellarCommand(context.input.split(' ').first()) ?: throw IllegalStateException("Cannot get root command.")
 
             for (runnable in command.runnables.filter { it.async }) runnable(stellarContext)
-            val arguments = ArgumentHelper.getArguments(command, context, if (rootNodeName != null) 0 else 1)
-            for (argument in arguments) for (runnable in argument.runnables.filter { it.async }) runnable(stellarContext)
+            val arguments = ArgumentHelper.getArguments(baseCommand, context, if (rootNodeName != null) 0 else 1)
+            for (runnable in baseCommand.runnables.filter { it.async }) if (!runnable(stellarContext)) return@executes 1
+            for (argument in arguments + command) for (runnable in argument.runnables.filter { it.async }) if (!runnable(stellarContext)) return@executes 1
             for (execution in command.executions.filter { it.async }) execution(stellarContext)
 
             Bukkit.getScheduler().runTask(plugin, Runnable {
-                for (runnable in command.runnables.filter { !it.async }) runnable(stellarContext)
-                for (argument in arguments) for (runnable in argument.runnables.filter { !it.async }) runnable(stellarContext)
+                for (runnable in baseCommand.runnables.filter { !it.async }) if (!runnable(stellarContext)) return@Runnable
+                for (runnable in command.runnables.filter { !it.async }) if (!runnable(stellarContext)) return@Runnable
+                for (argument in arguments) for (runnable in argument.runnables.filter { !it.async }) if (!runnable(stellarContext)) return@Runnable
                 for (execution in command.executions.filter { !it.async }) execution(stellarContext)
             })
             1
