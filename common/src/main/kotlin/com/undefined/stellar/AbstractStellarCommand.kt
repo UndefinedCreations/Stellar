@@ -41,13 +41,17 @@ import com.undefined.stellar.data.suggestion.Suggestion
 import com.undefined.stellar.nms.NMS
 import com.undefined.stellar.nms.NMSHelper
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
+import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
 import org.jetbrains.annotations.ApiStatus
 import java.lang.Enum.valueOf
+import java.util.*
+import java.util.concurrent.TimeUnit
 
 /**
  * This is the base of any command, whether it's an argument or a root command.
@@ -66,6 +70,8 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
     val requirements: MutableList<ExecutableRequirement<*>> = mutableListOf()
     @ApiStatus.Internal
     val arguments: MutableSet<AbstractStellarArgument<*, *>> = mutableSetOf()
+    @ApiStatus.Internal
+    val lastExecutions = HashMap<UUID, Long>()
     @ApiStatus.Internal
     val executions: MutableSet<ExecutableExecution<*>> = mutableSetOf()
     @ApiStatus.Internal
@@ -148,6 +154,170 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @return The modified command object.
      */
     fun addRequirements(vararg levels: Int): T = addRequirement<Player> { levels.all { NMSHelper.hasPermission(this, it) } }
+
+    /**
+     * Adds a cooldown to the command for each player.
+     *
+     * Prevents a player from re-executing the command until the specified duration has passed
+     * since their last successful execution. If the player is still on cooldown, the [block] function is run.
+     *
+     * @param duration The cooldown duration in milliseconds.
+     * @param block A function providing a [CommandContext] and the remaining time in milliseconds which executes anytime a player is on cooldown.
+     * @return The modified command object.
+     */
+    fun addCooldown(
+        duration: Long,
+        block: CommandContext<Player>.(remaining: Long) -> Unit = { remaining ->
+            sender.sendMessage("${ChatColor.RED}Please wait ${TimeUnit.MILLISECONDS.toSeconds(remaining)} more seconds!")
+        },
+    ): T = apply {
+        addRunnable<Player> {
+            val currentTime = System.currentTimeMillis()
+
+            if (sender.uniqueId in lastExecutions) {
+                val cooldownEnd = lastExecutions[sender.uniqueId]!!
+                val remaining = cooldownEnd - currentTime
+
+                if (remaining > 0) {
+                    block(remaining)
+                    return@addRunnable false
+                }
+            }
+
+            lastExecutions[sender.uniqueId] = currentTime + duration
+            return@addRunnable true
+        }
+    } as T
+
+    /**
+     * Adds a cooldown to the command for each player.
+     *
+     * Prevents a player from re-executing the command until the specified duration has passed
+     * since their last successful execution. If the player is still on cooldown, the [block] function is run.
+     *
+     * @param duration The cooldown duration in whatever is specified in [unit].
+     * @param unit A [TimeUnit] that determines what time unit the [duration] will be counted in.
+     * @param block A function providing a [CommandContext] and the remaining time in milliseconds which executes anytime a player is on cooldown.
+     * @return The modified command object.
+     */
+    fun addCooldown(
+        duration: Long,
+        unit: TimeUnit,
+        block: CommandContext<Player>.(remaining: Long) -> Unit = { remaining ->
+            sender.sendMessage("${ChatColor.RED}Please wait ${TimeUnit.MILLISECONDS.toSeconds(remaining)} more seconds!")
+        },
+    ): T = addCooldown(TimeUnit.MILLISECONDS.convert(duration, unit), block)
+
+    /**
+     * Adds a cooldown to the command for each player.
+     *
+     * Prevents a player from re-executing the command until the specified duration has passed
+     * since their last successful execution. If the player is still on cooldown, the [message] function is run.
+     *
+     * @param duration The cooldown duration in milliseconds.
+     * @param message A function providing a [CommandContext] and the remaining time in milliseconds returning a [Component] which is sent to the player when they are on cooldown.
+     * @return The modified command object.
+     */
+    fun addComponentMessageCooldown(
+        duration: Long,
+        message: CommandContext<Player>.(remaining: Long) -> Component = { remaining ->
+            Component.text("Please wait ${TimeUnit.MILLISECONDS.toSeconds(remaining)} more seconds!", NamedTextColor.RED)
+        },
+    ): T = addCooldown(duration) { remaining ->
+        sender.sendMessage(LegacyComponentSerializer.legacySection().serialize(message(remaining)))
+    }
+
+    /**
+     * Adds a cooldown to the command for each player.
+     *
+     * Prevents a player from re-executing the command until the specified duration has passed
+     * since their last successful execution. If the player is still on cooldown, the [message] function is run.
+     *
+     * @param duration The cooldown duration in whatever is specified in [unit].
+     * @param unit A [TimeUnit] that determines what time unit the [duration] will be counted in.
+     * @param message A function providing a [CommandContext] and the remaining time in milliseconds returning a [Component] which is sent to the player when they are on cooldown.
+     * @return The modified command object.
+     */
+    fun addComponentMessageCooldown(
+        duration: Long, unit: TimeUnit,
+        message: CommandContext<Player>.(remaining: Long) -> Component = { remaining ->
+            Component.text("Please wait ${TimeUnit.MILLISECONDS.toSeconds(remaining)} more seconds!", NamedTextColor.RED)
+        },
+    ): T = addComponentMessageCooldown(TimeUnit.MILLISECONDS.convert(duration, unit), message)
+
+    /**
+     * Adds a cooldown to the command for each player.
+     *
+     * Prevents a player from re-executing the command until the specified duration has passed
+     * since their last successful execution. If the player is still on cooldown, the [message] function is run.
+     *
+     * @param duration The cooldown duration in milliseconds.
+     * @param message A function providing a [CommandContext] and the remaining time in milliseconds returning a [String] which is parsed with [MiniMessage] and sent to the player when they are on cooldown.
+     * @return The modified command object.
+     */
+    fun addMessageCooldown(
+        duration: Long,
+        message: CommandContext<Player>.(remaining: Long) -> String = { remaining ->
+            "<red>Please wait ${TimeUnit.MILLISECONDS.toSeconds(remaining)} more seconds!"
+        },
+    ): T = addCooldown(duration) { remaining ->
+        sender.sendMessage(LegacyComponentSerializer.legacySection().serialize(MiniMessage.miniMessage().deserialize(message(remaining))))
+    }
+
+    /**
+     * Adds a cooldown to the command for each player.
+     *
+     * Prevents a player from re-executing the command until the specified duration has passed
+     * since their last successful execution. If the player is still on cooldown, the [message] function is run.
+     *
+     * @param duration The cooldown duration in whatever is specified in [unit].
+     * @param unit A [TimeUnit] that determines what time unit the [duration] will be counted in.
+     * @param message A function providing a [CommandContext] and the remaining time in milliseconds returning a [String] which is parsed with [MiniMessage] which is sent to the player when they are on cooldown.
+     * @return The modified command object.
+     */
+    fun addMessageCooldown(
+        duration: Long, unit: TimeUnit,
+        message: CommandContext<Player>.(remaining: Long) -> String = { remaining ->
+            "<red>Please wait ${TimeUnit.MILLISECONDS.toSeconds(remaining)} more seconds!"
+        },
+    ): T = addMessageCooldown(TimeUnit.MILLISECONDS.convert(duration, unit), message)
+
+    /**
+     * Adds a cooldown to the command for each player.
+     *
+     * Prevents a player from re-executing the command until the specified duration has passed
+     * since their last successful execution. If the player is still on cooldown, the [message] function is run.
+     *
+     * @param duration The cooldown duration in milliseconds.
+     * @param message A function providing a [CommandContext] and the remaining time in milliseconds returning a [String] and sent to the player when they are on cooldown. The [String] is not modified in the slightest.
+     * @return The modified command object.
+     */
+    fun addRawMessageCooldown(
+        duration: Long,
+        message: CommandContext<Player>.(remaining: Long) -> String = { remaining ->
+            "${ChatColor.RED}Please wait ${TimeUnit.MILLISECONDS.toSeconds(remaining)} more seconds!"
+        },
+    ): T = addCooldown(duration) { remaining ->
+        sender.sendMessage(LegacyComponentSerializer.legacySection().serialize(MiniMessage.miniMessage().deserialize(message(remaining))))
+    }
+
+    /**
+     * Adds a cooldown to the command for each player.
+     *
+     * Prevents a player from re-executing the command until the specified duration has passed
+     * since their last successful execution. If the player is still on cooldown, the [message] function is run.
+     *
+     * @param duration The cooldown duration in whatever is specified in [unit].
+     * @param unit A [TimeUnit] that determines what time unit the [duration] will be counted in.
+     * @param message A function providing a [CommandContext] and the remaining time in milliseconds returning a [String] which is sent to the player when they are on cooldown. The [String] is not modified in the slightest.
+     * @return The modified command object.
+     */
+    fun addRawMessageCooldown(
+        duration: Long, unit: TimeUnit,
+        message: CommandContext<Player>.(remaining: Long) -> String = { remaining ->
+            "${ChatColor.RED}Please wait ${TimeUnit.MILLISECONDS.toSeconds(remaining)} more seconds!"
+        },
+    ): T = addRawMessageCooldown(TimeUnit.MILLISECONDS.convert(duration, unit), message)
 
     /**
      * Adds an execution to the command. Only works in Kotlin.
