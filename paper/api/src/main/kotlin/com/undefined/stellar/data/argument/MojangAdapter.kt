@@ -30,7 +30,7 @@ object MojangAdapter {
                 }
             } as CommandNode
 
-        return CommandContext(parsedArguments, sender, input)
+        return CommandContext(context, parsedArguments, sender, input)
     }
 
 }

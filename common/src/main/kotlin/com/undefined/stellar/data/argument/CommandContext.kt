@@ -1,6 +1,7 @@
 package com.undefined.stellar.data.argument
 
 import com.undefined.stellar.data.exception.ArgumentCastMismatchException
+import com.undefined.stellar.nms.NMSHelper
 import org.bukkit.command.CommandSender
 import kotlin.reflect.KProperty
 
@@ -17,14 +18,19 @@ import kotlin.reflect.KProperty
  *
  * @param input A [String] that represents the entire command input excluding the `/`.
  */
-class CommandContext<T : CommandSender>(val args: CommandNode, val sender: T, val input: String) {
+class CommandContext<T : CommandSender>(
+    private val brigadierContext: com.mojang.brigadier.context.CommandContext<*>,
+    val args: CommandNode,
+    val sender: T,
+    val input: String,
+) {
 
     /**
      * A delegate operator function that gets the argument with the name of the property, in the type as specified by [T].
      *
+     * @return The argument with the type of [T].
      * @throws NoSuchElementException If the argument cannot be found.
      * @throws ArgumentCastMismatchException If the argument cannot be cast into [T].
-     * @return The argument with the type of [T].
      */
     inline operator fun <reified T> CommandNode.getValue(nothing: Nothing?, property: KProperty<*>): T =
         (args[property.name] ?: throw NoSuchElementException("No argument with the name ${property.name}"))(this@CommandContext as CommandContext<CommandSender>) as T
@@ -32,9 +38,9 @@ class CommandContext<T : CommandSender>(val args: CommandNode, val sender: T, va
     /**
      * Gets the argument with [name], in the type as specified by [T].
      *
+     * @return The argument with the type of [T].
      * @throws NoSuchElementException If the argument cannot be found.
      * @throws ArgumentCastMismatchException If the argument cannot be cast into [T].
-     * @return The argument with the type of [T].
      */
     inline fun <reified T> getArgument(name: String): T {
         val argument = args[name] ?: throw NoSuchElementException("No argument with the name $name")
@@ -46,9 +52,9 @@ class CommandContext<T : CommandSender>(val args: CommandNode, val sender: T, va
     /**
      * Gets the argument at [index], in the type as specified by [T].
      *
+     * @return The argument with the type of [T].
      * @throws NoSuchElementException If the argument cannot be found.
      * @throws ArgumentCastMismatchException If the argument cannot be cast into [T].
-     * @return The argument with the type of [T].
      */
     inline fun <reified T> getArgument(index: Int): T =
         args.values.toList()[index](this as CommandContext<CommandSender>) as? T
@@ -57,8 +63,8 @@ class CommandContext<T : CommandSender>(val args: CommandNode, val sender: T, va
     /**
      * Gets the argument with [name], in the type as specified by [T].
      *
-     * @throws NoSuchElementException If the argument cannot be found.
      * @return The argument with the type of [T], which returns null if the argument cannot be cast successfully.
+     * @throws NoSuchElementException If the argument cannot be found.
      */
     inline fun <reified T> getOrNull(name: String): T? {
         val argument = args[name] ?: throw NoSuchElementException("No argument with the name $name")
@@ -69,8 +75,8 @@ class CommandContext<T : CommandSender>(val args: CommandNode, val sender: T, va
     /**
      * Gets the argument at [index], in the type as specified by [T].
      *
-     * @throws NoSuchElementException If the argument cannot be found.
      * @return The argument with the type of [T], which returns null if the argument cannot be cast successfully.
+     * @throws NoSuchElementException If the argument cannot be found.
      */
     inline fun <reified T> getOrNull(index: Int): T? =
         args.values.toList()[index](this as CommandContext<CommandSender>) as? T
@@ -78,8 +84,8 @@ class CommandContext<T : CommandSender>(val args: CommandNode, val sender: T, va
     /**
      * Gets the argument with [name].
      *
-     * @throws NoSuchElementException If the argument cannot be found.
      * @return The argument as an [Object] or a [Any] (in Kotlin), which returns null if the argument cannot be cast successfully.
+     * @throws NoSuchElementException If the argument cannot be found.
      */
     operator fun get(name: String): Any? = (args[name]
         ?: throw NoSuchElementException("No argument with the name $name"))(this as CommandContext<CommandSender>)
@@ -87,9 +93,27 @@ class CommandContext<T : CommandSender>(val args: CommandNode, val sender: T, va
     /**
      * Gets the argument at [index].
      *
-     * @throws NoSuchElementException If the argument cannot be found.
      * @return The argument as an [Object] or a [Any] (in Kotlin), which returns null if the argument cannot be cast successfully.
+     * @throws NoSuchElementException If the argument cannot be found.
      */
     operator fun get(index: Int): Any? = args.values.toList()[index](this as CommandContext<CommandSender>)
+
+    /**
+     * Gets the input of a certain argument, if no argument is found, it will throw an [IllegalArgumentException].
+     *
+     * @param name A [String] representing the name of an argument.
+     * @return The raw input in [String] of the argument with [name].
+     * @throws IllegalArgumentException If no argument input is found with [name].
+     */
+    fun getArgumentInput(name: String): String = NMSHelper.getArgumentInput(brigadierContext, name)
+        ?: throw IllegalArgumentException("No argument input found with name $name.")
+
+    /**
+     * Gets the input of a certain argument, if no argument is found, it will return `null`.
+     *
+     * @param name A [String] representing the name of an argument.
+     * @return The raw input in a nullable [String] of the argument with [name].
+     */
+    fun getArgumentInputOrNull(name: String): String? = NMSHelper.getArgumentInput(brigadierContext, name)
 
 }
