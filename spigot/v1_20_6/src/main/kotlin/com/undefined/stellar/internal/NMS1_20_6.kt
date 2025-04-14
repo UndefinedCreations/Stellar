@@ -228,7 +228,7 @@ object NMS1_20_6 : NMS {
             // Scoreboard
             is DisplaySlotArgument -> DisplaySlot.valueOf(ScoreboardSlotArgument.getDisplaySlot(context, argument.name).serializedName)
             is ObjectiveArgument -> Bukkit.getScoreboardManager()!!.mainScoreboard.getObjective(BrigadierObjectiveArgument.getObjective(context, argument.name).name)
-            is ObjectiveCriteriaArgument -> CraftCriteria.getFromBukkit(BrigadierObjectiveCriteriaArgument.getCriteria(context, argument.name).name)
+            is ObjectiveCriteriaArgument -> BrigadierObjectiveCriteriaArgument.getCriteria(context, argument.name).name
             is ScoreHolderArgument -> when (argument.type) {
                 ScoreHolderType.SINGLE -> BrigadierScoreHolderArgument.getName(context, argument.name).scoreboardName
                 ScoreHolderType.MULTIPLE -> BrigadierScoreHolderArgument.getNames(context, argument.name).map { it.scoreboardName }

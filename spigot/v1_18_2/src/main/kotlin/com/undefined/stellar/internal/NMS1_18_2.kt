@@ -17,11 +17,8 @@ import com.undefined.stellar.argument.math.*
 import com.undefined.stellar.argument.misc.NamespacedKeyArgument
 import com.undefined.stellar.argument.misc.RegistryArgument
 import com.undefined.stellar.argument.misc.UUIDArgument
-import com.undefined.stellar.argument.player.GameModeArgument
 import com.undefined.stellar.argument.player.GameProfileArgument
 import com.undefined.stellar.argument.scoreboard.*
-import com.undefined.stellar.argument.structure.MirrorArgument
-import com.undefined.stellar.argument.structure.StructureRotationArgument
 import com.undefined.stellar.argument.text.ColorArgument
 import com.undefined.stellar.argument.text.ComponentArgument
 import com.undefined.stellar.argument.text.MessageArgument
@@ -34,7 +31,6 @@ import com.undefined.stellar.nms.NMS
 import com.undefined.stellar.nms.NMSHelper
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
-import net.minecraft.commands.CommandBuildContext
 import net.minecraft.commands.CommandSource
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.arguments.*
@@ -43,10 +39,10 @@ import net.minecraft.commands.arguments.coordinates.*
 import net.minecraft.commands.arguments.item.ItemArgument
 import net.minecraft.commands.arguments.item.ItemPredicateArgument
 import net.minecraft.core.BlockPos
+import net.minecraft.core.Registry
 import net.minecraft.core.particles.*
 import net.minecraft.network.chat.Component
-import net.minecraft.resources.ResourceKey
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.network.chat.TextComponent
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ColumnPos
 import net.minecraft.server.level.ServerPlayer
@@ -59,15 +55,12 @@ import net.minecraft.world.scores.Scoreboard
 import org.bukkit.*
 import org.bukkit.block.Block
 import org.bukkit.block.data.BlockData
-import org.bukkit.block.structure.Mirror
-import org.bukkit.block.structure.StructureRotation
 import org.bukkit.command.CommandSender
-import org.bukkit.craftbukkit.v1_19_R2.CraftParticle
-import org.bukkit.craftbukkit.v1_19_R2.block.data.CraftBlockData
-import org.bukkit.craftbukkit.v1_19_R2.entity.CraftPlayer
-import org.bukkit.craftbukkit.v1_19_R2.inventory.CraftItemStack
-import org.bukkit.craftbukkit.v1_19_R2.scoreboard.CraftCriteria
-import org.bukkit.craftbukkit.v1_19_R2.util.CraftNamespacedKey
+import org.bukkit.craftbukkit.v1_18_R2.CraftParticle
+import org.bukkit.craftbukkit.v1_18_R2.block.data.CraftBlockData
+import org.bukkit.craftbukkit.v1_18_R2.entity.CraftPlayer
+import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftItemStack
+import org.bukkit.craftbukkit.v1_18_R2.util.CraftNamespacedKey
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.scoreboard.DisplaySlot
@@ -78,7 +71,6 @@ import net.minecraft.commands.arguments.ColorArgument as BrigadierColorArgument
 import net.minecraft.commands.arguments.ComponentArgument as BrigadierComponentArgument
 import net.minecraft.commands.arguments.EntityAnchorArgument as BrigadierEntityAnchorArgument
 import net.minecraft.commands.arguments.EntityArgument as BrigadierEntityArgument
-import net.minecraft.commands.arguments.GameModeArgument as BrigadierGameModeArgument
 import net.minecraft.commands.arguments.GameProfileArgument as BrigadierGameProfileArgument
 import net.minecraft.commands.arguments.MessageArgument as BrigadierMessageArgument
 import net.minecraft.commands.arguments.ObjectiveArgument as BrigadierObjectiveArgument
@@ -92,14 +84,7 @@ import net.minecraft.commands.arguments.blocks.BlockPredicateArgument as Brigadi
 import net.minecraft.commands.arguments.coordinates.RotationArgument as BrigadierRotationArgument
 
 @Suppress("UNCHECKED_CAST", "DEPRECATION")
-object NMS1_19_3 : NMS {
-
-    private val COMMAND_BUILD_CONTEXT: CommandBuildContext by lazy {
-        CommandBuildContext.simple(
-            MinecraftServer.getServer().registryAccess(),
-            MinecraftServer.getServer().worldData.dataConfiguration.enabledFeatures()
-        )
-    }
+object NMS1_18_2 : NMS {
 
     override fun getCommandDispatcher(): CommandDispatcher<Any> = MinecraftServer.getServer().functions.dispatcher as CommandDispatcher<Any>
 
@@ -108,8 +93,8 @@ object NMS1_19_3 : NMS {
         is StringArgument -> BrigadierScoreHolderArgument.scoreHolder()
 
         // Block
-        is BlockDataArgument -> BlockStateArgument.block(COMMAND_BUILD_CONTEXT)
-        is BlockPredicateArgument -> BrigadierBlockPredicateArgument.blockPredicate(COMMAND_BUILD_CONTEXT)
+        is BlockDataArgument -> BlockStateArgument.block()
+        is BlockPredicateArgument -> BrigadierBlockPredicateArgument.blockPredicate()
 
         // Entity
         is EntityAnchorArgument -> BrigadierEntityAnchorArgument.anchor()
@@ -121,8 +106,8 @@ object NMS1_19_3 : NMS {
         }
 
         // Item
-        is ItemStackArgument -> ItemArgument.item(COMMAND_BUILD_CONTEXT)
-        is ItemStackPredicateArgument -> ItemPredicateArgument.itemPredicate(COMMAND_BUILD_CONTEXT)
+        is ItemStackArgument -> ItemArgument.item()
+        is ItemStackPredicateArgument -> ItemPredicateArgument.itemPredicate()
 
         // Math
         is AngleArgument -> BrigadierAngleArgument.angle()
@@ -135,11 +120,13 @@ object NMS1_19_3 : NMS {
 
         // Misc
         is NamespacedKeyArgument -> ResourceLocationArgument.id()
-        is RegistryArgument -> ResourceArgument.resource(COMMAND_BUILD_CONTEXT, ResourceKey.createRegistryKey<Keyed>(ResourceLocation(ResourceLocation.DEFAULT_NAMESPACE, RegistryArgument.registryNames[argument.registry] ?: throw IllegalArgumentException("Could not find registry!"))))
+        is RegistryArgument -> {
+            argument.addSuggestions(*Registry.ENCHANTMENT.keySet().map { it.toString() }.toTypedArray())
+            ResourceLocationArgument.id()
+        }
         is UUIDArgument -> UuidArgument.uuid()
 
         // Player
-        is GameModeArgument -> BrigadierGameModeArgument.gameMode()
         is GameProfileArgument -> BrigadierGameProfileArgument.gameProfile()
 
         // Scoreboard
@@ -151,10 +138,6 @@ object NMS1_19_3 : NMS {
             ScoreHolderType.MULTIPLE -> BrigadierScoreHolderArgument.scoreHolders()
         }
         is TeamArgument -> BrigadierTeamArgument.team()
-
-        // Structure
-        is MirrorArgument -> TemplateMirrorArgument.templateMirror()
-        is StructureRotationArgument -> TemplateRotationArgument.templateRotation()
 
         // Text
         is ColorArgument -> BrigadierColorArgument.color()
@@ -169,7 +152,7 @@ object NMS1_19_3 : NMS {
             LocationType.PRECISE_LOCATION_3D -> Vec3Argument.vec3()
             LocationType.PRECISE_LOCATION_2D -> Vec2Argument.vec2()
         }
-        is ParticleArgument -> BrigadierParticleArgument.particle(COMMAND_BUILD_CONTEXT)
+        is ParticleArgument -> BrigadierParticleArgument.particle()
         else -> throw UnsupportedArgumentException(argument)
     }
 
@@ -213,7 +196,6 @@ object NMS1_19_3 : NMS {
             is UUIDArgument -> UuidArgument.getUuid(context, argument.name)
 
             // Player
-            is GameModeArgument -> GameMode.getByValue(BrigadierGameModeArgument.getGameMode(context, argument.name).id)
             is GameProfileArgument -> BrigadierGameProfileArgument.getGameProfiles(context, argument.name)
 
             // Scoreboard
@@ -225,10 +207,6 @@ object NMS1_19_3 : NMS {
                 ScoreHolderType.MULTIPLE -> BrigadierScoreHolderArgument.getNames(context, argument.name)
             }
             is TeamArgument -> Bukkit.getScoreboardManager()!!.mainScoreboard.getTeam(BrigadierTeamArgument.getTeam(context, argument.name).name)
-
-            // Structure
-            is MirrorArgument -> Mirror.valueOf(TemplateMirrorArgument.getMirror(context, argument.name).name)
-            is StructureRotationArgument -> StructureRotation.valueOf(TemplateRotationArgument.getRotation(context, argument.name).name)
 
             // Text
             is ColorArgument -> ChatColor.getByChar(BrigadierColorArgument.getColor(context, argument.name).char)
@@ -259,14 +237,14 @@ object NMS1_19_3 : NMS {
             overworld,
             permissionLevel,
             sender.name,
-            Component.literal(sender.name),
+            TextComponent(sender.name),
             MinecraftServer.getServer(),
             null
         )
     }
 
     private data class Source(val sender: CommandSender) : CommandSource {
-        override fun sendSystemMessage(message: Component) = this.sender.sendMessage(LegacyComponentSerializer.legacySection().serialize(asAdventure(message)))
+        override fun sendMessage(message: Component, uuid: UUID) = this.sender.sendMessage(LegacyComponentSerializer.legacySection().serialize(asAdventure(message)))
         override fun acceptsSuccess(): Boolean = true
         override fun acceptsFailure(): Boolean = true
         override fun shouldInformAdmins(): Boolean = false
@@ -311,18 +289,15 @@ object NMS1_19_3 : NMS {
         )
         is VibrationParticleOption -> {
             val level: Level = context.source.level
-            val destination: Vibration.Destination
 
-            if (options.destination is BlockPositionSource) {
-                val to: Vec3 = options.destination.getPosition(level).get()
-                destination = Vibration.Destination.BlockDestination(Location(level.world, to.x(), to.y(), to.z()))
-                ParticleData(particle, Vibration(Location(null, 0.0, 0.0, 0.0), destination, options.arrivalInTicks))
+            if (options.vibrationPath.destination is BlockPositionSource) {
+                val to = blockPosToLocation(options.vibrationPath.destination.getPosition(level).get(), level.world)
+                val destination = Vibration.Destination.BlockDestination(Location(level.world, to.x, to.y, to.z))
+                ParticleData(particle, Vibration(to, destination, options.vibrationPath.arrivalInTicks))
             } else {
                 ParticleData(particle, null)
             }
         }
-        is ShriekParticleOption -> ParticleData(particle, options.delay)
-        is SculkChargeParticleOptions -> ParticleData(particle, options.roll())
         else -> ParticleData(particle, null)
     }
 
