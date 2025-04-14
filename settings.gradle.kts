@@ -15,4 +15,7 @@ include(
     ":spigot:v1_20_4",
     ":spigot:v1_20_2",
     ":spigot:v1_20_1",
+    ":spigot:v1_19_4",
+    ":spigot:v1_19_3",
+    ":spigot:v1_19_2",
 )
