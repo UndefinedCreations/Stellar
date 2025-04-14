@@ -2,23 +2,57 @@ package com.undefined.stellar
 
 import org.bukkit.plugin.java.JavaPlugin
 
+/**
+ * This is an abstract class allowing you to create a command by extending a class.
+ *
+ * @property name The primary name of the command.
+ * @property permission A [String] representing the required permission to execute the command (optional).
+ * @property aliases A [List] of command aliases (optional).
+ */
 abstract class BaseStellarCommand(val name: String, val permission: String = "", val aliases: List<String> = listOf()) {
 
     private var hasBeenRegistered = false
-
-    val command: StellarCommand by lazy {
+    private val command: StellarCommand by lazy {
         setup().apply { for (argument in arguments()) addArgument(argument.fullArgument) }
     }
 
+    /**
+     * Sets up and returns the core [StellarCommand] instance for this command.
+     * Called once during command initialization.
+     */
     abstract fun setup(): StellarCommand
+
+    /**
+     * Optionally provides additional [StellarArgument]s to be added to the command.
+     *
+     * @return A list of additional [StellarArgument]s.
+     */
     open fun arguments(): List<StellarArgument> = listOf()
 
+    /**
+     * Creates a new [StellarCommand] instance with the given configuration block.
+     *
+     * Usually, this is used along with the [setup] method as such:
+     * ```kotlin
+     * override fun setup(): StellarCommand = createCommand {
+     *   // code logic
+     * }
+     * ```
+     *
+     * @param init A lambda to configure the command instance.
+     * @return The configured [StellarCommand].
+     */
     fun createCommand(init: StellarCommand.() -> Unit): StellarCommand {
         val command = StellarCommand(name, permission, aliases)
         command.init()
         return command
     }
 
+    /**
+     * Registers the command with the given plugin, if it has not been registered yet.
+     *
+     * @param plugin The [JavaPlugin] instance used for registration.
+     */
     fun register(plugin: JavaPlugin) {
         if (hasBeenRegistered) return
         hasBeenRegistered = true
