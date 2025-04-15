@@ -43,14 +43,14 @@ abstract class AbstractStellarArgument<T : AbstractStellarArgument<T, *>, R>(nam
     fun setSuggestionOffset(offset: Int): T = apply { suggestionOffset = offset } as T
 
     /**
-     * Adds multiple [Suggestion] on top of the current suggestions.
+     * Adds a list of [Suggestion]s on top of the current suggestions.
      */
-    fun addSuggestions(vararg suggestions: Suggestion): T = apply {
+    fun addSuggestions(suggestions: List<Suggestion>): T = apply {
         this.suggestions.add(ExecutableSuggestion(CommandSender::class) { _, _ -> CompletableFuture.completedFuture(suggestions.toList()) })
     } as T
 
     /**
-     * Adds multiple [Suggestion] with the titles defined in [suggestions] on top of the current suggestions.
+     * Adds a `vararg` of [Suggestion]s with the titles defined in [suggestions] on top of the current suggestions.
      */
     fun addSuggestions(vararg suggestions: String): T = apply {
         this.suggestions.add(ExecutableSuggestion(CommandSender::class) { _, _ -> CompletableFuture.completedFuture(suggestions.map { it.toSuggestion() }) })
@@ -59,11 +59,12 @@ abstract class AbstractStellarArgument<T : AbstractStellarArgument<T, *>, R>(nam
     /**
      * Adds a [Suggestion] on top of the current suggestions.
      */
-    fun addSuggestion(suggestion: Suggestion): T = addSuggestions(suggestion)
+    fun addSuggestion(suggestion: Suggestion): T = addSuggestions(listOf(suggestion))
+
     /**
      * Adds a [Suggestion] with the given title and tooltip on top of the current suggestions.
      */
-    fun addSuggestion(title: String, tooltip: String? = null): T = addSuggestions(Suggestion.create(title, tooltip))
+    fun addSuggestion(title: String, tooltip: String? = null): T = addSuggestions(listOf(Suggestion.create(title, tooltip)))
 
     /**
      * Adds a function  that returns a list of suggestions in a [CompletableFuture] on top of the current suggestions. Only works in Kotlin.

@@ -68,7 +68,6 @@ import org.bukkit.craftbukkit.v1_21_R1.CraftParticle
 import org.bukkit.craftbukkit.v1_21_R1.block.data.CraftBlockData
 import org.bukkit.craftbukkit.v1_21_R1.entity.CraftPlayer
 import org.bukkit.craftbukkit.v1_21_R1.inventory.CraftItemStack
-import org.bukkit.craftbukkit.v1_21_R1.scoreboard.CraftCriteria
 import org.bukkit.craftbukkit.v1_21_R1.util.CraftNamespacedKey
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
