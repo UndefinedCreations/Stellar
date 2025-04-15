@@ -14,7 +14,6 @@ import com.undefined.stellar.argument.item.ItemStackArgument
 import com.undefined.stellar.argument.item.ItemStackPredicateArgument
 import com.undefined.stellar.argument.math.*
 import com.undefined.stellar.argument.misc.NamespacedKeyArgument
-import com.undefined.stellar.argument.misc.RegistryArgument
 import com.undefined.stellar.argument.player.GameProfileArgument
 import com.undefined.stellar.argument.scoreboard.*
 import com.undefined.stellar.argument.text.ColorArgument
@@ -82,11 +81,6 @@ object NMS1_13_1 : NMS {
 
         // Misc
         is NamespacedKeyArgument -> ArgumentMinecraftKeyRegistered.a()
-        is RegistryArgument -> {
-
-            argument.addSuggestions(*argument.registry.toList().map { it.toString() }.toTypedArray())
-            ArgumentMinecraftKeyRegistered.a()
-        }
 
         // Player
         is GameProfileArgument -> ArgumentProfile.a()
@@ -150,11 +144,6 @@ object NMS1_13_1 : NMS {
 
             // Misc
             is NamespacedKeyArgument -> CraftNamespacedKey.fromMinecraft(ArgumentMinecraftKeyRegistered.c(context, argument.name))
-            is RegistryArgument -> NMSHelper.getArgumentInput(context, argument.name)!!.let { input ->
-                val split = input.split(':')
-                val key = if (split.getOrNull(1) == null) NamespacedKey.minecraft(split[0]) else NamespacedKey(split[0], split[1])
-                argument.registry.get(key) ?: throw IllegalArgumentException("No ${RegistryArgument.registryNames[argument.registry]} registry entry found for key $key.")
-            }
 
             // Player
             is GameProfileArgument -> ArgumentProfile.a(context, argument.name)

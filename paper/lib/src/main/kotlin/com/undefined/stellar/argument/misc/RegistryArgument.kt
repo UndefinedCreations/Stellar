@@ -5,6 +5,9 @@ import com.undefined.stellar.AbstractStellarCommand
 import io.papermc.paper.registry.RegistryKey
 import org.bukkit.NamespacedKey
 
+/**
+ * @since 1.14
+ */
 class RegistryArgument(
     name: String,
     val registry: RegistryKey<*>,

@@ -4,6 +4,9 @@ import com.undefined.stellar.AbstractStellarArgument
 import com.undefined.stellar.AbstractStellarCommand
 import org.bukkit.Registry
 
+/**
+ * @since 1.14
+ */
 @Suppress("UnstableApiUsage")
 class RegistryArgument(
     name: String,
