@@ -86,7 +86,7 @@ object NMS1_14 : NMS {
         // Misc
         is NamespacedKeyArgument -> ArgumentMinecraftKeyRegistered.a()
         is RegistryArgument -> {
-            argument.addSuggestions(*Registry.ENCHANTMENT.toList().map { it.toString() }.toTypedArray())
+            argument.addSuggestions(*argument.registry.toList().map { it.toString() }.toTypedArray())
             ArgumentMinecraftKeyRegistered.a()
         }
 

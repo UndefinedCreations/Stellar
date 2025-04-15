@@ -2,7 +2,6 @@ package com.undefined.stellar.internal
 
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.arguments.ArgumentType
-import com.mojang.brigadier.arguments.IntegerArgumentType
 import com.mojang.brigadier.context.CommandContext
 import com.undefined.stellar.AbstractStellarArgument
 import com.undefined.stellar.argument.basic.StringArgument
@@ -30,19 +29,18 @@ import com.undefined.stellar.nms.NMS
 import com.undefined.stellar.nms.NMSHelper
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
-import net.minecraft.server.v1_15_R1.*
+import net.minecraft.server.v1_13_R1.*
 import org.bukkit.*
 import org.bukkit.Particle
-import org.bukkit.Registry
 import org.bukkit.World
 import org.bukkit.block.Block
 import org.bukkit.block.data.BlockData
 import org.bukkit.command.CommandSender
-import org.bukkit.craftbukkit.v1_15_R1.CraftParticle
-import org.bukkit.craftbukkit.v1_15_R1.block.data.CraftBlockData
-import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer
-import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack
-import org.bukkit.craftbukkit.v1_15_R1.util.CraftNamespacedKey
+import org.bukkit.craftbukkit.v1_13_R1.CraftParticle
+import org.bukkit.craftbukkit.v1_13_R1.block.data.CraftBlockData
+import org.bukkit.craftbukkit.v1_13_R1.entity.CraftPlayer
+import org.bukkit.craftbukkit.v1_13_R1.inventory.CraftItemStack
+import org.bukkit.craftbukkit.v1_13_R1.util.CraftNamespacedKey
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.scoreboard.DisplaySlot
@@ -50,9 +48,9 @@ import java.util.*
 import java.util.function.Predicate
 
 @Suppress("UNCHECKED_CAST", "DEPRECATION")
-object NMS1_15_2 : NMS {
+object NMS1_13 : NMS {
 
-    override fun getCommandDispatcher(): CommandDispatcher<Any> = MinecraftServer.getServer().functionData.commandDispatcher as CommandDispatcher<Any>
+    override fun getCommandDispatcher(): CommandDispatcher<Any> = MinecraftServer.getServer().functionData.d() as CommandDispatcher<Any>
 
     override fun getArgumentType(argument: AbstractStellarArgument<*, *>, plugin: JavaPlugin): ArgumentType<*> = when (argument) {
         // Basic
@@ -66,7 +64,7 @@ object NMS1_15_2 : NMS {
         is EntityAnchorArgument -> ArgumentAnchor.a()
         is EntityArgument -> when (argument.type) {
             EntityDisplayType.ENTITY -> ArgumentEntity::class.java.getDeclaredMethod("a")(null) as ArgumentEntity
-            EntityDisplayType.ENTITIES -> ArgumentEntity.multipleEntities()
+            EntityDisplayType.ENTITIES -> ArgumentEntity.b()
             EntityDisplayType.PLAYER -> ArgumentEntity.c()
             EntityDisplayType.PLAYERS -> ArgumentEntity.d()
         }
@@ -81,7 +79,6 @@ object NMS1_15_2 : NMS {
         is IntRangeArgument -> ArgumentCriterionValue::class.java.getDeclaredMethod("b")(null) as ArgumentCriterionValue<*>
         is OperationArgument -> ArgumentMathOperation.a()
         is RotationArgument -> ArgumentRotation.a()
-        is TimeArgument -> ArgumentTime.a()
 
         // Misc
         is NamespacedKeyArgument -> ArgumentMinecraftKeyRegistered.a()
@@ -109,10 +106,9 @@ object NMS1_15_2 : NMS {
         is MessageArgument -> ArgumentChat.a()
 
         // World
-        is EnvironmentArgument -> ArgumentDimension.a()
         is LocationArgument -> when (argument.type) {
             LocationType.LOCATION_3D -> ArgumentPosition.a()
-            LocationType.LOCATION_2D -> ArgumentVec2I.a()
+            LocationType.LOCATION_2D -> throw UnsupportedArgumentException(argument)
             LocationType.PRECISE_LOCATION_3D -> ArgumentVec3.a()
             LocationType.PRECISE_LOCATION_2D -> ArgumentVec2.a()
         }
@@ -143,16 +139,15 @@ object NMS1_15_2 : NMS {
 
             // Math
             is AxisArgument -> ArgumentRotationAxis.a(context, argument.name).mapTo(EnumSet.noneOf(Axis::class.java)) { Axis.valueOf(it.name) }
-            is DoubleRangeArgument -> context.getArgument(argument.name, CriterionConditionValue.FloatRange::class.java).let { (it.a() ?: 1.0F)..(it.b() ?: 2.0F) }
+            is DoubleRangeArgument -> context.getArgument(argument.name, CriterionConditionValue.c::class.java).let { (it.a() ?: 1.0F)..(it.b() ?: 2.0F) }
             is IntRangeArgument -> ArgumentCriterionValue.b.a(context, argument.name).let { (it.a() ?: 1)..(it.b() ?: 2) }
             is OperationArgument -> Operation.getOperation(NMSHelper.getArgumentInput(context, argument.name) ?: return null)
             is RotationArgument -> ArgumentRotation.a(context, argument.name).a(context.source).let {
                 Location(context.source.world.world, 0.0, 0.0, 0.0, it.x.toFloat(), it.y.toFloat())
             }
-            is TimeArgument -> IntegerArgumentType.getInteger(context, argument.name)
 
             // Misc
-            is NamespacedKeyArgument -> CraftNamespacedKey.fromMinecraft(ArgumentMinecraftKeyRegistered.d(context, argument.name))
+            is NamespacedKeyArgument -> CraftNamespacedKey.fromMinecraft(ArgumentMinecraftKeyRegistered.c(context, argument.name))
             is RegistryArgument -> NMSHelper.getArgumentInput(context, argument.name)!!.let { input ->
                 val split = input.split(':')
                 val key = if (split.getOrNull(1) == null) NamespacedKey.minecraft(split[0]) else NamespacedKey(split[0], split[1])
@@ -178,22 +173,21 @@ object NMS1_15_2 : NMS {
             is MessageArgument -> GsonComponentSerializer.gson().deserialize(IChatBaseComponent.ChatSerializer.a(ArgumentChat.a(context, argument.name)))
 
             // World
-            is EnvironmentArgument -> World.Environment.getEnvironment(ArgumentDimension.a(context, argument.name).dimensionID)
             is LocationArgument -> when (argument.type) {
                 LocationType.LOCATION_3D -> blockPosToLocation(context.getArgument(argument.name, IVectorPosition::class.java).c(context.source), context.source.world.world)
-                LocationType.LOCATION_2D -> columnPosToLocation(ArgumentVec2I.a(context, argument.name), context.source.world.world)
+                LocationType.LOCATION_2D -> null
                 LocationType.PRECISE_LOCATION_3D -> vec3ToLocation(ArgumentVec3.a(context, argument.name), context.source.world.world)
                 LocationType.PRECISE_LOCATION_2D -> vec2ToLocation(ArgumentVec2.a(context, argument.name), context.source.world.world)
             }
-            is ParticleArgument -> ArgumentParticle.a(context, argument.name).also { getParticleData(CraftParticle.toBukkit(it.particle), it) }
+            is ParticleArgument -> ArgumentParticle.a(context, argument.name).also { getParticleData(CraftParticle.toBukkit(it.b()), it) }
             else -> null
         }
     }
 
     override fun getCommandSourceStack(sender: CommandSender): Any {
-        val overworld = MinecraftServer.getServer().getWorldServer(DimensionManager.OVERWORLD)
+        val overworld = MinecraftServer.getServer().getWorldServer(DimensionManager.OVERWORLD.dimensionID)
         val serverPlayer: EntityPlayer? = (sender as? CraftPlayer)?.handle
-        val permissionLevel = serverPlayer?.profile?.let { serverPlayer.server.b(it) } ?: 4
+        val permissionLevel = serverPlayer?.profile?.let { serverPlayer.server.a(it) } ?: 4
         return CommandListenerWrapper(
             Source(sender),
             Vec3D(overworld.spawn),
@@ -210,17 +204,16 @@ object NMS1_15_2 : NMS {
     private data class Source(val sender: CommandSender) : ICommandListener {
         override fun sendMessage(message: IChatBaseComponent) =
             this.sender.sendMessage(LegacyComponentSerializer.legacySection().serialize(asAdventure(message)))
-        override fun shouldSendSuccess(): Boolean = true
-        override fun shouldSendFailure(): Boolean = true
-        override fun shouldBroadcastCommands(): Boolean = false
-        override fun getBukkitSender(var1: CommandListenerWrapper?): CommandSender = this.sender
+        override fun a(): Boolean = true
+        override fun b(): Boolean = true
+        override fun B_(): Boolean = false
+        override fun getBukkitSender(stack: CommandListenerWrapper): CommandSender = this.sender
     }
 
     fun asAdventure(component: IChatBaseComponent): net.kyori.adventure.text.Component =
         GsonComponentSerializer.gson().deserialize(IChatBaseComponent.ChatSerializer.a(component))
 
     private fun blockPosToLocation(block: BlockPosition, world: World) = Location(world, block.x.toDouble(), block.y.toDouble(), block.z.toDouble())
-    private fun columnPosToLocation(column: BlockPosition2D, world: World) = Location(world, column.a.toDouble(), 0.0, column.b.toDouble())
     private fun vec3ToLocation(vec: Vec3D, world: World) = Location(world, vec.x, vec.y, vec.z)
     private fun vec2ToLocation(vec: Vec2F, world: World) = Location(world, vec.i.toDouble(), 0.0, vec.j.toDouble())
 
@@ -245,7 +238,7 @@ object NMS1_15_2 : NMS {
         }
         is ParticleParamItem -> ParticleData(
             particle,
-            CraftItemStack.asBukkitCopy(options::class.java.getDeclaredMethod("c").also { it.isAccessible = true }(null) as net.minecraft.server.v1_15_R1.ItemStack)
+            CraftItemStack.asBukkitCopy(options::class.java.getDeclaredMethod("c").also { it.isAccessible = true }(null) as net.minecraft.server.v1_13_R1.ItemStack)
         )
         else -> ParticleData(particle, null)
     }

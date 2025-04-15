@@ -32,4 +32,7 @@ include(
     ":spigot:v1_14_2",
     ":spigot:v1_14_1",
     ":spigot:v1_14",
+    ":spigot:v1_13_2",
+    ":spigot:v1_13_1",
+    ":spigot:v1_13",
 )

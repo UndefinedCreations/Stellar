@@ -130,7 +130,7 @@ object NMS1_19_2 : NMS {
         // Misc
         is NamespacedKeyArgument -> ResourceLocationArgument.id()
         is RegistryArgument -> {
-            argument.addSuggestions(*Registry.ENCHANTMENT.keySet().map { it.toString() }.toTypedArray())
+            argument.addSuggestions(*argument.registry.keySet().map { it.toString() }.toTypedArray())
             ResourceLocationArgument.id()
         }
         is UUIDArgument -> UuidArgument.uuid()
