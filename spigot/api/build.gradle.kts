@@ -28,6 +28,11 @@ dependencies {
     api(project(":spigot:v1_16_1"))
     api(project(":spigot:v1_15_2"))
     api(project(":spigot:v1_15_1"))
+    api(project(":spigot:v1_14_4"))
+    api(project(":spigot:v1_14_3"))
+    api(project(":spigot:v1_14_2"))
+    api(project(":spigot:v1_14_1"))
+    api(project(":spigot:v1_14"))
 }
 
 tasks {
