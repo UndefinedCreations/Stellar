@@ -62,6 +62,14 @@ object NMSManager {
         "1.15.2" to NMS1_15_2,
         "1.15.1" to NMS1_15_1,
         "1.15" to NMS1_15_1,
+        "1.14.4" to NMS1_14_4,
+        "1.14.3" to NMS1_14_3,
+        "1.14.2" to NMS1_14_2,
+        "1.14.1" to NMS1_14_1,
+        "1.14" to NMS1_14,
+        "1.13.2" to NMS1_13_2,
+        "1.13.1" to NMS1_13_1,
+        "1.13" to NMS1_13,
     )
 
     fun unregister(name: String) {

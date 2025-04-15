@@ -100,7 +100,7 @@ import net.minecraft.commands.arguments.blocks.BlockPredicateArgument as Brigadi
 import net.minecraft.commands.arguments.coordinates.RotationArgument as BrigadierRotationArgument
 
 @Suppress("UNCHECKED_CAST", "DEPRECATION")
-object NMS1_21_4 : NMS {
+object NMS1_21_5 : NMS {
 
     private val COMMAND_BUILD_CONTEXT: CommandBuildContext = PaperCommands.INSTANCE.buildContext
 
@@ -243,7 +243,7 @@ object NMS1_21_4 : NMS {
 
             // Text
             is ColorArgument -> ChatColor.getByChar(BrigadierColorArgument.getColor(context, argument.name).char)
-            is ComponentArgument -> GsonComponentSerializer.gson().deserialize(Component.Serializer.toJson(BrigadierComponentArgument.getComponent(context, argument.name), COMMAND_BUILD_CONTEXT))
+            is ComponentArgument -> GsonComponentSerializer.gson().deserialize(Component.Serializer.toJson(BrigadierComponentArgument.getRawComponent(context, argument.name), COMMAND_BUILD_CONTEXT))
             is MessageArgument -> GsonComponentSerializer.gson().deserialize(Component.Serializer.toJson(BrigadierMessageArgument.getMessage(context, argument.name), COMMAND_BUILD_CONTEXT))
             is StyleArgument -> GsonComponentSerializer.gson().deserialize(Component.Serializer.toJson(
                 Component.empty().withStyle(BrigadierStyleArgument.getStyle(context, argument.name)), COMMAND_BUILD_CONTEXT

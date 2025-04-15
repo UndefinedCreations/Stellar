@@ -58,6 +58,7 @@ import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceKey
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ColumnPos
+import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.pattern.BlockInWorld
 import net.minecraft.world.level.gameevent.BlockPositionSource
@@ -100,7 +101,7 @@ import net.minecraft.commands.arguments.blocks.BlockPredicateArgument as Brigadi
 import net.minecraft.commands.arguments.coordinates.RotationArgument as BrigadierRotationArgument
 
 @Suppress("UNCHECKED_CAST", "DEPRECATION")
-object NMS1_21_4 : NMS {
+object NMS1_21_3 : NMS {
 
     private val COMMAND_BUILD_CONTEXT: CommandBuildContext = PaperCommands.INSTANCE.buildContext
 
@@ -265,12 +266,14 @@ object NMS1_21_4 : NMS {
 
     override fun getCommandSourceStack(sender: CommandSender): Any {
         val overworld = MinecraftServer.getServer().overworld()
+        val serverPlayer: ServerPlayer? = (sender as? CraftPlayer)?.handle
+        val permissionLevel = serverPlayer?.gameProfile?.let { serverPlayer.server.getProfilePermissions(it) } ?: 4
         return CommandSourceStack(
             Source(sender),
             Vec3.atLowerCornerOf(overworld.sharedSpawnPos),
             Vec2.ZERO,
             overworld,
-            (sender as? CraftPlayer)?.handle?.permissionLevel ?: 4,
+            permissionLevel,
             sender.name,
             Component.literal(sender.name),
             MinecraftServer.getServer(),
