@@ -5,5 +5,7 @@ import java.util.*
 
 /**
  * An argument that allows you to pass in a [UUID].
+ *
+ * @since 1.16
  */
 class UUIDArgument(name: String) : AbstractStellarArgument<UUIDArgument, UUID>(name)
