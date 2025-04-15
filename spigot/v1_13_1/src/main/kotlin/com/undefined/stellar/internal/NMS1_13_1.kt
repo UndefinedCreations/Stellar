@@ -10,6 +10,7 @@ import com.undefined.stellar.argument.block.BlockPredicateArgument
 import com.undefined.stellar.argument.entity.EntityAnchorArgument
 import com.undefined.stellar.argument.entity.EntityArgument
 import com.undefined.stellar.argument.entity.EntityDisplayType
+import com.undefined.stellar.argument.item.ItemSlotArgument
 import com.undefined.stellar.argument.item.ItemStackArgument
 import com.undefined.stellar.argument.item.ItemStackPredicateArgument
 import com.undefined.stellar.argument.math.*
@@ -19,7 +20,10 @@ import com.undefined.stellar.argument.scoreboard.*
 import com.undefined.stellar.argument.text.ColorArgument
 import com.undefined.stellar.argument.text.ComponentArgument
 import com.undefined.stellar.argument.text.MessageArgument
-import com.undefined.stellar.argument.world.*
+import com.undefined.stellar.argument.world.EnvironmentArgument
+import com.undefined.stellar.argument.world.LocationArgument
+import com.undefined.stellar.argument.world.LocationType
+import com.undefined.stellar.argument.world.ParticleArgument
 import com.undefined.stellar.data.argument.EntityAnchor
 import com.undefined.stellar.data.argument.Operation
 import com.undefined.stellar.data.argument.ParticleData
@@ -71,6 +75,7 @@ object NMS1_13_1 : NMS {
         // Item
         is ItemStackArgument -> ArgumentItemStack.a()
         is ItemStackPredicateArgument -> ArgumentItemPredicate.a()
+        is ItemSlotArgument -> ArgumentInventorySlot.a()
 
         // Math
         is AxisArgument -> ArgumentRotationAxis.a()
@@ -132,6 +137,7 @@ object NMS1_13_1 : NMS {
             // Item
             is ItemStackArgument -> CraftItemStack.asBukkitCopy(ArgumentItemStack.a(context, argument.name).a(1, false))
             is ItemStackPredicateArgument -> Predicate<ItemStack> { ArgumentItemPredicate.a(context, argument.name).test(CraftItemStack.asNMSCopy(it)) }
+            is ItemSlotArgument -> ArgumentInventorySlot.a(context, argument.name)
 
             // Math
             is AxisArgument -> ArgumentRotationAxis.a(context, argument.name).mapTo(EnumSet.noneOf(Axis::class.java)) { Axis.valueOf(it.name) }

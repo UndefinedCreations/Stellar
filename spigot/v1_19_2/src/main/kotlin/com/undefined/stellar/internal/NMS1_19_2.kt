@@ -11,6 +11,7 @@ import com.undefined.stellar.argument.block.BlockPredicateArgument
 import com.undefined.stellar.argument.entity.EntityAnchorArgument
 import com.undefined.stellar.argument.entity.EntityArgument
 import com.undefined.stellar.argument.entity.EntityDisplayType
+import com.undefined.stellar.argument.item.ItemSlotArgument
 import com.undefined.stellar.argument.item.ItemStackArgument
 import com.undefined.stellar.argument.item.ItemStackPredicateArgument
 import com.undefined.stellar.argument.math.*
@@ -42,7 +43,6 @@ import net.minecraft.commands.arguments.coordinates.*
 import net.minecraft.commands.arguments.item.ItemArgument
 import net.minecraft.commands.arguments.item.ItemPredicateArgument
 import net.minecraft.core.BlockPos
-import net.minecraft.core.Registry
 import net.minecraft.core.particles.*
 import net.minecraft.network.chat.Component
 import net.minecraft.server.MinecraftServer
@@ -64,7 +64,6 @@ import org.bukkit.craftbukkit.v1_19_R1.CraftParticle
 import org.bukkit.craftbukkit.v1_19_R1.block.data.CraftBlockData
 import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer
 import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftItemStack
-import org.bukkit.craftbukkit.v1_19_R1.scoreboard.CraftCriteria
 import org.bukkit.craftbukkit.v1_19_R1.util.CraftNamespacedKey
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
@@ -117,6 +116,7 @@ object NMS1_19_2 : NMS {
         // Item
         is ItemStackArgument -> ItemArgument.item(COMMAND_BUILD_CONTEXT)
         is ItemStackPredicateArgument -> ItemPredicateArgument.itemPredicate(COMMAND_BUILD_CONTEXT)
+        is ItemSlotArgument -> SlotArgument.slot()
 
         // Math
         is AngleArgument -> BrigadierAngleArgument.angle()
@@ -130,7 +130,7 @@ object NMS1_19_2 : NMS {
         // Misc
         is NamespacedKeyArgument -> ResourceLocationArgument.id()
         is RegistryArgument -> {
-            argument.addSuggestions(*argument.registry.keySet().map { it.toString() }.toTypedArray())
+            argument.addSuggestions(*argument.registry.toList().map { it.toString() }.toTypedArray())
             ResourceLocationArgument.id()
         }
         is UUIDArgument -> UuidArgument.uuid()
@@ -189,6 +189,7 @@ object NMS1_19_2 : NMS {
             // Item
             is ItemStackArgument -> CraftItemStack.asBukkitCopy(ItemArgument.getItem(context, argument.name).createItemStack(1, false))
             is ItemStackPredicateArgument -> Predicate<ItemStack> { ItemPredicateArgument.getItemPredicate(context, argument.name).test(CraftItemStack.asNMSCopy(it)) }
+            is ItemSlotArgument -> SlotArgument.getSlot(context, argument.name)
 
             // Math
             is AngleArgument -> BrigadierAngleArgument.getAngle(context, argument.name)

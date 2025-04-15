@@ -11,6 +11,7 @@ import com.undefined.stellar.argument.block.BlockPredicateArgument
 import com.undefined.stellar.argument.entity.EntityAnchorArgument
 import com.undefined.stellar.argument.entity.EntityArgument
 import com.undefined.stellar.argument.entity.EntityDisplayType
+import com.undefined.stellar.argument.item.ItemSlotArgument
 import com.undefined.stellar.argument.item.ItemStackArgument
 import com.undefined.stellar.argument.item.ItemStackPredicateArgument
 import com.undefined.stellar.argument.math.*
@@ -66,7 +67,6 @@ import org.bukkit.craftbukkit.v1_19_R2.CraftParticle
 import org.bukkit.craftbukkit.v1_19_R2.block.data.CraftBlockData
 import org.bukkit.craftbukkit.v1_19_R2.entity.CraftPlayer
 import org.bukkit.craftbukkit.v1_19_R2.inventory.CraftItemStack
-import org.bukkit.craftbukkit.v1_19_R2.scoreboard.CraftCriteria
 import org.bukkit.craftbukkit.v1_19_R2.util.CraftNamespacedKey
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
@@ -123,6 +123,7 @@ object NMS1_19_3 : NMS {
         // Item
         is ItemStackArgument -> ItemArgument.item(COMMAND_BUILD_CONTEXT)
         is ItemStackPredicateArgument -> ItemPredicateArgument.itemPredicate(COMMAND_BUILD_CONTEXT)
+        is ItemSlotArgument -> SlotArgument.slot()
 
         // Math
         is AngleArgument -> BrigadierAngleArgument.angle()
@@ -193,6 +194,7 @@ object NMS1_19_3 : NMS {
             // Item
             is ItemStackArgument -> CraftItemStack.asBukkitCopy(ItemArgument.getItem(context, argument.name).createItemStack(1, false))
             is ItemStackPredicateArgument -> Predicate<ItemStack> { ItemPredicateArgument.getItemPredicate(context, argument.name).test(CraftItemStack.asNMSCopy(it)) }
+            is ItemSlotArgument -> SlotArgument.getSlot(context, argument.name)
 
             // Math
             is AngleArgument -> BrigadierAngleArgument.getAngle(context, argument.name)
