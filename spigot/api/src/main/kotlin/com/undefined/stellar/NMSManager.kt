@@ -23,6 +23,7 @@ import org.bukkit.plugin.java.JavaPlugin
 import java.util.concurrent.CompletableFuture
 import com.mojang.brigadier.suggestion.Suggestion as BrigadierSuggestion
 
+@Suppress("UNCHECKED_CAST")
 object NMSManager {
 
     val nms: NMS by lazy { versions[version] ?: throw UnsupportedVersionException(versions.keys) }
@@ -53,6 +54,11 @@ object NMSManager {
         "1.17.1" to NMS1_17_1,
         "1.17" to NMS1_17_1,
         "1.16.5" to NMS1_16_5,
+        "1.16.4" to NMS1_16_4,
+        "1.16.3" to NMS1_16_3,
+        "1.16.2" to NMS1_16_3,
+        "1.16.1" to NMS1_16_1,
+        "1.16" to NMS1_16_1,
     )
 
     fun unregister(name: String) {
