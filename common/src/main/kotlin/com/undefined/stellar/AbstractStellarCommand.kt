@@ -261,7 +261,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
             "<red>Please wait ${TimeUnit.MILLISECONDS.toSeconds(remaining)} more seconds!"
         },
     ): T = addCooldown(duration) { remaining ->
-        sender.sendMessage(LegacyComponentSerializer.legacySection().serialize(MiniMessage.miniMessage().deserialize(message(remaining))))
+        sender.sendMessage(LegacyComponentSerializer.legacySection().serialize(Stellar.miniMessage.deserialize(message(remaining))))
     }
 
     /**
@@ -298,7 +298,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
             "${ChatColor.RED}Please wait ${TimeUnit.MILLISECONDS.toSeconds(remaining)} more seconds!"
         },
     ): T = addCooldown(duration) { remaining ->
-        sender.sendMessage(LegacyComponentSerializer.legacySection().serialize(MiniMessage.miniMessage().deserialize(message(remaining))))
+        sender.sendMessage(LegacyComponentSerializer.legacySection().serialize(Stellar.miniMessage.deserialize(message(remaining))))
     }
 
     /**
@@ -472,7 +472,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @return The modified command object.
      */
     fun addFailureMessage(message: String): T = apply {
-        val component = MiniMessage.miniMessage().deserialize(message)
+        val component = Stellar.miniMessage.deserialize(message)
         failureExecutions.add(ExecutableExecution(CommandSender::class, { it.sender.sendMessage(LegacyComponentSerializer.legacyAmpersand().serialize(component)) }, false))
     } as T
 
@@ -483,7 +483,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @return The modified command object.
      */
     fun addGlobalFailureMessage(message: String): T = apply {
-        val component = MiniMessage.miniMessage().deserialize(message)
+        val component = Stellar.miniMessage.deserialize(message)
         globalFailureExecutions.add(ExecutableExecution(CommandSender::class, { it.sender.sendMessage(LegacyComponentSerializer.legacyAmpersand().serialize(component)) }, false))
     } as T
 
