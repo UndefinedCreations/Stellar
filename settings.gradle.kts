@@ -9,6 +9,7 @@ include(
     ":paper:v1_21_3",
     ":paper:v1_21_1",
     ":paper:v1_21",
+    ":paper:v1_20_6",
     ":spigot:lib",
     ":spigot:api",
     ":spigot:v1_21_5",

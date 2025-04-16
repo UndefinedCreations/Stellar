@@ -36,12 +36,10 @@ import com.undefined.stellar.data.exception.UnsupportedArgumentException
 import com.undefined.stellar.nms.NMS
 import com.undefined.stellar.nms.NMSHelper
 import io.papermc.paper.adventure.PaperAdventure
-import io.papermc.paper.command.brigadier.PaperCommands
 import io.papermc.paper.registry.PaperRegistries
 import io.papermc.paper.registry.RegistryAccess
 import io.papermc.paper.registry.RegistryKey
 import io.papermc.paper.registry.entry.RegistryEntry
-import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import net.minecraft.commands.CommandBuildContext
 import net.minecraft.commands.CommandSource
@@ -101,9 +99,14 @@ import net.minecraft.commands.arguments.blocks.BlockPredicateArgument as Brigadi
 import net.minecraft.commands.arguments.coordinates.RotationArgument as BrigadierRotationArgument
 
 @Suppress("UNCHECKED_CAST", "DEPRECATION")
-object NMS1_21_1 : NMS {
+object NMS1_20_6 : NMS {
 
-    private val COMMAND_BUILD_CONTEXT: CommandBuildContext = PaperCommands.INSTANCE.buildContext
+    private val COMMAND_BUILD_CONTEXT: CommandBuildContext by lazy {
+        CommandBuildContext.simple(
+            MinecraftServer.getServer().registryAccess(),
+            MinecraftServer.getServer().worldData.dataConfiguration.enabledFeatures()
+        )
+    }
 
     override fun getCommandDispatcher(): CommandDispatcher<Any> = MinecraftServer.getServer().functions.dispatcher as CommandDispatcher<Any>
 
@@ -141,7 +144,7 @@ object NMS1_21_1 : NMS {
         // Misc
         is NamespacedKeyArgument -> ResourceLocationArgument.id()
         is RegistryArgument -> {
-            val byRegistryKey = PaperRegistries::class.java.getDeclaredField("BY_REGISTRY_KEY").apply { isAccessible = true }[null] as Map<RegistryKey<*>, RegistryEntry<*, *>>
+            val byRegistryKey = PaperRegistries::class.java.getDeclaredField("BY_REGISTRY_KEY").apply { isAccessible = true }[null] as Map<RegistryKey<*>, RegistryEntry<*, *, *>>
             val registry = (byRegistryKey[argument.registry] ?: throw IllegalArgumentException("${argument.registry} doesn't have an mc registry ResourceKey")).mcKey() as ResourceKey<out Registry<Any>>
             ResourceArgument.resource(COMMAND_BUILD_CONTEXT, registry)
         }
@@ -220,7 +223,10 @@ object NMS1_21_1 : NMS {
 
             // Misc
             is NamespacedKeyArgument -> CraftNamespacedKey.fromMinecraft(ResourceLocationArgument.getId(context, argument.name))
-            is RegistryArgument -> RegistryAccess.registryAccess().getRegistry(argument.registry as RegistryKey<Keyed>).getOrThrow(Key.key(NMSHelper.getArgumentInput(context, argument.name)!!))
+            is RegistryArgument -> {
+                val key = NamespacedKey.fromString(NMSHelper.getArgumentInput(context, argument.name)!!)!!
+                RegistryAccess.registryAccess().getRegistry(argument.registry as RegistryKey<Keyed>)[key] ?: throw NoSuchElementException("No value for $key in ${argument.registry.key().asString()}")
+            }
             is UUIDArgument -> UuidArgument.getUuid(context, argument.name)
 
             // Player

@@ -52,6 +52,7 @@ import net.minecraft.commands.arguments.coordinates.*
 import net.minecraft.commands.arguments.item.ItemArgument
 import net.minecraft.commands.arguments.item.ItemPredicateArgument
 import net.minecraft.core.BlockPos
+import net.minecraft.core.Registry
 import net.minecraft.core.particles.*
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceKey
