@@ -64,6 +64,7 @@ abstract class AbstractStellarArgument<T : AbstractStellarArgument<T, *>, R>(nam
     /**
      * Adds a [Suggestion] with the given title and tooltip on top of the current suggestions.
      */
+    @JvmOverloads
     fun addSuggestion(title: String, tooltip: String? = null): T = addSuggestions(listOf(Suggestion.create(title, tooltip)))
 
     /**
