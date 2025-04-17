@@ -21,7 +21,8 @@ class StellarCommand @JvmOverloads constructor(name: String, permissions: Iterab
      * @param permission A single Bukkit permission to be applied as a requirement.
      * @param aliases An `Iterable` of name aliases.
      */
-    @JvmOverloads constructor(name: String, permission: String, aliases: Iterable<String> = listOf()) : this(name, listOf(permission), aliases)
+    @JvmOverloads
+    constructor(name: String, permission: String, aliases: Iterable<String> = listOf()) : this(name, listOf(permission), aliases)
 
     init {
         setDescription("A command made with Stellar.")
