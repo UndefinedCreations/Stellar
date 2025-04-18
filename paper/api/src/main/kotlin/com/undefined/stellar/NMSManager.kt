@@ -25,17 +25,17 @@ import com.mojang.brigadier.suggestion.Suggestion as BrigadierSuggestion
 
 object NMSManager {
 
-    val nms: NMS by lazy { versions[version] ?: throw UnsupportedVersionException(versions.keys) }
+    val nms: NMS by lazy { versions[version]?.let { it() } ?: throw UnsupportedVersionException(versions.keys) }
 
     private val version by lazy { Bukkit.getBukkitVersion().split("-")[0] }
-    private val versions: Map<String, NMS> = mapOf(
-        "1.21.4" to NMS1_21_4,
-        "1.21.3" to NMS1_21_3,
-        "1.21.2" to NMS1_21_3,
-        "1.21.1" to NMS1_21_1,
-        "1.21" to NMS1_21,
-        "1.20.6" to NMS1_20_6,
-        "1.20.5" to NMS1_20_6,
+    private val versions: Map<String, () -> NMS> = mapOf(
+        "1.21.4" to { NMS1_21_4 },
+        "1.21.3" to { NMS1_21_3 },
+        "1.21.2" to { NMS1_21_3 },
+        "1.21.1" to { NMS1_21_1 },
+        "1.21" to { NMS1_21 },
+        "1.20.6" to { NMS1_20_6 },
+        "1.20.5" to { NMS1_20_6 },
     )
 
     fun unregister(name: String) {
