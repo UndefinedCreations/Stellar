@@ -13,7 +13,7 @@ import com.undefined.stellar.data.exception.UnsupportedVersionException
 import com.undefined.stellar.data.help.CommandAliasHelpTopic
 import com.undefined.stellar.data.help.StellarCommandHelpTopic
 import com.undefined.stellar.data.suggestion.Suggestion
-import com.undefined.stellar.internal.NMS1_21_4
+import com.undefined.stellar.internal.*
 import com.undefined.stellar.listener.StellarListener
 import com.undefined.stellar.nms.NMS
 import com.undefined.stellar.nms.NMSHelper
@@ -29,7 +29,13 @@ object NMSManager {
 
     private val version by lazy { Bukkit.getBukkitVersion().split("-")[0] }
     private val versions: Map<String, NMS> = mapOf(
-        "1.21.4" to NMS1_21_4
+        "1.21.4" to NMS1_21_4,
+        "1.21.3" to NMS1_21_3,
+        "1.21.2" to NMS1_21_3,
+        "1.21.1" to NMS1_21_1,
+        "1.21" to NMS1_21,
+        "1.20.6" to NMS1_20_6,
+        "1.20.5" to NMS1_20_6,
     )
 
     fun unregister(name: String) {

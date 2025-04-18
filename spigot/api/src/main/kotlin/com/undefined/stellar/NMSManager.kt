@@ -87,7 +87,8 @@ object NMSManager {
         val dispatcher = nms.getCommandDispatcher()
         val mainNode = dispatcher.register(builder)
 
-        for (name in command.aliases + "${plugin.description.name.lowercase()}:${command.name}")
+        val prefix: String = Stellar.prefix.takeIf { it.isNotBlank() } ?: plugin.description.name.lowercase()
+        for (name in command.aliases + "$prefix:${command.name}")
             dispatcher.register(LiteralArgumentBuilder.literal<Any>(name).redirect(mainNode))
 
         Bukkit.getServer().helpMap.addTopic(StellarCommandHelpTopic(command.name, command.information["Description"] ?: "", command.information.entries.associateBy({ it.value }) { it.key }) {
