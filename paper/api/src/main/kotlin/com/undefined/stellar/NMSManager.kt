@@ -38,12 +38,6 @@ object NMSManager {
         "1.20.5" to { NMS1_20_6 },
     )
 
-    fun unregister(name: String) {
-        val knownCommands: HashMap<String, Command> = Bukkit.getServer().commandMap.knownCommands as HashMap<String, Command>
-        for ((key, value) in knownCommands) if (key == name) value.unregister(Bukkit.getServer().commandMap)
-        knownCommands.remove(name)
-    }
-
     fun register(command: StellarCommand, plugin: JavaPlugin) {
         if (!StellarListener.hasBeenInitialized) Bukkit.getPluginManager().registerEvents(StellarListener, plugin).also { StellarListener.hasBeenInitialized = true }
 

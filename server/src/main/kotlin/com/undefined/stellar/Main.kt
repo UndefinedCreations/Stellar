@@ -2,6 +2,7 @@ package com.undefined.stellar
 
 import com.undefined.stellar.argument.basic.StringType
 import com.undefined.stellar.argument.scoreboard.ScoreHolderType
+import com.undefined.stellar.util.unregisterCommand
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import org.bukkit.ChatColor
 import org.bukkit.block.structure.StructureRotation
@@ -26,6 +27,7 @@ class Main : JavaPlugin() {
 //        StellarCommand("server")
 //            .addStringArgument("string", StringType.ALPHANUMERIC_WORD)
 //            .register(this)
+        unregisterCommand("ban")
         StellarCommand("server")
             .addMessageCooldown(5, TimeUnit.SECONDS) { remaining ->
                 "<red>Please wait ${TimeUnit.MILLISECONDS.toSeconds(remaining)} more seconds!"

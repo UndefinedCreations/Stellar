@@ -133,4 +133,7 @@ fun command(name: String): StellarCommand = command(name, "")
 /**
  * Unregisters a command with the given name.
  */
-fun unregisterCommand(name: String) = NMSManager.unregister(name)
+fun unregisterCommand(vararg names: String) {
+    val dispatcher = NMSManager.nms.getCommandDispatcher()
+    for (name in names) dispatcher.root.children.remove(dispatcher.root.getChild(name))
+}

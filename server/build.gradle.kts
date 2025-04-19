@@ -1,9 +1,9 @@
-import com.undefinedcreations.runServer.ServerType
+import com.undefinedcreations.nova.ServerType
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     id("setup")
-    id("com.undefinedcreations.runServer") version "0.1.6"
+    id("com.undefinedcreations.nova") version "0.0.4"
     id("com.gradleup.shadow") version "8.3.5"
 }
 
@@ -21,6 +21,7 @@ dependencies {
     compileOnly(libs.papermc)
     implementation("net.kyori:adventure-api:4.20.0")
     implementation("net.kyori:adventure-platform-bukkit:4.3.4")
+    implementation("net.kyori:adventure-text-minimessage:4.20.0")
     implementation(project(":paper:api"))
 //    implementation("com.undefined:stellar:0.1.37:paper")
 }
@@ -30,7 +31,6 @@ tasks {
         dependsOn(shadowJar)
     }
     shadowJar {
-        archiveFileName.set("Stellar-shadow.jar")
         outputs.upToDateWhen { false }
     }
     compileKotlin {
@@ -41,7 +41,7 @@ tasks {
     }
     runServer {
         minecraftVersion("1.21.4")
-        serverFolderName { "run" }
+        perVersionFolder(true)
         acceptMojangEula()
         serverType(ServerType.PAPERMC)
     }

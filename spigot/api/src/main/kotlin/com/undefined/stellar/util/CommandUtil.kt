@@ -1,7 +1,11 @@
 package com.undefined.stellar.util
 
+import com.mojang.brigadier.CommandDispatcher
 import com.undefined.stellar.NMSManager
 import com.undefined.stellar.StellarCommand
+import org.bukkit.Bukkit
+import org.bukkit.command.Command
+import org.bukkit.command.SimpleCommandMap
 
 fun command(name: String, description: String, permissions: List<String>, aliases: List<String>, builder: StellarCommand.() -> Unit): StellarCommand {
     val command = StellarCommand(name, permissions, aliases)
@@ -29,5 +33,6 @@ fun command(name: String, permissions: List<String>, aliases: List<String>): Ste
 fun command(name: String): StellarCommand = command(name, "")
 
 fun unregisterCommand(vararg names: String) {
-    for (name in names) NMSManager.unregister(name)
+    val dispatcher = NMSManager.nms.getCommandDispatcher()
+    for (name in names) dispatcher.root.children.remove(dispatcher.root.getChild(name))
 }
