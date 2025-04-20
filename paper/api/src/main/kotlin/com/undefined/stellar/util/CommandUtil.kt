@@ -1,7 +1,37 @@
 package com.undefined.stellar.util
 
 import com.undefined.stellar.NMSManager
+import com.undefined.stellar.Stellar
 import com.undefined.stellar.StellarCommand
+import org.bukkit.Bukkit
+import org.bukkit.command.Command
+import org.bukkit.help.HelpTopic
+import org.bukkit.plugin.java.JavaPlugin
+import org.bukkit.scheduler.BukkitTask
+import java.util.TreeMap
+
+object CommandUtil {
+    /**
+     * Unregisters a list of commands and removes their respective [HelpTopic]. It does this within a [BukkitTask].
+     *
+     * @param plugin The [JavaPlugin] instance to be used to run the [BukkitTask].
+     * @param names The list of command names to be unregistered.
+     */
+    @JvmOverloads
+    fun unregisterCommands(plugin: JavaPlugin = Stellar.plugin ?: throw IllegalArgumentException("Plugin cannot be null!"), vararg names: String) {
+        Bukkit.getScheduler().runTask(plugin, Runnable {
+            val dispatcher = NMSManager.nms.getCommandDispatcher()
+            val knownCommands: HashMap<String, Command> = Bukkit.getServer().commandMap.knownCommands as HashMap<String, Command>
+            val helpTopics: TreeMap<String, HelpTopic> = Bukkit.getHelpMap()::class.java.getDeclaredField("helpTopics").apply { isAccessible = true }[Bukkit.getHelpMap()] as TreeMap<String, HelpTopic>
+            for (name in names) {
+                dispatcher.root.children.remove(dispatcher.root.getChild(name))
+                knownCommands[name]?.unregister(Bukkit.getServer().commandMap)
+                helpTopics.remove("/$name")
+            }
+            for (player in Bukkit.getOnlinePlayers()) player.updateCommands()
+        })
+    }
+}
 
 /**
  * Creates a new command with the specified parameters and a builder function.
@@ -129,11 +159,3 @@ fun command(name: String, permissions: List<String>, aliases: List<String>): Ste
  * @return The created StellarCommand instance.
  */
 fun command(name: String): StellarCommand = command(name, "")
-
-/**
- * Unregisters a command with the given name.
- */
-fun unregisterCommand(vararg names: String) {
-    val dispatcher = NMSManager.nms.getCommandDispatcher()
-    for (name in names) dispatcher.root.children.remove(dispatcher.root.getChild(name))
-}

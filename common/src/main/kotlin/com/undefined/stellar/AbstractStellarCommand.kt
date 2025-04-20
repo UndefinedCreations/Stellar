@@ -806,8 +806,8 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
     /**
      * Adds an [EnumArgument] to the command with the given name.
      *
-     * @param converter A function providing a [CommandSender] and an [Enum] instance from the [enum], returning the [Suggestion] sent to the player.
-     * If the [Suggestion] is null, then it will be filtered out (default: uses the `name` property.
+     * @param converter A function providing a [CommandSender] and an [Enum] instance from the [T], returning the [Suggestion] sent to the player.
+     * If the [Suggestion] is null, then it will be filtered out (default: uses the `name` property).
      * This is useful when you wish to get the argument input and process the information yourself.
      * @param parse A function providing a [CommandSender] and the argument input, returning the parsed [Enum] (default: `enum.valueOf(input.uppercase())`).
      * @param async Whether the _suggestions_ should be gotten asynchronously (default: `true`).
@@ -1062,6 +1062,6 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param plugin The given `JavaPlugin` instance (default: plugin in [Stellar]).
      * @return The registered command object.
      */
-    abstract fun register(plugin: JavaPlugin = Stellar.plugin): T
+    abstract fun register(plugin: JavaPlugin = Stellar.plugin ?: throw IllegalArgumentException("Plugin cannot be null!")): T
 
 }

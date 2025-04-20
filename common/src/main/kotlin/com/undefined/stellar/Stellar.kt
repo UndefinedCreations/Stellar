@@ -9,7 +9,7 @@ object Stellar {
         private set
     var prefix: String = ""
         private set
-    var plugin: JavaPlugin = throw IllegalArgumentException("Plugin cannot be null!")
+    var plugin: JavaPlugin? = null
         private set
     val commands: MutableList<AbstractStellarCommand<*>> = mutableListOf()
 
