@@ -151,6 +151,6 @@ abstract class AbstractStellarArgument<T : AbstractStellarArgument<T, *>, R>(nam
     override fun setUsageText(text: String): T = apply { parent.setUsageText(text) } as T
     override fun clearInformation(): T = apply { parent.clearInformation() } as T
 
-    override fun register(plugin: JavaPlugin): T = apply { parent.register(plugin) } as T
+    override fun register(plugin: JavaPlugin, prefix: String): T = apply { parent.register(plugin, prefix) } as T
 
 }

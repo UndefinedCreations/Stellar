@@ -72,7 +72,7 @@ object NMSManager {
         "1.13" to { NMS1_13 },
     )
 
-    fun register(command: StellarCommand, plugin: JavaPlugin) {
+    fun register(command: StellarCommand, plugin: JavaPlugin, prefix: String) {
         if (!StellarListener.hasBeenInitialized) Bukkit.getPluginManager().registerEvents(StellarListener, plugin).also { StellarListener.hasBeenInitialized = true }
 
         Stellar.commands.add(command)
@@ -80,8 +80,9 @@ object NMSManager {
         val dispatcher = nms.getCommandDispatcher()
         val mainNode = dispatcher.register(builder)
 
-        val prefix: String = Stellar.prefix.takeIf { it.isNotBlank() } ?: plugin.description.name.lowercase()
-        for (name in command.aliases + "$prefix:${command.name}")
+        // Register command name with the prefix, e.g. minecraft:ban
+        val fallbackPrefix = prefix.takeIf { it.isNotBlank() } ?: plugin.description.name.lowercase()
+        for (name in command.aliases + "$fallbackPrefix:${command.name}")
             dispatcher.register(LiteralArgumentBuilder.literal<Any>(name).redirect(mainNode))
 
         Bukkit.getServer().helpMap.addTopic(StellarCommandHelpTopic(command.name, command.information["Description"] ?: "", command.information.entries.associateBy({ it.value }) { it.key }) {

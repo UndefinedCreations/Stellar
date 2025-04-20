@@ -46,9 +46,9 @@ open class ListArgument<T, R> @JvmOverloads constructor(
 
 	init {
 		if (base is ListArgument<*, *>) throw UnsupportedArgumentTypeException(base)
-		addFutureSuggestion { context, input ->
-			if (async) CompletableFuture.supplyAsync { getSuggestionList(context, input) }
-			else CompletableFuture.completedFuture(getSuggestionList(context, input))
+		addFutureSuggestion<CommandSender> { input ->
+			if (async) CompletableFuture.supplyAsync { getSuggestionList(this, input) }
+			else CompletableFuture.completedFuture(getSuggestionList(this, input))
 		}
 	}
 

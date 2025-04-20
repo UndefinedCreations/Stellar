@@ -18,7 +18,6 @@ import com.undefined.stellar.listener.StellarListener
 import com.undefined.stellar.nms.NMS
 import com.undefined.stellar.nms.NMSHelper
 import org.bukkit.Bukkit
-import org.bukkit.command.Command
 import org.bukkit.plugin.java.JavaPlugin
 import java.util.concurrent.CompletableFuture
 import com.mojang.brigadier.suggestion.Suggestion as BrigadierSuggestion
@@ -38,7 +37,7 @@ object NMSManager {
         "1.20.5" to { NMS1_20_6 },
     )
 
-    fun register(command: StellarCommand, plugin: JavaPlugin) {
+    fun register(command: StellarCommand, plugin: JavaPlugin, prefix: String) {
         if (!StellarListener.hasBeenInitialized) Bukkit.getPluginManager().registerEvents(StellarListener, plugin).also { StellarListener.hasBeenInitialized = true }
 
         Stellar.commands.add(command)
@@ -49,10 +48,13 @@ object NMSManager {
             command.requirements.all { it(this) }
         })
 
-
-        // Register command name with plugin name, e.g. minecraft:ban
-        dispatcher.register(LiteralArgumentBuilder.literal<Any>("${plugin.pluginMeta.name.lowercase()}:${command.name}").redirect(mainNode))
-        Bukkit.getServer().helpMap.addTopic(StellarCommandHelpTopic("${plugin.pluginMeta.name.lowercase()}:${command.name}", command.information["Description"] ?: "", command.information.reversed().entries.associateBy({ it.key }) { it.value }) {
+        // Register command name with the prefix, e.g. minecraft:ban
+        println("prefix: $prefix")
+        println("prefix: ${Stellar.prefix}")
+        println("prefix: ${plugin.pluginMeta.name.lowercase()}")
+        val fallbackPrefix = prefix.takeIf { it.isNotBlank() } ?: plugin.pluginMeta.name.lowercase()
+        dispatcher.register(LiteralArgumentBuilder.literal<Any>("$fallbackPrefix:${command.name}").redirect(mainNode))
+        Bukkit.getServer().helpMap.addTopic(StellarCommandHelpTopic("$fallbackPrefix:${command.name}", command.information["Description"] ?: "", command.information.reversed().entries.associateBy({ it.key }) { it.value }) {
             command.requirements.all { it(this) }
         })
 

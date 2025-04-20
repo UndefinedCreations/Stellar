@@ -35,9 +35,9 @@ class StellarCommand @JvmOverloads constructor(name: String, permissions: Iterab
     override fun setUsageText(text: String): StellarCommand = setInformation("Usage", text)
     override fun clearInformation(): StellarCommand = apply { aliases.clear() }
 
-    override fun register(plugin: JavaPlugin) = apply {
+    override fun register(plugin: JavaPlugin, prefix: String) = apply {
         if (aliases.isNotEmpty()) setInformation("Aliases", aliases.joinToString())
-        NMSManager.register(this, plugin)
+        NMSManager.register(this, plugin, prefix)
     }
 
 }

@@ -1126,6 +1126,6 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param plugin The given `JavaPlugin` instance (default: plugin in [Stellar]).
      * @return The registered command object.
      */
-    abstract fun register(plugin: JavaPlugin = Stellar.plugin ?: throw IllegalArgumentException("Plugin cannot be null!")): T
+    abstract fun register(plugin: JavaPlugin = Stellar.plugin ?: throw IllegalArgumentException("Plugin cannot be null!"), prefix: String = Stellar.prefix): T
 
 }

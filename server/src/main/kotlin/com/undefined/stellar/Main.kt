@@ -27,11 +27,10 @@ class Main : JavaPlugin() {
 //        StellarCommand("server")
 //            .addStringArgument("string", StringType.ALPHANUMERIC_WORD)
 //            .register(this)
-        CommandUtil.unregisterCommand(this, "version")
 
         StellarCommand("list")
             .addListArgument("list", listOf(""))
-            .register(this)
+            .register(this, "template")
 
         StellarCommand("server")
             .addMessageCooldown(5, TimeUnit.SECONDS) { remaining ->
@@ -42,7 +41,7 @@ class Main : JavaPlugin() {
                 val string: String by args
                 sender.sendMessage(string)
             }
-            .register(this)
+            .register(this, "test")
 //        StellarCommand("server")
 //            .addStringArgument("string", StringType.QUOTABLE_PHRASE)
 //            .register(this)
