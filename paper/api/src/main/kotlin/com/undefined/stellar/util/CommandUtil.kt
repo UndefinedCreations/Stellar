@@ -12,22 +12,20 @@ import java.util.TreeMap
 
 object CommandUtil {
     /**
-     * Unregisters a list of commands and removes their respective [HelpTopic]. It does this within a [BukkitTask].
+     * Unregisters a command and removes their respective [HelpTopic]. It does this within a [BukkitTask].
      *
+     * @param name The command names to be unregistered.
      * @param plugin The [JavaPlugin] instance to be used to run the [BukkitTask].
-     * @param names The list of command names to be unregistered.
      */
     @JvmOverloads
-    fun unregisterCommands(plugin: JavaPlugin = Stellar.plugin ?: throw IllegalArgumentException("Plugin cannot be null!"), vararg names: String) {
+    fun unregisterCommand(name: String, plugin: JavaPlugin = Stellar.plugin ?: throw IllegalArgumentException("Plugin cannot be null!")) {
         Bukkit.getScheduler().runTask(plugin, Runnable {
             val dispatcher = NMSManager.nms.getCommandDispatcher()
             val knownCommands: HashMap<String, Command> = Bukkit.getServer().commandMap.knownCommands as HashMap<String, Command>
             val helpTopics: TreeMap<String, HelpTopic> = Bukkit.getHelpMap()::class.java.getDeclaredField("helpTopics").apply { isAccessible = true }[Bukkit.getHelpMap()] as TreeMap<String, HelpTopic>
-            for (name in names) {
-                dispatcher.root.children.remove(dispatcher.root.getChild(name))
-                knownCommands[name]?.unregister(Bukkit.getServer().commandMap)
-                helpTopics.remove("/$name")
-            }
+            dispatcher.root.children.remove(dispatcher.root.getChild(name))
+            knownCommands[name]?.unregister(Bukkit.getServer().commandMap)
+            helpTopics.remove("/$name")
             for (player in Bukkit.getOnlinePlayers()) player.updateCommands()
         })
     }

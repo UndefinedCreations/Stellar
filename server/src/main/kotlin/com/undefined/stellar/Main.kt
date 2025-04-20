@@ -4,7 +4,6 @@ import com.undefined.stellar.argument.basic.StringType
 import com.undefined.stellar.argument.scoreboard.ScoreHolderType
 import com.undefined.stellar.util.CommandUtil
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
-import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.block.structure.StructureRotation
 import org.bukkit.entity.Player
@@ -28,7 +27,7 @@ class Main : JavaPlugin() {
 //        StellarCommand("server")
 //            .addStringArgument("string", StringType.ALPHANUMERIC_WORD)
 //            .register(this)
-        CommandUtil.unregisterCommands(this, "version")
+        CommandUtil.unregisterCommand(this, "version")
 
         StellarCommand("list")
             .addListArgument("list", listOf(""))
