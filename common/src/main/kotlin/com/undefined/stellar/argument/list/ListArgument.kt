@@ -63,6 +63,8 @@ open class ListArgument<T, R> @JvmOverloads constructor(
 	 */
 	@OverrideOnly
 	open fun getSuggestionList(context: CommandContext<CommandSender>, input: String): List<Suggestion> =
-		list(context).mapNotNull { converter(context.sender, it) }.filter { it.text.startsWith(input, true) }
+		list(context).mapNotNull {
+			converter(context.sender, it).takeIf { it?.text?.isNotBlank() == true }
+		}.filter { it.text.startsWith(input, true) }
 
 }
