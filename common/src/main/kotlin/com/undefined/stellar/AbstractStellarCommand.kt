@@ -110,13 +110,25 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
     } as T
 
     /**
-     * Adds a requirement that must be met for the command to be available to the player. Also works in Java.
+     * Adds a requirement that must be met for the command to be available to the player.
      *
      * @param requirement The condition that must be met.
      * @return The modified command object.
      */
     fun addRequirement(requirement: StellarRequirement<CommandSender>): T = apply {
         requirements.add(ExecutableRequirement(CommandSender::class, requirement))
+    } as T
+
+    /**
+     * Adds a requirement that must be met for the command to be available to the player.
+     *
+     * @param sender The [Class] the sender will be cast into, which must be or extend [CommandSender].
+     * If the cast is unsuccessful, then the function will not be run. **If you wish to just use a [CommandSender], you can omit this parameter.**
+     * @param requirement The condition that must be met.
+     * @return The modified command object.
+     */
+    fun <C : CommandSender> addRequirement(sender: Class<C>, requirement: StellarRequirement<C>): T = apply {
+        requirements.add(ExecutableRequirement(sender.kotlin, requirement))
     } as T
 
     /**
@@ -331,13 +343,25 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
     } as T
 
     /**
-     * Adds an execution to the command. Also works in Java.
+     * Adds an execution to the command.
      *
      * @param execution The execution block.
      * @return The modified command object.
      */
     fun addExecution(execution: StellarExecution<CommandSender>): T = apply {
         executions.add(ExecutableExecution(CommandSender::class, execution, false))
+    } as T
+
+    /**
+     * Adds an execution to the command.
+     *
+     * @param sender The [Class] the sender will be cast into, which must be or extend [CommandSender].
+     * If the cast is unsuccessful, then the function will not be run. **If you wish to just use a [CommandSender], you can omit this parameter.**
+     * @param execution The execution block.
+     * @return The modified command object.
+     */
+    fun <C : CommandSender> addExecution(sender: Class<C>, execution: StellarExecution<C>): T = apply {
+        executions.add(ExecutableExecution(sender.kotlin, execution, false))
     } as T
 
     /**
@@ -352,13 +376,25 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
     } as T
 
     /**
-     * Adds an async execution to the command. Also works in Java.
+     * Adds an async execution to the command.
      *
      * @param execution The execution block.
      * @return The modified command object.
      */
     fun addAsyncExecution(execution: StellarExecution<CommandSender>): T = apply {
         executions.add(ExecutableExecution(CommandSender::class, execution, true))
+    } as T
+
+    /**
+     * Adds an async execution to the command.
+     *
+     * @param sender The [Class] the sender will be cast into, which must be or extend [CommandSender].
+     * If the cast is unsuccessful, then the function will not be run. **If you wish to just use a [CommandSender], you can omit this parameter.**
+     * @param execution The execution block.
+     * @return The modified command object.
+     */
+    fun <C : CommandSender> addAsyncExecution(sender: Class<C>, execution: StellarExecution<C>): T = apply {
+        executions.add(ExecutableExecution(sender.kotlin, execution, true))
     } as T
 
     /**
@@ -383,6 +419,18 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
     } as T
 
     /**
+     * Adds a runnable to the command.
+     *
+     * @param sender The [Class] the sender will be cast into, which must be or extend [CommandSender].
+     * If the cast is unsuccessful, then the function will not be run. **If you wish to just use a [CommandSender], you can omit this parameter.**
+     * @param runnable The execution block.
+     * @return The modified command object.
+     */
+    fun <C : CommandSender> addRunnable(sender: Class<C>, runnable: StellarRunnable<C>): T = apply {
+        runnables.add(ExecutableRunnable(sender.kotlin, runnable, false))
+    } as T
+
+    /**
      * Adds an async runnable to the command. Only works in Kotlin.
      *
      * @param C The type of CommandSender.
@@ -394,13 +442,15 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
     } as T
 
     /**
-     * Adds an async runnable to the command. Also works in Java.
+     * Adds an async runnable to the command.
      *
+     * @param sender The [Class] the sender will be cast into, which must be or extend [CommandSender].
+     * If the cast is unsuccessful, then the function will not be run. **If you wish to just use a [CommandSender], you can omit this parameter.**
      * @param runnable The execution block.
      * @return The modified command object.
      */
-    fun addAsyncRunnable(runnable: StellarRunnable<CommandSender>): T = apply {
-        runnables.add(ExecutableRunnable(CommandSender::class, runnable, true))
+    fun <C : CommandSender> addAsyncRunnable(sender: Class<C>, runnable: StellarRunnable<C>): T = apply {
+        runnables.add(ExecutableRunnable(sender.kotlin, runnable, true))
     } as T
 
     /**
@@ -415,13 +465,15 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
     } as T
 
     /**
-     * Adds a failure execution to the command to be displayed when the command fails. Also works in Java.
+     * Adds a failure execution to the command to be displayed when the command fails.
      *
      * @param execution The execution block.
+     * @param sender The [Class] the sender will be cast into, which must be or extend [CommandSender].
+     * If the cast is unsuccessful, then the function will not be run. **If you wish to just use a [CommandSender], you can omit this parameter.**
      * @return The modified command object.
      */
-    fun addFailureExecution(execution: StellarExecution<CommandSender>): T = apply {
-        failureExecutions.add(ExecutableExecution(CommandSender::class, execution, false))
+    fun <C : CommandSender> addFailureExecution(sender: Class<C>, execution: StellarExecution<C>): T = apply {
+        failureExecutions.add(ExecutableExecution(sender.kotlin, execution, false))
     } as T
 
     /**
@@ -436,13 +488,25 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
     } as T
 
     /**
-     * Adds a failure execution to the _root_ command to be displayed when the command fails. Also works in Java.
+     * Adds a failure execution to the _root_ command to be displayed when the command fails.
      *
      * @param execution The execution block.
      * @return The modified command object.
      */
     fun addGlobalFailureExecution(execution: StellarExecution<CommandSender>): T = apply {
         globalFailureExecutions.add(ExecutableExecution(CommandSender::class, execution, false))
+    } as T
+
+    /**
+     * Adds a failure execution to the _root_ command to be displayed when the command fails.
+     *
+     * @param sender The [Class] the sender will be cast into, which must be or extend [CommandSender].
+     * If the cast is unsuccessful, then the function will not be run. **If you wish to just use a [CommandSender], you can omit this parameter.**
+     * @param execution The execution block.
+     * @return The modified command object.
+     */
+    fun <C : CommandSender> addGlobalFailureExecution(sender: Class<C>, execution: StellarExecution<C>): T = apply {
+        globalFailureExecutions.add(ExecutableExecution(sender.kotlin, execution, false))
     } as T
 
     /**
