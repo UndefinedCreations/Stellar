@@ -2,7 +2,7 @@ package com.undefined.stellar.listener
 
 import com.undefined.stellar.AbstractStellarCommand
 import com.undefined.stellar.NMSManager
-import com.undefined.stellar.Stellar
+import com.undefined.stellar.StellarConfig
 import com.undefined.stellar.data.argument.ArgumentHelper
 import com.undefined.stellar.data.argument.MojangAdapter
 import org.bukkit.command.CommandSender
@@ -35,7 +35,7 @@ object StellarListener : Listener {
         if (context.nodes.isEmpty()) return false
 
         val rootNodeName = context.rootNode.name.takeIf { it.isNotBlank() }
-        val baseCommand: AbstractStellarCommand<*> = Stellar.getStellarCommand(rootNodeName ?: context.nodes[0].node.name) ?: return false
+        val baseCommand: AbstractStellarCommand<*> = StellarConfig.getStellarCommand(rootNodeName ?: context.nodes[0].node.name) ?: return false
         val argument = ArgumentHelper.getArguments(baseCommand, context, if (rootNodeName != null) 0 else 1).lastOrNull()
         argument?.let {
             sendFailureExecutions(argument, context)

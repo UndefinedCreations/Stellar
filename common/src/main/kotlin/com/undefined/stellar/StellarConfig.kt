@@ -4,7 +4,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.plugin.java.JavaPlugin
 import org.jetbrains.annotations.ApiStatus
 
-object Stellar {
+object StellarConfig {
 
     @ApiStatus.Internal
     var miniMessage: MiniMessage? = null
@@ -22,15 +22,15 @@ object Stellar {
     fun getStellarCommand(name: String): AbstractStellarCommand<*>? =
         commands.firstOrNull { it.name == name.substringAfter(':') || name in it.aliases }
 
-    fun setMiniMessage(miniMessage: MiniMessage): Stellar = apply {
+    fun setMiniMessage(miniMessage: MiniMessage): StellarConfig = apply {
         this.miniMessage = miniMessage
     }
 
-    fun setPrefix(prefix: String): Stellar = apply {
+    fun setPrefix(prefix: String): StellarConfig = apply {
         this.prefix = prefix
     }
 
-    fun setPlugin(plugin: JavaPlugin): Stellar = apply {
+    fun setPlugin(plugin: JavaPlugin): StellarConfig = apply {
         this.plugin = plugin
     }
 

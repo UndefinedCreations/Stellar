@@ -276,7 +276,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
             "<red>Please wait ${TimeUnit.MILLISECONDS.toSeconds(remaining)} more seconds!"
         },
     ): T = addCooldown(duration) { remaining ->
-        sender.sendMessage(LegacyComponentSerializer.legacySection().serialize(Stellar.miniMessage!!.deserialize(message(remaining))))
+        sender.sendMessage(LegacyComponentSerializer.legacySection().serialize(StellarConfig.miniMessage!!.deserialize(message(remaining))))
     }
 
     /**
@@ -313,7 +313,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
             "${ChatColor.RED}Please wait ${TimeUnit.MILLISECONDS.toSeconds(remaining)} more seconds!"
         },
     ): T = addCooldown(duration) { remaining ->
-        sender.sendMessage(LegacyComponentSerializer.legacySection().serialize(Stellar.miniMessage!!.deserialize(message(remaining))))
+        sender.sendMessage(LegacyComponentSerializer.legacySection().serialize(StellarConfig.miniMessage!!.deserialize(message(remaining))))
     }
 
     /**
@@ -539,7 +539,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @return The modified command object.
      */
     fun addFailureMessage(message: String): T = apply {
-        val component = Stellar.miniMessage!!.deserialize(message)
+        val component = StellarConfig.miniMessage!!.deserialize(message)
         failureExecutions.add(ExecutableExecution(CommandSender::class, { it.sender.sendMessage(LegacyComponentSerializer.legacyAmpersand().serialize(component)) }, false))
     } as T
 
@@ -550,7 +550,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @return The modified command object.
      */
     fun addGlobalFailureMessage(message: String): T = apply {
-        val component = Stellar.miniMessage!!.deserialize(message)
+        val component = StellarConfig.miniMessage!!.deserialize(message)
         globalFailureExecutions.add(ExecutableExecution(CommandSender::class, { it.sender.sendMessage(LegacyComponentSerializer.legacyAmpersand().serialize(component)) }, false))
     } as T
 
@@ -1126,9 +1126,9 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
     /**
      * Registers the command with the given plugin.
      *
-     * @param plugin The given `JavaPlugin` instance (default: plugin in [Stellar]).
+     * @param plugin The given `JavaPlugin` instance (default: plugin in [StellarConfig]).
      * @return The registered command object.
      */
-    abstract fun register(plugin: JavaPlugin = Stellar.plugin ?: throw IllegalArgumentException("Plugin cannot be null!"), prefix: String = Stellar.prefix): T
+    abstract fun register(plugin: JavaPlugin = StellarConfig.plugin ?: throw IllegalArgumentException("Plugin cannot be null!"), prefix: String = StellarConfig.prefix): T
 
 }

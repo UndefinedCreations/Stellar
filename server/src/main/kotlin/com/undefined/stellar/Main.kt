@@ -3,9 +3,6 @@ package com.undefined.stellar
 import com.undefined.stellar.argument.basic.StringType
 import com.undefined.stellar.argument.scoreboard.ScoreHolderType
 import com.undefined.stellar.util.CommandUtil
-import net.kyori.adventure.platform.bukkit.BukkitAudiences
-import net.minecraft.server.MinecraftServer
-import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.block.structure.StructureRotation
 import org.bukkit.entity.Player
@@ -18,7 +15,7 @@ import java.util.concurrent.TimeUnit
 class Main : JavaPlugin() {
 
     override fun onEnable() {
-        Stellar.setPlugin(this)
+        StellarConfig.setPlugin(this)
 
         // literal
 //        StellarCommand("server")

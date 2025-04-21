@@ -73,7 +73,7 @@ object NMSManager {
     fun register(command: StellarCommand, plugin: JavaPlugin, prefix: String) {
         if (!StellarListener.hasBeenInitialized) Bukkit.getPluginManager().registerEvents(StellarListener, plugin).also { StellarListener.hasBeenInitialized = true }
 
-        Stellar.commands.add(command)
+        StellarConfig.commands.add(command)
         val builder = getLiteralArgumentBuilder(command, plugin)
         val dispatcher = nms.getCommandDispatcher()
         val mainNode = dispatcher.register(builder)
@@ -121,7 +121,7 @@ object NMSManager {
         builder.executes { context ->
             val stellarContext = MojangAdapter.getStellarCommandContext(context)
             val rootNodeName = context.rootNode.name.takeIf { it.isNotBlank() }
-            val baseCommand = Stellar.getStellarCommand(context.input.split(' ').first()) ?: throw IllegalStateException("Cannot get root command.")
+            val baseCommand = StellarConfig.getStellarCommand(context.input.split(' ').first()) ?: throw IllegalStateException("Cannot get root command.")
 
             for (runnable in command.runnables.filter { it.async }) runnable(stellarContext)
             val arguments = ArgumentHelper.getArguments(baseCommand, context, if (rootNodeName != null) 0 else 1)

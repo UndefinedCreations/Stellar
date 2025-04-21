@@ -1,11 +1,10 @@
 package com.undefined.stellar.util
 
 import com.undefined.stellar.NMSManager
-import com.undefined.stellar.Stellar
+import com.undefined.stellar.StellarConfig
 import com.undefined.stellar.StellarCommand
 import org.bukkit.Bukkit
 import org.bukkit.command.Command
-import org.bukkit.command.SimpleCommandMap
 import org.bukkit.help.HelpTopic
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.scheduler.BukkitTask
@@ -19,7 +18,7 @@ object CommandUtil {
      * @param plugin The [JavaPlugin] instance to be used to run the [BukkitTask].
      */
     @JvmOverloads
-    fun unregisterCommand(name: String, plugin: JavaPlugin = Stellar.plugin ?: throw IllegalArgumentException("Plugin cannot be null!")) {
+    fun unregisterCommand(name: String, plugin: JavaPlugin = StellarConfig.plugin ?: throw IllegalArgumentException("Plugin cannot be null!")) {
         val dispatcher = NMSManager.nms.getCommandDispatcher()
         val knownCommands: HashMap<String, Command> = Bukkit.getServer().commandMap.knownCommands as HashMap<String, Command>
         val helpTopics: TreeMap<String, HelpTopic> = Bukkit.getHelpMap()::class.java.getDeclaredField("helpTopics").apply { isAccessible = true }[Bukkit.getHelpMap()] as TreeMap<String, HelpTopic>
