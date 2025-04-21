@@ -4,6 +4,8 @@ import com.undefined.stellar.argument.basic.StringType
 import com.undefined.stellar.argument.scoreboard.ScoreHolderType
 import com.undefined.stellar.util.CommandUtil
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
+import net.minecraft.server.MinecraftServer
+import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.block.structure.StructureRotation
 import org.bukkit.entity.Player
@@ -16,7 +18,7 @@ import java.util.concurrent.TimeUnit
 class Main : JavaPlugin() {
 
     override fun onEnable() {
-        val audience = BukkitAudiences.create(this)
+        Stellar.setPlugin(this)
 
         // literal
 //        StellarCommand("server")
@@ -27,6 +29,11 @@ class Main : JavaPlugin() {
 //        StellarCommand("server")
 //            .addStringArgument("string", StringType.ALPHANUMERIC_WORD)
 //            .register(this)
+//        Bukkit.getScheduler().runTask(this, Runnable {
+//            val dispatcher = NMSManager.nms.getCommandDispatcher()
+//            dispatcher.root.children.remove(dispatcher.root.getChild("data"))
+//        })
+        CommandUtil.unregisterCommand("data")
 
         StellarCommand("list")
             .addListArgument("list", listOf(""))

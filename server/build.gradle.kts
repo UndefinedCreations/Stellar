@@ -3,8 +3,9 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     setup
-    id("com.undefinedcreations.nova") version "0.0.4"
     id("com.gradleup.shadow")
+    id("com.undefinedcreations.echo") version "0.0.11"
+    id("com.undefinedcreations.nova") version "0.0.4"
 }
 
 repositories {
@@ -18,12 +19,14 @@ val versionVar = version
 val groupIdVar = "com.undefined"
 
 dependencies {
-    compileOnly(libs.papermc)
+//    compileOnly(libs.spigot)
+    echo("1.21.4")
+    implementation(kotlin("reflect"))
     implementation("net.kyori:adventure-api:4.20.0")
     implementation("net.kyori:adventure-platform-bukkit:4.3.4")
     implementation("net.kyori:adventure-text-minimessage:4.20.0")
-//    implementation(project(":paper:api"))
-    implementation("com.undefined:stellar:0.1.63")
+    implementation(project(":spigot:api"))
+//    implementation("com.undefined:stellar:0.1.63")
 }
 
 tasks {
@@ -43,7 +46,7 @@ tasks {
         minecraftVersion("1.21.4")
         perVersionFolder(true)
         acceptMojangEula()
-        serverType(ServerType.PAPERMC)
+        serverType(ServerType.SPIGOT)
     }
 }
 

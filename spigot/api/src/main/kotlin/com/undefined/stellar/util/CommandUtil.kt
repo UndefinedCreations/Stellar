@@ -13,23 +13,23 @@ import java.util.*
 
 object CommandUtil {
     /**
-     * Unregisters a command and removes their respective [HelpTopic]. It does this within a [BukkitTask].
+     * Unregisters a command and removes itself from the /help command, which it does within a [BukkitTask].
      *
      * @param name The command names to be unregistered.
      * @param plugin The [JavaPlugin] instance to be used to run the [BukkitTask].
      */
     @JvmOverloads
-    fun unregisterCommands(name: String, plugin: JavaPlugin = Stellar.plugin ?: throw IllegalArgumentException("Plugin cannot be null!")) {
-        Bukkit.getScheduler().runTask(plugin, Runnable {
-            val dispatcher = NMSManager.nms.getCommandDispatcher()
-            val commandMap = Bukkit.getServer().javaClass.getDeclaredField("commandMap").apply { isAccessible = true }[Bukkit.getServer()] as SimpleCommandMap
-            val knownCommands: HashMap<String, Command> = SimpleCommandMap::class.java.getDeclaredField("knownCommands").apply { isAccessible = true }[commandMap] as HashMap<String, Command>
-            val helpTopics: TreeMap<String, HelpTopic> = Bukkit.getHelpMap()::class.java.getDeclaredField("helpTopics").apply { isAccessible = true }[Bukkit.getHelpMap()] as TreeMap<String, HelpTopic>
+    fun unregisterCommand(name: String, plugin: JavaPlugin = Stellar.plugin ?: throw IllegalArgumentException("Plugin cannot be null!")) {
+        val dispatcher = NMSManager.nms.getCommandDispatcher()
+        val commandMap = Bukkit.getServer().javaClass.getDeclaredField("commandMap").apply { isAccessible = true }[Bukkit.getServer()] as SimpleCommandMap
+        val knownCommands: HashMap<String, Command> = SimpleCommandMap::class.java.getDeclaredField("knownCommands").apply { isAccessible = true }[commandMap] as HashMap<String, Command>
+        val helpTopics: TreeMap<String, HelpTopic> = Bukkit.getHelpMap()::class.java.getDeclaredField("helpTopics").apply { isAccessible = true }[Bukkit.getHelpMap()] as TreeMap<String, HelpTopic>
 
-            dispatcher.root.children.remove(dispatcher.root.getChild(name))
-            knownCommands[name]?.unregister(commandMap)
+        dispatcher.root.children.remove(dispatcher.root.getChild(name))
+        knownCommands[name]?.unregister(commandMap)
+        for (player in Bukkit.getOnlinePlayers()) player.updateCommands()
+        Bukkit.getScheduler().runTask(plugin, Runnable {
             helpTopics.remove("/$name")
-            for (player in Bukkit.getOnlinePlayers()) player.updateCommands()
         })
     }
 }
