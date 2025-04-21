@@ -1,8 +1,8 @@
 package com.undefined.stellar.util
 
 import com.undefined.stellar.NMSManager
-import com.undefined.stellar.StellarConfig
 import com.undefined.stellar.StellarCommand
+import com.undefined.stellar.StellarConfig
 import org.bukkit.Bukkit
 import org.bukkit.command.Command
 import org.bukkit.help.HelpTopic

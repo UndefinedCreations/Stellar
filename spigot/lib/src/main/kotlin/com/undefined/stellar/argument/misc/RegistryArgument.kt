@@ -1,7 +1,7 @@
 package com.undefined.stellar.argument.misc
 
-import com.undefined.stellar.ParameterArgument
 import com.undefined.stellar.AbstractStellarCommand
+import com.undefined.stellar.ParameterArgument
 import org.bukkit.Registry
 
 /**

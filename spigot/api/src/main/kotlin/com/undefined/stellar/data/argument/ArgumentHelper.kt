@@ -2,7 +2,6 @@ package com.undefined.stellar.data.argument
 
 import com.mojang.brigadier.context.CommandContext
 import com.undefined.stellar.AbstractStellarArgument
-import com.undefined.stellar.ParameterArgument
 import com.undefined.stellar.AbstractStellarCommand
 import org.jetbrains.annotations.ApiStatus
 

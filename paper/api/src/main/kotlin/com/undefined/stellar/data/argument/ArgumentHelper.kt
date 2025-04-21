@@ -1,8 +1,9 @@
 package com.undefined.stellar.data.argument
 
 import com.mojang.brigadier.context.CommandContext
-import com.undefined.stellar.ParameterArgument
+import com.undefined.stellar.AbstractStellarArgument
 import com.undefined.stellar.AbstractStellarCommand
+import com.undefined.stellar.ParameterArgument
 
 object ArgumentHelper {
 
@@ -10,8 +11,8 @@ object ArgumentHelper {
         baseCommand: AbstractStellarCommand<*>,
         context: CommandContext<Any>,
         currentIndex: Int,
-        listOfArguments: List<ParameterArgument<*, *>> = emptyList()
-    ): List<ParameterArgument<*, *>> {
+        listOfArguments: List<AbstractStellarArgument<*>> = emptyList()
+    ): List<AbstractStellarArgument<*>> {
         val currentNodeName = context.nodes.getOrNull(currentIndex)?.node?.name ?: return listOfArguments
         for (argument in baseCommand.arguments)
             if (argument.name == currentNodeName || currentNodeName in argument.aliases)
