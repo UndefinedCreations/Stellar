@@ -2,16 +2,19 @@ package com.undefined.stellar.data.argument
 
 import com.mojang.brigadier.context.CommandContext
 import com.undefined.stellar.AbstractStellarArgument
+import com.undefined.stellar.ParameterArgument
 import com.undefined.stellar.AbstractStellarCommand
+import org.jetbrains.annotations.ApiStatus
 
 object ArgumentHelper {
 
+    @ApiStatus.Internal
     fun getArguments(
         baseCommand: AbstractStellarCommand<*>,
         context: CommandContext<Any>,
         currentIndex: Int,
-        listOfArguments: List<AbstractStellarArgument<*, *>> = emptyList()
-    ): List<AbstractStellarArgument<*, *>> {
+        listOfArguments: List<AbstractStellarArgument<*>> = emptyList()
+    ): List<AbstractStellarArgument<*>> {
         val currentNodeName = context.nodes.getOrNull(currentIndex)?.node?.name ?: return listOfArguments
         for (argument in baseCommand.arguments)
             if (argument.name == currentNodeName || currentNodeName in argument.aliases)

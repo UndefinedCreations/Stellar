@@ -1,6 +1,6 @@
 package com.undefined.stellar.argument.misc
 
-import com.undefined.stellar.AbstractStellarArgument
+import com.undefined.stellar.ParameterArgument
 import com.undefined.stellar.AbstractStellarCommand
 import org.bukkit.Registry
 
@@ -11,7 +11,7 @@ import org.bukkit.Registry
 class RegistryArgument(
     name: String,
     val registry: Registry<*>,
-) : AbstractStellarArgument<RegistryArgument, Any>(name) {
+) : ParameterArgument<RegistryArgument, Any>(name) {
     companion object {
         val registryNames: Map<Registry<*>, String> = mapOf(
             Registry.GAME_EVENT to "game_event",

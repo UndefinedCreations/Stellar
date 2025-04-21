@@ -1,6 +1,6 @@
 package com.undefined.stellar.argument.structure
 
-import com.undefined.stellar.AbstractStellarArgument
+import com.undefined.stellar.ParameterArgument
 import org.bukkit.block.structure.StructureRotation
 
 /**
@@ -8,4 +8,4 @@ import org.bukkit.block.structure.StructureRotation
  *
  * @since 1.19
  */
-class StructureRotationArgument(name: String) : AbstractStellarArgument<StructureRotationArgument, StructureRotation>(name)
+class StructureRotationArgument(name: String) : ParameterArgument<StructureRotationArgument, StructureRotation>(name)

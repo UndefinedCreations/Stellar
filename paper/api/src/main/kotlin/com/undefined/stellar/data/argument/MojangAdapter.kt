@@ -1,6 +1,6 @@
 package com.undefined.stellar.data.argument
 
-import com.undefined.stellar.AbstractStellarArgument
+import com.undefined.stellar.ParameterArgument
 import com.undefined.stellar.AbstractStellarCommand
 import com.undefined.stellar.NMSManager
 import com.undefined.stellar.StellarConfig
@@ -23,7 +23,7 @@ object MojangAdapter {
         if (arguments.filter { it !is LiteralArgument }.groupingBy { it.name }.eachCount().any { it.value > 1 }) throw DuplicateArgumentNameException()
 
         val parsedArguments: CommandNode =
-            arguments.associate<AbstractStellarArgument<*, *>, String, (CommandContext<CommandSender>) -> Any?> { argument ->
+            arguments.associate<ParameterArgument<*, *>, String, (CommandContext<CommandSender>) -> Any?> { argument ->
                 Pair(argument.name) {
                     if (argument is ListArgument<*, *>) return@Pair argument.parseInternal(sender, NMSManager.nms.parseArgument(context, argument.base) ?: context.getArgument(argument.name, Any::class.java))
                     NMSManager.nms.parseArgument(context, argument) ?: context.getArgument(argument.name, Any::class.java)

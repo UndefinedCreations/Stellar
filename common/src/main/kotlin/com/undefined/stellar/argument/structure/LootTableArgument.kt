@@ -1,6 +1,6 @@
 package com.undefined.stellar.argument.structure
 
-import com.undefined.stellar.AbstractStellarArgument
+import com.undefined.stellar.ParameterArgument
 import org.bukkit.loot.LootTable
 
 /**
@@ -8,4 +8,4 @@ import org.bukkit.loot.LootTable
  * It returns a [LootTable].
  * @since 1.21.5
  */
-class LootTableArgument(name: String) : AbstractStellarArgument<LootTableArgument, LootTable>(name)
+class LootTableArgument(name: String) : ParameterArgument<LootTableArgument, LootTable>(name)

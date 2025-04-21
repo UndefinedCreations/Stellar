@@ -10,13 +10,12 @@ import org.jetbrains.annotations.ApiStatus
 import java.util.concurrent.CompletableFuture
 
 /**
- * Being an extension of [AbstractStellarCommand], it represents an argument.
+ * Represents an argument, whether literal or parameter (non-literal).
  *
  * @param name The name of the argument.
- * @param argumentType This is used internally and should not be used by the end user. Is used when the Brigadier library contains the argument type wanted.
  */
 @Suppress("UNCHECKED_CAST")
-abstract class AbstractStellarArgument<T : AbstractStellarArgument<T, *>, R>(name: String, val argumentType: ArgumentType<R>? = null) : AbstractStellarCommand<T>(name) {
+abstract class AbstractStellarArgument<T : AbstractStellarArgument<T>>(name: String) : AbstractStellarCommand<T>(name) {
 
     /**
      * Represents the parent command, whether it's a command or an argument. This is automatically set internally.
@@ -25,124 +24,6 @@ abstract class AbstractStellarArgument<T : AbstractStellarArgument<T, *>, R>(nam
 
     override val globalFailureExecutions: MutableSet<ExecutableExecution<*>>
         get() = parent.globalFailureExecutions
-    @ApiStatus.Internal
-    open val suggestions: MutableSet<ExecutableSuggestion<*>> = mutableSetOf()
-    @ApiStatus.Internal
-    open var suggestionOffset: Int = 0
-
-    /**
-     * Adds a suggestion offset on top of the current offset.
-     * The suggestion offset represents how many additional letters it will take for suggestions to appear.
-     *
-     * @return The modified [AbstractStellarArgument].
-     */
-    fun addSuggestionOffset(offset: Int): T = apply { suggestionOffset += offset } as T
-
-    /**
-     * Sets the current suggestion offset amount to this offset.
-     * The suggestion offset represents how many additional letters it will take for suggestions to appear.
-     *
-     * @return The modified [AbstractStellarArgument].
-     */
-    fun setSuggestionOffset(offset: Int): T = apply { suggestionOffset = offset } as T
-
-    /**
-     * Adds a list of [Suggestion]s on top of the current suggestions.
-     *
-     * @return The modified [AbstractStellarArgument].
-     */
-    fun addSuggestions(suggestions: List<Suggestion>): T = apply {
-        this.suggestions.add(ExecutableSuggestion(CommandSender::class) { _, _ -> CompletableFuture.completedFuture(suggestions.toList()) })
-    } as T
-
-    /**
-     * Adds a `vararg` of [Suggestion]s with the titles defined in [suggestions] on top of the current suggestions.
-     *
-     * @return The modified [AbstractStellarArgument].
-     */
-    fun addSuggestions(vararg suggestions: String): T = apply {
-        this.suggestions.add(ExecutableSuggestion(CommandSender::class) { _, _ -> CompletableFuture.completedFuture(suggestions.map { it.toSuggestion() }) })
-    } as T
-
-    /**
-     * Adds a [Suggestion] on top of the current suggestions.
-     *
-     * @return The modified [AbstractStellarArgument].
-     */
-    fun addSuggestion(suggestion: Suggestion): T = addSuggestions(listOf(suggestion))
-
-    /**
-     * Adds a [Suggestion] with the given title and tooltip on top of the current suggestions.
-     *
-     * @return The modified [AbstractStellarArgument].
-     */
-    @JvmOverloads
-    fun addSuggestion(title: String, tooltip: String? = null): T = addSuggestions(listOf(Suggestion.create(title, tooltip)))
-
-    /**
-     * Adds a function  that returns a list of suggestions in a [CompletableFuture] on top of the current suggestions. Only works in Kotlin.
-     *
-     * @return The modified [AbstractStellarArgument].
-     */
-    inline fun <reified C : CommandSender> addFutureSuggestion(noinline suggestion: CommandContext<C>.(input: String) -> CompletableFuture<Iterable<Suggestion>>): T = apply {
-        suggestions.add(ExecutableSuggestion(C::class, suggestion))
-    } as T
-
-    /**
-     * Adds an async function that returns a list of [Suggestion] on top of the current suggestions. Only works in Kotlin.
-     *
-     * @return The modified [AbstractStellarArgument].
-     */
-    inline fun <reified C : CommandSender> addAsyncSuggestion(noinline suggestion: CommandContext<C>.(input: String) -> List<Suggestion>): T = apply {
-        suggestions.add(ExecutableSuggestion(C::class) { context, input -> CompletableFuture.supplyAsync { suggestion(context, input) } })
-    } as T
-
-    /**
-     * Adds a function that returns a list of [Suggestion] on top of the current suggestions. Only works in Kotlin.
-     *
-     * @return The modified [AbstractStellarArgument].
-     */
-    inline fun <reified C : CommandSender> addSuggestion(noinline suggestion: CommandContext<C>.(input: String) -> List<Suggestion>): T =
-        apply {
-            suggestions.add(ExecutableSuggestion(C::class) { context, input ->
-                CompletableFuture.completedFuture(
-                    suggestion(context, input)
-                )
-            })
-        } as T
-
-    /**
-     * Adds a function that returns a list of [Suggestion] on top of the current suggestions.
-     *
-     * @param sender The [Class] the sender will be cast into, which must be or extend [CommandSender].
-     * If the cast is unsuccessful, then the function will not be run. **If you wish to just use a `CommandSender`, you can omit this parameter.**
-     * @return The modified [AbstractStellarArgument].
-     */
-    fun <C : CommandSender> addFutureSuggestion(sender: Class<C>, suggestion: StellarSuggestion<C>): T = apply {
-        suggestions.add(ExecutableSuggestion(sender.kotlin, suggestion))
-    } as T
-
-    /**
-     * Adds a function that returns a list of [Suggestion] on top of the current suggestions.
-     *
-     * @param sender The [Class] the sender will be cast into, which must be or extend [CommandSender].
-     * If the cast is unsuccessful, then the function will not be run. **If you wish to just use a `CommandSender`, you can omit this parameter.**
-     * @return The modified [AbstractStellarArgument].
-     */
-    fun <C : CommandSender> addAsyncSuggestion(sender: Class<C>, suggestion: SimpleStellarSuggestion<C>): T = apply {
-        suggestions.add(ExecutableSuggestion(sender.kotlin) { context, input -> CompletableFuture.supplyAsync { suggestion(context, input) } })
-    } as T
-
-    /**
-     * Adds a function that returns a list of [Suggestion] on top of the current suggestions.
-     *
-     * @param sender The [Class] the sender will be cast into, which must be or extend [CommandSender].
-     * If the cast is unsuccessful, then the function will not be run. **If you wish to just use a `CommandSender`, you can omit this parameter.**
-     * @return The modified [AbstractStellarArgument].
-     */
-    fun <C : CommandSender> addSuggestion(sender: Class<C>, suggestion: SimpleStellarSuggestion<C>): T = apply {
-        suggestions.add(ExecutableSuggestion(sender.kotlin) { context, input -> CompletableFuture.completedFuture(suggestion(context, input)) })
-    } as T
 
     override fun hasGlobalHiddenDefaultFailureMessages(): Boolean = parent.hasGlobalHiddenDefaultFailureMessages()
 

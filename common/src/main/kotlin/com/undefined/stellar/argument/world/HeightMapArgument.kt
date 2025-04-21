@@ -1,6 +1,6 @@
 package com.undefined.stellar.argument.world
 
-import com.undefined.stellar.AbstractStellarArgument
+import com.undefined.stellar.ParameterArgument
 import org.bukkit.HeightMap
 
 /**
@@ -8,4 +8,4 @@ import org.bukkit.HeightMap
  *
  * @since 1.19.4
  */
-class HeightMapArgument(name: String) : AbstractStellarArgument<HeightMapArgument, HeightMap>(name)
+class HeightMapArgument(name: String) : ParameterArgument<HeightMapArgument, HeightMap>(name)

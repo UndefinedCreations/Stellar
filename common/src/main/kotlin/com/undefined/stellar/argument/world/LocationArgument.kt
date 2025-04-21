@@ -1,12 +1,12 @@
 package com.undefined.stellar.argument.world
 
-import com.undefined.stellar.AbstractStellarArgument
+import com.undefined.stellar.ParameterArgument
 import org.bukkit.Location
 
 /**
  * An argument that allows you to pass in a [Location], as dictated by the [LocationType].
  */
-class LocationArgument(name: String, val type: LocationType) : AbstractStellarArgument<LocationArgument, Location>(name)
+class LocationArgument(name: String, val type: LocationType) : ParameterArgument<LocationArgument, Location>(name)
 
 /**
  * Dictates what kind of location can be selected.

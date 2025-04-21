@@ -1,6 +1,6 @@
 package com.undefined.stellar.argument.structure
 
-import com.undefined.stellar.AbstractStellarArgument
+import com.undefined.stellar.ParameterArgument
 import org.bukkit.block.structure.Mirror
 
 /**
@@ -8,4 +8,4 @@ import org.bukkit.block.structure.Mirror
  *
  * @since 1.19
  */
-class MirrorArgument(name: String) : AbstractStellarArgument<MirrorArgument, Mirror>(name)
+class MirrorArgument(name: String) : ParameterArgument<MirrorArgument, Mirror>(name)

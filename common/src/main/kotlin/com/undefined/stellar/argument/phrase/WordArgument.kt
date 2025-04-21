@@ -1,6 +1,6 @@
 package com.undefined.stellar.argument.phrase
 
-import com.undefined.stellar.AbstractStellarArgument
+import com.undefined.stellar.ParameterArgument
 import com.undefined.stellar.data.phrase.*
 import com.undefined.stellar.data.suggestion.Suggestion
 import com.undefined.stellar.data.suggestion.toSuggestion
@@ -9,7 +9,7 @@ import org.jetbrains.annotations.ApiStatus
 import java.util.concurrent.CompletableFuture
 
 /**
- * An "argument" representing a word inside a [PhraseArgument]. This does not function as a usual argument and does not extend [AbstractStellarArgument].
+ * An "argument" representing a word inside a [PhraseArgument]. This does not function as a usual argument and does not extend [ParameterArgument].
  */
 class WordArgument {
 

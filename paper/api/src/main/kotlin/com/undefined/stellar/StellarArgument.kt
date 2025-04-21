@@ -6,9 +6,9 @@ package com.undefined.stellar
  * @property base The base argument type being wrapped.
  * @property permissions A vararg of [String] of required permissions to execute this command (optional).
  */
-abstract class StellarArgument(val base: AbstractStellarArgument<*, *>, vararg val permissions: String) {
+abstract class StellarArgument(val base: ParameterArgument<*, *>, vararg val permissions: String) {
 
-    internal val fullArgument: AbstractStellarArgument<*, *> by lazy {
+    internal val fullArgument: ParameterArgument<*, *> by lazy {
         setup().apply {
             addRequirements(*permissions)
             for (argument in arguments()) addArgument(argument.fullArgument)
@@ -16,10 +16,10 @@ abstract class StellarArgument(val base: AbstractStellarArgument<*, *>, vararg v
     }
 
     /**
-     * Sets up and returns the core [AbstractStellarArgument] instance for this argument.
+     * Sets up and returns the core [ParameterArgument] instance for this argument.
      * Called once during command initialization.
      */
-    abstract fun setup(): AbstractStellarArgument<*, *>
+    abstract fun setup(): ParameterArgument<*, *>
 
     /**
      * Optionally provides additional [StellarArgument]s to be added to the command.
@@ -29,7 +29,7 @@ abstract class StellarArgument(val base: AbstractStellarArgument<*, *>, vararg v
     open fun arguments(): List<StellarArgument> = listOf()
 
     /**
-     * Creates a new [AbstractStellarArgument] instance with the given configuration block.
+     * Creates a new [ParameterArgument] instance with the given configuration block.
      *
      * Usually, this is used along with the [setup] method as such:
      * ```kotlin
@@ -41,6 +41,6 @@ abstract class StellarArgument(val base: AbstractStellarArgument<*, *>, vararg v
      * @param init A lambda to configure the argument instance.
      * @return The configured [StellarCommand].
      */
-    fun createArgument(init: AbstractStellarArgument<*, *>.() -> Unit): AbstractStellarArgument<*, *> = base.apply { init() }
+    fun createArgument(init: ParameterArgument<*, *>.() -> Unit): ParameterArgument<*, *> = base.apply { init() }
 
 }

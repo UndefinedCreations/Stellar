@@ -1,13 +1,13 @@
 package com.undefined.stellar.argument.basic
 
 import com.mojang.brigadier.arguments.StringArgumentType
-import com.undefined.stellar.AbstractStellarArgument
+import com.undefined.stellar.ParameterArgument
 
 /**
  * An argument that allows you to type a string, as allowed by its [StringType], and returns that [String].
  * @since 1.13
  */
-open class StringArgument(name: String, type: StringType = StringType.WORD) : AbstractStellarArgument<StringArgument, String>(name, type.argumentType)
+open class StringArgument(name: String, type: StringType = StringType.WORD) : ParameterArgument<StringArgument, String>(name, type.argumentType)
 
 /**
  * Dictates what type of string the player is allowed to input.

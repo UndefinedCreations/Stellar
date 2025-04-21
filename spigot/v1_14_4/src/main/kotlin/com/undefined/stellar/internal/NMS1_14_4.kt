@@ -4,7 +4,7 @@ import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.arguments.ArgumentType
 import com.mojang.brigadier.arguments.IntegerArgumentType
 import com.mojang.brigadier.context.CommandContext
-import com.undefined.stellar.AbstractStellarArgument
+import com.undefined.stellar.ParameterArgument
 import com.undefined.stellar.argument.basic.StringArgument
 import com.undefined.stellar.argument.block.BlockDataArgument
 import com.undefined.stellar.argument.block.BlockPredicateArgument
@@ -57,7 +57,7 @@ object NMS1_14_4 : NMS {
 
     override fun getCommandDispatcher(): CommandDispatcher<Any> = MinecraftServer.getServer().functionData.d() as CommandDispatcher<Any>
 
-    override fun getArgumentType(argument: AbstractStellarArgument<*, *>, plugin: JavaPlugin): ArgumentType<*> = when (argument) {
+    override fun getArgumentType(argument: ParameterArgument<*, *>, plugin: JavaPlugin): ArgumentType<*> = when (argument) {
         // Basic
         is StringArgument -> ArgumentScoreholder.a()
 
@@ -124,7 +124,7 @@ object NMS1_14_4 : NMS {
         else -> throw UnsupportedArgumentException(argument)
     }
 
-    override fun parseArgument(ctx: CommandContext<Any>, argument: AbstractStellarArgument<*, *>): Any? {
+    override fun parseArgument(ctx: CommandContext<Any>, argument: ParameterArgument<*, *>): Any? {
         val context: CommandContext<CommandListenerWrapper> = ctx as CommandContext<CommandListenerWrapper>
         return when (argument) {
             // Basic

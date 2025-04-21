@@ -69,7 +69,7 @@ object NMSManager {
         return builder
     }
 
-    private fun getRequiredArgumentBuilder(argument: AbstractStellarArgument<*, *>, plugin: JavaPlugin): RequiredArgumentBuilder<Any, *> {
+    private fun getRequiredArgumentBuilder(argument: ParameterArgument<*, *>, plugin: JavaPlugin): RequiredArgumentBuilder<Any, *> {
         argument.nms = nms
         val builder: RequiredArgumentBuilder<Any, *> = RequiredArgumentBuilder.argument(argument.name, argument.argumentType ?: nms.getArgumentType(if (argument is ListArgument<*, *>) argument.base else argument, plugin))
         handleArguments(argument, builder, plugin)
@@ -80,7 +80,7 @@ object NMSManager {
     private fun handleArguments(command: AbstractStellarCommand<*>, builder: ArgumentBuilder<Any, *>, plugin: JavaPlugin) {
         for (argument in command.arguments)
             if (argument is LiteralArgument) for (name in argument.aliases + argument.name) builder.then(getLiteralArgumentBuilder(argument, plugin, name))
-            else builder.then(getRequiredArgumentBuilder(argument, plugin))
+            else if (argument is ParameterArgument<*, *>) builder.then(getRequiredArgumentBuilder(argument, plugin))
     }
 
     private fun handleCommandFunctions(command: AbstractStellarCommand<*>, builder: ArgumentBuilder<Any, *>, plugin: JavaPlugin) {
@@ -113,7 +113,7 @@ object NMSManager {
     }
 
     private fun handleSuggestions(argument: AbstractStellarCommand<*>, argumentBuilder: ArgumentBuilder<Any, *>) {
-        if (argument !is AbstractStellarArgument<*, *> || argument.suggestions.isEmpty() || argumentBuilder !is RequiredArgumentBuilder<Any, *>) return
+        if (argument !is ParameterArgument<*, *> || argument.suggestions.isEmpty() || argumentBuilder !is RequiredArgumentBuilder<Any, *>) return
         argumentBuilder.suggests { context, builder ->
             val stellarContext = MojangAdapter.getStellarCommandContext(context)
             val range = StringRange.between(builder.start + argument.suggestionOffset, builder.input.length)

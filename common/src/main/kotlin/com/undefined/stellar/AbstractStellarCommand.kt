@@ -72,7 +72,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
     @ApiStatus.Internal
     val requirements: MutableList<ExecutableRequirement<*>> = mutableListOf()
     @ApiStatus.Internal
-    val arguments: MutableSet<AbstractStellarArgument<*, *>> = mutableSetOf()
+    val arguments: MutableSet<AbstractStellarArgument<*>> = mutableSetOf()
     @ApiStatus.Internal
     val lastExecutions = HashMap<UUID, Long>()
     @ApiStatus.Internal
@@ -573,7 +573,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
     /**
      * Adds the given argument to the command and return the argument.
      */
-    fun <T : AbstractStellarArgument<*, *>> addArgument(argument: T): T = argument.apply {
+    fun <T : AbstractStellarArgument<*>> addArgument(argument: T): T = argument.apply {
         argument.parent = this@AbstractStellarCommand
         this@AbstractStellarCommand.arguments.add(argument)
     }
@@ -770,7 +770,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      */
     @JvmOverloads
     fun <T, R> addListArgument(
-        type: AbstractStellarArgument<*, R>,
+        type: ParameterArgument<*, R>,
         list: List<T>,
         parse: CommandSender.(R) -> T,
         converter: CommandSender.(T) -> String? = { it.toString() },
@@ -789,7 +789,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      */
     @JvmOverloads
     fun <T, R> addListArgument(
-        type: AbstractStellarArgument<*, R>,
+        type: ParameterArgument<*, R>,
         list: CommandContext<CommandSender>.() -> List<T>,
         parse: CommandSender.(R) -> T,
         converter: CommandSender.(T) -> String? = { it.toString() },
@@ -844,7 +844,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      */
     @JvmOverloads
     fun <T, R> addAdvancedListArgument(
-        type: AbstractStellarArgument<*, R>,
+        type: ParameterArgument<*, R>,
         list: List<T>,
         parse: CommandSender.(R) -> T,
         converter: CommandSender.(T) -> Suggestion? = { Suggestion.withText(it.toString()) },
@@ -863,7 +863,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      */
     @JvmOverloads
     fun <T, R> addAdvancedListArgument(
-        type: AbstractStellarArgument<*, R>,
+        type: ParameterArgument<*, R>,
         list: CommandContext<CommandSender>.() -> List<T>,
         parse: CommandSender.(R) -> T,
         converter: CommandSender.(T) -> Suggestion? = { Suggestion.withText(it.toString()) },

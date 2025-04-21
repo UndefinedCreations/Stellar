@@ -1,6 +1,6 @@
 package com.undefined.stellar.argument.player
 
-import com.undefined.stellar.AbstractStellarArgument
+import com.undefined.stellar.ParameterArgument
 import org.bukkit.GameMode
 
 /**
@@ -8,4 +8,4 @@ import org.bukkit.GameMode
  *
  * @since 1.19.3
  */
-class GameModeArgument(name: String) : AbstractStellarArgument<GameModeArgument, Collection<GameMode>>(name)
+class GameModeArgument(name: String) : ParameterArgument<GameModeArgument, Collection<GameMode>>(name)

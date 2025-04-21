@@ -1,6 +1,6 @@
 package com.undefined.stellar.argument.entity
 
-import com.undefined.stellar.AbstractStellarArgument
+import com.undefined.stellar.ParameterArgument
 import org.bukkit.entity.Entity
 
 /**
@@ -9,7 +9,7 @@ import org.bukkit.entity.Entity
  *
  * You can customize quantity and type of entities that the player can select using the [EntityDisplayType] enum.
  */
-class EntityArgument(name: String, val type: EntityDisplayType) : AbstractStellarArgument<EntityArgument, Entity>(name)
+class EntityArgument(name: String, val type: EntityDisplayType) : ParameterArgument<EntityArgument, Entity>(name)
 
 /**
  * Dictates which entities are allowed, and the quantity of entities that are allowed.
