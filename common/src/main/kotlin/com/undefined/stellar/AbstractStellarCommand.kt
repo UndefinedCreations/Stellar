@@ -27,7 +27,10 @@ import com.undefined.stellar.argument.text.ColorArgument
 import com.undefined.stellar.argument.text.ComponentArgument
 import com.undefined.stellar.argument.text.MessageArgument
 import com.undefined.stellar.argument.text.StyleArgument
-import com.undefined.stellar.argument.world.*
+import com.undefined.stellar.argument.world.EnvironmentArgument
+import com.undefined.stellar.argument.world.HeightMapArgument
+import com.undefined.stellar.argument.world.LocationArgument
+import com.undefined.stellar.argument.world.LocationType
 import com.undefined.stellar.data.argument.CommandContext
 import com.undefined.stellar.data.argument.EnumFormatting
 import com.undefined.stellar.data.execution.ExecutableExecution
@@ -273,7 +276,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
             "<red>Please wait ${TimeUnit.MILLISECONDS.toSeconds(remaining)} more seconds!"
         },
     ): T = addCooldown(duration) { remaining ->
-        sender.sendMessage(LegacyComponentSerializer.legacySection().serialize(Stellar.miniMessage.deserialize(message(remaining))))
+        sender.sendMessage(LegacyComponentSerializer.legacySection().serialize(Stellar.miniMessage!!.deserialize(message(remaining))))
     }
 
     /**
@@ -310,7 +313,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
             "${ChatColor.RED}Please wait ${TimeUnit.MILLISECONDS.toSeconds(remaining)} more seconds!"
         },
     ): T = addCooldown(duration) { remaining ->
-        sender.sendMessage(LegacyComponentSerializer.legacySection().serialize(Stellar.miniMessage.deserialize(message(remaining))))
+        sender.sendMessage(LegacyComponentSerializer.legacySection().serialize(Stellar.miniMessage!!.deserialize(message(remaining))))
     }
 
     /**
@@ -536,7 +539,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @return The modified command object.
      */
     fun addFailureMessage(message: String): T = apply {
-        val component = Stellar.miniMessage.deserialize(message)
+        val component = Stellar.miniMessage!!.deserialize(message)
         failureExecutions.add(ExecutableExecution(CommandSender::class, { it.sender.sendMessage(LegacyComponentSerializer.legacyAmpersand().serialize(component)) }, false))
     } as T
 
@@ -547,7 +550,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @return The modified command object.
      */
     fun addGlobalFailureMessage(message: String): T = apply {
-        val component = Stellar.miniMessage.deserialize(message)
+        val component = Stellar.miniMessage!!.deserialize(message)
         globalFailureExecutions.add(ExecutableExecution(CommandSender::class, { it.sender.sendMessage(LegacyComponentSerializer.legacyAmpersand().serialize(component)) }, false))
     } as T
 

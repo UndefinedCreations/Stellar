@@ -1,8 +1,6 @@
 plugins {
     setup
     `publishing-convention`
-    `maven-publish`
-    id("com.gradleup.shadow") version "8.3.5"
 }
 
 dependencies {
@@ -19,7 +17,11 @@ dependencies {
 
 tasks {
     shadowJar {
-        exclude("**/kotlin/**")
+        minimize {
+            exclude("**/kotlin/**")
+            exclude("**/intellij/**")
+            exclude("**/jetbrains/**")
+        }
         archiveClassifier = "paper"
     }
 }

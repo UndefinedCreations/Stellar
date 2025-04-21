@@ -8,7 +8,7 @@ import org.bukkit.command.Command
 import org.bukkit.help.HelpTopic
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.scheduler.BukkitTask
-import java.util.TreeMap
+import java.util.*
 
 object CommandUtil {
     /**

@@ -1,5 +1,6 @@
 plugins {
     `java-library`
+    id("com.gradleup.shadow")
     `maven-publish`
 }
 
@@ -7,7 +8,7 @@ publishing {
     publications {
         create<MavenPublication>("mavenJava") {
             artifactId = rootProject.name
-            from(components["java"])
+            from(components["shadow"])
 
             pom {
                 name = "Stellar"
@@ -49,6 +50,9 @@ publishing {
 
 tasks {
     jar {
+        archiveClassifier = "dev"
+    }
+    shadowJar {
         archiveClassifier = "dev"
     }
 }

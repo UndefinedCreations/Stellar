@@ -2,8 +2,6 @@ import org.jetbrains.dokka.gradle.DokkaTask
 
 plugins {
     id("setup")
-    `publishing-convention`
-    id("com.gradleup.shadow") version "8.3.5"
     id("org.jetbrains.dokka") version "2.0.0"
     id("io.papermc.paperweight.userdev") version "2.0.0-beta.14" apply false
 }
@@ -21,13 +19,6 @@ dependencies {
 subprojects {
     apply(plugin = "org.jetbrains.dokka")
     tasks.withType<DokkaTask>()
-}
-
-tasks {
-    shadowJar {
-        exclude("**/kotlin/**")
-        archiveClassifier = ""
-    }
 }
 
 java {

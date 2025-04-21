@@ -1,7 +1,6 @@
 plugins {
     setup
     id("io.papermc.paperweight.userdev")
-    `maven-publish`
 }
 
 dependencies {

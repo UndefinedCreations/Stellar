@@ -3,7 +3,6 @@ import com.undefinedcreations.echo.tasks.RemapTask
 plugins {
     id("setup")
     id("com.undefinedcreations.echo")
-    `publishing-convention`
 }
 
 dependencies {

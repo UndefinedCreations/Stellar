@@ -2,9 +2,9 @@ import com.undefinedcreations.nova.ServerType
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    id("setup")
+    setup
     id("com.undefinedcreations.nova") version "0.0.4"
-    id("com.gradleup.shadow") version "8.3.5"
+    id("com.gradleup.shadow")
 }
 
 repositories {
@@ -22,8 +22,8 @@ dependencies {
     implementation("net.kyori:adventure-api:4.20.0")
     implementation("net.kyori:adventure-platform-bukkit:4.3.4")
     implementation("net.kyori:adventure-text-minimessage:4.20.0")
-    implementation(project(":paper:api"))
-//    implementation("com.undefined:stellar:0.1.37:paper")
+//    implementation(project(":paper:api"))
+    implementation("com.undefined:stellar:0.1.63")
 }
 
 tasks {

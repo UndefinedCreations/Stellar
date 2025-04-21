@@ -49,9 +49,6 @@ object NMSManager {
         })
 
         // Register command name with the prefix, e.g. minecraft:ban
-        println("prefix: $prefix")
-        println("prefix: ${Stellar.prefix}")
-        println("prefix: ${plugin.pluginMeta.name.lowercase()}")
         val fallbackPrefix = prefix.takeIf { it.isNotBlank() } ?: plugin.pluginMeta.name.lowercase()
         dispatcher.register(LiteralArgumentBuilder.literal<Any>("$fallbackPrefix:${command.name}").redirect(mainNode))
         Bukkit.getServer().helpMap.addTopic(StellarCommandHelpTopic("$fallbackPrefix:${command.name}", command.information["Description"] ?: "", command.information.reversed().entries.associateBy({ it.key }) { it.value }) {

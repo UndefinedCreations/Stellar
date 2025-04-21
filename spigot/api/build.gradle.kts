@@ -1,7 +1,58 @@
+import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin
+
 plugins {
     id("setup")
     `publishing-convention`
-    id("com.gradleup.shadow") version "8.3.5"
+}
+
+val baseShadowJar by tasks.registering(com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar::class) {
+    group = ShadowJavaPlugin.SHADOW_GROUP
+    description = "Create a combined JAR of all SpigotMC dependencies."
+
+    minimize {
+        exclude("**/kotlin/**")
+        exclude("**/intellij/**")
+        exclude("**/jetbrains/**")
+    }
+    archiveClassifier = ""
+
+    from(sourceSets.map { it.output })
+    configurations = project.configurations.runtimeClasspath.map { listOf(it) }.get()
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("baseJar") {
+            artifactId = rootProject.name
+//            from(components["shadow"])
+            artifact(baseShadowJar)
+
+            pom {
+                name = "Stellar"
+                description = "A simple, yet very powerful command framework for Kotlin."
+                url = "https://www.github.com/UndefinedCreations/Stellar"
+                licenses {
+                    license {
+                        name = "MIT"
+                        url = "https://mit-license.org/"
+                        distribution = "https://mit-license.org/"
+                    }
+                }
+                developers {
+                    developer {
+                        id = "lutto"
+                        name = "StillLutto"
+                        url = "https://github.com/StillLutto/"
+                    }
+                }
+                scm {
+                    url = "https://github.com/UndefinedCreations/Stellar/"
+                    connection = "scm:git:git://github.com/UndefinedCreations/Stellar.git"
+                    developerConnection = "scm:git:ssh://git@github.com/UndefinedCreations/Stellar.git"
+                }
+            }
+        }
+    }
 }
 
 dependencies {
@@ -40,7 +91,11 @@ dependencies {
 
 tasks {
     shadowJar {
-        exclude("**/kotlin/**")
+        minimize {
+            exclude("**/kotlin/**")
+            exclude("**/intellij/**")
+            exclude("**/jetbrains/**")
+        }
         archiveClassifier = "spigot"
     }
 }

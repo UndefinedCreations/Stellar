@@ -17,8 +17,6 @@ import com.undefined.stellar.listener.StellarListener
 import com.undefined.stellar.nms.NMS
 import com.undefined.stellar.nms.NMSHelper
 import org.bukkit.Bukkit
-import org.bukkit.command.Command
-import org.bukkit.command.SimpleCommandMap
 import org.bukkit.plugin.java.JavaPlugin
 import java.util.concurrent.CompletableFuture
 import com.mojang.brigadier.suggestion.Suggestion as BrigadierSuggestion
