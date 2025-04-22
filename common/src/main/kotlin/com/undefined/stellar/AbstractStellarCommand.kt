@@ -893,7 +893,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
             }
         },
         async: Boolean = true,
-    ): EnumArgument<T> = addArgument(EnumArgument(name, T::class, converter, parse, async))
+    ): EnumArgument<T> = addArgument(EnumArgument(name, T::class.java, converter, parse, async))
 
     /**
      * Adds an [EnumArgument] to the command with the given name. Only works in Kotlin.
@@ -906,7 +906,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
         name: String,
         formatting: EnumFormatting = EnumFormatting.LOWERCASE,
         async: Boolean = true,
-    ): EnumArgument<T> = addArgument(EnumArgument(name, T::class, { Suggestion.withText(formatting.action(it.name)) }, async = async))
+    ): EnumArgument<T> = addArgument(EnumArgument(name, T::class.java, { Suggestion.withText(formatting.action(it.name)) }, async = async))
 
     /**
      * Adds an [EnumArgument] to the command with the given name.
@@ -933,7 +933,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
             }
         },
         async: Boolean = true,
-    ): EnumArgument<T> = addArgument(EnumArgument(name, enum.kotlin, converter, parse, async))
+    ): EnumArgument<T> = addArgument(EnumArgument(name, enum, converter, parse, async))
 
     /**
      * Adds an [EnumArgument] to the command with the given name.
@@ -947,7 +947,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
         enum: Class<T>,
         formatting: EnumFormatting = EnumFormatting.LOWERCASE,
         async: Boolean = true,
-    ): EnumArgument<T> = addArgument(EnumArgument(name, enum.kotlin, { Suggestion.withText(formatting.action(it.name)) }, async = async))
+    ): EnumArgument<T> = addArgument(EnumArgument(name, enum, { Suggestion.withText(formatting.action(it.name)) }, async = async))
 
     /**
      * Adds an [OnlinePlayersArgument] to the command with the given name. It is a list of all currently online players.

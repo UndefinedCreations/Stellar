@@ -1,14 +1,17 @@
 package com.undefined.stellar
 
+import com.undefined.stellar.argument.basic.StringArgument
 import com.undefined.stellar.argument.basic.StringType
 import com.undefined.stellar.argument.scoreboard.ScoreHolderType
 import com.undefined.stellar.util.CommandUtil
 import org.bukkit.ChatColor
 import org.bukkit.block.structure.StructureRotation
+import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
 import org.bukkit.loot.LootTable
 import org.bukkit.loot.LootTables
 import org.bukkit.plugin.java.JavaPlugin
+import org.bukkit.potion.PotionEffectType
 import org.bukkit.scoreboard.Team
 import java.util.concurrent.TimeUnit
 
@@ -30,7 +33,20 @@ class Main : JavaPlugin() {
 //            val dispatcher = NMSManager.nms.getCommandDispatcher()
 //            dispatcher.root.children.remove(dispatcher.root.getChild("data"))
 //        })
-        CommandUtil.unregisterCommand("data")
+
+        StellarCommand("enum")
+            .addEnumArgument<EntityType>("type")
+            .addExecution<Player> {
+                sender.sendMessage(getArgument<EntityType>("type").name)
+            }
+
+        val list = listOf("minecraft:a", "minecraft:b", "minecraft:c")
+        StellarCommand("list")
+            .addListArgument("name", list, { it.replaceFirst("[a-zA-Z]:", "") })
+            .addExecution<Player> {
+                val name: String by args
+                sender.sendMessage(name)
+            }
 
         StellarCommand("list")
             .addListArgument("list", listOf(""))
