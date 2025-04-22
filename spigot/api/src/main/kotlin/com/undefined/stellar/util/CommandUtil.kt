@@ -26,9 +26,9 @@ object CommandUtil {
         val helpTopics: TreeMap<String, HelpTopic> = Bukkit.getHelpMap()::class.java.getDeclaredField("helpTopics").apply { isAccessible = true }[Bukkit.getHelpMap()] as TreeMap<String, HelpTopic>
 
         dispatcher.root.children.remove(dispatcher.root.getChild(name))
-        knownCommands[name]?.unregister(commandMap)
         for (player in Bukkit.getOnlinePlayers()) player.updateCommands()
         Bukkit.getScheduler().runTask(plugin, Runnable {
+            knownCommands[name]?.unregister(commandMap)
             helpTopics.remove("/$name")
         })
     }
