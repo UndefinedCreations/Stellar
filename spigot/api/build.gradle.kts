@@ -1,12 +1,10 @@
-import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin
-
 plugins {
     id("setup")
     `publishing-convention`
 }
 
 val baseShadowJar by tasks.registering(com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar::class) {
-    group = ShadowJavaPlugin.SHADOW_GROUP
+    group = "stellar"
     description = "Create a combined JAR of all SpigotMC dependencies."
 
     minimize {
@@ -24,7 +22,6 @@ publishing {
     publications {
         create<MavenPublication>("baseJar") {
             artifactId = rootProject.name
-//            from(components["shadow"])
             artifact(baseShadowJar)
 
             pom {
