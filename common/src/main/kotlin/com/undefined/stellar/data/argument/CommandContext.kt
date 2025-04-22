@@ -20,7 +20,7 @@ import kotlin.reflect.KProperty
  */
 class CommandContext<T : CommandSender>(
     private val brigadierContext: com.mojang.brigadier.context.CommandContext<*>,
-    val args: CommandNode,
+    val args: CommandTree,
     val sender: T,
     val input: String,
 ) {
@@ -32,7 +32,7 @@ class CommandContext<T : CommandSender>(
      * @throws NoSuchElementException If the argument cannot be found.
      * @throws ArgumentCastMismatchException If the argument cannot be cast into [T].
      */
-    inline operator fun <reified T> CommandNode.getValue(nothing: Nothing?, property: KProperty<*>): T =
+    inline operator fun <reified T> CommandTree.getValue(nothing: Nothing?, property: KProperty<*>): T =
         (args[property.name] ?: throw NoSuchElementException("No argument with the name ${property.name}"))(this@CommandContext as CommandContext<CommandSender>) as T
 
     /**

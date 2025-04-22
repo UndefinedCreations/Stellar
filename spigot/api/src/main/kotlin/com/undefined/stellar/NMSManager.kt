@@ -21,7 +21,6 @@ import org.bukkit.plugin.java.JavaPlugin
 import java.util.concurrent.CompletableFuture
 import com.mojang.brigadier.suggestion.Suggestion as BrigadierSuggestion
 
-@Suppress("UNCHECKED_CAST")
 object NMSManager {
 
     val nms: NMS by lazy { versions[version]?.let { it() } ?: throw UnsupportedVersionException(versions.keys) }
