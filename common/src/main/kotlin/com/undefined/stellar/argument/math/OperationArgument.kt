@@ -6,5 +6,6 @@ import com.undefined.stellar.data.argument.Operation
 /**
  * An argument that allows you to pass an arithmetic operator, such as `=` or `+=`.
  * It returns an [Operation], and use the `apply` method to calculate the new value from two numbers.
+ * @since 1.13
  */
 class OperationArgument(name: String) : ParameterArgument<OperationArgument, Operation>(name)

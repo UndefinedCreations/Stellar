@@ -17,6 +17,8 @@ import kotlin.reflect.KClass
  * This is useful when you wish to get the argument input and process the information yourself.
  * @param parse A function providing a [CommandSender] and the argument input, returning the parsed [Enum] (default: `enum.valueOf(input.uppercase())`).
  * @param async Whether the _suggestions_ should be gotten asynchronously (default: `false`).
+ *
+ * @since 1.13
  */
 @Suppress("UNCHECKED_CAST")
 class EnumArgument<T : Enum<T>>(

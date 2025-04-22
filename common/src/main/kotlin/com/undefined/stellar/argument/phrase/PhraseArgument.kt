@@ -14,6 +14,7 @@ import org.jetbrains.annotations.ApiStatus
 /**
  * An extension of [StringArgument] with [StringType.PHRASE] which allows you to input a phrase and handle each word independently.
  * This allows you to add word suggestions, word executions and word runnables.
+ * @since 1.13
  */
 class PhraseArgument(name: String) : StringArgument(name, StringType.PHRASE) {
 

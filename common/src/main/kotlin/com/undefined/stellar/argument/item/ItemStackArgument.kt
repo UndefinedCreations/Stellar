@@ -5,5 +5,6 @@ import org.bukkit.inventory.ItemStack
 
 /**
  * An argument that returns an [ItemStack], which people can modify by specifying its material and item components (<item_id>[<list of components>]).
+ * @since 1.13
  */
 class ItemStackArgument(name: String) : ParameterArgument<ItemStackArgument, ItemStack>(name)

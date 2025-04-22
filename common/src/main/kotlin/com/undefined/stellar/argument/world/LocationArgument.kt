@@ -5,6 +5,7 @@ import org.bukkit.Location
 
 /**
  * An argument that allows you to pass in a [Location], as dictated by the [LocationType].
+ * @since 1.13
  */
 class LocationArgument(name: String, val type: LocationType) : ParameterArgument<LocationArgument, Location>(name)
 

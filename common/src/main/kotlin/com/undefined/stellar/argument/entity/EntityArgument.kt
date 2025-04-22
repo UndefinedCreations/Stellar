@@ -8,6 +8,8 @@ import org.bukkit.entity.Entity
  * It also includes the use of target selectors (@a, @e, etc.).
  *
  * You can customize quantity and type of entities that the player can select using the [EntityDisplayType] enum.
+ *
+ * @since 1.13
  */
 class EntityArgument(name: String, val type: EntityDisplayType) : ParameterArgument<EntityArgument, Entity>(name)
 

@@ -5,5 +5,6 @@ import org.bukkit.NamespacedKey
 
 /**
  * An argument that allows you to pass in a "resource key" (i.e. [NamespacedKey]), with this syntax: `namespace:key`. Returning a [NamespacedKey].
+ * @since 1.13
  */
 class NamespacedKeyArgument(name: String) : ParameterArgument<NamespacedKeyArgument, NamespacedKey>(name)

@@ -7,5 +7,7 @@ import java.util.function.Predicate
 /**
  * Returns [Predicate] of [ItemStack], which people can modify by specifying its material and item components (<item_type>[<list of tests>]).
  * For more information on the syntax, see the [wiki](https://minecraft.wiki/w/Argument_types#minecraft:item_predicate).
+ *
+ * @since 1.13
  */
 class ItemStackPredicateArgument(name: String) : ParameterArgument<ItemStackPredicateArgument, Predicate<ItemStack>>(name)
