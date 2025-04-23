@@ -40,9 +40,6 @@ val packageJavadoc by tasks.registering(Jar::class) {
 val packageSources by tasks.registering(Jar::class) {
     group = "stellar"
     archiveClassifier = "sources"
-    println(subprojects.map { it.sourceSets.main.get().allSource.srcDirs })
-    println(sourceSets.main.get().allSource.srcDirs)
-//    println(subprojects.map { it.tasks.named<Jar>("sourceJar").get().archiveFile })
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
     from(subprojects.map { it.sourceSets.main.get().allSource })
 }

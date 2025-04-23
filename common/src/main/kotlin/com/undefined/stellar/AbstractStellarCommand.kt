@@ -217,6 +217,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @return The modified command object.
      */
     @JvmOverloads
+    @JvmName(name = "addKotlinCooldown")
     inline fun addCooldown(
         duration: Long,
         crossinline block: CommandContext<Player>.(remaining: Long) -> Unit = { remaining ->
@@ -273,6 +274,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @return The modified command object.
      */
     @JvmOverloads
+    @JvmName(name = "addKotlinCooldown")
     inline fun addCooldown(
         duration: Long,
         unit: TimeUnit,

@@ -5,6 +5,8 @@ import com.undefined.stellar.argument.misc.RegistryArgument
 import com.undefined.stellar.argument.scoreboard.ScoreHolderType
 import com.undefined.stellar.data.argument.CommandContext
 import com.undefined.stellar.util.unregisterCommand
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.ChatColor
 import org.bukkit.Registry
 import org.bukkit.block.structure.StructureRotation
@@ -17,21 +19,22 @@ import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.scoreboard.Team
 import java.util.concurrent.TimeUnit
 
+
 class Main : JavaPlugin() {
 
     override fun onEnable() {
         StellarCommand("message")
-            .addCooldown(5, TimeUnit.SECONDS) { remaining ->
-                sender.sendMessage("${ChatColor.RED}Please wait ${TimeUnit.MILLISECONDS.toSeconds(remaining)} more seconds!") // this is also the default message
+            .addRawMessageCooldown(5, TimeUnit.SECONDS) { remaining: Long ->
+                "${ChatColor.RED}Please wait ${TimeUnit.MILLISECONDS.toSeconds(remaining)} more seconds!"
             }
             .addOnlinePlayersArgument("target")
             .addStringArgument("message", StringType.PHRASE)
-            .addExecution<Player> {
-                val target: Player by args
-                val message: String by args
-                target.sendMessage("${sender.name} -> $message.")
+            .addExecution(Player::class.java) { context: CommandContext<Player> ->
+                val target = context.getArgument<Player>("target")
+                val message = context.getArgument<String>("message")
+                target.sendMessage(context.sender.name + " -> " + message + ".")
             }
-            .register(this, "prefix") // or can be specified here
+            .register(this)
 
         // literal
 //        StellarCommand("server")
@@ -46,7 +49,6 @@ class Main : JavaPlugin() {
 //            val dispatcher = NMSManager.nms.getCommandDispatcher()
 //            dispatcher.root.children.remove(dispatcher.root.getChild("data"))
 //        })
-
         unregisterCommand("enchant")
 
         val unit = TimeUnit.MILLISECONDS

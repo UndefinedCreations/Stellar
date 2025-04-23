@@ -1,7 +1,10 @@
 package com.undefined.stellar;
 
+import com.undefined.stellar.argument.basic.StringType;
 import com.undefined.stellar.argument.misc.RegistryArgument;
 import com.undefined.stellar.util.CommandUtil;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.ChatColor;
 import org.bukkit.Registry;
@@ -17,18 +20,20 @@ public class TestMain extends JavaPlugin {
 
     @Override
     public void onEnable() {
-//        new StellarCommand("message")
-//                .addCooldown(5, TimeUnit.SECONDS, (context, remaining) -> {
-//                    context.getSender().sendMessage(ChatColor.RED + "Please wait ${TimeUnit.MILLISECONDS.toSeconds(remaining)} more seconds!"); // this is also the default message
-//                })
-//            .addOnlinePlayersArgument("target")
-//                .addStringArgument("message", StringType.PHRASE)
-//                .addExecution<Player> {
-//                val target: Player by args
-//        val message: String by args
-//        target.sendMessage("${sender.name} -> $message.")
-//            }
-//            .register(this, "prefix") // or can be specified here
+        new StellarCommand("message")
+                .addComponentMessageCooldown(
+                        5,
+                        TimeUnit.SECONDS,
+                        (context, remaining) -> Component.text("Please wait " + TimeUnit.MILLISECONDS.toSeconds(remaining) + " more seconds!", NamedTextColor.RED)
+                )
+                .addOnlinePlayersArgument("target")
+                .addStringArgument("message", StringType.PHRASE)
+                .addExecution(Player.class, context -> {
+                    Player target = context.getArgument("target");
+                    String message = context.getArgument("message");
+                    target.sendMessage(context.getSender().getName() + " -> " + message + ".");
+                })
+                .register(this, "prefix");
 
         StellarConfig.INSTANCE.setPrefix("myserver");
 
