@@ -19,17 +19,33 @@ object StellarConfig {
     @ApiStatus.Internal
     val commands: MutableList<AbstractStellarCommand<*>> = mutableListOf()
 
+    @ApiStatus.Internal
     fun getStellarCommand(name: String): AbstractStellarCommand<*>? =
         commands.firstOrNull { it.name == name.substringAfter(':') || name in it.aliases }
 
+    /**
+     * Sets the [MiniMessage] instance in [StellarConfig], which will be used a default value.
+     * @return The modified [StellarConfig].
+     */
+    @JvmStatic
     fun setMiniMessage(miniMessage: MiniMessage): StellarConfig = apply {
         this.miniMessage = miniMessage
     }
 
+    /**
+     * Sets the default prefix in [StellarConfig], which will be used a default value.
+     * @return The modified [StellarConfig].
+     */
+    @JvmStatic
     fun setPrefix(prefix: String): StellarConfig = apply {
         this.prefix = prefix
     }
 
+    /**
+     * Sets the [JavaPlugin] instance in [StellarConfig], which will be used a default value.
+     * @return The modified [StellarConfig].
+     */
+    @JvmStatic
     fun setPlugin(plugin: JavaPlugin): StellarConfig = apply {
         this.plugin = plugin
     }
