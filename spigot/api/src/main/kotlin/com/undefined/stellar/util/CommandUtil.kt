@@ -19,6 +19,7 @@ object CommandUtil {
      * @param plugin The [JavaPlugin] instance to be used to run the [BukkitTask].
      */
     @JvmOverloads
+    @JvmStatic
     fun unregisterCommand(name: String, plugin: JavaPlugin = StellarConfig.plugin ?: throw IllegalArgumentException("Plugin cannot be null!")) {
         val dispatcher = NMSManager.nms.getCommandDispatcher()
         val commandMap = Bukkit.getServer().javaClass.getDeclaredField("commandMap").apply { isAccessible = true }[Bukkit.getServer()] as SimpleCommandMap

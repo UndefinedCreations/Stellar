@@ -1164,11 +1164,20 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
     abstract fun clearInformation(): T
 
     /**
-     * Registers the command with the given plugin.
+     * Registers the command with the given plugin and prefix.
      *
      * @param plugin The given `JavaPlugin` instance (default: plugin in [StellarConfig]).
      * @return The registered command object.
      */
     abstract fun register(plugin: JavaPlugin = StellarConfig.plugin ?: throw IllegalArgumentException("Plugin cannot be null!"), prefix: String = StellarConfig.prefix): T
+
+    /**
+     * Registers the command with the given plugin.
+     *
+     * @param plugin The given `JavaPlugin` instance (default: plugin in [StellarConfig]).
+     * @return The registered command object.
+     */
+    @JvmOverloads
+    fun register(plugin: JavaPlugin = StellarConfig.plugin ?: throw IllegalArgumentException("Plugin cannot be null!")): T = register(plugin, StellarConfig.prefix)
 
 }
