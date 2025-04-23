@@ -1,24 +1,37 @@
 package com.undefined.stellar
 
-import com.undefined.stellar.argument.basic.StringArgument
 import com.undefined.stellar.argument.basic.StringType
+import com.undefined.stellar.argument.misc.RegistryArgument
 import com.undefined.stellar.argument.scoreboard.ScoreHolderType
-import com.undefined.stellar.util.CommandUtil
+import com.undefined.stellar.data.argument.CommandContext
+import com.undefined.stellar.util.unregisterCommand
 import org.bukkit.ChatColor
+import org.bukkit.Registry
 import org.bukkit.block.structure.StructureRotation
+import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
 import org.bukkit.loot.LootTable
 import org.bukkit.loot.LootTables
 import org.bukkit.plugin.java.JavaPlugin
-import org.bukkit.potion.PotionEffectType
 import org.bukkit.scoreboard.Team
 import java.util.concurrent.TimeUnit
 
 class Main : JavaPlugin() {
 
     override fun onEnable() {
-        StellarConfig.setPlugin(this)
+        StellarCommand("message")
+            .addCooldown(5, TimeUnit.SECONDS) { remaining ->
+                sender.sendMessage("${ChatColor.RED}Please wait ${TimeUnit.MILLISECONDS.toSeconds(remaining)} more seconds!") // this is also the default message
+            }
+            .addOnlinePlayersArgument("target")
+            .addStringArgument("message", StringType.PHRASE)
+            .addExecution<Player> {
+                val target: Player by args
+                val message: String by args
+                target.sendMessage("${sender.name} -> $message.")
+            }
+            .register(this, "prefix") // or can be specified here
 
         // literal
 //        StellarCommand("server")
@@ -34,23 +47,53 @@ class Main : JavaPlugin() {
 //            dispatcher.root.children.remove(dispatcher.root.getChild("data"))
 //        })
 
+        unregisterCommand("enchant")
+
+        val unit = TimeUnit.MILLISECONDS
+        unit.convert(100, TimeUnit.SECONDS)
+
+        StellarCommand("enchant")
+            .addArgument(RegistryArgument("enchant", Registry.ENCHANTMENT))
+            .addIntegerArgument("level", 0, 255)
+            .addExecution(Player::class.java) { context: CommandContext<Player> ->
+                val enchantment = context.getArgument<Enchantment>("enchant")
+                val level = context.getArgument<Int>("level")
+                context.sender.inventory.itemInMainHand.addUnsafeEnchantment(enchantment, level)
+            }
+            .register(this, "stellar")
+
+        StellarCommand("fly")
+            .addExecution(Player::class.java) { context: CommandContext<Player> ->
+                context.sender.isFlying = !context.sender.isFlying
+                context.sender.sendMessage(ChatColor.GREEN.toString() + "You are now " + (if (context.sender.isFlying) "flying." else "not flying."))
+            }
+            .register(this, "stellar")
+
+        StellarCommand("get-uuid")
+            .addOnlinePlayersArgument("target")
+            .addExecution<Player> {
+                val target: Player by args
+                sender.sendMessage(target.uniqueId.toString())
+            }
+            .register(this)
+
         StellarCommand("enum")
             .addEnumArgument<EntityType>("type")
             .addExecution<Player> {
                 sender.sendMessage(getArgument<EntityType>("type").name)
             }
+            .register(this)
+
+        unregisterCommand("list")
 
         val list = listOf("minecraft:a", "minecraft:b", "minecraft:c")
         StellarCommand("list")
-            .addListArgument("name", list, { it.replaceFirst("[a-zA-Z]:", "") })
+            .addListArgument("name", list, tooltip = { it.replaceFirst("[a-zA-Z]+:".toRegex(), "") })
             .addExecution<Player> {
                 val name: String by args
                 sender.sendMessage(name)
             }
-
-        StellarCommand("list")
-            .addListArgument("list", listOf(""))
-            .register(this, "template")
+            .register(this)
 
         StellarCommand("server")
             .addMessageCooldown(5, TimeUnit.SECONDS) { remaining ->

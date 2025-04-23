@@ -33,6 +33,7 @@ import com.undefined.stellar.argument.world.LocationArgument
 import com.undefined.stellar.argument.world.LocationType
 import com.undefined.stellar.data.argument.CommandContext
 import com.undefined.stellar.data.argument.EnumFormatting
+import com.undefined.stellar.data.cooldown.CooldownExecution
 import com.undefined.stellar.data.execution.ExecutableExecution
 import com.undefined.stellar.data.execution.ExecutableRunnable
 import com.undefined.stellar.data.execution.StellarExecution
@@ -180,9 +181,45 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param block A function providing a [CommandContext] and the remaining time in milliseconds which executes anytime a player is on cooldown.
      * @return The modified command object.
      */
+    @JvmOverloads
     fun addCooldown(
         duration: Long,
-        block: CommandContext<Player>.(remaining: Long) -> Unit = { remaining ->
+        block: CooldownExecution = CooldownExecution { context, remaining ->
+            context.sender.sendMessage("${ChatColor.RED}Please wait ${TimeUnit.MILLISECONDS.toSeconds(remaining)} more seconds!")
+        },
+    ): T = apply {
+        addRunnable<Player> {
+            val currentTime = System.currentTimeMillis()
+
+            if (sender.uniqueId in lastExecutions) {
+                val cooldownEnd = lastExecutions[sender.uniqueId]!!
+                val remaining = cooldownEnd - currentTime
+
+                if (remaining > 0) {
+                    block(this, remaining)
+                    return@addRunnable false
+                }
+            }
+
+            lastExecutions[sender.uniqueId] = currentTime + duration
+            return@addRunnable true
+        }
+    } as T
+
+    /**
+     * Adds a cooldown to the command for each player. Only works in Kotlin.
+     *
+     * Prevents a player from re-executing the command until the specified duration has passed
+     * since their last successful execution. If the player is still on cooldown, the [block] function is run.
+     *
+     * @param duration The cooldown duration in milliseconds.
+     * @param block A function providing a [CommandContext] and the remaining time in milliseconds which executes anytime a player is on cooldown.
+     * @return The modified command object.
+     */
+    @JvmOverloads
+    inline fun addCooldown(
+        duration: Long,
+        crossinline block: CommandContext<Player>.(remaining: Long) -> Unit = { remaining ->
             sender.sendMessage("${ChatColor.RED}Please wait ${TimeUnit.MILLISECONDS.toSeconds(remaining)} more seconds!")
         },
     ): T = apply {
@@ -215,16 +252,37 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param block A function providing a [CommandContext] and the remaining time in milliseconds which executes anytime a player is on cooldown.
      * @return The modified command object.
      */
+    @JvmOverloads
     fun addCooldown(
         duration: Long,
         unit: TimeUnit,
-        block: CommandContext<Player>.(remaining: Long) -> Unit = { remaining ->
+        block: CooldownExecution = CooldownExecution { context, remaining ->
+            context.sender.sendMessage("${ChatColor.RED}Please wait ${TimeUnit.MILLISECONDS.toSeconds(remaining)} more seconds!")
+        },
+    ): T = addCooldown(TimeUnit.MILLISECONDS.convert(duration, unit), block)
+
+    /**
+     * Adds a cooldown to the command for each player. Only works in Kotlin.
+     *
+     * Prevents a player from re-executing the command until the specified duration has passed
+     * since their last successful execution. If the player is still on cooldown, the [block] function is run.
+     *
+     * @param duration The cooldown duration in whatever is specified in [unit].
+     * @param unit A [TimeUnit] that determines what time unit the [duration] will be counted in.
+     * @param block A function providing a [CommandContext] and the remaining time in milliseconds which executes anytime a player is on cooldown.
+     * @return The modified command object.
+     */
+    @JvmOverloads
+    inline fun addCooldown(
+        duration: Long,
+        unit: TimeUnit,
+        crossinline block: CommandContext<Player>.(remaining: Long) -> Unit = { remaining ->
             sender.sendMessage("${ChatColor.RED}Please wait ${TimeUnit.MILLISECONDS.toSeconds(remaining)} more seconds!")
         },
     ): T = addCooldown(TimeUnit.MILLISECONDS.convert(duration, unit), block)
 
     /**
-     * Adds a cooldown to the command for each player.
+     * Adds a cooldown to the command for each player. Only works in Kotlin.
      *
      * Prevents a player from re-executing the command until the specified duration has passed
      * since their last successful execution. If the player is still on cooldown, the [message] function is run.
@@ -233,9 +291,10 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param message A function providing a [CommandContext] and the remaining time in milliseconds returning a [Component] which is sent to the player when they are on cooldown.
      * @return The modified command object.
      */
-    fun addComponentMessageCooldown(
+    @JvmOverloads
+    inline fun addComponentMessageCooldown(
         duration: Long,
-        message: CommandContext<Player>.(remaining: Long) -> Component = { remaining ->
+        crossinline message: CommandContext<Player>.(remaining: Long) -> Component = { remaining ->
             Component.text("Please wait ${TimeUnit.MILLISECONDS.toSeconds(remaining)} more seconds!", NamedTextColor.RED)
         },
     ): T = addCooldown(duration) { remaining ->
@@ -253,9 +312,11 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param message A function providing a [CommandContext] and the remaining time in milliseconds returning a [Component] which is sent to the player when they are on cooldown.
      * @return The modified command object.
      */
-    fun addComponentMessageCooldown(
-        duration: Long, unit: TimeUnit,
-        message: CommandContext<Player>.(remaining: Long) -> Component = { remaining ->
+    @JvmOverloads
+    inline fun addComponentMessageCooldown(
+        duration: Long,
+        unit: TimeUnit,
+        crossinline message: CommandContext<Player>.(remaining: Long) -> Component = { remaining ->
             Component.text("Please wait ${TimeUnit.MILLISECONDS.toSeconds(remaining)} more seconds!", NamedTextColor.RED)
         },
     ): T = addComponentMessageCooldown(TimeUnit.MILLISECONDS.convert(duration, unit), message)
@@ -270,9 +331,10 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param message A function providing a [CommandContext] and the remaining time in milliseconds returning a [String] which is parsed with [MiniMessage] and sent to the player when they are on cooldown.
      * @return The modified command object.
      */
-    fun addMessageCooldown(
+    @JvmOverloads
+    inline fun addMessageCooldown(
         duration: Long,
-        message: CommandContext<Player>.(remaining: Long) -> String = { remaining ->
+        crossinline message: CommandContext<Player>.(remaining: Long) -> String = { remaining ->
             "<red>Please wait ${TimeUnit.MILLISECONDS.toSeconds(remaining)} more seconds!"
         },
     ): T = addCooldown(duration) { remaining ->
@@ -290,15 +352,16 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param message A function providing a [CommandContext] and the remaining time in milliseconds returning a [String] which is parsed with [MiniMessage] which is sent to the player when they are on cooldown.
      * @return The modified command object.
      */
-    fun addMessageCooldown(
+    @JvmOverloads
+    inline fun addMessageCooldown(
         duration: Long, unit: TimeUnit,
-        message: CommandContext<Player>.(remaining: Long) -> String = { remaining ->
+        crossinline message: CommandContext<Player>.(remaining: Long) -> String = { remaining ->
             "<red>Please wait ${TimeUnit.MILLISECONDS.toSeconds(remaining)} more seconds!"
         },
     ): T = addMessageCooldown(TimeUnit.MILLISECONDS.convert(duration, unit), message)
 
     /**
-     * Adds a cooldown to the command for each player.
+     * Adds a cooldown to the command for each player without the message being parsed by [MiniMessage].
      *
      * Prevents a player from re-executing the command until the specified duration has passed
      * since their last successful execution. If the player is still on cooldown, the [message] function is run.
@@ -307,17 +370,18 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param message A function providing a [CommandContext] and the remaining time in milliseconds returning a [String] and sent to the player when they are on cooldown. The [String] is not modified in the slightest.
      * @return The modified command object.
      */
-    fun addRawMessageCooldown(
+    @JvmOverloads
+    inline fun addRawMessageCooldown(
         duration: Long,
-        message: CommandContext<Player>.(remaining: Long) -> String = { remaining ->
+        crossinline message: CommandContext<Player>.(remaining: Long) -> String = { remaining ->
             "${ChatColor.RED}Please wait ${TimeUnit.MILLISECONDS.toSeconds(remaining)} more seconds!"
         },
     ): T = addCooldown(duration) { remaining ->
-        sender.sendMessage(LegacyComponentSerializer.legacySection().serialize(StellarConfig.miniMessage!!.deserialize(message(remaining))))
+        sender.sendMessage(message(remaining))
     }
 
     /**
-     * Adds a cooldown to the command for each player.
+     * Adds a cooldown to the command for each player without the message being parsed by [MiniMessage].
      *
      * Prevents a player from re-executing the command until the specified duration has passed
      * since their last successful execution. If the player is still on cooldown, the [message] function is run.
@@ -327,9 +391,10 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param message A function providing a [CommandContext] and the remaining time in milliseconds returning a [String] which is sent to the player when they are on cooldown. The [String] is not modified in the slightest.
      * @return The modified command object.
      */
-    fun addRawMessageCooldown(
+    @JvmOverloads
+    inline fun addRawMessageCooldown(
         duration: Long, unit: TimeUnit,
-        message: CommandContext<Player>.(remaining: Long) -> String = { remaining ->
+        crossinline message: CommandContext<Player>.(remaining: Long) -> String = { remaining ->
             "${ChatColor.RED}Please wait ${TimeUnit.MILLISECONDS.toSeconds(remaining)} more seconds!"
         },
     ): T = addRawMessageCooldown(TimeUnit.MILLISECONDS.convert(duration, unit), message)

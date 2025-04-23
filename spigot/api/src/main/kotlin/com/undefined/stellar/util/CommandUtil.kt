@@ -1,3 +1,5 @@
+@file:JvmName("CommandUtil")
+
 package com.undefined.stellar.util
 
 import com.undefined.stellar.NMSManager
@@ -11,28 +13,25 @@ import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.scheduler.BukkitTask
 import java.util.*
 
-object CommandUtil {
-    /**
-     * Unregisters a command and removes itself from the /help command, which it does within a [BukkitTask].
-     *
-     * @param name The command names to be unregistered.
-     * @param plugin The [JavaPlugin] instance to be used to run the [BukkitTask].
-     */
-    @JvmOverloads
-    @JvmStatic
-    fun unregisterCommand(name: String, plugin: JavaPlugin = StellarConfig.plugin ?: throw IllegalArgumentException("Plugin cannot be null!")) {
-        val dispatcher = NMSManager.nms.getCommandDispatcher()
-        val commandMap = Bukkit.getServer().javaClass.getDeclaredField("commandMap").apply { isAccessible = true }[Bukkit.getServer()] as SimpleCommandMap
-        val knownCommands: HashMap<String, Command> = SimpleCommandMap::class.java.getDeclaredField("knownCommands").apply { isAccessible = true }[commandMap] as HashMap<String, Command>
-        val helpTopics: TreeMap<String, HelpTopic> = Bukkit.getHelpMap()::class.java.getDeclaredField("helpTopics").apply { isAccessible = true }[Bukkit.getHelpMap()] as TreeMap<String, HelpTopic>
+/**
+ * Unregisters a command and removes itself from the /help command, which it does within a [BukkitTask].
+ *
+ * @param name The command names to be unregistered.
+ * @param plugin The [JavaPlugin] instance to be used to run the [BukkitTask].
+ */
+@JvmOverloads
+fun unregisterCommand(name: String, plugin: JavaPlugin = StellarConfig.plugin ?: throw IllegalArgumentException("Plugin cannot be null!")) {
+    val dispatcher = NMSManager.nms.getCommandDispatcher()
+    val commandMap = Bukkit.getServer().javaClass.getDeclaredField("commandMap").apply { isAccessible = true }[Bukkit.getServer()] as SimpleCommandMap
+    val knownCommands: HashMap<String, Command> = SimpleCommandMap::class.java.getDeclaredField("knownCommands").apply { isAccessible = true }[commandMap] as HashMap<String, Command>
+    val helpTopics: TreeMap<String, HelpTopic> = Bukkit.getHelpMap()::class.java.getDeclaredField("helpTopics").apply { isAccessible = true }[Bukkit.getHelpMap()] as TreeMap<String, HelpTopic>
 
-        dispatcher.root.children.remove(dispatcher.root.getChild(name))
-        for (player in Bukkit.getOnlinePlayers()) player.updateCommands()
-        Bukkit.getScheduler().runTask(plugin, Runnable {
-            knownCommands[name]?.unregister(commandMap)
-            helpTopics.remove("/$name")
-        })
-    }
+    dispatcher.root.children.remove(dispatcher.root.getChild(name))
+    for (player in Bukkit.getOnlinePlayers()) player.updateCommands()
+    Bukkit.getScheduler().runTask(plugin, Runnable {
+        knownCommands[name]?.unregister(commandMap)
+        helpTopics.remove("/$name")
+    })
 }
 
 fun command(name: String, description: String, permissions: List<String>, aliases: List<String>, builder: StellarCommand.() -> Unit): StellarCommand {
