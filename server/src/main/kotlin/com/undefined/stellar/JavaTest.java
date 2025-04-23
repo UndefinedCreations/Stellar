@@ -14,7 +14,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.concurrent.TimeUnit;
 
-public class TestMain extends JavaPlugin {
+public class JavaTest extends JavaPlugin {
 
     private final MiniMessage miniMessage = MiniMessage.builder().build();
 
