@@ -6,8 +6,10 @@ import com.undefined.stellar.argument.list.ListArgument
 import com.undefined.stellar.data.exception.DuplicateArgumentNameException
 import com.undefined.stellar.nms.NMSHelper
 import org.bukkit.command.CommandSender
+import org.jetbrains.annotations.ApiStatus
 import com.mojang.brigadier.context.CommandContext as BrigadierCommandContext
 
+@ApiStatus.Internal
 object MojangAdapter {
 
     fun getStellarCommandContext(context: BrigadierCommandContext<Any>): CommandContext<CommandSender> {

@@ -1,5 +1,6 @@
 package com.undefined.stellar
 
+import com.mojang.brigadier.Command
 import com.mojang.brigadier.builder.ArgumentBuilder
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.builder.RequiredArgumentBuilder
@@ -115,9 +116,16 @@ object NMSManager {
     }
 
     private fun handleExecutions(command: AbstractStellarCommand<*>, builder: ArgumentBuilder<Any, *>, plugin: JavaPlugin) {
-        if (command.executions.isEmpty()) return
+        val subArguments = ArgumentHelper.getCommandAndArguments(command)
+        if (command.executions.isEmpty() && subArguments.none { it.runnables.any { it.alwaysApplicable } }) return
         builder.executes { context ->
             val stellarContext = MojangAdapter.getStellarCommandContext(context)
+
+            if (subArguments.any { it.runnables.any { it.alwaysApplicable } }) {
+                for (argument in subArguments) for (runnable in argument.runnables) runnable(stellarContext)
+                return@executes Command.SINGLE_SUCCESS
+            }
+
             val rootNodeName = context.rootNode.name.takeIf { it.isNotBlank() }
             val baseCommand = StellarConfig.getStellarCommand(context.input.split(' ').first()) ?: throw IllegalStateException("Cannot get root command.")
 

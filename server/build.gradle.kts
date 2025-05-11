@@ -4,7 +4,6 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     setup
     id("com.gradleup.shadow")
-    id("com.undefinedcreations.echo") version "0.0.11"
     id("com.undefinedcreations.nova") version "0.0.4"
 }
 
@@ -23,14 +22,12 @@ val versionVar = version
 val groupIdVar = "com.undefined"
 
 dependencies {
-//    compileOnly(libs.spigot)
-    echo("1.21.4")
+    compileOnly(libs.spigot)
     implementation(kotlin("reflect"))
     implementation("net.kyori:adventure-api:4.20.0")
     implementation("net.kyori:adventure-platform-bukkit:4.3.4")
     implementation("net.kyori:adventure-text-minimessage:4.20.0")
-//    implementation(project(":spigot:api"))
-    implementation("com.undefined:stellar:1.0.0-SNAPSHOT")
+    implementation(project(":spigot:api"))
 }
 
 tasks {
@@ -38,6 +35,7 @@ tasks {
         dependsOn(shadowJar)
     }
     shadowJar {
+        archiveFileName = "server.jar"
         outputs.upToDateWhen { false }
     }
     compileKotlin {

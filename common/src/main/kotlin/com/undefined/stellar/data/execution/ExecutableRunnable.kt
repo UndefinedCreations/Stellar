@@ -8,7 +8,7 @@ import kotlin.reflect.safeCast
 
 @Suppress("UNCHECKED_CAST")
 @ApiStatus.Internal
-data class ExecutableRunnable<C : CommandSender>(val clazz: KClass<C>, val runnable: StellarRunnable<C>, val async: Boolean) {
+data class ExecutableRunnable<C : CommandSender>(val alwaysApplicable: Boolean, val clazz: KClass<C>, val runnable: StellarRunnable<C>, val async: Boolean) {
     operator fun invoke(context: CommandContext<CommandSender>): Boolean {
         if (clazz.safeCast(context.sender) == null) return false
         return runnable(context as? CommandContext<C> ?: return false)

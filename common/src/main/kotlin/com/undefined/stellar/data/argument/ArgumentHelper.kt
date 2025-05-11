@@ -3,11 +3,12 @@ package com.undefined.stellar.data.argument
 import com.mojang.brigadier.context.CommandContext
 import com.undefined.stellar.AbstractStellarArgument
 import com.undefined.stellar.AbstractStellarCommand
-import com.undefined.stellar.ParameterArgument
+import org.jetbrains.annotations.ApiStatus
 
 object ArgumentHelper {
 
-    fun getArguments(
+    @ApiStatus.Internal
+    tailrec fun getArguments(
         baseCommand: AbstractStellarCommand<*>,
         context: CommandContext<Any>,
         currentIndex: Int,
@@ -19,5 +20,10 @@ object ArgumentHelper {
                 return getArguments(argument, context, currentIndex + 1, listOfArguments + argument)
         return emptyList()
     }
+
+    @ApiStatus.Internal
+    tailrec fun getCommandAndArguments(command: AbstractStellarCommand<*>, arguments: List<AbstractStellarArgument<*>> = listOf()): List<AbstractStellarCommand<*>> =
+        if (command !is AbstractStellarArgument<*>) arguments
+        else getCommandAndArguments(command.parent, arguments + command)
 
 }

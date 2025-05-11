@@ -471,21 +471,23 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * Adds a runnable to the command. Only works in Kotlin.
      *
      * @param C The type of CommandSender.
+     * @param alwaysApplicable Whether it should always run or only when an execution is already present for the last argument.
      * @param runnable The execution block.
      * @return The modified command object.
      */
-    inline fun <reified C : CommandSender> addRunnable(noinline runnable: CommandContext<C>.() -> Boolean): T = apply {
-        runnables.add(ExecutableRunnable(C::class, runnable, false))
+    inline fun <reified C : CommandSender> addRunnable(alwaysApplicable: Boolean = false, noinline runnable: CommandContext<C>.() -> Boolean): T = apply {
+        runnables.add(ExecutableRunnable(alwaysApplicable, C::class, runnable, false))
     } as T
 
     /**
      * Adds a runnable to the command. Also works in Java.
      *
+     * @param alwaysApplicable Whether it should always run or only when an execution is already present for the last argument.
      * @param runnable The execution block.
      * @return The modified command object.
      */
-    fun addRunnable(runnable: StellarRunnable<CommandSender>): T = apply {
-        runnables.add(ExecutableRunnable(CommandSender::class, runnable, false))
+    fun addRunnable(alwaysApplicable: Boolean = false, runnable: StellarRunnable<CommandSender>): T = apply {
+        runnables.add(ExecutableRunnable(alwaysApplicable, CommandSender::class, runnable, false))
     } as T
 
     /**
@@ -493,34 +495,37 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      *
      * @param sender The [Class] the sender will be cast into, which must be or extend [CommandSender].
      * If the cast is unsuccessful, then the function will not be run. **If you wish to just use a [CommandSender], you can omit this parameter.**
+     * @param alwaysApplicable Whether it should always run or only when an execution is already present for the last argument.
      * @param runnable The execution block.
      * @return The modified command object.
      */
-    fun <C : CommandSender> addRunnable(sender: Class<C>, runnable: StellarRunnable<C>): T = apply {
-        runnables.add(ExecutableRunnable(sender.kotlin, runnable, false))
+    fun <C : CommandSender> addRunnable(alwaysApplicable: Boolean = false, sender: Class<C>, runnable: StellarRunnable<C>): T = apply {
+        runnables.add(ExecutableRunnable(alwaysApplicable, sender.kotlin, runnable, false))
     } as T
 
     /**
      * Adds an async runnable to the command. Only works in Kotlin.
      *
      * @param C The type of CommandSender.
+     * @param alwaysApplicable Whether it should always run or only when an execution is already present for the last argument.
      * @param runnable The execution block.
      * @return The modified command object.
      */
-    inline fun <reified C : CommandSender> addAsyncRunnable(noinline runnable: CommandContext<C>.() -> Boolean): T = apply {
-        runnables.add(ExecutableRunnable(C::class, runnable, true))
+    inline fun <reified C : CommandSender> addAsyncRunnable(alwaysApplicable: Boolean = false, noinline runnable: CommandContext<C>.() -> Boolean): T = apply {
+        runnables.add(ExecutableRunnable(alwaysApplicable, C::class, runnable, true))
     } as T
 
     /**
      * Adds an async runnable to the command.
      *
+     * @param alwaysApplicable Whether it should always run or only when an execution is already present for the last argument.
      * @param sender The [Class] the sender will be cast into, which must be or extend [CommandSender].
      * If the cast is unsuccessful, then the function will not be run. **If you wish to just use a [CommandSender], you can omit this parameter.**
      * @param runnable The execution block.
      * @return The modified command object.
      */
-    fun <C : CommandSender> addAsyncRunnable(sender: Class<C>, runnable: StellarRunnable<C>): T = apply {
-        runnables.add(ExecutableRunnable(sender.kotlin, runnable, true))
+    fun <C : CommandSender> addAsyncRunnable(alwaysApplicable: Boolean = false, sender: Class<C>, runnable: StellarRunnable<C>): T = apply {
+        runnables.add(ExecutableRunnable(alwaysApplicable, sender.kotlin, runnable, true))
     } as T
 
     /**
