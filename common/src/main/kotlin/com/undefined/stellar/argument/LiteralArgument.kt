@@ -7,4 +7,8 @@ import com.undefined.stellar.AbstractStellarArgument
  *
  * You cannot get the parsed value of this argument.
  */
-class LiteralArgument(name: String) : AbstractStellarArgument<LiteralArgument>(name)
+class LiteralArgument(name: String) : AbstractStellarArgument<LiteralArgument>(name) {
+    companion object {
+        fun literal(name: String): LiteralArgument = LiteralArgument(name)
+    }
+}

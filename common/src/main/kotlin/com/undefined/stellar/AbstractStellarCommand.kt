@@ -638,22 +638,50 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
 
     // Arguments
     /**
-     * Adds the given argument to the command and return the argument.
+     * Adds the given argument to the command and returns the modified command.
+     *
+     * @param argument The argument to be added.
+     * @param block A lambda used to configure the argument after it's added (default: empty block).
+     * @return The modified command.
      */
-    fun <T : AbstractStellarArgument<*>> addArgument(argument: T): T = argument.apply {
+    @JvmOverloads
+    fun <U : AbstractStellarArgument<*>> then(argument: AbstractStellarArgument<*>, block: U.() -> Unit = {}): T = apply {
+        addArgument(argument, block as AbstractStellarArgument<*>.() -> Unit)
+    } as T
+
+    /**
+     * Adds a [LiteralArgument] with the given name to the command and returns the modified command.
+     *
+     * @param name The name of the [LiteralArgument].
+     * @param block A lambda used to configure the argument after it's added (default: empty block).
+     * @return The modified command.
+     */
+    @JvmOverloads
+    fun then(name: String, block: LiteralArgument.() -> Unit = {}): T = then(LiteralArgument(name), block)
+
+    /**
+     * Adds the given argument to the command and returns the argument.
+     *
+     * @param argument The argument to be added.
+     * @param block A lambda used to configure the argument after it's added (default: empty block).
+     * @return The added argument.
+     */
+    @JvmOverloads
+    fun <T : AbstractStellarArgument<*>> addArgument(argument: T, block: T.() -> Unit = {}): T = argument.apply {
         argument.parent = this@AbstractStellarCommand
         this@AbstractStellarCommand.arguments.add(argument)
+        argument.block()
     }
 
     /**
      * Adds a [LiteralArgument] to the command with the given name and aliases.
-     * @return The created [BooleanArgument].
+     * @return The created [LiteralArgument].
      */
     fun addArgument(name: String, vararg aliases: String): LiteralArgument = addArgument(LiteralArgument(name).apply { addAliases(*aliases) })
 
     /**
      * Adds a [LiteralArgument] to the command with the given name and aliases.
-     * @return The created [BooleanArgument].
+     * @return The created [LiteralArgument].
      */
     fun addLiteralArgument(name: String, vararg aliases: String): LiteralArgument = addArgument(LiteralArgument(name).apply { addAliases(*aliases) })
 
