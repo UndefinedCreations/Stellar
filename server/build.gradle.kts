@@ -10,8 +10,12 @@ plugins {
 
 repositories {
     maven {
-        name = "undefined-repo"
+        name = "undefined-releases"
         url = uri("https://repo.undefinedcreations.com/releases")
+    }
+    maven {
+        name = "undefined-snapshots"
+        url = uri("https://repo.undefinedcreations.com/snapshots")
     }
 }
 
@@ -26,7 +30,7 @@ dependencies {
     implementation("net.kyori:adventure-platform-bukkit:4.3.4")
     implementation("net.kyori:adventure-text-minimessage:4.20.0")
 //    implementation(project(":spigot:api"))
-    implementation("com.undefined:stellar:1.0.0")
+    implementation("com.undefined:stellar:1.0.0-SNAPSHOT")
 }
 
 tasks {
