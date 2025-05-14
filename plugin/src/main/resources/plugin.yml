@@ -1,0 +1,4 @@
+name: Stellar
+version: '1.0.0'
+main: com.undefined.stellar.StellarPlugin
+api-version: '1.13'

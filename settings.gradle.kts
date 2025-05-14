@@ -40,4 +40,5 @@ include(
     ":spigot:v1_13_2",
     ":spigot:v1_13_1",
     ":spigot:v1_13",
+    ":plugin",
 )
