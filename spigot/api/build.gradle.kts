@@ -1,55 +1,6 @@
 plugins {
     id("setup")
-    `publishing-convention`
-}
-
-val baseShadowJar by tasks.registering(com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar::class) {
-    group = "stellar"
-    description = "Create a combined JAR of all SpigotMC dependencies."
-
-    minimize {
-        exclude("**/kotlin/**")
-        exclude("**/intellij/**")
-        exclude("**/jetbrains/**")
-    }
-    archiveClassifier = ""
-
-    from(sourceSets.map { it.output })
-    configurations = project.configurations.runtimeClasspath.map { listOf(it) }.get()
-}
-
-publishing {
-    publications {
-        create<MavenPublication>("baseJar") {
-            artifactId = rootProject.name
-            artifact(baseShadowJar)
-
-            pom {
-                name = "Stellar"
-                description = "A simple, yet very powerful command framework for Kotlin."
-                url = "https://www.github.com/UndefinedCreations/Stellar"
-                licenses {
-                    license {
-                        name = "MIT"
-                        url = "https://mit-license.org/"
-                        distribution = "https://mit-license.org/"
-                    }
-                }
-                developers {
-                    developer {
-                        id = "lutto"
-                        name = "StillLutto"
-                        url = "https://github.com/StillLutto/"
-                    }
-                }
-                scm {
-                    url = "https://github.com/UndefinedCreations/Stellar/"
-                    connection = "scm:git:git://github.com/UndefinedCreations/Stellar.git"
-                    developerConnection = "scm:git:ssh://git@github.com/UndefinedCreations/Stellar.git"
-                }
-            }
-        }
-    }
+    id("com.gradleup.shadow")
 }
 
 dependencies {
@@ -93,6 +44,7 @@ tasks {
             exclude("**/intellij/**")
             exclude("**/jetbrains/**")
         }
-        archiveClassifier = "spigot"
+        archiveClassifier = project.name
+        archiveFileName = "${rootProject.name}-${project.version}.jar"
     }
 }

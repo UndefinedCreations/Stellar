@@ -1,6 +1,6 @@
 plugins {
-    setup
-    `publishing-convention`
+    id("setup")
+    id("com.gradleup.shadow")
 }
 
 dependencies {
@@ -22,6 +22,7 @@ tasks {
             exclude("**/intellij/**")
             exclude("**/jetbrains/**")
         }
-        archiveClassifier = "paper"
+        archiveClassifier = project.name
+        archiveFileName = "${rootProject.name}-${project.version}.jar"
     }
 }

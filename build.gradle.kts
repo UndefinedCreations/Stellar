@@ -9,12 +9,16 @@ plugins {
     id("io.papermc.paperweight.userdev") version "2.0.0-beta.14" apply false
 }
 
+private val submodules: HashMap<String, String> = hashMapOf(
+    ":spigot:api" to "spigot",
+    ":paper:api" to "paper",
+)
+
 dependencies {
     compileOnly(libs.spigot)
     compileOnly(libs.brigadier)
 
-    api(project(":paper:lib"))
-    api(project(":spigot:lib"))
+    api(project(":spigot:api"))
 
     dokkaPlugin("org.jetbrains.dokka:kotlin-as-java-plugin:2.0.0")
 }
@@ -46,10 +50,17 @@ val packageSources by tasks.registering(Jar::class) {
 
 publishing {
     publications {
-        create<MavenPublication>("sources") {
+        create<MavenPublication>("kotlin") {
             artifactId = rootProject.name
+            from(components["shadow"])
             artifact(packageJavadoc)
             artifact(packageSources)
+            for (module in submodules) {
+                println("module: ${module.key}, ${module.value}")
+                artifact(project(module.key).layout.buildDirectory.dir("libs").get().file("stellar-$version.jar")) {
+                    classifier = module.value
+                }
+            }
 
             pom {
                 name = "Stellar"
@@ -104,6 +115,13 @@ java {
 
 tasks {
     shadowJar {
-        archiveClassifier = "all"
+        minimize {
+            exclude("**/kotlin/**")
+            exclude("**/intellij/**")
+            exclude("**/jetbrains/**")
+        }
+        archiveClassifier = ""
+
+        for (module in submodules) dependsOn(project(module.key).tasks.named("shadowJar"))
     }
 }

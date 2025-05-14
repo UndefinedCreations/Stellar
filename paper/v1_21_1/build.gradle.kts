@@ -1,5 +1,5 @@
 plugins {
-    setup
+    id("setup")
     id("io.papermc.paperweight.userdev")
 }
 
