@@ -1,6 +1,8 @@
 
 # Stellar
+
 [![Latest Version](https://img.shields.io/badge/dynamic/xml?label=Latest%20Version&style=for-the-badge&logo=gradle&url=https%3A%2F%2Frepo.undefinedcreations.com%2Freleases%2Fcom%2Fundefined%2Fstellar%2Fmaven-metadata.xml&query=%2F%2Fmetadata%2F%2Fversioning%2F%2Flatest)](https://github.com/UndefinedCreations/Akari/releases)
+
 Stellar is a simple, yet very powerful Spigot command framework.
 
 ## Documentation
