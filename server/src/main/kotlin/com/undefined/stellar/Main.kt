@@ -10,7 +10,7 @@ class Main : JavaPlugin() {
     override fun onEnable() {
         StellarConfig.setPlugin(this)
 
-        StellarCommand("test")
+        StellarCommand("Test")
             .addArgument("players")
             .addRunnable<Player>(true) {
                 sender.sendMessage(getOrNull<Int>("page").toString())

@@ -4,18 +4,22 @@ import org.bukkit.plugin.java.JavaPlugin
 import java.util.*
 
 /**
- * This is the base of any command, e.g. /op <target>, op would be the base command.
+ * This is the base of any command. For example, for the command `/op <target>`, op would be the base command.
  *
  * @param name The name of the command.
  * @param permissions An `Iterable` of Bukkit string permissions to be applied as a requirement.
  * @param aliases An `Iterable` of name aliases.
  */
-open class StellarCommand @JvmOverloads constructor(name: String, permissions: Iterable<String> = listOf(), aliases: Iterable<String> = listOf()) : AbstractStellarCommand<StellarCommand>(name) {
+open class StellarCommand @JvmOverloads constructor(
+    name: String,
+    permissions: Iterable<String> = listOf(),
+    aliases: Iterable<String> = listOf(),
+) : AbstractStellarCommand<StellarCommand>(name) {
 
     val information: SortedMap<String, String> = sortedMapOf()
 
     /**
-     * This is the base of any command, e.g. /op <target>, op would be the base command.
+     * This is the base of any command. For example, for the command `/op <target>`, op would be the base command.
      *
      * @param name The name of the command.
      * @param permission A single Bukkit permission to be applied as a requirement.
