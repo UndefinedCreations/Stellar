@@ -79,6 +79,11 @@ publishing {
                         name = "StillLutto"
                         url = "https://github.com/StillLutto/"
                     }
+                    developer {
+                        id = "redmagic"
+                        name = "TheRedMagic"
+                        url = "https://github.com/TheRedMagic/"
+                    }
                 }
                 scm {
                     url = "https://github.com/UndefinedCreations/Stellar/"
