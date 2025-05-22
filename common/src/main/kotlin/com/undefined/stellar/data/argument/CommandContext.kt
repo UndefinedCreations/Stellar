@@ -60,11 +60,11 @@ class CommandContext<T : CommandSender>(
     /**
      * Gets the argument with [name], in the type as specified by [T].
      *
-     * @return The argument with the type of [T], which returns null if the argument cannot be cast successfully.
+     * @return The argument with the type of [T], which returns null if the argument cannot be cast successfully or the argument cannot be found.
      * @throws NoSuchElementException If the argument cannot be found.
      */
     fun <T> getOrNull(name: String): T? {
-        val argument = args[name] ?: throw NoSuchElementException("No argument with the name $name")
+        val argument = args[name] ?: return null
         val context = this as CommandContext<CommandSender>
         return argument(context) as? T
     }
@@ -72,11 +72,11 @@ class CommandContext<T : CommandSender>(
     /**
      * Gets the argument at [index], in the type as specified by [T].
      *
-     * @return The argument with the type of [T], which returns null if the argument cannot be cast successfully.
+     * @return The argument with the type of [T], which returns null if the argument cannot be cast successfully or the argument cannot be found.
      * @throws NoSuchElementException If the argument cannot be found.
      */
     fun <T> getOrNull(index: Int): T? =
-        args.values.toList()[index](this as CommandContext<CommandSender>) as? T
+        args.values.toList().getOrNull(index)?.invoke(this as CommandContext<CommandSender>) as? T
 
     /**
      * Gets the argument with [name].
