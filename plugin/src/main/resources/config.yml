@@ -1,0 +1,2 @@
+prefix: "" # The prefix that is used in
+blacklisted-commands: [] # A list of commands that are completely unregistered when the plugin is loaded.

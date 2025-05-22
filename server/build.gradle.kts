@@ -27,11 +27,10 @@ dependencies {
     implementation("com.undefined:lynx:0.0.22:core")
     implementation("com.undefined:lynx:0.0.22:npc")
     implementation("com.undefined:akari:0.0.2")
-    implementation("com.undefined:stellar:0.1.70")
     implementation("net.kyori:adventure-api:4.20.0")
     implementation("net.kyori:adventure-platform-bukkit:4.3.4")
     implementation("net.kyori:adventure-text-minimessage:4.20.0")
-//    implementation(project(":spigot:api"))
+    implementation(project(":spigot:api"))
 }
 
 tasks {

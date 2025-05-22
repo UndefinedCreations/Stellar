@@ -5,21 +5,20 @@ plugins {
     id("setup")
     id("com.gradleup.shadow")
     id("com.undefinedcreations.nova") version "0.0.4"
+    id("com.undefinedcreations.echo") version "0.0.11"
 }
 
 repositories {
     maven {
-        name = "undefined-repo"
+        name = "undefined-releases"
         url = uri("https://repo.undefinedcreations.com/releases")
     }
+    maven("https://repo.codemc.org/repository/maven-public/")
 }
-
-val versionVar = version
-val groupIdVar = "com.undefined"
 
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.13-R0.1-SNAPSHOT")
-    implementation("com.undefined:stellar:1.0.0:paper")
+    implementation(project(":spigot:api"))
 }
 
 tasks {
@@ -27,6 +26,7 @@ tasks {
         dependsOn(shadowJar)
     }
     shadowJar {
+        archiveFileName = "stellar-plugin.jar"
         outputs.upToDateWhen { false }
     }
     compileKotlin {
@@ -36,10 +36,10 @@ tasks {
         options.release = 21
     }
     runServer {
-        minecraftVersion("1.20.6")
+        minecraftVersion("1.21.4")
         perVersionFolder(true)
         acceptMojangEula()
-        serverType(ServerType.PAPERMC)
+        serverType(ServerType.SPIGOT)
     }
 }
 
