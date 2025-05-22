@@ -55,12 +55,10 @@ publishing {
             from(components["shadow"])
             artifact(packageJavadoc)
             artifact(packageSources)
-            for (module in submodules) {
-                println("module: ${module.key}, ${module.value}")
+            for (module in submodules)
                 artifact(project(module.key).layout.buildDirectory.dir("libs").get().file("stellar-$version.jar")) {
                     classifier = module.value
                 }
-            }
 
             pom {
                 name = "Stellar"

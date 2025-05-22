@@ -10,8 +10,6 @@ class Main : JavaPlugin() {
     override fun onEnable() {
         StellarConfig.setPlugin(this)
 
-//        com.undefined.lynx.LynxConfig
-
         StellarCommand("test")
             .addArgument("players")
             .addRunnable<Player>(true) {
