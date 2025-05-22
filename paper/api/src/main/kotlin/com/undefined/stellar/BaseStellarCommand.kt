@@ -51,9 +51,9 @@ abstract class BaseStellarCommand(val name: String, val permission: String = "",
     /**
      * Registers the command with the given plugin, if it has not been registered yet.
      *
-     * @param plugin The [JavaPlugin] instance used for registration.
+     * @param plugin The [JavaPlugin] instance used for registration (default: plugin in [StellarConfig]).
      */
-    fun register(plugin: JavaPlugin) {
+    fun register(plugin: JavaPlugin = StellarConfig.plugin ?: throw IllegalArgumentException("Plugin cannot be null!")) {
         if (hasBeenRegistered) return
         hasBeenRegistered = true
         command.register(plugin)
