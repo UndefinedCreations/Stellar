@@ -16,9 +16,11 @@ repositories {
     maven("https://repo.codemc.org/repository/maven-public/")
 }
 
+val serverType = "paper"
+
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.13-R0.1-SNAPSHOT")
-    implementation(project(":spigot:api"))
+    implementation(project(":$serverType:api"))
 }
 
 tasks {
@@ -26,7 +28,7 @@ tasks {
         dependsOn(shadowJar)
     }
     shadowJar {
-        archiveFileName = "stellar-plugin.jar"
+        archiveFileName = "stellar-$serverType-$version.jar"
         outputs.upToDateWhen { false }
     }
     compileKotlin {
