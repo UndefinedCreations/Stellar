@@ -1,2 +1,2 @@
-prefix: "" # The prefix that is used in
+prefix: "" # The prefix that is used for commands (e.g. /minecraft:ban).
 blacklisted-commands: [] # A list of commands that are completely unregistered when the plugin is loaded.
