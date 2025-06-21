@@ -31,6 +31,7 @@ import com.undefined.stellar.argument.structure.MirrorArgument
 import com.undefined.stellar.argument.structure.StructureRotationArgument
 import com.undefined.stellar.argument.text.ColorArgument
 import com.undefined.stellar.argument.text.ComponentArgument
+import com.undefined.stellar.argument.text.HexArgument
 import com.undefined.stellar.argument.text.MessageArgument
 import com.undefined.stellar.argument.text.StyleArgument
 import com.undefined.stellar.argument.world.*
@@ -175,6 +176,7 @@ object NMS1_21_6 : NMS {
         // Text
         is ColorArgument -> BrigadierColorArgument.color()
         is ComponentArgument -> BrigadierComponentArgument.textComponent(COMMAND_BUILD_CONTEXT)
+        is HexArgument -> HexColorArgument.hexColor()
         is MessageArgument -> BrigadierMessageArgument.message()
         is StyleArgument -> BrigadierStyleArgument.style(COMMAND_BUILD_CONTEXT)
 
@@ -251,6 +253,7 @@ object NMS1_21_6 : NMS {
             // Text
             is ColorArgument -> ChatColor.getByChar(BrigadierColorArgument.getColor(context, argument.name).char)
             is ComponentArgument -> GsonComponentSerializer.gson().deserialize(ComponentSerializer.toJson(BrigadierComponentArgument.getRawComponent(context, argument.name), COMMAND_BUILD_CONTEXT))
+            is HexArgument -> HexColorArgument.getHexColor(context, argument.name)
             is MessageArgument -> GsonComponentSerializer.gson().deserialize(ComponentSerializer.toJson(BrigadierMessageArgument.getMessage(context, argument.name), COMMAND_BUILD_CONTEXT))
             is StyleArgument -> GsonComponentSerializer.gson().deserialize(ComponentSerializer.toJson(
                 Component.empty().withStyle(BrigadierStyleArgument.getStyle(context, argument.name)), COMMAND_BUILD_CONTEXT
