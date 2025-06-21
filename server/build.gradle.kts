@@ -18,8 +18,7 @@ repositories {
     }
 }
 
-val versionVar = version
-val groupIdVar = "com.undefined"
+val serverType = "spigot"
 
 dependencies {
     compileOnly(libs.spigot)
@@ -30,7 +29,7 @@ dependencies {
     implementation("net.kyori:adventure-api:4.20.0")
     implementation("net.kyori:adventure-platform-bukkit:4.3.4")
     implementation("net.kyori:adventure-text-minimessage:4.20.0")
-    implementation(project(":spigot:api"))
+    implementation(project(":$serverType:api"))
 }
 
 tasks {
@@ -48,10 +47,10 @@ tasks {
         options.release = 21
     }
     runServer {
-        minecraftVersion("1.21.4")
+        minecraftVersion("1.21.6")
         perVersionFolder(true)
         acceptMojangEula()
-        serverType(ServerType.SPIGOT)
+        if (serverType == "spigot") serverType(ServerType.SPIGOT) else serverType(ServerType.PAPERMC)
     }
 }
 

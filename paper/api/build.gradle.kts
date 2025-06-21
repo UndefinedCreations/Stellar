@@ -7,6 +7,7 @@ dependencies {
     compileOnly(libs.papermc)
     compileOnly(libs.brigadier)
     api(project(":paper:lib"))
+    api(project(":paper:v1_21_6"))
     api(project(":paper:v1_21_5"))
     api(project(":paper:v1_21_4"))
     api(project(":paper:v1_21_3"))

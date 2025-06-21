@@ -25,6 +25,7 @@ import com.undefined.stellar.argument.structure.MirrorArgument
 import com.undefined.stellar.argument.structure.StructureRotationArgument
 import com.undefined.stellar.argument.text.ColorArgument
 import com.undefined.stellar.argument.text.ComponentArgument
+import com.undefined.stellar.argument.text.HexArgument
 import com.undefined.stellar.argument.text.MessageArgument
 import com.undefined.stellar.argument.text.StyleArgument
 import com.undefined.stellar.argument.world.EnvironmentArgument
@@ -1202,6 +1203,12 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @return The created [ComponentArgument].
      */
     fun addComponentArgument(name: String): ComponentArgument = addArgument(ComponentArgument(name))
+
+    /**
+     * Adds a [HexArgument] to the command with the given name.
+     * @return The created [HexArgument].
+     */
+    fun addHexArgument(name: String): HexArgument = addArgument(HexArgument(name))
 
     /**
      * Adds a [MessageArgument] to the command with the given name.

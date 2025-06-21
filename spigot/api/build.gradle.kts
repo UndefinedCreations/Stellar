@@ -7,6 +7,7 @@ dependencies {
     compileOnly(libs.spigot)
     compileOnly(libs.brigadier)
     api(project(":spigot:lib"))
+    api(project(":spigot:v1_21_6"))
     api(project(":spigot:v1_21_5"))
     api(project(":spigot:v1_21_4"))
     api(project(":spigot:v1_21_3"))

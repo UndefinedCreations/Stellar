@@ -12,26 +12,11 @@ class Main : JavaPlugin() {
     override fun onEnable() {
         StellarConfig.setPlugin(this)
 
-        StellarCommand("Test")
-            .addArgument("players")
-            .addRunnable<Player>(true) {
-                sender.sendMessage(getOrNull<Int>("page").toString())
-                true
-            }
-            .addIntegerArgument("page")
-            .register()
-
-        StellarCommand("message")
-            .addExecution { a -> a.sender.sendMessage("h") }
-            .addAliases("msg", "tell")
-            .addOnlinePlayersArgument("target")
-            .addStringArgument("message", StringType.PHRASE)
-            .addRequirement("example.user.message")
+        StellarCommand("color")
+            .addHexArgument("hex")
             .addExecution<Player> {
-                val target: Player by args
-                val message: String by args
-                sender.sendMessage("${ChatColor.GREEN}You successfully sent a message to ${target.name}.")
-                target.sendMessage(message)
+                val hex: Int by args
+                sender.sendMessage("You chose this hex: ${String.format("%06X", hex)}")
             }
             .register()
     }
