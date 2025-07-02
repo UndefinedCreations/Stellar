@@ -108,7 +108,7 @@ import net.minecraft.commands.arguments.blocks.BlockPredicateArgument as Brigadi
 import net.minecraft.commands.arguments.coordinates.RotationArgument as BrigadierRotationArgument
 
 @Suppress("UNCHECKED_CAST", "DEPRECATION")
-object NMS1_21_6 : NMS {
+object NMS1_21_7 : NMS {
 
     private val COMMAND_BUILD_CONTEXT: CommandBuildContext = PaperCommands.INSTANCE.buildContext
 

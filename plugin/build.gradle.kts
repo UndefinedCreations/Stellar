@@ -16,11 +16,12 @@ repositories {
     maven("https://repo.codemc.org/repository/maven-public/")
 }
 
-val serverType = "paper"
+val serverType = ServerType.SPIGOT
+val minecraftVersion = "1.21.7"
 
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.13-R0.1-SNAPSHOT")
-    implementation(project(":$serverType:api"))
+    implementation(project(":${serverType.loaderName}:api"))
 }
 
 tasks {
@@ -38,10 +39,10 @@ tasks {
         options.release = 21
     }
     runServer {
-        minecraftVersion("1.21.4")
+        minecraftVersion(minecraftVersion)
         perVersionFolder(true)
         acceptMojangEula()
-        serverType(ServerType.SPIGOT)
+        serverType(serverType)
     }
 }
 
