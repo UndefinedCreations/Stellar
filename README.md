@@ -17,7 +17,7 @@ Stellar is a simple, yet very powerful Spigot command framework.
 ```gradle
 maven {
     name = "undefined-repo"
-    url = "https://repo.undefinecreation.com/releases"
+    url = "https://repo.undefinecreations.com/releases"
 }
 ```
 ```gradle
