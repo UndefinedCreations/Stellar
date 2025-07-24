@@ -26,10 +26,10 @@ repositories {
 }
 
 dependencies {
-    compileOnly("net.kyori:adventure-api:4.17.0")
-    compileOnly("net.kyori:adventure-text-minimessage:4.17.0")
-    compileOnly("net.kyori:adventure-platform-bukkit:4.3.4")
-    compileOnly("net.kyori:adventure-text-serializer-legacy:4.17.0")
+    compileOnly("net.kyori:adventure-api:4.22.0")
+    compileOnly("net.kyori:adventure-text-minimessage:4.22.0")
+    compileOnly("net.kyori:adventure-platform-bukkit:4.4.0")
+    compileOnly("net.kyori:adventure-text-serializer-legacy:4.22.0")
 }
 
 tasks {

@@ -13,7 +13,7 @@ class RegistryArgument(
     val registry: Registry<*>,
 ) : ParameterArgument<RegistryArgument, Any>(name) {
     companion object {
-        val registryNames: Map<Registry<*>, String> = mapOf(
+        val registryNames: Map<Registry<*>, String> = mapOf( // VERCHECK
             Registry.GAME_EVENT to "game_event",
             Registry.STRUCTURE_TYPE to "worldgen/structure_type",
             Registry.EFFECT to "mob_effect",

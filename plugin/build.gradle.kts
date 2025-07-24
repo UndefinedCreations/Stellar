@@ -29,7 +29,7 @@ tasks {
         dependsOn(shadowJar)
     }
     shadowJar {
-        archiveFileName = "stellar-$serverType-$version.jar"
+        archiveFileName = "stellar-${serverType.loaderName}-$version.jar"
         outputs.upToDateWhen { false }
     }
     compileKotlin {

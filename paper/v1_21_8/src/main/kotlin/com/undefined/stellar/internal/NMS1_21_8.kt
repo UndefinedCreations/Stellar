@@ -60,6 +60,7 @@ import net.minecraft.commands.arguments.item.ItemPredicateArgument
 import net.minecraft.core.BlockPos
 import net.minecraft.core.HolderLookup
 import net.minecraft.core.particles.*
+import net.minecraft.core.registries.Registries
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.ComponentSerialization
 import net.minecraft.resources.ResourceKey
@@ -146,11 +147,10 @@ object NMS1_21_8 : NMS {
 
         // Misc
         is NamespacedKeyArgument -> ResourceLocationArgument.id()
-        is RegistryArgument -> {
-            val byRegistryKey = PaperRegistries::class.java.getDeclaredField("BY_REGISTRY_KEY").apply { isAccessible = true }[null] as Map<RegistryKey<*>, RegistryEntry<*, *>>
-            val registry = (byRegistryKey[argument.registry] ?: throw IllegalArgumentException("${argument.registry} doesn't have an mc registry ResourceKey")).mcKey() as ResourceKey<out Registry<Any>>
-            ResourceArgument.resource(COMMAND_BUILD_CONTEXT, registry)
-        }
+        is RegistryArgument -> ResourceArgument.resource(
+            COMMAND_BUILD_CONTEXT,
+            PaperRegistries.registryToNms<Any, Any>(argument.registry as RegistryKey<Any>)
+        )
         is UUIDArgument -> UuidArgument.uuid()
 
         // Player
