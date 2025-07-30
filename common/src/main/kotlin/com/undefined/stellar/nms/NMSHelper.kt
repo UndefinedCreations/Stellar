@@ -16,6 +16,8 @@ object NMSHelper {
     }
 
     fun getBukkitSender(source: Any): CommandSender = source.javaClass.getDeclaredMethod("getBukkitSender")(source) as CommandSender
-    fun hasPermission(player: Player, level: Int): Boolean = player.javaClass.getField("handle")[player].let { it.javaClass.getMethod("hasPermissions").invoke(it, level) as Boolean }
+    fun hasPermission(player: Player, level: Int): Boolean = player.javaClass.getMethod("getHandle")(player).let {
+        it.javaClass.getMethod("hasPermissions", Int::class.java)(it, level) as Boolean
+    } // VERCHECK
 
 }

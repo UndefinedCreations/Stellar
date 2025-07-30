@@ -18,13 +18,12 @@ repositories {
     }
 }
 
-val serverType = "spigot"
+val serverType = "paper"
 
 dependencies {
     compileOnly(libs.spigot)
     implementation(kotlin("reflect"))
-    implementation("com.undefined:lynx:0.0.22:core")
-    implementation("com.undefined:lynx:0.0.22:npc")
+    implementation("com.undefined:lynx:1.1.1-SNAPSHOT")
     implementation("com.undefined:akari:0.0.2")
     implementation("net.kyori:adventure-api:4.20.0")
     implementation("net.kyori:adventure-platform-bukkit:4.3.4")
@@ -47,7 +46,7 @@ tasks {
         options.release = 21
     }
     runServer {
-        minecraftVersion("1.21.6")
+        minecraftVersion("1.21.8")
         perVersionFolder(true)
         acceptMojangEula()
         if (serverType == "spigot") serverType(ServerType.SPIGOT) else serverType(ServerType.PAPERMC)

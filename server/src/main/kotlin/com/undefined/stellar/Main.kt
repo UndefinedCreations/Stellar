@@ -1,22 +1,18 @@
 package com.undefined.stellar
 
-import com.undefined.stellar.argument.basic.StringType
-import com.undefined.stellar.argument.misc.UUIDArgument
-import org.bukkit.ChatColor
+import com.undefined.stellar.data.requirement.PermissionLevel
+import com.undefined.stellar.nms.NMSHelper
 import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
-import java.util.UUID
 
 class Main : JavaPlugin() {
 
     override fun onEnable() {
         StellarConfig.setPlugin(this)
 
-        StellarCommand("color")
-            .addHexArgument("hex")
+        StellarCommand("testing")
             .addExecution<Player> {
-                val hex: Int by args
-                sender.sendMessage("You chose this hex: ${String.format("%06X", hex)}")
+                NMSHelper.hasPermission(sender, 1)
             }
             .register()
     }
