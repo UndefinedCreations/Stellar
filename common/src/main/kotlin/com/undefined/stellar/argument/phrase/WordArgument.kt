@@ -135,6 +135,18 @@ class WordArgument {
     }
 
     /**
+     * Adds an execution on top of the other executions.
+     *
+     * @param sender The [Class] the sender will be cast into, which must be or extend [CommandSender].
+     * If the cast is unsuccessful, then the function will not be run. **If you wish to just use a [CommandSender], you can omit this parameter.**
+     * @return The modified [WordArgument] instance.
+     */
+    fun <C : CommandSender> addExecution(sender: Class<C>, execution: PhraseExecution<C>): WordArgument {
+        executions.add(PhraseExecutableExecution(sender.kotlin, execution))
+        return this
+    }
+
+    /**
      * Adds an async execution on top of the other executions. Only works in Kotlin.
      * @return The modified [WordArgument] instance.
      */

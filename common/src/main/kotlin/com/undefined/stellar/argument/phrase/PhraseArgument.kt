@@ -133,6 +133,16 @@ class PhraseArgument(name: String) : StringArgument(name, StringType.PHRASE) {
     /**
      * Adds an execution to the [WordArgument] at [index].
      *
+     * @param sender The [Class] the sender will be cast into, which must be or extend [CommandSender].
+     * If the cast is unsuccessful, then the function will not be run. **If you wish to just use a [CommandSender], you can omit this parameter.**
+     * @return The modified [PhraseArgument] instance.
+     */
+    fun <C : CommandSender> addWordExecution(index: Int, sender: Class<C>, execution: PhraseExecution<C>): PhraseArgument =
+        getOrCreateWordArgument(index) { addExecution(sender, execution) }
+
+    /**
+     * Adds an execution to the [WordArgument] at [index].
+     *
      * @return The modified [PhraseArgument] instance.
      */
     fun addWordExecution(index: Int, execution: PhraseExecution<CommandSender>): PhraseArgument =

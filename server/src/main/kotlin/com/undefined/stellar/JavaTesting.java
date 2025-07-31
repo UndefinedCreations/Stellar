@@ -9,13 +9,15 @@ public class JavaTesting extends JavaPlugin {
     public void onEnable() {
         StellarConfig.setPlugin(this);
 
-        new StellarCommand("test")
-                .then("test", argument -> {
+        new StellarCommand("server")
+                .addPhraseArgument("args")
+                .addWordArgument(0, argument -> {
                     argument.addExecution(Player.class, context -> {
-                        context.getSender().sendMessage("test");
+                        context.getArgument(0);
+                        // ...
                     });
                 })
-                .register(this);
+                .addWordSuggestions(1, "first", "second");
     }
 
 }
