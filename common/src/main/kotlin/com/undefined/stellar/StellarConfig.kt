@@ -27,6 +27,7 @@ object StellarConfig {
      * Sets the [MiniMessage] instance in [StellarConfig], which will be used a default value.
      * @return The modified [StellarConfig].
      */
+    @JvmStatic
     fun setMiniMessage(miniMessage: MiniMessage): StellarConfig = apply {
         this.miniMessage = miniMessage
     }
@@ -35,6 +36,7 @@ object StellarConfig {
      * Sets the default prefix in [StellarConfig], which will be used a default value.
      * @return The modified [StellarConfig].
      */
+    @JvmStatic
     fun setPrefix(prefix: String): StellarConfig = apply {
         this.prefix = prefix
     }
@@ -43,6 +45,7 @@ object StellarConfig {
      * Sets the [JavaPlugin] instance in [StellarConfig], which will be used a default value.
      * @return The modified [StellarConfig].
      */
+    @JvmStatic
     fun setPlugin(plugin: JavaPlugin): StellarConfig = apply {
         this.plugin = plugin
     }

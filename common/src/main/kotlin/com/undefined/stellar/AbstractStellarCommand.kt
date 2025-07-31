@@ -32,6 +32,7 @@ import com.undefined.stellar.argument.world.EnvironmentArgument
 import com.undefined.stellar.argument.world.HeightMapArgument
 import com.undefined.stellar.argument.world.LocationArgument
 import com.undefined.stellar.argument.world.LocationType
+import com.undefined.stellar.data.argument.ArgumentConfiguration
 import com.undefined.stellar.data.argument.CommandContext
 import com.undefined.stellar.data.argument.EnumFormatting
 import com.undefined.stellar.data.cooldown.CooldownExecution
@@ -651,7 +652,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @return The modified command.
      */
     @JvmOverloads
-    fun <U : AbstractStellarArgument<*>> then(argument: AbstractStellarArgument<*>, block: U.() -> Unit = {}): T = apply {
+    fun <U : AbstractStellarArgument<*>> then(argument: AbstractStellarArgument<*>, block: ArgumentConfiguration<U> = ArgumentConfiguration {}): T = apply {
         addArgument(argument, block as AbstractStellarArgument<*>.() -> Unit)
     } as T
 
@@ -663,7 +664,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @return The modified command.
      */
     @JvmOverloads
-    fun then(name: String, block: LiteralArgument.() -> Unit = {}): T = then(LiteralArgument(name), block)
+    fun then(name: String, block: ArgumentConfiguration<LiteralArgument> = ArgumentConfiguration {}): T = then(LiteralArgument(name), block)
 
     /**
      * Adds the given argument to the command and returns the argument.
@@ -673,10 +674,10 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @return The added argument.
      */
     @JvmOverloads
-    fun <T : AbstractStellarArgument<*>> addArgument(argument: T, block: T.() -> Unit = {}): T = argument.apply {
+    fun <T : AbstractStellarArgument<*>> addArgument(argument: T, block: ArgumentConfiguration<T> = ArgumentConfiguration {}): T = argument.apply {
         argument.parent = this@AbstractStellarCommand
         this@AbstractStellarCommand.arguments.add(argument)
-        argument.block()
+        block.create(argument)
     }
 
     /**

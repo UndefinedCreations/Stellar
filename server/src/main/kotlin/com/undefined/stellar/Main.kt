@@ -1,6 +1,5 @@
 package com.undefined.stellar
 
-import com.undefined.stellar.data.requirement.PermissionLevel
 import com.undefined.stellar.nms.NMSHelper
 import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
