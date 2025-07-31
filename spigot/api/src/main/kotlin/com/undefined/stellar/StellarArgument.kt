@@ -1,11 +1,14 @@
 package com.undefined.stellar
 
+import org.jetbrains.annotations.ApiStatus
+
 /**
  * An abstract wrapper class used to create class argument along with [BaseStellarCommand].
  *
  * @property base The base argument type being wrapped.
  * @property permissions A vararg of [String] of required permissions to execute this command (optional).
  */
+@ApiStatus.Experimental
 abstract class StellarArgument(val base: ParameterArgument<*, *>, vararg val permissions: String) {
 
     internal val fullArgument: ParameterArgument<*, *> by lazy {

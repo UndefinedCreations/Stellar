@@ -1,6 +1,7 @@
 package com.undefined.stellar
 
 import org.bukkit.plugin.java.JavaPlugin
+import org.jetbrains.annotations.ApiStatus
 
 /**
  * This is an abstract class allowing you to create a command by extending a class.
@@ -9,6 +10,7 @@ import org.bukkit.plugin.java.JavaPlugin
  * @property permission A [String] representing the required permission to execute the command (optional).
  * @property aliases A [List] of command aliases (optional).
  */
+@ApiStatus.Experimental
 abstract class BaseStellarCommand(val name: String, val permission: String = "", val aliases: List<String> = listOf()) {
 
     private var hasBeenRegistered = false
