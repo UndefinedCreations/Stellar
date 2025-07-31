@@ -1,6 +1,5 @@
 package com.undefined.stellar
 
-import com.undefined.stellar.nms.NMSHelper
 import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
 
@@ -9,9 +8,10 @@ class Main : JavaPlugin() {
     override fun onEnable() {
         StellarConfig.setPlugin(this)
 
-        StellarCommand("testing")
+        StellarCommand("hub")
+            .addAlias("lobby")
             .addExecution<Player> {
-                NMSHelper.hasPermission(sender, 1)
+                sender.sendMessage("Sending to hub...")
             }
             .register()
     }

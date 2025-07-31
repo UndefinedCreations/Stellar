@@ -54,14 +54,16 @@ object NMSManager {
 
         // Register command name with the prefix, e.g. minecraft:ban
         val fallbackPrefix = prefix.takeIf { it.isNotBlank() } ?: plugin.pluginMeta.name.lowercase()
-        dispatcher.register(LiteralArgumentBuilder.literal<Any>("$fallbackPrefix:${command.name}").redirect(mainNode))
-        Bukkit.getServer().helpMap.addTopic(StellarCommandHelpTopic("$fallbackPrefix:${command.name}", command.information["Description"] ?: "", command.information.reversed().entries.associateBy({ it.key }) { it.value }) {
-            command.requirements.all { it(this) }
-        })
 
-        for (name in command.aliases) {
-            dispatcher.register(LiteralArgumentBuilder.literal<Any>(name).redirect(mainNode))
-            Bukkit.getServer().helpMap.addTopic(CommandAliasHelpTopic(name, command.name, Bukkit.getServer().helpMap))
+        // TODO use .redirect for aliases, wasn't working before for some reason
+        for (name in command.aliases + command.name) {
+            dispatcher.register(getLiteralArgumentBuilder(command, plugin, name))
+            dispatcher.register(getLiteralArgumentBuilder(command, plugin, "$fallbackPrefix:$name"))
+            if (name !in command.aliases) {
+                Bukkit.getServer().helpMap.addTopic(StellarCommandHelpTopic(name, command.information["Description"] ?: "", command.information.reversed().entries.associateBy({ it.key }) { it.value }) {
+                    command.requirements.all { it(this) }
+                })
+            } else Bukkit.getServer().helpMap.addTopic(CommandAliasHelpTopic(name, command.name, Bukkit.getServer().helpMap))
         }
     }
 

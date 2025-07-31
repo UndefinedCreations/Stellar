@@ -18,7 +18,6 @@ class CommandAliasHelpTopic(alias: String, aliasFor: String, private val helpMap
     }
 
     override fun getFullText(forWho: CommandSender): String {
-        Preconditions.checkArgument(forWho != null, "CommandServer forWho cannot be null")
         val sb = StringBuilder(this.shortText)
         val aliasForTopic = helpMap.getHelpTopic(this.aliasFor)
         if (aliasForTopic != null) {

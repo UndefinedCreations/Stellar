@@ -11,6 +11,7 @@ import com.undefined.stellar.argument.list.ListArgument
 import com.undefined.stellar.data.argument.ArgumentHelper
 import com.undefined.stellar.data.argument.MojangAdapter
 import com.undefined.stellar.data.exception.UnsupportedVersionException
+import com.undefined.stellar.data.help.CommandAliasHelpTopic
 import com.undefined.stellar.data.help.StellarCommandHelpTopic
 import com.undefined.stellar.data.suggestion.Suggestion
 import com.undefined.stellar.internal.*
@@ -76,18 +77,21 @@ object NMSManager {
         if (!StellarListener.hasBeenInitialized) Bukkit.getPluginManager().registerEvents(StellarListener, plugin).also { StellarListener.hasBeenInitialized = true }
 
         StellarConfig.commands.add(command)
-        val builder = getLiteralArgumentBuilder(command, plugin)
         val dispatcher = nms.getCommandDispatcher()
-        val mainNode = dispatcher.register(builder)
 
         // Register command name with the prefix, e.g. minecraft:ban
         val fallbackPrefix = prefix.takeIf { it.isNotBlank() } ?: plugin.description.name.lowercase()
-        for (name in command.aliases + "$fallbackPrefix:${command.name}")
-            dispatcher.register(LiteralArgumentBuilder.literal<Any>(name).redirect(mainNode))
 
-        Bukkit.getServer().helpMap.addTopic(StellarCommandHelpTopic(command.name, command.information["Description"] ?: "", command.information) {
-            command.requirements.all { it(this) }
-        })
+        // TODO use .redirect for aliases, wasn't working before for some reason
+        for (name in command.aliases + command.name) {
+            dispatcher.register(getLiteralArgumentBuilder(command, plugin, name))
+            dispatcher.register(getLiteralArgumentBuilder(command, plugin, "$fallbackPrefix:$name"))
+            if (name !in command.aliases) {
+                Bukkit.getServer().helpMap.addTopic(StellarCommandHelpTopic(name, command.information["Description"] ?: "", command.information.reversed().entries.associateBy({ it.key }) { it.value }) {
+                    command.requirements.all { it(this) }
+                })
+            } else Bukkit.getServer().helpMap.addTopic(CommandAliasHelpTopic(name, command.name, Bukkit.getServer().helpMap))
+        }
     }
 
     private fun getLiteralArgumentBuilder(command: AbstractStellarCommand<*>, plugin: JavaPlugin, name: String = command.name): LiteralArgumentBuilder<Any> {
