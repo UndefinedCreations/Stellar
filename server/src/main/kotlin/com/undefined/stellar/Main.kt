@@ -11,7 +11,7 @@ class Main : JavaPlugin() {
         StellarCommand("menu")
             .then("triumph") {
                 addStringArgument("name")
-                    .addSuggestions(*TriumphGUIs::class.declaredFunctions.map { it.name }.toTypedArray())
+                    .addSuggestions("test", "another")
             }
             .register(this)
     }

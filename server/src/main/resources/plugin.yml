@@ -1,4 +1,4 @@
 name: server
-version: '${version}'
+version: '1.1.0'
 main: com.undefined.stellar.Main
 api-version: '1.21'

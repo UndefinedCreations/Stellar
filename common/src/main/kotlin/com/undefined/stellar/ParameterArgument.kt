@@ -43,7 +43,9 @@ abstract class ParameterArgument<T : ParameterArgument<T, *>, R>(name: String, v
      * @return The modified [ParameterArgument].
      */
     fun addSuggestions(suggestions: List<Suggestion>): T = apply {
-        this.suggestions.add(ExecutableSuggestion(CommandSender::class) { _, _ -> CompletableFuture.completedFuture(suggestions.toList()) })
+        this.suggestions.add(ExecutableSuggestion(CommandSender::class) { _, input ->
+            CompletableFuture.completedFuture(suggestions.filter { it.text.startsWith(input) })
+        })
     } as T
 
     /**
@@ -52,7 +54,11 @@ abstract class ParameterArgument<T : ParameterArgument<T, *>, R>(name: String, v
      * @return The modified [ParameterArgument].
      */
     fun addSuggestions(vararg suggestions: String): T = apply {
-        this.suggestions.add(ExecutableSuggestion(CommandSender::class) { _, _ -> CompletableFuture.completedFuture(suggestions.map { it.toSuggestion() }) })
+        this.suggestions.add(ExecutableSuggestion(CommandSender::class) { _, input ->
+            CompletableFuture.completedFuture(
+                suggestions.filter { it.startsWith(input) }.map { it.toSuggestion() }
+            )
+        })
     } as T
 
     /**
