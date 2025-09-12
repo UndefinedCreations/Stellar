@@ -657,6 +657,19 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
     } as T
 
     /**
+     * Adds the given argument to the command and returns the modified command.
+     *
+     * @param argument The argument to be added.
+     * @param block A lambda used to configure the argument after it's added (default: empty block).
+     * @return The modified command.
+     */
+    @JvmOverloads
+    @JvmName("thenKotlin")
+    fun <U : AbstractStellarArgument<*>> then(argument: AbstractStellarArgument<*>, block: U.() -> Unit = {}): T = apply {
+        addArgument(argument, block as AbstractStellarArgument<*>.() -> Unit)
+    } as T
+
+    /**
      * Adds a [LiteralArgument] with the given name to the command and returns the modified command.
      *
      * @param name The name of the [LiteralArgument].
@@ -665,6 +678,17 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      */
     @JvmOverloads
     fun then(name: String, block: ArgumentConfiguration<LiteralArgument> = ArgumentConfiguration {}): T = then(LiteralArgument(name), block)
+
+    /**
+     * Adds a [LiteralArgument] with the given name to the command and returns the modified command.
+     *
+     * @param name The name of the [LiteralArgument].
+     * @param block A lambda used to configure the argument after it's added (default: empty block).
+     * @return The modified command.
+     */
+    @JvmOverloads
+    @JvmName("thenKotlin")
+    fun then(name: String, block: LiteralArgument.() -> Unit = {}): T = then(LiteralArgument(name), block)
 
     /**
      * Adds the given argument to the command and returns the argument.

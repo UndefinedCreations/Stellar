@@ -10,6 +10,9 @@ public class JavaTesting extends JavaPlugin {
         StellarConfig.setPlugin(this);
 
         new StellarCommand("server")
+                .then("test", (arg) -> {
+                    arg.getName();
+                })
                 .addPhraseArgument("args")
                 .addWordArgument(0, argument -> {
                     argument.addExecution(Player.class, context -> {
