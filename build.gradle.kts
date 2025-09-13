@@ -50,7 +50,7 @@ val packageSources by tasks.registering(Jar::class) {
 
 publishing {
     publications {
-        create<MavenPublication>("kotlin") {
+        create<MavenPublication>("main") {
             artifactId = rootProject.name
             from(components["shadow"])
             artifact(packageJavadoc)

@@ -70,8 +70,8 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
     @ApiStatus.Internal
     lateinit var nms: NMS
 
-    @ApiStatus.Internal
     val aliases: MutableSet<String> = mutableSetOf()
+
     @ApiStatus.Internal
     val requirements: MutableList<ExecutableRequirement<*>> = mutableListOf()
     @ApiStatus.Internal

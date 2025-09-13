@@ -13,12 +13,11 @@ import java.util.concurrent.CompletableFuture
  * @param name The name of the argument.
  * @param argumentType This is used internally and should not be used by the end user. Is used when the Brigadier library contains the argument type wanted.
  */
-@Suppress("UNCHECKED_CAST")
+@Suppress("UNCHECKED_CAST", "PropertyName")
 abstract class ParameterArgument<T : ParameterArgument<T, *>, R>(name: String, val argumentType: ArgumentType<R>? = null) : AbstractStellarArgument<T>(name) {
 
     @ApiStatus.Internal
-    open val suggestions: MutableSet<ExecutableSuggestion<*>> = mutableSetOf()
-    @ApiStatus.Internal
+    open val _suggestions: MutableSet<ExecutableSuggestion<*>> = mutableSetOf()
     open var suggestionOffset: Int = 0
 
     /**
@@ -43,7 +42,7 @@ abstract class ParameterArgument<T : ParameterArgument<T, *>, R>(name: String, v
      * @return The modified [ParameterArgument].
      */
     fun addSuggestions(suggestions: List<Suggestion>): T = apply {
-        this.suggestions.add(ExecutableSuggestion(CommandSender::class) { _, input ->
+        this._suggestions.add(ExecutableSuggestion(CommandSender::class) { _, input ->
             CompletableFuture.completedFuture(suggestions.filter { it.text.startsWith(input) })
         })
     } as T
@@ -54,7 +53,7 @@ abstract class ParameterArgument<T : ParameterArgument<T, *>, R>(name: String, v
      * @return The modified [ParameterArgument].
      */
     fun addSuggestions(vararg suggestions: String): T = apply {
-        this.suggestions.add(ExecutableSuggestion(CommandSender::class) { _, input ->
+        this._suggestions.add(ExecutableSuggestion(CommandSender::class) { _, input ->
             CompletableFuture.completedFuture(
                 suggestions.filter { it.startsWith(input) }.map { it.toSuggestion() }
             )
@@ -82,7 +81,7 @@ abstract class ParameterArgument<T : ParameterArgument<T, *>, R>(name: String, v
      * @return The modified [ParameterArgument].
      */
     inline fun <reified C : CommandSender> addFutureSuggestion(noinline suggestion: CommandContext<C>.(input: String) -> CompletableFuture<Iterable<Suggestion>>): T = apply {
-        suggestions.add(ExecutableSuggestion(C::class, suggestion))
+        _suggestions.add(ExecutableSuggestion(C::class, suggestion))
     } as T
 
     /**
@@ -91,7 +90,7 @@ abstract class ParameterArgument<T : ParameterArgument<T, *>, R>(name: String, v
      * @return The modified [ParameterArgument].
      */
     inline fun <reified C : CommandSender> addAsyncSuggestion(noinline suggestion: CommandContext<C>.(input: String) -> List<Suggestion>): T = apply {
-        suggestions.add(ExecutableSuggestion(C::class) { context, input -> CompletableFuture.supplyAsync { suggestion(context, input) } })
+        _suggestions.add(ExecutableSuggestion(C::class) { context, input -> CompletableFuture.supplyAsync { suggestion(context, input) } })
     } as T
 
     /**
@@ -101,7 +100,7 @@ abstract class ParameterArgument<T : ParameterArgument<T, *>, R>(name: String, v
      */
     inline fun <reified C : CommandSender> addSuggestion(noinline suggestion: CommandContext<C>.(input: String) -> List<Suggestion>): T =
         apply {
-            suggestions.add(ExecutableSuggestion(C::class) { context, input ->
+            _suggestions.add(ExecutableSuggestion(C::class) { context, input ->
                 CompletableFuture.completedFuture(
                     suggestion(context, input)
                 )
@@ -116,7 +115,7 @@ abstract class ParameterArgument<T : ParameterArgument<T, *>, R>(name: String, v
      * @return The modified [ParameterArgument].
      */
     fun <C : CommandSender> addFutureSuggestion(sender: Class<C>, suggestion: StellarSuggestion<C>): T = apply {
-        suggestions.add(ExecutableSuggestion(sender.kotlin, suggestion))
+        _suggestions.add(ExecutableSuggestion(sender.kotlin, suggestion))
     } as T
 
     /**
@@ -127,7 +126,7 @@ abstract class ParameterArgument<T : ParameterArgument<T, *>, R>(name: String, v
      * @return The modified [ParameterArgument].
      */
     fun <C : CommandSender> addAsyncSuggestion(sender: Class<C>, suggestion: SimpleStellarSuggestion<C>): T = apply {
-        suggestions.add(ExecutableSuggestion(sender.kotlin) { context, input -> CompletableFuture.supplyAsync { suggestion(context, input) } })
+        _suggestions.add(ExecutableSuggestion(sender.kotlin) { context, input -> CompletableFuture.supplyAsync { suggestion(context, input) } })
     } as T
 
     /**
@@ -138,7 +137,7 @@ abstract class ParameterArgument<T : ParameterArgument<T, *>, R>(name: String, v
      * @return The modified [ParameterArgument].
      */
     fun <C : CommandSender> addSuggestion(sender: Class<C>, suggestion: SimpleStellarSuggestion<C>): T = apply {
-        suggestions.add(ExecutableSuggestion(sender.kotlin) { context, input -> CompletableFuture.completedFuture(suggestion(context, input)) })
+        _suggestions.add(ExecutableSuggestion(sender.kotlin) { context, input -> CompletableFuture.completedFuture(suggestion(context, input)) })
     } as T
 
 }

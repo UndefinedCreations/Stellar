@@ -1,4 +1,5 @@
 rootProject.name = "stellar"
+
 include(
     ":server",
     ":common",
@@ -43,4 +44,6 @@ include(
     ":spigot:v1_13_1",
     ":spigot:v1_13",
     ":plugin",
+    ":kotlin:core",
+    ":kotlin:spigot",
 )

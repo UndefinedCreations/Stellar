@@ -10,6 +10,7 @@ import org.bukkit.command.Command
 import org.bukkit.help.HelpTopic
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.scheduler.BukkitTask
+import org.jetbrains.annotations.ApiStatus
 import java.util.*
 
 /**
@@ -42,6 +43,8 @@ fun unregisterCommand(name: String, plugin: JavaPlugin = StellarConfig.plugin ?:
  * @param builder A lambda function used to configure the command.
  * @return The created StellarCommand instance.
  */
+@Deprecated("Use the kotlin module")
+@ApiStatus.ScheduledForRemoval()
 fun command(name: String, description: String, permissions: List<String>, aliases: List<String>, builder: StellarCommand.() -> Unit): StellarCommand {
     val command = StellarCommand(name, permissions, aliases)
     command.setDescription(description)
@@ -57,6 +60,8 @@ fun command(name: String, description: String, permissions: List<String>, aliase
  * @param builder A lambda function used to configure the command.
  * @return The created StellarCommand instance.
  */
+@Deprecated("Use the kotlin module")
+@ApiStatus.ScheduledForRemoval()
 fun command(name: String, description: String, builder: StellarCommand.() -> Unit): StellarCommand = command(name, description, listOf(), listOf(), builder)
 
 /**
@@ -68,6 +73,8 @@ fun command(name: String, description: String, builder: StellarCommand.() -> Uni
  * @param builder A lambda function used to configure the command.
  * @return The created StellarCommand instance.
  */
+@Deprecated("Use the kotlin module")
+@ApiStatus.ScheduledForRemoval()
 fun command(name: String, description: String, permissions: List<String>, builder: StellarCommand.() -> Unit): StellarCommand = command(name, description, permissions, listOf(), builder)
 
 /**
@@ -78,6 +85,8 @@ fun command(name: String, description: String, permissions: List<String>, builde
  * @param builder A lambda function used to configure the command.
  * @return The created StellarCommand instance.
  */
+@Deprecated("Use the kotlin module")
+@ApiStatus.ScheduledForRemoval()
 fun command(name: String, permissions: List<String>, builder: StellarCommand.() -> Unit): StellarCommand = command(name, "", permissions, listOf(), builder)
 
 /**
@@ -89,6 +98,8 @@ fun command(name: String, permissions: List<String>, builder: StellarCommand.() 
  * @param builder A lambda function used to configure the command.
  * @return The created StellarCommand instance.
  */
+@Deprecated("Use the kotlin module")
+@ApiStatus.ScheduledForRemoval()
 fun command(name: String, permissions: List<String>, aliases: List<String>, builder: StellarCommand.() -> Unit): StellarCommand = command(name, "", permissions, aliases, builder)
 
 /**
@@ -98,6 +109,8 @@ fun command(name: String, permissions: List<String>, aliases: List<String>, buil
  * @param builder A lambda function used to configure the command.
  * @return The created StellarCommand instance.
  */
+@Deprecated("Use the kotlin module")
+@ApiStatus.ScheduledForRemoval()
 fun command(name: String, builder: StellarCommand.() -> Unit): StellarCommand = command(name, "", builder)
 
 /**
@@ -109,6 +122,8 @@ fun command(name: String, builder: StellarCommand.() -> Unit): StellarCommand = 
  * @param aliases A list of aliases for the command.
  * @return The created StellarCommand instance.
  */
+@Deprecated("Use the kotlin module")
+@ApiStatus.ScheduledForRemoval()
 fun command(name: String, description: String, permissions: List<String>, aliases: List<String>): StellarCommand {
     val command = StellarCommand(name, permissions, aliases)
     command.setDescription(description)
@@ -122,6 +137,8 @@ fun command(name: String, description: String, permissions: List<String>, aliase
  * @param description The description of the command.
  * @return The created StellarCommand instance.
  */
+@Deprecated("Use the kotlin module")
+@ApiStatus.ScheduledForRemoval()
 fun command(name: String, description: String): StellarCommand = command(name, description, listOf(), listOf())
 
 /**
@@ -132,6 +149,8 @@ fun command(name: String, description: String): StellarCommand = command(name, d
  * @param permissions A list of permissions required to execute the command.
  * @return The created StellarCommand instance.
  */
+@Deprecated("Use the kotlin module")
+@ApiStatus.ScheduledForRemoval()
 fun command(name: String, description: String, permissions: List<String>): StellarCommand = command(name, description, permissions, listOf())
 
 /**
@@ -141,6 +160,8 @@ fun command(name: String, description: String, permissions: List<String>): Stell
  * @param permissions A list of permissions required to execute the command.
  * @return The created StellarCommand instance.
  */
+@Deprecated("Use the kotlin module")
+@ApiStatus.ScheduledForRemoval()
 fun command(name: String, permissions: List<String>): StellarCommand = command(name, "", permissions, listOf())
 
 /**
@@ -151,10 +172,14 @@ fun command(name: String, permissions: List<String>): StellarCommand = command(n
  * @param aliases A list of aliases for the command.
  * @return The created StellarCommand instance.
  */
+@Deprecated("Use the kotlin module")
+@ApiStatus.ScheduledForRemoval()
 fun command(name: String, permissions: List<String>, aliases: List<String>): StellarCommand = command(name, "", permissions, aliases)
 
 /**
  * Creates a new command with a name.
  * @return The created StellarCommand instance.
  */
+@Deprecated("Use the kotlin module")
+@ApiStatus.ScheduledForRemoval()
 fun command(name: String): StellarCommand = command(name, "")

@@ -5,6 +5,8 @@ plugins {
     kotlin("jvm")
 }
 
+val libs = extensions.getByType(VersionCatalogsExtension::class.java).named("libs")
+
 group = properties["group"]!!
 version = properties["version"]!!
 
@@ -30,6 +32,7 @@ dependencies {
     compileOnly("net.kyori:adventure-text-minimessage:4.22.0")
     compileOnly("net.kyori:adventure-platform-bukkit:4.4.0")
     compileOnly("net.kyori:adventure-text-serializer-legacy:4.22.0")
+    compileOnly(libs.findLibrary("kotlin-coroutines").orElseThrow())
 }
 
 tasks {
