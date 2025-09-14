@@ -46,4 +46,5 @@ include(
     ":plugin",
     ":kotlin:core",
     ":kotlin:spigot",
+    ":kotlin:paper",
 )
