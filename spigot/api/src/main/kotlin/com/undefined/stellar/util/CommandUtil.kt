@@ -12,6 +12,7 @@ import org.bukkit.command.SimpleCommandMap
 import org.bukkit.help.HelpTopic
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.scheduler.BukkitTask
+import org.jetbrains.annotations.ApiStatus
 import java.util.*
 
 /**
@@ -42,6 +43,8 @@ fun unregisterCommand(name: String, plugin: JavaPlugin = StellarConfig.plugin ?:
     for (player in Bukkit.getOnlinePlayers()) player.updateCommands()
 }
 
+@Deprecated("Use the kotlin module")
+@ApiStatus.ScheduledForRemoval()
 fun command(name: String, description: String, permissions: List<String>, aliases: List<String>, builder: StellarCommand.() -> Unit): StellarCommand {
     val command = StellarCommand(name, permissions, aliases)
     command.setDescription(description)
@@ -49,20 +52,50 @@ fun command(name: String, description: String, permissions: List<String>, aliase
     return command
 }
 
+@Deprecated("Use the kotlin module")
+@ApiStatus.ScheduledForRemoval()
 fun command(name: String, description: String, builder: StellarCommand.() -> Unit): StellarCommand = command(name, description, listOf(), listOf(), builder)
+
+@Deprecated("Use the kotlin module")
+@ApiStatus.ScheduledForRemoval()
 fun command(name: String, description: String, permissions: List<String>, builder: StellarCommand.() -> Unit): StellarCommand = command(name, description, permissions, listOf(), builder)
+
+@Deprecated("Use the kotlin module")
+@ApiStatus.ScheduledForRemoval()
 fun command(name: String, permissions: List<String>, builder: StellarCommand.() -> Unit): StellarCommand = command(name, "", permissions, listOf(), builder)
+
+@Deprecated("Use the kotlin module")
+@ApiStatus.ScheduledForRemoval()
 fun command(name: String, permissions: List<String>, aliases: List<String>, builder: StellarCommand.() -> Unit): StellarCommand = command(name, "", permissions, aliases, builder)
+
+@Deprecated("Use the kotlin module")
+@ApiStatus.ScheduledForRemoval()
 fun command(name: String, builder: StellarCommand.() -> Unit): StellarCommand = command(name, "", builder)
 
+@Deprecated("Use the kotlin module")
+@ApiStatus.ScheduledForRemoval()
 fun command(name: String, description: String, permissions: List<String>, aliases: List<String>): StellarCommand {
     val command = StellarCommand(name, permissions, aliases)
     command.setDescription(description)
     return command
 }
 
+@Deprecated("Use the kotlin module")
+@ApiStatus.ScheduledForRemoval()
 fun command(name: String, description: String): StellarCommand = command(name, description, listOf(), listOf())
+
+@Deprecated("Use the kotlin module")
+@ApiStatus.ScheduledForRemoval()
 fun command(name: String, description: String, permissions: List<String>): StellarCommand = command(name, description, permissions, listOf())
+
+@Deprecated("Use the kotlin module")
+@ApiStatus.ScheduledForRemoval()
 fun command(name: String, permissions: List<String>): StellarCommand = command(name, "", permissions, listOf())
+
+@Deprecated("Use the kotlin module")
+@ApiStatus.ScheduledForRemoval()
 fun command(name: String, permissions: List<String>, aliases: List<String>): StellarCommand = command(name, "", permissions, aliases)
+
+@Deprecated("Use the kotlin module")
+@ApiStatus.ScheduledForRemoval()
 fun command(name: String): StellarCommand = command(name, "")

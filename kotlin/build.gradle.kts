@@ -9,9 +9,17 @@ plugins {
 }
 
 private val submodules: HashMap<String, String> = hashMapOf(
+    ":kotlin:spigot" to "",
     ":kotlin:spigot" to "spigot",
-//    ":kotlin:paper" to "paper",
+    ":kotlin:paper" to "paper",
 )
+
+dependencies {
+    compileOnly(libs.spigot)
+    compileOnly(libs.brigadier)
+
+    api(project(":kotlin:spigot"))
+}
 
 val packageKotlinJavadoc by tasks.registering(Jar::class) {
     group = "stellar"
@@ -90,6 +98,11 @@ publishing {
             }
         }
     }
+}
+
+java {
+    withSourcesJar()
+    withJavadocJar()
 }
 
 tasks {

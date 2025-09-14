@@ -7,13 +7,14 @@ dependencies {
     compileOnly(libs.papermc)
     compileOnly(libs.brigadier)
     compileOnly(project(":paper:api"))
-    compileOnly(project(":kotlin:core"))
+
+    api(project(":kotlin:core"))
 }
 
 tasks {
     shadowJar {
         minimize {
-            exclude("**/kotlin/**")
+            exclude("/kotlin/**")
             exclude("**/intellij/**")
             exclude("**/jetbrains/**")
         }

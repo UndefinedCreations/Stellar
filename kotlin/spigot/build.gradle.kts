@@ -7,13 +7,14 @@ dependencies {
     compileOnly(libs.spigot)
     compileOnly(libs.brigadier)
     compileOnly(project(":spigot:api"))
-    compileOnly(project(":kotlin:core"))
+
+    api(project(":kotlin:core"))
 }
 
 tasks {
     shadowJar {
         minimize {
-            exclude("**/kotlin/**")
+            exclude("/kotlin/**")
             exclude("**/intellij/**")
             exclude("**/jetbrains/**")
         }
