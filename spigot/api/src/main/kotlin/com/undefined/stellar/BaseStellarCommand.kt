@@ -36,7 +36,7 @@ abstract class BaseStellarCommand(val name: String, val permission: String = "",
      *
      * Usually, this is used along with the [setup] method as such:
      * ```kotlin
-     * override fun setup(): StellarCommand = createCommand {
+     * override fun setup() = createCommand {
      *   // code logic
      * }
      * ```
@@ -44,7 +44,7 @@ abstract class BaseStellarCommand(val name: String, val permission: String = "",
      * @param init A lambda to configure the command instance.
      * @return The configured [StellarCommand].
      */
-    fun createCommand(init: StellarCommand.() -> Unit): StellarCommand {
+    open fun createCommand(init: StellarCommand.() -> Unit): StellarCommand {
         val command = StellarCommand(name, permission, aliases)
         command.init()
         return command
