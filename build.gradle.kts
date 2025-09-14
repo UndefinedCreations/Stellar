@@ -38,14 +38,15 @@ val packageJavadoc by tasks.registering(Jar::class) {
     archiveClassifier = "javadoc"
 
     dependsOn(tasks.dokkaJavadocCollector)
-    from(tasks.dokkaJavadocCollector.flatMap { it.outputDirectory })
+    from(tasks.dokkaJavadocCollector.filter { "kotlin" !in it.path }.flatMap { it.outputDirectory })
 }
 
 val packageSources by tasks.registering(Jar::class) {
     group = "stellar"
     archiveClassifier = "sources"
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
-    from(subprojects.map { it.sourceSets.main.get().allSource })
+
+    from(subprojects.filter { "kotlin" !in it.path }.map { it.sourceSets.main.get().allSource })
 }
 
 publishing {
