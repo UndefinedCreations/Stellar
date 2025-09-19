@@ -5,6 +5,7 @@ import org.bukkit.plugin.java.JavaPlugin
 
 /**
  * Registers a new command with a name, permissions, and a builder function.
+ *
  * @param name The name of the command.
  * @param plugin The plugin with which the command will be registered. If this is null, it will not register the command.
  * @return The created StellarCommand instance.

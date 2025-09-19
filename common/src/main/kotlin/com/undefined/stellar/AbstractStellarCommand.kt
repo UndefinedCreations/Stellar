@@ -830,7 +830,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
         list: CommandContext<CommandSender>.() -> List<String>,
         tooltip: (String) -> String? = { null },
         type: StringType = StringType.WORD
-    ): ListArgument<String, String> = addArgument(ListArgument(StringArgument(name, type), list, { Suggestion.create(it, tooltip(it)) }, { it }))
+    ): ListArgument<String, String> = addArgument(ListArgument.create(StringArgument(name, type), list, { Suggestion.create(it, tooltip(it)) }, { it }))
 
     /**
      * Adds a [ListArgument] to the command with the given name. It uses its [StringArgument] as a base wrapper.
@@ -854,7 +854,6 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param list The list of possible values.
      * @param parse A function to parse the returned [String] into type `T`.
      * @param converter A function to convert a value into a [String] (default: uses `toString()`).
-     * @param async Whether the _suggestions_ should be gotten asynchronously (default: `false`).
      * @return The created [ListArgument].
      */
     @JvmOverloads
@@ -863,7 +862,27 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
         list: List<T>,
         parse: CommandSender.(String) -> T,
         converter: CommandSender.(T) -> String? = { it.toString() },
-        async: Boolean = false,
+    ): ListArgument<T, String> = addArgument(ListArgument(StringArgument(name, StringType.WORD), list, { converter(it)?.let { Suggestion.withText(it) } }, parse))
+
+    /**
+     * Adds a [ListArgument] to the command with the given name.
+     *
+     * @param list The list of possible values.
+     * @param parse A function to parse the returned [String] into type `T`.
+     * @param converter A function to convert a value into a [String] (default: uses `toString()`).
+     * @param async Whether the _suggestions_ should be gotten asynchronously (default: `false`).
+     * @return The created [ListArgument].
+     */
+    @Suppress("DEPRECATION")
+    @Deprecated("The async parameter should be omitted")
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
+    @JvmOverloads
+    fun <T> addListArgument(
+        name: String,
+        list: List<T>,
+        parse: CommandSender.(String) -> T,
+        converter: CommandSender.(T) -> String? = { it.toString() },
+        async: Boolean,
     ): ListArgument<T, String> = addArgument(ListArgument(StringArgument(name, StringType.WORD), list, { converter(it)?.let { Suggestion.withText(it) } }, parse, async))
 
     /**
@@ -882,7 +901,24 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
         parse: CommandSender.(String) -> T,
         converter: CommandSender.(T) -> String? = { it.toString() },
         async: Boolean = false,
-    ): ListArgument<T, String> = addArgument(ListArgument(StringArgument(name, StringType.WORD), list, { converter(it)?.let { Suggestion.withText(it) } }, parse, async))
+    ): ListArgument<T, String> = addArgument(ListArgument.create(StringArgument(name, StringType.WORD), list, { converter(it)?.let { Suggestion.withText(it) } }, parse, async))
+
+    /**
+     * Adds a [ListArgument] to the command wrapped around the given [AbstractStellarCommand].
+     *
+     * @param type The base argument the list is wrapped around to.
+     * @param list The list of possible values.
+     * @param parse A function to parse the returned [String] into type `T`.
+     * @param converter A function to convert a value into a [String] (default: uses `toString()`).
+     * @return The created [ListArgument].
+     */
+    @JvmOverloads
+    fun <T, R> addListArgument(
+        type: ParameterArgument<*, R>,
+        list: List<T>,
+        parse: CommandSender.(R) -> T,
+        converter: CommandSender.(T) -> String? = { it.toString() },
+    ): ListArgument<T, R> = addArgument(ListArgument(type, list, { converter(it)?.let { Suggestion.withText(it) } }, parse))
 
     /**
      * Adds a [ListArgument] to the command wrapped around the given [AbstractStellarCommand].
@@ -894,13 +930,16 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param async Whether the _suggestions_ should be gotten asynchronously (default: `false`).
      * @return The created [ListArgument].
      */
+    @Suppress("DEPRECATION")
+    @Deprecated("The async parameter should be omitted")
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
     @JvmOverloads
     fun <T, R> addListArgument(
         type: ParameterArgument<*, R>,
         list: List<T>,
         parse: CommandSender.(R) -> T,
         converter: CommandSender.(T) -> String? = { it.toString() },
-        async: Boolean = false,
+        async: Boolean,
     ): ListArgument<T, R> = addArgument(ListArgument(type, list, { converter(it)?.let { Suggestion.withText(it) } }, parse, async))
 
     /**
@@ -920,7 +959,23 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
         parse: CommandSender.(R) -> T,
         converter: CommandSender.(T) -> String? = { it.toString() },
         async: Boolean = false,
-    ): ListArgument<T, R> = addArgument(ListArgument(type, list, { converter(it)?.let { Suggestion.withText(it) } }, parse, async))
+    ): ListArgument<T, R> = addArgument(ListArgument.create(type, list, { converter(it)?.let { Suggestion.withText(it) } }, parse, async))
+
+    /**
+     * Adds a [ListArgument] to the command with the given name.
+     *
+     * @param list The list of possible values.
+     * @param parse A function to parse the returned [String] into type `T`.
+     * @param converter A function to convert a value into a [Suggestion] (default: uses `toString()`).
+     * @return The created [ListArgument].
+     */
+    @JvmOverloads
+    fun <T> addAdvancedListArgument(
+        name: String,
+        list: List<T>,
+        parse: CommandSender.(String) -> T,
+        converter: CommandSender.(T) -> Suggestion? = { Suggestion.withText(it.toString()) },
+    ): ListArgument<T, String> = addArgument(ListArgument(StringArgument(name, StringType.WORD), list, converter, parse))
 
     /**
      * Adds a [ListArgument] to the command with the given name.
@@ -931,13 +986,16 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param async Whether the _suggestions_ should be gotten asynchronously (default: `false`).
      * @return The created [ListArgument].
      */
+    @Suppress("DEPRECATION")
+    @Deprecated("The async parameter should be omitted")
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
     @JvmOverloads
     fun <T> addAdvancedListArgument(
         name: String,
         list: List<T>,
         parse: CommandSender.(String) -> T,
         converter: CommandSender.(T) -> Suggestion? = { Suggestion.withText(it.toString()) },
-        async: Boolean = false,
+        async: Boolean,
     ): ListArgument<T, String> = addArgument(ListArgument(StringArgument(name, StringType.WORD), list, converter, parse, async))
 
     /**
@@ -956,7 +1014,24 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
         parse: CommandSender.(String) -> T,
         converter: CommandSender.(T) -> Suggestion? = { Suggestion.withText(it.toString()) },
         async: Boolean = false,
-    ): ListArgument<T, String> = addArgument(ListArgument(StringArgument(name, StringType.WORD), list, converter, parse, async))
+    ): ListArgument<T, String> = addArgument(ListArgument.create(StringArgument(name, StringType.WORD), list, converter, parse, async))
+
+    /**
+     * Adds a [ListArgument] to the command wrapped around the given [AbstractStellarCommand].
+     *
+     * @param type The base argument the list is wrapped around to.
+     * @param list The list of possible values.
+     * @param parse A function to parse the returned [String] into type `T`.
+     * @param converter A function to convert a value into a [Suggestion] (default: uses `toString()`).
+     * @return The created [ListArgument].
+     */
+    @JvmOverloads
+    fun <T, R> addAdvancedListArgument(
+        type: ParameterArgument<*, R>,
+        list: List<T>,
+        parse: CommandSender.(R) -> T,
+        converter: CommandSender.(T) -> Suggestion? = { Suggestion.withText(it.toString()) },
+    ): ListArgument<T, R> = addArgument(ListArgument(type, list, converter, parse))
 
     /**
      * Adds a [ListArgument] to the command wrapped around the given [AbstractStellarCommand].
@@ -968,13 +1043,16 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param async Whether the _suggestions_ should be gotten asynchronously (default: `false`).
      * @return The created [ListArgument].
      */
+    @Suppress("DEPRECATION")
+    @Deprecated("The async parameter should be omitted")
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
     @JvmOverloads
     fun <T, R> addAdvancedListArgument(
         type: ParameterArgument<*, R>,
         list: List<T>,
         parse: CommandSender.(R) -> T,
         converter: CommandSender.(T) -> Suggestion? = { Suggestion.withText(it.toString()) },
-        async: Boolean = false,
+        async: Boolean,
     ): ListArgument<T, R> = addArgument(ListArgument(type, list, converter, parse, async))
 
     /**
@@ -994,7 +1072,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
         parse: CommandSender.(R) -> T,
         converter: CommandSender.(T) -> Suggestion? = { Suggestion.withText(it.toString()) },
         async: Boolean = false,
-    ): ListArgument<T, R> = addArgument(ListArgument(type, list, converter, parse, async))
+    ): ListArgument<T, R> = addArgument(ListArgument.create(type, list, converter, parse, async))
 
     /**
      * Adds an [EnumArgument] to the command with the given name. Only works in Kotlin.
