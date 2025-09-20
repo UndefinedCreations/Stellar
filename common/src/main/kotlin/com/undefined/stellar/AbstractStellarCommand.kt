@@ -1134,13 +1134,12 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param async Whether the _suggestions_ should be gotten asynchronously.
      * @return The created [EnumArgument].
      */
-    @JvmOverloads
     @Suppress("DEPRECATION")
     @Deprecated("The async parameter should be omitted")
     @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
     inline fun <reified T : Enum<T>> addEnumArgument(
         name: String,
-        formatting: EnumFormatting = EnumFormatting.LOWERCASE,
+        formatting: EnumFormatting,
         async: Boolean,
     ): EnumArgument<T> = addArgument(EnumArgument(name, T::class.java, { Suggestion.withText(formatting.action(it.name)) }, async = async))
 
@@ -1150,7 +1149,6 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param formatting The formatting style for the enum names (default: [EnumFormatting.LOWERCASE]).
      * @return The created [EnumArgument].
      */
-    @JvmOverloads
     inline fun <reified T : Enum<T>> addEnumArgument(
         name: String,
         formatting: EnumFormatting = EnumFormatting.LOWERCASE,
@@ -1166,7 +1164,6 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param async Whether the _suggestions_ should be gotten asynchronously.
      * @return The created [EnumArgument].
      */
-    @JvmOverloads
     @Suppress("DEPRECATION")
     @Deprecated("The async parameter should be omitted")
     @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")

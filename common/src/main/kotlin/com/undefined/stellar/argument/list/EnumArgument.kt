@@ -20,7 +20,7 @@ import java.lang.Enum.valueOf
  * @since 1.13
  */
 @Suppress("UNCHECKED_CAST")
-class EnumArgument<T : Enum<T>>(
+class EnumArgument<T : Enum<T>> @JvmOverloads constructor(
 	name: String,
 	val enum: Class<out Enum<T>>,
 	converter: CommandSender.(Enum<T>) -> Suggestion? = { Suggestion.withText(it.name) },
@@ -51,7 +51,6 @@ class EnumArgument<T : Enum<T>>(
 	 *
 	 * @since 1.13
 	 */
-	@JvmOverloads
 	@ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
 	@Deprecated("The async parameter should be omitted")
 	constructor(
