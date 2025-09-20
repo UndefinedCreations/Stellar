@@ -27,5 +27,6 @@ body:
     - Multiple (please specify in text area)
     - Any
     default: 0
+    multiple: true
   validations:
     required: true
