@@ -66,13 +66,13 @@ import kotlin.coroutines.CoroutineContext
  * Adds a [LiteralArgument] to the command with the given name and aliases.
  * @return The created [LiteralArgument].
  */
-fun AbstractStellarCommand<*>.argument(name: String, vararg aliases: String, block: LiteralArgument.() -> Unit = {}): LiteralArgument = addArgument(LiteralArgument(name).apply { addAliases(*aliases) })
+fun AbstractStellarCommand<*>.argument(name: String, vararg aliases: String, block: LiteralArgument.() -> Unit = {}): LiteralArgument = addArgument(LiteralArgument(name).apply { addAliases(*aliases) }).apply(block)
 
 /**
  * Adds a [LiteralArgument] to the command with the given name and aliases.
  * @return The created [LiteralArgument].
  */
-fun AbstractStellarCommand<*>.literalArgument(name: String, vararg aliases: String, block: LiteralArgument.() -> Unit = {}): LiteralArgument = addArgument(LiteralArgument(name).apply { addAliases(*aliases) })
+fun AbstractStellarCommand<*>.literalArgument(name: String, vararg aliases: String, block: LiteralArgument.() -> Unit = {}): LiteralArgument = addArgument(LiteralArgument(name).apply { addAliases(*aliases) }).apply(block)
 
 // Basic
 /**
@@ -189,7 +189,7 @@ fun AbstractStellarCommand<*>.listArgument(
     CoroutineScope(context).future {
         list(this@ListArgument)
     }
-}, { Suggestion.create(it, tooltip(it)) }, { it },))
+}, { Suggestion.create(it, tooltip(it)) }, { it },)).apply(block)
 
 /**
  * Adds a [ListArgument] to the command with the given name. It uses its [StringArgument] as a base wrapper.
@@ -205,7 +205,7 @@ fun AbstractStellarCommand<*>.listArgument(
     tooltip: (String) -> String? = { null },
     type: StringType = StringType.WORD,
     block: ListArgument<String, String>.() -> Unit = {},
-): ListArgument<String, String> = addArgument(ListArgument(StringArgument(name, type), list, { Suggestion.create(it, tooltip(it)) }, { it }))
+): ListArgument<String, String> = addArgument(ListArgument(StringArgument(name, type), list, { Suggestion.create(it, tooltip(it)) }, { it })).apply(block)
 
 /**
  * Adds a [ListArgument] to the command with the given name.
@@ -221,7 +221,7 @@ fun <T> AbstractStellarCommand<*>.listArgument(
     parse: CommandSender.(String) -> T,
     converter: CommandSender.(T) -> String? = { it.toString() },
     block: ListArgument<T, String>.() -> Unit = {},
-): ListArgument<T, String> = addArgument(ListArgument(StringArgument(name, StringType.WORD), list, { converter(it)?.let { Suggestion.withText(it) } }, parse))
+): ListArgument<T, String> = addArgument(ListArgument(StringArgument(name, StringType.WORD), list, { converter(it)?.let { Suggestion.withText(it) } }, parse)).apply(block)
 
 /**
  * Adds a [ListArgument] to the command with the given name.
@@ -243,7 +243,7 @@ fun <T> AbstractStellarCommand<*>.listArgument(
     CoroutineScope(context).future {
         list(this@ListArgument)
     }
-}, { converter(it)?.let { Suggestion.withText(it) } }, parse))
+}, { converter(it)?.let { Suggestion.withText(it) } }, parse)).apply(block)
 
 /**
  * Adds a [ListArgument] to the command wrapped around the given [AbstractStellarCommand].
@@ -260,7 +260,7 @@ fun <T, R> AbstractStellarCommand<*>.listArgument(
     parse: CommandSender.(R) -> T,
     converter: CommandSender.(T) -> String? = { it.toString() },
     block: ListArgument<T, R>.() -> Unit = {},
-): ListArgument<T, R> = addArgument(ListArgument(type, list, { converter(it)?.let { Suggestion.withText(it) } }, parse))
+): ListArgument<T, R> = addArgument(ListArgument(type, list, { converter(it)?.let { Suggestion.withText(it) } }, parse)).apply(block)
 
 /**
  * Adds a [ListArgument] to the command wrapped around the given [AbstractStellarCommand].
@@ -283,7 +283,7 @@ fun <T, R> AbstractStellarCommand<*>.listArgument(
     CoroutineScope(context).future {
         list(this@ListArgument)
     }
-}, { converter(it)?.let { Suggestion.withText(it) } }, parse))
+}, { converter(it)?.let { Suggestion.withText(it) } }, parse)).apply(block)
 
 /**
  * Adds a [ListArgument] to the command with the given name.
@@ -299,7 +299,7 @@ fun <T> AbstractStellarCommand<*>.advancedListArgument(
     parse: CommandSender.(String) -> T,
     converter: CommandSender.(T) -> Suggestion? = { Suggestion.withText(it.toString()) },
     block: ListArgument<T, String>.() -> Unit = {},
-): ListArgument<T, String> = addArgument(ListArgument(StringArgument(name, StringType.WORD), list, converter, parse))
+): ListArgument<T, String> = addArgument(ListArgument(StringArgument(name, StringType.WORD), list, converter, parse)).apply(block)
 
 /**
  * Adds a [ListArgument] to the command with the given name.
@@ -321,7 +321,7 @@ fun <T> AbstractStellarCommand<*>.advancedListArgument(
     CoroutineScope(context).future {
         list(this@ListArgument)
     }
-}, converter, parse))
+}, converter, parse)).apply(block)
 
 /**
  * Adds a [ListArgument] to the command wrapped around the given [AbstractStellarCommand].
@@ -338,7 +338,7 @@ fun <T, R> AbstractStellarCommand<*>.advancedListArgument(
     parse: CommandSender.(R) -> T,
     converter: CommandSender.(T) -> Suggestion? = { Suggestion.withText(it.toString()) },
     block: ListArgument<T, R>.() -> Unit = {},
-): ListArgument<T, R> = addArgument(ListArgument(type, list, converter, parse)).apply(block)
+): ListArgument<T, R> = addArgument(ListArgument(type, list, converter, parse)).apply(block).apply(block)
 
 /**
  * Adds a [ListArgument] to the command wrapped around the given [AbstractStellarCommand].
@@ -361,7 +361,7 @@ fun <T, R> AbstractStellarCommand<*>.advancedListArgument(
     CoroutineScope(context).future {
         list(this@ListArgument)
     }
-}, converter, parse)).apply(block)
+}, converter, parse)).apply(block).apply(block)
 
 /**
  * Adds an [EnumArgument] to the command with the given name. Only works in Kotlin.
@@ -385,7 +385,7 @@ inline fun <reified T : Enum<T>> AbstractStellarCommand<*>.enumArgument(
         }
     },
     block: EnumArgument<T>.() -> Unit = {},
-): EnumArgument<T> = addArgument(EnumArgument(name, T::class.java, converter, parse))
+): EnumArgument<T> = addArgument(EnumArgument(name, T::class.java, converter, parse)).apply(block)
 
 /**
  * Adds an [EnumArgument] to the command with the given name. Only works in Kotlin.
@@ -397,7 +397,7 @@ inline fun <reified T : Enum<T>> AbstractStellarCommand<*>.enumArgument(
     name: String,
     formatting: EnumFormatting = EnumFormatting.LOWERCASE,
     block: EnumArgument<T>.() -> Unit = {},
-): EnumArgument<T> = addArgument(EnumArgument(name, T::class.java, { Suggestion.withText(formatting.action(it.name)) }))
+): EnumArgument<T> = addArgument(EnumArgument(name, T::class.java, { Suggestion.withText(formatting.action(it.name)) })).apply(block)
 
 /**
  * Adds an [EnumArgument] to the command with the given name.
@@ -435,7 +435,7 @@ fun <T : Enum<T>> AbstractStellarCommand<*>.enumArgument(
     enum: Class<T>,
     formatting: EnumFormatting = EnumFormatting.LOWERCASE,
     block: EnumArgument<T>.() -> Unit = {},
-): EnumArgument<T> = addArgument(EnumArgument(name, enum, { Suggestion.withText(formatting.action(it.name)) }))
+): EnumArgument<T> = addArgument(EnumArgument(name, enum, { Suggestion.withText(formatting.action(it.name)) })).apply(block)
 
 /**
  * Adds an [OnlinePlayersArgument] to the command with the given name. It is a list of all currently online players.
@@ -629,4 +629,4 @@ fun AbstractStellarCommand<*>.heightMapArgument(name: String, block: HeightMapAr
  * @param type The type of location.
  * @return The created [LocationArgument].
  */
-fun AbstractStellarCommand<*>.locationArgument(name: String, type: LocationType, block: LocationArgument.() -> Unit = {}): LocationArgument = addArgument(LocationArgument(name, type))
+fun AbstractStellarCommand<*>.locationArgument(name: String, type: LocationType, block: LocationArgument.() -> Unit = {}): LocationArgument = addArgument(LocationArgument(name, type)).apply(block)
