@@ -1,0 +1,27 @@
+name: Update request
+description: Suggest a version update (e.g. Minecraft version, library version)
+title: "[Update] "
+labels: "enhancement"
+type: Update
+body:
+- type: markdown
+  attributes:
+    value: "Thanks for taking the time to suggest this version update! We really appreciate the support <3."
+- type: input
+  id: library
+  attributes:
+    label: Library name
+    description: "Which library needs to be updated?"
+    placeholder: "e.g. Minecraft, Brigadier, Kotlin Coroutines, etc."
+- type: input
+  id: current-version
+  attributes:
+    label: Current version
+    description: "The version currently in use."
+    placeholder: "e.g. 17.0.2"
+- type: input
+  id: target-version
+  attributes:
+    label: Target version
+    description: "The version you suggest updating to."
+    placeholder: "e.g. 18.2.0"
