@@ -870,7 +870,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param list The list of possible values.
      * @param parse A function to parse the returned [String] into type `T`.
      * @param converter A function to convert a value into a [String] (default: uses `toString()`).
-     * @param async Whether the _suggestions_ should be gotten asynchronously (default: `false`).
+     * @param async Whether the _suggestions_ should be gotten asynchronously.
      * @return The created [ListArgument].
      */
     @Suppress("DEPRECATION")
@@ -891,7 +891,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param list A function returning the list of possible values.
      * @param parse A function to parse the returned [String] into type `T`.
      * @param converter A function to convert a value into a [String] (default: uses `toString()`).
-     * @param async Whether the _suggestions_ should be gotten asynchronously (default: `false`).
+     * @param async Whether the _suggestions_ should be gotten asynchronously.
      * @return The created [ListArgument].
      */
     @JvmOverloads
@@ -900,7 +900,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
         list: CommandContext<CommandSender>.() -> List<T>,
         parse: CommandSender.(String) -> T,
         converter: CommandSender.(T) -> String? = { it.toString() },
-        async: Boolean = false,
+        async: Boolean,
     ): ListArgument<T, String> = addArgument(ListArgument.create(StringArgument(name, StringType.WORD), list, { converter(it)?.let { Suggestion.withText(it) } }, parse, async))
 
     /**
@@ -927,7 +927,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param list The list of possible values.
      * @param parse A function to parse the returned [String] into type `T`.
      * @param converter A function to convert a value into a [String] (default: uses `toString()`).
-     * @param async Whether the _suggestions_ should be gotten asynchronously (default: `false`).
+     * @param async Whether the _suggestions_ should be gotten asynchronously.
      * @return The created [ListArgument].
      */
     @Suppress("DEPRECATION")
@@ -949,7 +949,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param list A function returning the list of possible values.
      * @param parse A function to parse the returned [String] into type `T`.
      * @param converter A function to convert a value into a [String] (default: uses `toString()`).
-     * @param async Whether the _suggestions_ should be gotten asynchronously (default: `false`).
+     * @param async Whether the _suggestions_ should be gotten asynchronously.
      * @return The created [ListArgument].
      */
     @JvmOverloads
@@ -958,7 +958,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
         list: CommandContext<CommandSender>.() -> List<T>,
         parse: CommandSender.(R) -> T,
         converter: CommandSender.(T) -> String? = { it.toString() },
-        async: Boolean = false,
+        async: Boolean,
     ): ListArgument<T, R> = addArgument(ListArgument.create(type, list, { converter(it)?.let { Suggestion.withText(it) } }, parse, async))
 
     /**
@@ -983,7 +983,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param list The list of possible values.
      * @param parse A function to parse the returned [String] into type `T`.
      * @param converter A function to convert a value into a [Suggestion] (default: uses `toString()`).
-     * @param async Whether the _suggestions_ should be gotten asynchronously (default: `false`).
+     * @param async Whether the _suggestions_ should be gotten asynchronously.
      * @return The created [ListArgument].
      */
     @Suppress("DEPRECATION")
@@ -1004,7 +1004,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param list A function returning the list of possible values.
      * @param parse A function to parse the returned [String] into type `T`.
      * @param converter A function to convert a value into a [Suggestion] (default: uses `toString()`).
-     * @param async Whether the _suggestions_ should be gotten asynchronously (default: `false`).
+     * @param async Whether the _suggestions_ should be gotten asynchronously.
      * @return The created [ListArgument].
      */
     @JvmOverloads
@@ -1013,7 +1013,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
         list: CommandContext<CommandSender>.() -> List<T>,
         parse: CommandSender.(String) -> T,
         converter: CommandSender.(T) -> Suggestion? = { Suggestion.withText(it.toString()) },
-        async: Boolean = false,
+        async: Boolean,
     ): ListArgument<T, String> = addArgument(ListArgument.create(StringArgument(name, StringType.WORD), list, converter, parse, async))
 
     /**
@@ -1040,7 +1040,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param list The list of possible values.
      * @param parse A function to parse the returned [String] into type `T`.
      * @param converter A function to convert a value into a [Suggestion] (default: uses `toString()`).
-     * @param async Whether the _suggestions_ should be gotten asynchronously (default: `false`).
+     * @param async Whether the _suggestions_ should be gotten asynchronously.
      * @return The created [ListArgument].
      */
     @Suppress("DEPRECATION")
@@ -1062,7 +1062,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param list A function returning the list of possible values.
      * @param parse A function to parse the returned [String] into type `T`.
      * @param converter A function to convert a value into a [Suggestion] (default: uses `toString()`).
-     * @param async Whether the _suggestions_ should be gotten asynchronously (default: `false`).
+     * @param async Whether the _suggestions_ should be gotten asynchronously.
      * @return The created [ListArgument].
      */
     @JvmOverloads
@@ -1071,7 +1071,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
         list: CommandContext<CommandSender>.() -> List<T>,
         parse: CommandSender.(R) -> T,
         converter: CommandSender.(T) -> Suggestion? = { Suggestion.withText(it.toString()) },
-        async: Boolean = false,
+        async: Boolean,
     ): ListArgument<T, R> = addArgument(ListArgument.create(type, list, converter, parse, async))
 
     /**
@@ -1081,9 +1081,13 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * If the [Suggestion] is null, then it will be filtered out (default: uses the `name` property).
      * This is useful when you wish to get the argument input and process the information yourself.
      * @param parse A function providing a [CommandSender] and the argument input, returning the parsed [Enum] (default: `enum.valueOf(input.uppercase())`).
-     * @param async Whether the _suggestions_ should be gotten asynchronously (default: `true`).
+     * @param async Whether the _suggestions_ should be gotten asynchronously.
      * @return The created [EnumArgument].
      */
+    @JvmOverloads
+    @Suppress("DEPRECATION")
+    @Deprecated("The async parameter should be omitted")
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
     inline fun <reified T : Enum<T>> addEnumArgument(
         name: String,
         noinline converter: CommandSender.(Enum<T>) -> Suggestion? = {
@@ -1096,21 +1100,61 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
                 null
             }
         },
-        async: Boolean = true,
+        async: Boolean,
     ): EnumArgument<T> = addArgument(EnumArgument(name, T::class.java, converter, parse, async))
 
     /**
      * Adds an [EnumArgument] to the command with the given name. Only works in Kotlin.
      *
-     * @param formatting The formatting style for the enum names (default: [EnumFormatting.LOWERCASE]).
-     * @param async Whether the _suggestions_ should be gotten asynchronously (default: `true`).
+     * @param converter A function providing a [CommandSender] and an [Enum] instance from the [T], returning the [Suggestion] sent to the player.
+     * If the [Suggestion] is null, then it will be filtered out (default: uses the `name` property).
+     * This is useful when you wish to get the argument input and process the information yourself.
+     * @param parse A function providing a [CommandSender] and the argument input, returning the parsed [Enum] (default: `enum.valueOf(input.uppercase())`).
      * @return The created [EnumArgument].
      */
+    @JvmOverloads
+    inline fun <reified T : Enum<T>> addEnumArgument(
+        name: String,
+        noinline converter: CommandSender.(Enum<T>) -> Suggestion? = {
+            Suggestion.withText(it.name)
+        },
+        noinline parse: CommandSender.(String) -> Enum<T>? = { input ->
+            try {
+                valueOf(Enum::class.java as Class<out Enum<*>>, input.uppercase()) as Enum<T>
+            } catch (e: IllegalArgumentException) {
+                null
+            }
+        },
+    ): EnumArgument<T> = addArgument(EnumArgument(name, T::class.java, converter, parse))
+
+    /**
+     * Adds an [EnumArgument] to the command with the given name. Only works in Kotlin.
+     *
+     * @param formatting The formatting style for the enum names (default: [EnumFormatting.LOWERCASE]).
+     * @param async Whether the _suggestions_ should be gotten asynchronously.
+     * @return The created [EnumArgument].
+     */
+    @JvmOverloads
+    @Suppress("DEPRECATION")
+    @Deprecated("The async parameter should be omitted")
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
     inline fun <reified T : Enum<T>> addEnumArgument(
         name: String,
         formatting: EnumFormatting = EnumFormatting.LOWERCASE,
-        async: Boolean = true,
+        async: Boolean,
     ): EnumArgument<T> = addArgument(EnumArgument(name, T::class.java, { Suggestion.withText(formatting.action(it.name)) }, async = async))
+
+    /**
+     * Adds an [EnumArgument] to the command with the given name. Only works in Kotlin.
+     *
+     * @param formatting The formatting style for the enum names (default: [EnumFormatting.LOWERCASE]).
+     * @return The created [EnumArgument].
+     */
+    @JvmOverloads
+    inline fun <reified T : Enum<T>> addEnumArgument(
+        name: String,
+        formatting: EnumFormatting = EnumFormatting.LOWERCASE,
+    ): EnumArgument<T> = addArgument(EnumArgument(name, T::class.java, { Suggestion.withText(formatting.action(it.name)) }))
 
     /**
      * Adds an [EnumArgument] to the command with the given name.
@@ -1119,7 +1163,36 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * If the [Suggestion] is null, then it will be filtered out (default: uses the `name` property).
      * This is useful when you wish to get the argument input and process the information yourself.
      * @param parse A function providing a [CommandSender] and the argument input, returning the parsed [Enum] (default: `enum.valueOf(input.uppercase())`).
-     * @param async Whether the _suggestions_ should be gotten asynchronously (default: `true`).
+     * @param async Whether the _suggestions_ should be gotten asynchronously.
+     * @return The created [EnumArgument].
+     */
+    @JvmOverloads
+    @Suppress("DEPRECATION")
+    @Deprecated("The async parameter should be omitted")
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
+    fun <T : Enum<T>> addEnumArgument(
+        name: String,
+        enum: Class<T>,
+        converter: CommandSender.(Enum<T>) -> Suggestion? = {
+            Suggestion.withText(it.name)
+        },
+        parse: CommandSender.(String) -> Enum<T>? = { input ->
+            try {
+                valueOf(Enum::class.java as Class<out Enum<*>>, input.uppercase()) as Enum<T>
+            } catch (e: IllegalArgumentException) {
+                null
+            }
+        },
+        async: Boolean,
+    ): EnumArgument<T> = addArgument(EnumArgument(name, enum, converter, parse, async))
+
+    /**
+     * Adds an [EnumArgument] to the command with the given name.
+     *
+     * @param converter A function providing a [CommandSender] and an [Enum] instance from the [T], returning the [Suggestion] sent to the player.
+     * If the [Suggestion] is null, then it will be filtered out (default: uses the `name` property).
+     * This is useful when you wish to get the argument input and process the information yourself.
+     * @param parse A function providing a [CommandSender] and the argument input, returning the parsed [Enum] (default: `enum.valueOf(input.uppercase())`).
      * @return The created [EnumArgument].
      */
     @JvmOverloads
@@ -1136,32 +1209,66 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
                 null
             }
         },
-        async: Boolean = true,
-    ): EnumArgument<T> = addArgument(EnumArgument(name, enum, converter, parse, async))
+    ): EnumArgument<T> = addArgument(EnumArgument(name, enum, converter, parse))
 
     /**
      * Adds an [EnumArgument] to the command with the given name.
      *
      * @param formatting The formatting style for the enum names (default: [EnumFormatting.LOWERCASE]).
-     * @param async Whether the _suggestions_ should be gotten asynchronously (default: `true`).
+     * @param async Whether the _suggestions_ should be gotten asynchronously.
+     * @return The created [EnumArgument].
+     */
+    @JvmOverloads
+    @Suppress("DEPRECATION")
+    @Deprecated("The async parameter should be omitted")
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
+    fun <T : Enum<T>> addEnumArgument(
+        name: String,
+        enum: Class<T>,
+        formatting: EnumFormatting = EnumFormatting.LOWERCASE,
+        async: Boolean,
+    ): EnumArgument<T> = addArgument(EnumArgument(name, enum, { Suggestion.withText(formatting.action(it.name)) }, async = async))
+
+    /**
+     * Adds an [EnumArgument] to the command with the given name.
+     *
+     * @param formatting The formatting style for the enum names (default: [EnumFormatting.LOWERCASE]).
      * @return The created [EnumArgument].
      */
     fun <T : Enum<T>> addEnumArgument(
         name: String,
         enum: Class<T>,
         formatting: EnumFormatting = EnumFormatting.LOWERCASE,
-        async: Boolean = true,
-    ): EnumArgument<T> = addArgument(EnumArgument(name, enum, { Suggestion.withText(formatting.action(it.name)) }, async = async))
+    ): EnumArgument<T> = addArgument(EnumArgument(name, enum, { Suggestion.withText(formatting.action(it.name)) }))
 
     /**
      * Adds an [OnlinePlayersArgument] to the command with the given name. It is a list of all currently online players.
      *
      * @param filter A function to filter players (default: exclude sender).
-     * @param async Whether the _suggestions_ should be gotten asynchronously (default: `false`).
+     * @param async Whether the _suggestions_ should be gotten asynchronously.
      * @return The created [OnlinePlayersArgument], which returns a [Player] when parsed.
      */
     @JvmOverloads
-    fun addOnlinePlayersArgument(name: String, filter: CommandSender.(Player) -> Boolean = { it != this }, async: Boolean = false): OnlinePlayersArgument = addArgument(OnlinePlayersArgument(name, filter, async))
+    @Suppress("DEPRECATION")
+    @Deprecated("The async parameter should be omitted")
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
+    fun addOnlinePlayersArgument(
+        name: String,
+        filter: CommandSender.(Player) -> Boolean = { it != this },
+        async: Boolean,
+    ): OnlinePlayersArgument = addArgument(OnlinePlayersArgument(name, filter, async))
+
+    /**
+     * Adds an [OnlinePlayersArgument] to the command with the given name. It is a list of all currently online players.
+     *
+     * @param filter A function to filter players (default: exclude sender).
+     * @return The created [OnlinePlayersArgument], which returns a [Player] when parsed.
+     */
+    @JvmOverloads
+    fun addOnlinePlayersArgument(
+        name: String,
+        filter: CommandSender.(Player) -> Boolean = { it != this },
+    ): OnlinePlayersArgument = addArgument(OnlinePlayersArgument(name, filter))
 
     // Math
     /**
