@@ -259,7 +259,6 @@ fun <T, R> AbstractStellarCommand<*>.listArgument(
     list: List<T>,
     parse: CommandSender.(R) -> T,
     converter: CommandSender.(T) -> String? = { it.toString() },
-    async: Boolean = false,
     block: ListArgument<T, R>.() -> Unit = {},
 ): ListArgument<T, R> = addArgument(ListArgument(type, list, { converter(it)?.let { Suggestion.withText(it) } }, parse))
 
@@ -371,7 +370,6 @@ fun <T, R> AbstractStellarCommand<*>.advancedListArgument(
  * If the [Suggestion] is null, then it will be filtered out (default: uses the `name` property).
  * This is useful when you wish to get the argument input and process the information yourself.
  * @param parse A function providing a [CommandSender] and the argument input, returning the parsed [Enum] (default: `enum.valueOf(input.uppercase())`).
- * @param async Whether the _suggestions_ should be gotten asynchronously (default: `true`).
  * @return The created [EnumArgument].
  */
 inline fun <reified T : Enum<T>> AbstractStellarCommand<*>.enumArgument(
@@ -386,23 +384,20 @@ inline fun <reified T : Enum<T>> AbstractStellarCommand<*>.enumArgument(
             null
         }
     },
-    async: Boolean = true,
     block: EnumArgument<T>.() -> Unit = {},
-): EnumArgument<T> = addArgument(EnumArgument(name, T::class.java, converter, parse, async))
+): EnumArgument<T> = addArgument(EnumArgument(name, T::class.java, converter, parse))
 
 /**
  * Adds an [EnumArgument] to the command with the given name. Only works in Kotlin.
  *
  * @param formatting The formatting style for the enum names (default: [EnumFormatting.LOWERCASE]).
- * @param async Whether the _suggestions_ should be gotten asynchronously (default: `true`).
  * @return The created [EnumArgument].
  */
 inline fun <reified T : Enum<T>> AbstractStellarCommand<*>.enumArgument(
     name: String,
     formatting: EnumFormatting = EnumFormatting.LOWERCASE,
-    async: Boolean = true,
     block: EnumArgument<T>.() -> Unit = {},
-): EnumArgument<T> = addArgument(EnumArgument(name, T::class.java, { Suggestion.withText(formatting.action(it.name)) }, async = async))
+): EnumArgument<T> = addArgument(EnumArgument(name, T::class.java, { Suggestion.withText(formatting.action(it.name)) }))
 
 /**
  * Adds an [EnumArgument] to the command with the given name.
@@ -411,7 +406,6 @@ inline fun <reified T : Enum<T>> AbstractStellarCommand<*>.enumArgument(
  * If the [Suggestion] is null, then it will be filtered out (default: uses the `name` property).
  * This is useful when you wish to get the argument input and process the information yourself.
  * @param parse A function providing a [CommandSender] and the argument input, returning the parsed [Enum] (default: `enum.valueOf(input.uppercase())`).
- * @param async Whether the _suggestions_ should be gotten asynchronously (default: `true`).
  * @return The created [EnumArgument].
  */
 fun <T : Enum<T>> AbstractStellarCommand<*>.enumArgument(
@@ -427,33 +421,33 @@ fun <T : Enum<T>> AbstractStellarCommand<*>.enumArgument(
             null
         }
     },
-    async: Boolean = true,
     block: EnumArgument<T>.() -> Unit = {},
-): EnumArgument<T> = addArgument(EnumArgument(name, enum, converter, parse, async)).apply(block)
+): EnumArgument<T> = addArgument(EnumArgument(name, enum, converter, parse)).apply(block)
 
 /**
  * Adds an [EnumArgument] to the command with the given name.
  *
  * @param formatting The formatting style for the enum names (default: [EnumFormatting.LOWERCASE]).
- * @param async Whether the _suggestions_ should be gotten asynchronously (default: `true`).
  * @return The created [EnumArgument].
  */
 fun <T : Enum<T>> AbstractStellarCommand<*>.enumArgument(
     name: String,
     enum: Class<T>,
     formatting: EnumFormatting = EnumFormatting.LOWERCASE,
-    async: Boolean = true,
     block: EnumArgument<T>.() -> Unit = {},
-): EnumArgument<T> = addArgument(EnumArgument(name, enum, { Suggestion.withText(formatting.action(it.name)) }, async = async))
+): EnumArgument<T> = addArgument(EnumArgument(name, enum, { Suggestion.withText(formatting.action(it.name)) }))
 
 /**
  * Adds an [OnlinePlayersArgument] to the command with the given name. It is a list of all currently online players.
  *
  * @param filter A function to filter players (default: exclude sender).
- * @param async Whether the _suggestions_ should be gotten asynchronously (default: `false`).
  * @return The created [OnlinePlayersArgument], which returns a [Player] when parsed.
  */
-fun AbstractStellarCommand<*>.onlinePlayersArgument(name: String, filter: CommandSender.(Player) -> Boolean = { it != this }, async: Boolean = false, block: OnlinePlayersArgument.() -> Unit = {}): OnlinePlayersArgument = addArgument(OnlinePlayersArgument(name, filter, async)).apply(block)
+fun AbstractStellarCommand<*>.onlinePlayersArgument(
+    name: String,
+    filter: CommandSender.(Player) -> Boolean = { it != this },
+    block: OnlinePlayersArgument.() -> Unit = {},
+): OnlinePlayersArgument = addArgument(OnlinePlayersArgument(name, filter)).apply(block)
 
 // Math
 /**
