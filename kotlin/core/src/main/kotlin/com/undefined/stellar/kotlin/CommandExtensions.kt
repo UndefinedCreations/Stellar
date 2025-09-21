@@ -3,6 +3,8 @@ package com.undefined.stellar.kotlin
 import com.undefined.stellar.AbstractStellarCommand
 import com.undefined.stellar.data.argument.CommandContext
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.future.future
 import kotlinx.coroutines.runBlocking
 import org.bukkit.command.CommandSender
 import java.util.concurrent.CompletableFuture
@@ -12,24 +14,17 @@ import kotlin.coroutines.CoroutineContext
  * Adds an execution to the command.
  *
  * @param C The type of CommandSender.
- * @param context The [CoroutineContext] the execution will be run in. If null, the execution will run on the current thread.
+ * @param context The [CoroutineContext] the execution will be run in (default: [Dispatchers.Default]).
  * @param execution The execution block.
+ * @return The modified command object.
  */
 inline fun <reified C : CommandSender> AbstractStellarCommand<*>.execution(
-    context: CoroutineContext? = null,
+    context: CoroutineContext = Dispatchers.Default,
     noinline execution: suspend CommandContext<C>.(CoroutineScope) -> Unit,
-) {
-    addExecution<C> {
-        if (context != null) {
-            runBlocking(context) {
-                execution(this)
-            }
-        } else {
-            runBlocking {
-                execution(this)
-            }
-        }
-    }
+): AbstractStellarCommand<*> = addExecution<C> {
+    CoroutineScope(context).future {
+        execution(this)
+    }.get()
 }
 
 /**
@@ -38,32 +33,25 @@ inline fun <reified C : CommandSender> AbstractStellarCommand<*>.execution(
  * @param C The type of CommandSender.
  * @param execution The execution block.
  */
-inline fun <reified C : CommandSender> AbstractStellarCommand<*>.asyncExecution(noinline execution: CommandContext<C>.() -> Unit) = addExecution(execution)
+inline fun <reified C : CommandSender> AbstractStellarCommand<*>.asyncExecution(noinline execution: CommandContext<C>.() -> Unit) = addAsyncExecution(execution)
 
 /**
  * Adds a runnable to the command.
  *
  * @param C The type of CommandSender.
  * @param alwaysApplicable Whether it should always run or only when an execution is already present for the last argument.
- * @param context The [CoroutineContext] the execution will be run in. If null, the execution will run on the current thread.
+ * @param context The [CoroutineContext] the runnable will be run in (default: [Dispatchers.Default]).
  * @param runnable The execution block.
+ * @return The modified command object.
  */
 inline fun <reified C : CommandSender> AbstractStellarCommand<*>.runnable(
     alwaysApplicable: Boolean = false,
-    context: CoroutineContext? = null,
+    context: CoroutineContext = Dispatchers.Default,
     noinline runnable: suspend CommandContext<C>.(CoroutineScope) -> Boolean,
-) {
-    addRunnable<C>(alwaysApplicable = alwaysApplicable) {
-        if (context != null) {
-            runBlocking(context) {
-                runnable(this)
-            }
-        } else {
-            runBlocking {
-                runnable(this)
-            }
-        }
-    }
+): AbstractStellarCommand<*> = addRunnable<C>(alwaysApplicable = alwaysApplicable) {
+    CoroutineScope(context).future {
+        runnable(this)
+    }.get()
 }
 
 /**
@@ -84,50 +72,34 @@ inline fun <reified C : CommandSender> AbstractStellarCommand<*>.asyncRunnable(
  * Adds a failure execution to the command to be displayed when the command fails.
  *
  * @param C The type of CommandSender.
- * @param context The [CoroutineContext] the execution will be run in. If null, the execution will run on the current thread.
+ * @param context The [CoroutineContext] the execution will be run in (default: [Dispatchers.Default]).
  * @param execution The execution block.
  * @return The modified command object.
  */
 inline fun <reified C : CommandSender> AbstractStellarCommand<*>.failureExecution(
-    context: CoroutineContext? = null,
+    context: CoroutineContext = Dispatchers.Default,
     noinline execution: suspend CommandContext<C>.(CoroutineScope) -> Unit,
-) {
-    addFailureExecution<C> {
-        if (context != null) {
-            runBlocking(context) {
-                execution(this)
-            }
-        } else {
-            runBlocking {
-                execution(this)
-            }
-        }
-    }
+): AbstractStellarCommand<*> = addFailureExecution<C> {
+    CoroutineScope(context).future {
+        execution(this)
+    }.get()
 }
 
 /**
  * Adds a requirement that must be met for the command to be available to the player.
  *
  * @param C The type of CommandSender.
- * @param context The [CoroutineContext] the requirement will be run in. If null, the requirement will run on the current thread.
+ * @param context The [CoroutineContext] the requirement will be run in (default: [Dispatchers.Default]).
  * @param requirement The condition that must be met.
  * @return The modified command object.
  */
 inline fun <reified C : CommandSender> AbstractStellarCommand<*>.requires(
-    context: CoroutineContext? = null,
+    context: CoroutineContext = Dispatchers.Default,
     noinline requirement: suspend C.(CoroutineScope) -> Boolean,
-) {
-    addRequirement<C> {
-        if (context != null) {
-            runBlocking(context) {
-                requirement(this)
-            }
-        } else {
-            runBlocking {
-                requirement(this)
-            }
-        }
-    }
+): AbstractStellarCommand<*> = addRequirement<C> {
+    CoroutineScope(context).future {
+        requirement(this)
+    }.get()
 }
 
 /**
