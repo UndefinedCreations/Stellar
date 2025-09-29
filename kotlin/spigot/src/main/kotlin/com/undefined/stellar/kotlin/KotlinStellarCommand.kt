@@ -33,7 +33,7 @@ class KotlinStellarCommand(name: String) : StellarCommand(name) {
      *
      * @return The created [LiteralArgument].
      */
-    operator fun String.invoke(block: LiteralArgument.() -> Unit): LiteralArgument = addLiteralArgument(name).apply(block)
+    operator fun String.invoke(block: LiteralArgument.() -> Unit): LiteralArgument = addLiteralArgument(this).apply(block)
 
 }
 

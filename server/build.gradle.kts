@@ -23,6 +23,8 @@ val serverType = "paper"
 dependencies {
     compileOnly(libs.spigot)
     implementation(kotlin("reflect"))
+    implementation(project(":kotlin:paper"))
+    implementation(libs.kotlin.coroutines)
     implementation("com.undefined:lynx:1.1.1-SNAPSHOT")
     implementation("com.undefined:akari:0.0.2")
     implementation("net.kyori:adventure-api:4.20.0")
