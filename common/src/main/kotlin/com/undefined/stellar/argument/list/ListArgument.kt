@@ -82,6 +82,11 @@ open class ListArgument<T, R> @JvmOverloads constructor(
 	@OverrideOnly
 	open fun getSuggestionList(context: CommandContext<CommandSender>, input: String): CompletableFuture<Iterable<Suggestion>> =
 		list(context).thenApply { list ->
+			println("ListArgument.getSuggestionList")
+			println("list: ${list}")
+			println("list: ${list.mapNotNull {
+				converter(context.sender, it)
+			}}")
 			list.mapNotNull {
 				converter(context.sender, it).takeIf { it?.text?.isNotBlank() == true }
 			}.filter { it.text.startsWith(input, true) && it.text != input }

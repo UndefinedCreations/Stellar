@@ -876,7 +876,6 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
     @Suppress("DEPRECATION")
     @Deprecated("The async parameter should be omitted")
     @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
-    @JvmOverloads
     fun <T> addListArgument(
         name: String,
         list: List<T>,
@@ -891,10 +890,28 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param list A function returning the list of possible values.
      * @param parse A function to parse the returned [String] into type `T`.
      * @param converter A function to convert a value into a [String] (default: uses `toString()`).
-     * @param async Whether the _suggestions_ should be gotten asynchronously.
      * @return The created [ListArgument].
      */
     @JvmOverloads
+    fun <T> addListArgument(
+        name: String,
+        list: CommandContext<CommandSender>.() -> List<T>,
+        parse: CommandSender.(String) -> T,
+        converter: CommandSender.(T) -> String? = { it.toString() },
+    ): ListArgument<T, String> = addArgument(ListArgument.create(StringArgument(name, StringType.WORD), list, { converter(it)?.let { Suggestion.withText(it) } }, parse))
+
+    /**
+     * Adds a [ListArgument] to the command with the given name.
+     *
+     * @param list A function returning the list of possible values.
+     * @param parse A function to parse the returned [String] into type `T`.
+     * @param converter A function to convert a value into a [String] (default: uses `toString()`).
+     * @param async Whether the _suggestions_ should be gotten asynchronously.
+     * @return The created [ListArgument].
+     */
+    @Suppress("DEPRECATION")
+    @Deprecated("The async parameter should be omitted")
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
     fun <T> addListArgument(
         name: String,
         list: CommandContext<CommandSender>.() -> List<T>,
@@ -933,7 +950,6 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
     @Suppress("DEPRECATION")
     @Deprecated("The async parameter should be omitted")
     @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
-    @JvmOverloads
     fun <T, R> addListArgument(
         type: ParameterArgument<*, R>,
         list: List<T>,
@@ -952,7 +968,9 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param async Whether the _suggestions_ should be gotten asynchronously.
      * @return The created [ListArgument].
      */
-    @JvmOverloads
+    @Suppress("DEPRECATION")
+    @Deprecated("The async parameter should be omitted")
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
     fun <T, R> addListArgument(
         type: ParameterArgument<*, R>,
         list: CommandContext<CommandSender>.() -> List<T>,
@@ -989,7 +1007,6 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
     @Suppress("DEPRECATION")
     @Deprecated("The async parameter should be omitted")
     @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
-    @JvmOverloads
     fun <T> addAdvancedListArgument(
         name: String,
         list: List<T>,
@@ -1007,7 +1024,9 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param async Whether the _suggestions_ should be gotten asynchronously.
      * @return The created [ListArgument].
      */
-    @JvmOverloads
+    @Suppress("DEPRECATION")
+    @Deprecated("The async parameter should be omitted")
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
     fun <T> addAdvancedListArgument(
         name: String,
         list: CommandContext<CommandSender>.() -> List<T>,
@@ -1046,7 +1065,6 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
     @Suppress("DEPRECATION")
     @Deprecated("The async parameter should be omitted")
     @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
-    @JvmOverloads
     fun <T, R> addAdvancedListArgument(
         type: ParameterArgument<*, R>,
         list: List<T>,
@@ -1065,7 +1083,9 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param async Whether the _suggestions_ should be gotten asynchronously.
      * @return The created [ListArgument].
      */
-    @JvmOverloads
+    @Suppress("DEPRECATION")
+    @Deprecated("The async parameter should be omitted")
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
     fun <T, R> addAdvancedListArgument(
         type: ParameterArgument<*, R>,
         list: CommandContext<CommandSender>.() -> List<T>,
@@ -1084,7 +1104,6 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param async Whether the _suggestions_ should be gotten asynchronously.
      * @return The created [EnumArgument].
      */
-    @JvmOverloads
     @Suppress("DEPRECATION")
     @Deprecated("The async parameter should be omitted")
     @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
