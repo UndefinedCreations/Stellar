@@ -17,8 +17,12 @@ import org.bukkit.entity.Player
  * @since 1.13
  */
 class OnlinePlayersArgument(name: String, filter: CommandSender.(Player) -> Boolean = { it.uniqueId != (this as? Player)?.uniqueId }, async: Boolean = false) : ListArgument<Player, String>(
-    StringArgument(name, StringType.WORD),
+    base = StringArgument(name, StringType.WORD),
     list = Bukkit.getServer().onlinePlayers,
-    converter = { player -> player.takeIf { filter(player) }?.let { Suggestion.withText(player.name) } ?: Suggestion.empty() },
-    parse = { Bukkit.getPlayer(it) },
+    converter = { player ->
+        player.takeIf { filter(player) }?.let { Suggestion.withText(player.name) } ?: Suggestion.empty()
+    },
+    parse = { input ->
+        Bukkit.getPlayer(input)?.takeIf { player -> filter(player) }
+    },
 )
