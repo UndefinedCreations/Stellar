@@ -17,7 +17,7 @@ import java.util.concurrent.CompletableFuture
  * @param converter A function providing a [CommandSender] and a value from the list, returning the [Suggestion] shown in-game. This is used to convert each element in the list ot a suggestion viewable in-game (default: uses `toString()`).
  * @param parse A function providing a [CommandSender] and the value returned from the [ParameterArgument], returning the argument parsed from the [base] argument.
  */
-open class ListArgument<T, R> @JvmOverloads constructor(
+open class ListArgument<T, R>(
 	val base: ParameterArgument<*, R>,
 	val list: CommandContext<CommandSender>.() -> CompletableFuture<Iterable<T>>,
 	val converter: CommandSender.(T) -> Suggestion? = { Suggestion.withText(it.toString()) },

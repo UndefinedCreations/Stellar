@@ -13,7 +13,7 @@ import org.bukkit.plugin.java.JavaPlugin
 object MenuCommands : KotlinBaseStellarCommand("menu", "menu.admin", listOf("menus")) {
     override fun setup(): StellarCommand = kotlinCommand {
         "open" {
-            onlinePlayersArgument("player") {
+            onlinePlayersArgument("player", filter = { false }) {
                 listArgument(
                     "menu",
                     { listOf("abc", "bcd", "cde") },

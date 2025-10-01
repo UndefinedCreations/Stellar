@@ -57,6 +57,7 @@ import com.undefined.stellar.data.suggestion.Suggestion
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.future.future
+import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import java.lang.Enum.valueOf
@@ -436,6 +437,8 @@ fun <T : Enum<T>> AbstractStellarCommand<*>.enumArgument(
     formatting: EnumFormatting = EnumFormatting.LOWERCASE,
     block: EnumArgument<T>.() -> Unit = {},
 ): EnumArgument<T> = addArgument(EnumArgument(name, enum, { Suggestion.withText(formatting.action(it.name)) })).apply(block)
+
+typealias KotlinOnlinePlayersArgument = ListArgument<Player, String>
 
 /**
  * Adds an [OnlinePlayersArgument] to the command with the given name. It is a list of all currently online players.

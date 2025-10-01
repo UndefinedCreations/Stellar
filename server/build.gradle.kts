@@ -48,7 +48,7 @@ tasks {
         options.release = 21
     }
     runServer {
-        minecraftVersion("1.21.8")
+        minecraftVersion("1.21.9")
         perVersionFolder(true)
         acceptMojangEula()
         if (serverType == "spigot") serverType(ServerType.SPIGOT) else serverType(ServerType.PAPERMC)
