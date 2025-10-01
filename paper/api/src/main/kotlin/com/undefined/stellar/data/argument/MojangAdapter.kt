@@ -1,5 +1,7 @@
 package com.undefined.stellar.data.argument
 
+import com.mojang.brigadier.exceptions.CommandSyntaxException
+import com.mojang.brigadier.exceptions.SimpleCommandExceptionType
 import com.undefined.stellar.*
 import com.undefined.stellar.argument.LiteralArgument
 import com.undefined.stellar.argument.list.ListArgument
@@ -11,6 +13,8 @@ import com.mojang.brigadier.context.CommandContext as BrigadierCommandContext
 
 @ApiStatus.Internal
 object MojangAdapter {
+
+    private val INVALID_LIST_ENTRY = SimpleCommandExceptionType { "Invalid list entry!" }
 
     fun getStellarCommandContext(context: BrigadierCommandContext<Any>): CommandContext<CommandSender> {
         val input = context.input.removePrefix("/")
@@ -24,9 +28,10 @@ object MojangAdapter {
         val parsedArguments: CommandTree =
             arguments.associate<AbstractStellarArgument<*>, String, (CommandContext<CommandSender>) -> Any> { argument ->
                 Pair(argument.name) {
+                    println("parsing: ${argument.name}")
                     if (argument is ListArgument<*, *>)
                         return@Pair argument.parseInternal(sender, NMSManager.nms.parseArgument(context, argument.base) ?: context.getArgument(argument.name, Any::class.java))
-                            ?: throw IllegalArgumentException("Argument return value cannot be null!")
+                            ?: throw CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherParseException().create(input)
                     (NMSManager.nms.parseArgument(context, argument as ParameterArgument<*, *>) ?: context.getArgument(argument.name, Any::class.java)) ?: throw IllegalArgumentException("Argument return value cannot be null!")
                 }
             } as CommandTree
