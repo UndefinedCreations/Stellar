@@ -1,13 +1,18 @@
 package com.undefined.stellar.kotlin
 
+import com.undefined.stellar.AbstractStellarArgument
 import com.undefined.stellar.AbstractStellarCommand
+import com.undefined.stellar.ParameterArgument
 import com.undefined.stellar.data.argument.CommandContext
+import com.undefined.stellar.data.suggestion.ExecutableSuggestion
+import com.undefined.stellar.data.suggestion.Suggestion
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.future.future
 import kotlinx.coroutines.runBlocking
 import org.bukkit.command.CommandSender
 import java.util.concurrent.CompletableFuture
+import kotlin.apply
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -117,3 +122,33 @@ fun AbstractStellarCommand<*>.requires(level: Int) = addRequirement(1)
  * @param permission The permission string.
  */
 fun AbstractStellarCommand<*>.requires(permission: String) = addRequirement<CommandSender> { hasPermission(permission) }
+
+/**
+ * Adds any number of [Suggestion] on top of the current suggestions.
+ *
+ * @return The modified [ParameterArgument].
+ */
+fun ParameterArgument<*, *>.suggests(vararg suggestions: Suggestion) = addSuggestions(suggestions.toString())
+
+/**
+ * Adds a [Suggestion] with the given title and tooltip on top of the current suggestions.
+ *
+ * @return The modified [ParameterArgument].
+ */
+fun ParameterArgument<*, *>.suggests(title: String, tooltip: String? = null) = addSuggestion(title, tooltip)
+
+/**
+ * Adds a function that returns a list of [Suggestion] on top of the current suggestions. Only works in Kotlin.
+ *
+ * @param C The type of CommandSender.
+ * @param context The [CoroutineContext] the requirement will be run in (default: [Dispatchers.Default]).
+ * @return The modified [ParameterArgument].
+ */
+inline fun <reified C : CommandSender> ParameterArgument<*, *>.suggests(
+    context: CoroutineContext = Dispatchers.Default,
+    noinline suggestion: suspend CommandContext<C>.(input: String) -> List<Suggestion>,
+) = addFutureSuggestion<C> { input ->
+    CoroutineScope(context).future {
+        suggestion(input)
+    }
+}
