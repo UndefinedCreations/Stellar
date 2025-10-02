@@ -2,6 +2,7 @@ package com.undefined.stellar.kotlin
 
 import com.undefined.stellar.AbstractStellarCommand
 import com.undefined.stellar.ParameterArgument
+import com.undefined.stellar.StellarConfig
 import com.undefined.stellar.argument.LiteralArgument
 import com.undefined.stellar.argument.basic.*
 import com.undefined.stellar.argument.block.BlockDataArgument
@@ -34,12 +35,10 @@ import com.undefined.stellar.data.argument.CommandContext
 import com.undefined.stellar.data.argument.EnumFormatting
 import com.undefined.stellar.data.suggestion.Suggestion
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.future.future
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import java.lang.Enum.valueOf
-import kotlin.coroutines.CoroutineContext
 
 /**
  * Adds a [LiteralArgument] to the command with the given name and aliases.
@@ -151,10 +150,10 @@ fun AbstractStellarCommand<*>.itemPredicateArgument(name: String, block: ItemSta
 /**
  * Adds a [ListArgument] to the command with the given name. It uses its [StringArgument] as a base wrapper.
  *
- * @param list A function return a list of possible values.
+ * @param list A function returning a list of possible values.
  * @param tooltip A function that assigns each suggestion with a tooltip. If the value is null, it will not add a tooltip.
  * @param type The [StringType] it will use in the [StringArgument].
- * @param context The [CoroutineContext] used to create the [CoroutineScope] the function is going to run in.
+ * @param scope The [CoroutineScope] used to create
  * @return The created [ListArgument].
  */
 fun AbstractStellarCommand<*>.listArgument(
@@ -162,10 +161,10 @@ fun AbstractStellarCommand<*>.listArgument(
     list: suspend CommandContext<CommandSender>.() -> List<String>,
     tooltip: (String) -> String? = { null },
     type: StringType = StringType.WORD,
-    context: CoroutineContext = Dispatchers.Default,
+    scope: CoroutineScope = StellarConfig.scope,
     block: ListArgument<String, String>.() -> Unit = {},
 ): ListArgument<String, String> = addArgument(ListArgument(StringArgument(name, type), {
-    CoroutineScope(context).future {
+    scope.future {
         list(this@ListArgument)
     }
 }, { Suggestion.create(it, tooltip(it)) }, { it },)).apply(block)
@@ -208,7 +207,7 @@ fun <T> AbstractStellarCommand<*>.listArgument(
  * @param list A function returning the list of possible values.
  * @param parse A function to parse the returned [String] into type `T`.
  * @param converter A function to convert a value into a [String] (default: uses `toString()`).
- * @param context The [CoroutineContext] used to create the [CoroutineScope] the function is going to run in.
+ * @param scope The [CoroutineScope] used to create
  * @return The created [ListArgument].
  */
 fun <T> AbstractStellarCommand<*>.listArgument(
@@ -216,10 +215,10 @@ fun <T> AbstractStellarCommand<*>.listArgument(
     list: suspend CommandContext<CommandSender>.() -> Iterable<T>,
     parse: CommandSender.(String) -> T,
     converter: CommandSender.(T) -> String? = { it.toString() },
-    context: CoroutineContext = Dispatchers.Default,
+    scope: CoroutineScope = StellarConfig.scope,
     block: ListArgument<T, String>.() -> Unit = {},
 ): ListArgument<T, String> = addArgument(ListArgument(StringArgument(name, StringType.WORD), {
-    CoroutineScope(context).future {
+    scope.future {
         list(this@ListArgument)
     }
 }, { converter(it)?.let { Suggestion.withText(it) } }, parse)).apply(block)
@@ -248,7 +247,7 @@ fun <T, R> AbstractStellarCommand<*>.listArgument(
  * @param list A function returning the list of possible values.
  * @param parse A function to parse the returned [String] into type `T`.
  * @param converter A function to convert a value into a [String] (default: uses `toString()`).
- * @param context The [CoroutineContext] used to create the [CoroutineScope] the function is going to run in.
+ * @param scope The [CoroutineScope] used to create
  * @return The created [ListArgument].
  */
 fun <T, R> AbstractStellarCommand<*>.listArgument(
@@ -256,10 +255,10 @@ fun <T, R> AbstractStellarCommand<*>.listArgument(
     list: suspend CommandContext<CommandSender>.() -> List<T>,
     parse: CommandSender.(R) -> T,
     converter: CommandSender.(T) -> String? = { it.toString() },
-    context: CoroutineContext = Dispatchers.Default,
+    scope: CoroutineScope = StellarConfig.scope,
     block: ListArgument<T, R>.() -> Unit = {},
 ): ListArgument<T, R> = addArgument(ListArgument(type, {
-    CoroutineScope(context).future {
+    scope.future {
         list(this@ListArgument)
     }
 }, { converter(it)?.let { Suggestion.withText(it) } }, parse)).apply(block)
@@ -286,7 +285,7 @@ fun <T> AbstractStellarCommand<*>.advancedListArgument(
  * @param list A function returning the list of possible values.
  * @param parse A function to parse the returned [String] into type `T`.
  * @param converter A function to convert a value into a [Suggestion] (default: uses `toString()`).
- * @param context The [CoroutineContext] used to create the [CoroutineScope] the function is going to run in.
+ * @param scope The [CoroutineScope] used to create
  * @return The created [ListArgument].
  */
 fun <T> AbstractStellarCommand<*>.advancedListArgument(
@@ -294,10 +293,10 @@ fun <T> AbstractStellarCommand<*>.advancedListArgument(
     list: suspend CommandContext<CommandSender>.() -> List<T>,
     parse: CommandSender.(String) -> T,
     converter: CommandSender.(T) -> Suggestion? = { Suggestion.withText(it.toString()) },
-    context: CoroutineContext = Dispatchers.Default,
+    scope: CoroutineScope = StellarConfig.scope,
     block: ListArgument<T, String>.() -> Unit = {},
 ): ListArgument<T, String> = addArgument(ListArgument(StringArgument(name, StringType.WORD), {
-    CoroutineScope(context).future {
+    scope.future {
         list(this@ListArgument)
     }
 }, converter, parse)).apply(block)
@@ -326,7 +325,7 @@ fun <T, R> AbstractStellarCommand<*>.advancedListArgument(
  * @param list A function returning the list of possible values.
  * @param parse A function to parse the returned [String] into type `T`.
  * @param converter A function to convert a value into a [Suggestion] (default: uses `toString()`).
- * @param context The [CoroutineContext] used to create the [CoroutineScope] the function is going to run in.
+ * @param scope The [CoroutineScope] used to create
  * @return The created [ListArgument].
  */
 fun <T, R> AbstractStellarCommand<*>.advancedListArgument(
@@ -334,10 +333,10 @@ fun <T, R> AbstractStellarCommand<*>.advancedListArgument(
     list: suspend CommandContext<CommandSender>.() -> List<T>,
     parse: CommandSender.(R) -> T,
     converter: CommandSender.(T) -> Suggestion? = { Suggestion.withText(it.toString()) },
-    context: CoroutineContext = Dispatchers.Default,
+    scope: CoroutineScope = StellarConfig.scope,
     block: ListArgument<T, R>.() -> Unit = {},
 ): ListArgument<T, R> = addArgument(ListArgument(type, {
-    CoroutineScope(context).future {
+    scope.future {
         list(this@ListArgument)
     }
 }, converter, parse)).apply(block).apply(block)

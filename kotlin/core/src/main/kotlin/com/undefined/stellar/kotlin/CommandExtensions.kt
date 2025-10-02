@@ -2,30 +2,30 @@ package com.undefined.stellar.kotlin
 
 import com.undefined.stellar.AbstractStellarCommand
 import com.undefined.stellar.ParameterArgument
+import com.undefined.stellar.StellarConfig
 import com.undefined.stellar.data.argument.CommandContext
 import com.undefined.stellar.data.suggestion.Suggestion
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.future.future
+import kotlinx.coroutines.launch
 import org.bukkit.command.CommandSender
 import java.util.concurrent.CompletableFuture
-import kotlin.coroutines.CoroutineContext
 
 /**
  * Adds an execution to the command.
  *
  * @param C The type of CommandSender.
- * @param context The [CoroutineContext] the execution will be run in (default: [Dispatchers.Default]).
+ * @param scope The [CoroutineScope] used to create
  * @param execution The execution block.
  * @return The modified command object.
  */
 inline fun <reified C : CommandSender> AbstractStellarCommand<*>.execution(
-    context: CoroutineContext = Dispatchers.Default,
-    noinline execution: suspend CommandContext<C>.(CoroutineScope) -> Unit,
+    scope: CoroutineScope = StellarConfig.scope,
+    noinline execution: suspend CommandContext<C>.() -> Unit,
 ): AbstractStellarCommand<*> = addExecution<C> {
-    CoroutineScope(context).future {
-        execution(this)
-    }.get()
+    scope.launch {
+        execution()
+    }
 }
 
 /**
@@ -41,17 +41,17 @@ inline fun <reified C : CommandSender> AbstractStellarCommand<*>.asyncExecution(
  *
  * @param C The type of CommandSender.
  * @param alwaysApplicable Whether it should always run or only when an execution is already present for the last argument.
- * @param context The [CoroutineContext] the runnable will be run in (default: [Dispatchers.Default]).
+ * @param scope The [CoroutineScope] used to create
  * @param runnable The execution block.
  * @return The modified command object.
  */
 inline fun <reified C : CommandSender> AbstractStellarCommand<*>.runnable(
     alwaysApplicable: Boolean = false,
-    context: CoroutineContext = Dispatchers.Default,
-    noinline runnable: suspend CommandContext<C>.(CoroutineScope) -> Boolean,
+    scope: CoroutineScope = StellarConfig.scope,
+    noinline runnable: suspend CommandContext<C>.() -> Boolean,
 ): AbstractStellarCommand<*> = addRunnable<C>(alwaysApplicable = alwaysApplicable) {
-    CoroutineScope(context).future {
-        runnable(this)
+    scope.future {
+        runnable()
     }.get()
 }
 
@@ -65,41 +65,39 @@ inline fun <reified C : CommandSender> AbstractStellarCommand<*>.runnable(
 inline fun <reified C : CommandSender> AbstractStellarCommand<*>.asyncRunnable(
     alwaysApplicable: Boolean = false,
     noinline execution: CommandContext<C>.() -> Boolean,
-) {
-    addAsyncRunnable(alwaysApplicable, execution)
-}
+): AbstractStellarCommand<*> = addAsyncRunnable(alwaysApplicable, execution)
 
 /**
  * Adds a failure execution to the command to be displayed when the command fails.
  *
  * @param C The type of CommandSender.
- * @param context The [CoroutineContext] the execution will be run in (default: [Dispatchers.Default]).
+ * @param scope The [CoroutineScope] used to create
  * @param execution The execution block.
  * @return The modified command object.
  */
 inline fun <reified C : CommandSender> AbstractStellarCommand<*>.failureExecution(
-    context: CoroutineContext = Dispatchers.Default,
-    noinline execution: suspend CommandContext<C>.(CoroutineScope) -> Unit,
+    scope: CoroutineScope = StellarConfig.scope,
+    noinline execution: suspend CommandContext<C>.() -> Unit,
 ): AbstractStellarCommand<*> = addFailureExecution<C> {
-    CoroutineScope(context).future {
-        execution(this)
-    }.get()
+    scope.launch {
+        execution()
+    }
 }
 
 /**
  * Adds a requirement that must be met for the command to be available to the player.
  *
  * @param C The type of CommandSender.
- * @param context The [CoroutineContext] the requirement will be run in (default: [Dispatchers.Default]).
+ * @param scope The [CoroutineScope] used to create
  * @param requirement The condition that must be met.
  * @return The modified command object.
  */
 inline fun <reified C : CommandSender> AbstractStellarCommand<*>.requires(
-    context: CoroutineContext = Dispatchers.Default,
-    noinline requirement: suspend C.(CoroutineScope) -> Boolean,
+    scope: CoroutineScope = StellarConfig.scope,
+    noinline requirement: suspend C.() -> Boolean,
 ): AbstractStellarCommand<*> = addRequirement<C> {
-    CoroutineScope(context).future {
-        requirement(this)
+    scope.future {
+        requirement()
     }.get()
 }
 
@@ -137,14 +135,14 @@ fun ParameterArgument<*, *>.suggests(title: String, tooltip: String? = null) = a
  * Adds a function that returns a list of [Suggestion] on top of the current suggestions. Only works in Kotlin.
  *
  * @param C The type of CommandSender.
- * @param context The [CoroutineContext] the requirement will be run in (default: [Dispatchers.Default]).
+ * @param scope The [CoroutineScope] used to create
  * @return The modified [ParameterArgument].
  */
 inline fun <reified C : CommandSender> ParameterArgument<*, *>.suggests(
-    context: CoroutineContext = Dispatchers.Default,
+    scope: CoroutineScope = StellarConfig.scope,
     noinline suggestion: suspend CommandContext<C>.(input: String) -> List<Suggestion>,
 ) = addFutureSuggestion<C> { input ->
-    CoroutineScope(context).future {
+    scope.future {
         suggestion(input)
     }
 }

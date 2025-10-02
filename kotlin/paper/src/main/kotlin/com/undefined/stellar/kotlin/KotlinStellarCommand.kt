@@ -3,6 +3,7 @@ package com.undefined.stellar.kotlin
 import com.undefined.stellar.StellarCommand
 import com.undefined.stellar.StellarConfig
 import com.undefined.stellar.argument.LiteralArgument
+import kotlinx.coroutines.CoroutineScope
 import org.bukkit.plugin.java.JavaPlugin
 
 /**
