@@ -23,11 +23,7 @@ import com.undefined.stellar.argument.scoreboard.*
 import com.undefined.stellar.argument.structure.LootTableArgument
 import com.undefined.stellar.argument.structure.MirrorArgument
 import com.undefined.stellar.argument.structure.StructureRotationArgument
-import com.undefined.stellar.argument.text.ColorArgument
-import com.undefined.stellar.argument.text.ComponentArgument
-import com.undefined.stellar.argument.text.HexArgument
-import com.undefined.stellar.argument.text.MessageArgument
-import com.undefined.stellar.argument.text.StyleArgument
+import com.undefined.stellar.argument.text.*
 import com.undefined.stellar.argument.world.EnvironmentArgument
 import com.undefined.stellar.argument.world.HeightMapArgument
 import com.undefined.stellar.argument.world.LocationArgument

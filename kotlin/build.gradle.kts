@@ -1,5 +1,3 @@
-import kotlin.collections.iterator
-
 plugins {
     java
     id("setup")

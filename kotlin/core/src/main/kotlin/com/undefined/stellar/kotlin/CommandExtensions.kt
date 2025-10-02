@@ -1,18 +1,14 @@
 package com.undefined.stellar.kotlin
 
-import com.undefined.stellar.AbstractStellarArgument
 import com.undefined.stellar.AbstractStellarCommand
 import com.undefined.stellar.ParameterArgument
 import com.undefined.stellar.data.argument.CommandContext
-import com.undefined.stellar.data.suggestion.ExecutableSuggestion
 import com.undefined.stellar.data.suggestion.Suggestion
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.future.future
-import kotlinx.coroutines.runBlocking
 import org.bukkit.command.CommandSender
 import java.util.concurrent.CompletableFuture
-import kotlin.apply
 import kotlin.coroutines.CoroutineContext
 
 /**

@@ -1,11 +1,8 @@
 package com.undefined.stellar
 
-import com.undefined.stellar.argument.LiteralArgument
 import com.undefined.stellar.argument.basic.StringType
-import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
-import org.bukkit.entity.Player
 
 class MainStellarCommand : BaseStellarCommand("stellar", "com.undefined.stellar") {
 

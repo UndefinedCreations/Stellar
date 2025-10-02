@@ -1,7 +1,6 @@
 package com.undefined.stellar
 
 import com.undefined.stellar.kotlin.KotlinBaseStellarCommand
-import com.undefined.stellar.kotlin.advancedListArgument
 import com.undefined.stellar.kotlin.asyncExecution
 import com.undefined.stellar.kotlin.listArgument
 import com.undefined.stellar.kotlin.onlinePlayersArgument

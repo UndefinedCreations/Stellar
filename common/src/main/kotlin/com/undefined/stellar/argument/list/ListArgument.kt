@@ -7,7 +7,6 @@ import com.undefined.stellar.data.suggestion.Suggestion
 import org.bukkit.command.CommandSender
 import org.jetbrains.annotations.ApiStatus
 import java.util.concurrent.CompletableFuture
-import kotlin.collections.mapNotNull
 
 /**
  * An argument that wraps around an [ParameterArgument] and adds a suggestion based on the list provided.
