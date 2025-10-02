@@ -41,11 +41,9 @@ dependencies {
 
 tasks {
     shadowJar {
-        minimize {
-            exclude("**/kotlin/**")
-            exclude("**/intellij/**")
-            exclude("**/jetbrains/**")
-        }
+        exclude("**/kotlin/**")
+        exclude("**/intellij/**")
+        exclude("**/jetbrains/**")
         archiveClassifier = project.name
         archiveFileName = "${rootProject.name}-${project.version}.jar"
     }
