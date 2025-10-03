@@ -158,11 +158,11 @@ fun AbstractStellarCommand<*>.itemPredicateArgument(name: String, block: ItemSta
  */
 fun AbstractStellarCommand<*>.listArgument(
     name: String,
-    list: suspend CommandContext<CommandSender>.() -> List<String>, // list: suspend CommandContext<CommandSender>.()
-    tooltip: (String) -> String? = { null }, // parse: CommandSender.(St
-    type: StringType = StringType.WORD, // converter: suspend CommandContext<CommandSender>.(T) -> String? =
-    scope: CoroutineScope = StellarConfig.scope, // scope: CoroutineScop
-    block: ListArgument<String, String>.() -> Unit = {}, // block: ListArgument<T, String>
+    list: suspend CommandContext<CommandSender>.() -> List<String>,
+    tooltip: (String) -> String? = { null },
+    type: StringType = StringType.WORD,
+    scope: CoroutineScope = StellarConfig.scope,
+    block: ListArgument<String, String>.() -> Unit = {},
 ): ListArgument<String, String> = addArgument(ListArgument(StringArgument(name, type), {
     scope.future {
         list(this@ListArgument)
