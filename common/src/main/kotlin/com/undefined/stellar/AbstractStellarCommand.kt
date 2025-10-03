@@ -1268,7 +1268,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
         name: String,
         filter: CommandSender.(Player) -> Boolean = { it != this },
         async: Boolean,
-    ): OnlinePlayersArgument = addArgument(OnlinePlayersArgument(name, filter, async))
+    ): OnlinePlayersArgument = addArgument(OnlinePlayersArgument.create(name, filter))
 
     /**
      * Adds an [OnlinePlayersArgument] to the command with the given name. It is a list of all currently online players.
@@ -1280,7 +1280,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
     fun addOnlinePlayersArgument(
         name: String,
         filter: CommandSender.(Player) -> Boolean = { it != this },
-    ): OnlinePlayersArgument = addArgument(OnlinePlayersArgument(name, filter))
+    ): OnlinePlayersArgument = addArgument(OnlinePlayersArgument.create(name, filter))
 
     // Math
     /**

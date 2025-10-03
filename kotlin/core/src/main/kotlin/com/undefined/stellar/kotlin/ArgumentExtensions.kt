@@ -153,16 +153,16 @@ fun AbstractStellarCommand<*>.itemPredicateArgument(name: String, block: ItemSta
  * @param list A function returning a list of possible values.
  * @param tooltip A function that assigns each suggestion with a tooltip. If the value is null, it will not add a tooltip.
  * @param type The [StringType] it will use in the [StringArgument].
- * @param scope The [CoroutineScope] used to create
+ * @param scope The [CoroutineScope] used to compute the list.
  * @return The created [ListArgument].
  */
 fun AbstractStellarCommand<*>.listArgument(
     name: String,
-    list: suspend CommandContext<CommandSender>.() -> List<String>,
-    tooltip: (String) -> String? = { null },
-    type: StringType = StringType.WORD,
-    scope: CoroutineScope = StellarConfig.scope,
-    block: ListArgument<String, String>.() -> Unit = {},
+    list: suspend CommandContext<CommandSender>.() -> List<String>, // list: suspend CommandContext<CommandSender>.()
+    tooltip: (String) -> String? = { null }, // parse: CommandSender.(St
+    type: StringType = StringType.WORD, // converter: suspend CommandContext<CommandSender>.(T) -> String? =
+    scope: CoroutineScope = StellarConfig.scope, // scope: CoroutineScop
+    block: ListArgument<String, String>.() -> Unit = {}, // block: ListArgument<T, String>
 ): ListArgument<String, String> = addArgument(ListArgument(StringArgument(name, type), {
     scope.future {
         list(this@ListArgument)
@@ -191,15 +191,21 @@ fun AbstractStellarCommand<*>.listArgument(
  * @param list The list of possible values.
  * @param parse A function to parse the returned [String] into type `T`.
  * @param converter A function to convert a value into a [String] (default: uses `toString()`).
+ * @param scope The [CoroutineScope] used to compute the list.
  * @return The created [ListArgument].
  */
 fun <T> AbstractStellarCommand<*>.listArgument(
     name: String,
     list: List<T>,
     parse: CommandSender.(String) -> T,
-    converter: CommandSender.(T) -> String? = { it.toString() },
+    converter: suspend CommandContext<CommandSender>.(T) -> String? = { it.toString() },
+    scope: CoroutineScope = StellarConfig.scope,
     block: ListArgument<T, String>.() -> Unit = {},
-): ListArgument<T, String> = addArgument(ListArgument(StringArgument(name, StringType.WORD), list, { converter(it)?.let { Suggestion.withText(it) } }, parse)).apply(block)
+): ListArgument<T, String> = addArgument(ListArgument(StringArgument(name, StringType.WORD), {
+    scope.future {
+        list.mapNotNull { converter(it)?.let { Suggestion.withText(it) } }
+    }
+}, parse)).apply(block)
 
 /**
  * Adds a [ListArgument] to the command with the given name.
@@ -207,21 +213,24 @@ fun <T> AbstractStellarCommand<*>.listArgument(
  * @param list A function returning the list of possible values.
  * @param parse A function to parse the returned [String] into type `T`.
  * @param converter A function to convert a value into a [String] (default: uses `toString()`).
- * @param scope The [CoroutineScope] used to create
+ * @param scope The [CoroutineScope] used to compute the list.
  * @return The created [ListArgument].
  */
 fun <T> AbstractStellarCommand<*>.listArgument(
     name: String,
     list: suspend CommandContext<CommandSender>.() -> Iterable<T>,
     parse: CommandSender.(String) -> T,
-    converter: CommandSender.(T) -> String? = { it.toString() },
+    converter: suspend CommandContext<CommandSender>.(T) -> String? = { it.toString() },
     scope: CoroutineScope = StellarConfig.scope,
     block: ListArgument<T, String>.() -> Unit = {},
 ): ListArgument<T, String> = addArgument(ListArgument(StringArgument(name, StringType.WORD), {
     scope.future {
-        list(this@ListArgument)
+        list().mapNotNull {
+            val convertedText = converter(it).takeIf { suggestion -> suggestion?.isNotBlank() == true }
+            convertedText?.let { Suggestion.withText(convertedText) }
+        }.filter { it.text.startsWith(input, true) && it.text != input }
     }
-}, { converter(it)?.let { Suggestion.withText(it) } }, parse)).apply(block)
+}, parse)).apply(block)
 
 /**
  * Adds a [ListArgument] to the command wrapped around the given [AbstractStellarCommand].
@@ -230,15 +239,24 @@ fun <T> AbstractStellarCommand<*>.listArgument(
  * @param list The list of possible values.
  * @param parse A function to parse the returned [String] into type `T`.
  * @param converter A function to convert a value into a [String] (default: uses `toString()`).
+ * @param scope The [CoroutineScope] used to compute the list.
  * @return The created [ListArgument].
  */
 fun <T, R> AbstractStellarCommand<*>.listArgument(
     type: ParameterArgument<*, R>,
     list: List<T>,
     parse: CommandSender.(R) -> T,
-    converter: CommandSender.(T) -> String? = { it.toString() },
+    converter: suspend CommandContext<CommandSender>.(T) -> String? = { it.toString() },
+    scope: CoroutineScope = StellarConfig.scope,
     block: ListArgument<T, R>.() -> Unit = {},
-): ListArgument<T, R> = addArgument(ListArgument(type, list, { converter(it)?.let { Suggestion.withText(it) } }, parse)).apply(block)
+): ListArgument<T, R> = addArgument(ListArgument(type, {
+    scope.future {
+        list.mapNotNull {
+            val convertedText = converter(it).takeIf { suggestion -> suggestion?.isNotBlank() == true }
+            convertedText?.let { Suggestion.withText(convertedText) }
+        }.filter { it.text.startsWith(input, true) && it.text != input }
+    }
+}, parse)).apply(block)
 
 /**
  * Adds a [ListArgument] to the command wrapped around the given [AbstractStellarCommand].
@@ -247,21 +265,24 @@ fun <T, R> AbstractStellarCommand<*>.listArgument(
  * @param list A function returning the list of possible values.
  * @param parse A function to parse the returned [String] into type `T`.
  * @param converter A function to convert a value into a [String] (default: uses `toString()`).
- * @param scope The [CoroutineScope] used to create
+ * @param scope The [CoroutineScope] used to compute the list.
  * @return The created [ListArgument].
  */
 fun <T, R> AbstractStellarCommand<*>.listArgument(
     type: ParameterArgument<*, R>,
     list: suspend CommandContext<CommandSender>.() -> List<T>,
     parse: CommandSender.(R) -> T,
-    converter: CommandSender.(T) -> String? = { it.toString() },
+    converter: suspend CommandContext<CommandSender>.(T) -> String? = { it.toString() },
     scope: CoroutineScope = StellarConfig.scope,
     block: ListArgument<T, R>.() -> Unit = {},
 ): ListArgument<T, R> = addArgument(ListArgument(type, {
     scope.future {
-        list(this@ListArgument)
+        list().mapNotNull {
+            val convertedText = converter(it).takeIf { suggestion -> suggestion?.isNotBlank() == true }
+            convertedText?.let { Suggestion.withText(convertedText) }
+        }.filter { it.text.startsWith(input, true) && it.text != input }
     }
-}, { converter(it)?.let { Suggestion.withText(it) } }, parse)).apply(block)
+}, parse)).apply(block)
 
 /**
  * Adds a [ListArgument] to the command with the given name.
@@ -269,15 +290,23 @@ fun <T, R> AbstractStellarCommand<*>.listArgument(
  * @param list The list of possible values.
  * @param parse A function to parse the returned [String] into type `T`.
  * @param converter A function to convert a value into a [Suggestion] (default: uses `toString()`).
+ * @param scope The [CoroutineScope] used to compute the list.
  * @return The created [ListArgument].
  */
 fun <T> AbstractStellarCommand<*>.advancedListArgument(
     name: String,
     list: Collection<T>,
     parse: CommandSender.(String) -> T,
-    converter: CommandSender.(T) -> Suggestion? = { Suggestion.withText(it.toString()) },
+    converter: suspend CommandContext<CommandSender>.(T) -> Suggestion? = { Suggestion.withText(it.toString()) },
+    scope: CoroutineScope = StellarConfig.scope,
     block: ListArgument<T, String>.() -> Unit = {},
-): ListArgument<T, String> = addArgument(ListArgument(StringArgument(name, StringType.WORD), list, converter, parse)).apply(block)
+): ListArgument<T, String> = addArgument(ListArgument(StringArgument(name, StringType.WORD), {
+    scope.future {
+        list.mapNotNull {
+            converter(it).takeIf { suggestion -> suggestion?.text?.isNotBlank() == true }
+        }.filter { it.text.startsWith(input, true) && it.text != input }
+    }
+}, parse)).apply(block)
 
 /**
  * Adds a [ListArgument] to the command with the given name.
@@ -285,21 +314,23 @@ fun <T> AbstractStellarCommand<*>.advancedListArgument(
  * @param list A function returning the list of possible values.
  * @param parse A function to parse the returned [String] into type `T`.
  * @param converter A function to convert a value into a [Suggestion] (default: uses `toString()`).
- * @param scope The [CoroutineScope] used to create
+ * @param scope The [CoroutineScope] used to compute the list.
  * @return The created [ListArgument].
  */
 fun <T> AbstractStellarCommand<*>.advancedListArgument(
     name: String,
     list: suspend CommandContext<CommandSender>.() -> List<T>,
     parse: CommandSender.(String) -> T,
-    converter: CommandSender.(T) -> Suggestion? = { Suggestion.withText(it.toString()) },
+    converter: suspend CommandContext<CommandSender>.(T) -> Suggestion? = { Suggestion.withText(it.toString()) },
     scope: CoroutineScope = StellarConfig.scope,
     block: ListArgument<T, String>.() -> Unit = {},
 ): ListArgument<T, String> = addArgument(ListArgument(StringArgument(name, StringType.WORD), {
     scope.future {
-        list(this@ListArgument)
+        list().mapNotNull {
+            converter(it).takeIf { suggestion -> suggestion?.text?.isNotBlank() == true }
+        }.filter { it.text.startsWith(input, true) && it.text != input }
     }
-}, converter, parse)).apply(block)
+}, parse)).apply(block)
 
 /**
  * Adds a [ListArgument] to the command wrapped around the given [AbstractStellarCommand].
@@ -308,15 +339,23 @@ fun <T> AbstractStellarCommand<*>.advancedListArgument(
  * @param list The list of possible values.
  * @param parse A function to parse the returned [String] into type `T`.
  * @param converter A function to convert a value into a [Suggestion] (default: uses `toString()`).
+ * @param scope The [CoroutineScope] used to compute the list.
  * @return The created [ListArgument].
  */
 fun <T, R> AbstractStellarCommand<*>.advancedListArgument(
     type: ParameterArgument<*, R>,
     list: List<T>,
     parse: CommandSender.(R) -> T,
-    converter: CommandSender.(T) -> Suggestion? = { Suggestion.withText(it.toString()) },
+    converter: suspend CommandContext<CommandSender>.(T) -> Suggestion? = { Suggestion.withText(it.toString()) },
+    scope: CoroutineScope = StellarConfig.scope,
     block: ListArgument<T, R>.() -> Unit = {},
-): ListArgument<T, R> = addArgument(ListArgument(type, list, converter, parse)).apply(block).apply(block)
+): ListArgument<T, R> = addArgument(ListArgument(type, {
+    scope.future {
+        list.mapNotNull {
+            converter(it).takeIf { suggestion -> suggestion?.text?.isNotBlank() == true }
+        }.filter { it.text.startsWith(input, true) && it.text != input }
+    }
+}, parse)).apply(block).apply(block)
 
 /**
  * Adds a [ListArgument] to the command wrapped around the given [AbstractStellarCommand].
@@ -325,48 +364,46 @@ fun <T, R> AbstractStellarCommand<*>.advancedListArgument(
  * @param list A function returning the list of possible values.
  * @param parse A function to parse the returned [String] into type `T`.
  * @param converter A function to convert a value into a [Suggestion] (default: uses `toString()`).
- * @param scope The [CoroutineScope] used to create
+ * @param scope The [CoroutineScope] used to compute the list.
  * @return The created [ListArgument].
  */
 fun <T, R> AbstractStellarCommand<*>.advancedListArgument(
     type: ParameterArgument<*, R>,
     list: suspend CommandContext<CommandSender>.() -> List<T>,
     parse: CommandSender.(R) -> T,
-    converter: CommandSender.(T) -> Suggestion? = { Suggestion.withText(it.toString()) },
+    converter: suspend CommandContext<CommandSender>.(T) -> Suggestion? = { Suggestion.withText(it.toString()) },
     scope: CoroutineScope = StellarConfig.scope,
     block: ListArgument<T, R>.() -> Unit = {},
 ): ListArgument<T, R> = addArgument(ListArgument(type, {
     scope.future {
-        list(this@ListArgument)
+        list().mapNotNull {
+            converter(it).takeIf { suggestion -> suggestion?.text?.isNotBlank() == true }
+        }.filter { it.text.startsWith(input, true) && it.text != input }
     }
-}, converter, parse)).apply(block).apply(block)
+}, parse)).apply(block).apply(block)
 
 /**
- * Adds an [EnumArgument] to the command with the given name. Only works in Kotlin.
+ * Adds a [ListArgument] to the command with the given name with the values of [T].
  *
  * @param converter A function providing a [CommandSender] and an [Enum] instance from the [T], returning the [Suggestion] sent to the player.
  * If the [Suggestion] is null, then it will be filtered out (default: uses the `name` property).
  * This is useful when you wish to get the argument input and process the information yourself.
  * @param parse A function providing a [CommandSender] and the argument input, returning the parsed [Enum] (default: `enum.valueOf(input.uppercase())`).
- * @return The created [EnumArgument].
+ * @param scope The [CoroutineScope] used to compute the list.
+ * @return The created [ListArgument].
  */
 inline fun <reified T : Enum<T>> AbstractStellarCommand<*>.enumArgument(
     name: String,
-    noinline converter: CommandSender.(Enum<T>) -> Suggestion? = {
-        Suggestion.withText(it.name)
+    noinline converter: suspend CommandContext<CommandSender>.(Enum<T>) -> String? = { it.name },
+    noinline parse: CommandSender.(String) -> Enum<T> = { input ->
+        valueOf(Enum::class.java as Class<out Enum<*>>, input.uppercase()) as Enum<T>
     },
-    noinline parse: CommandSender.(String) -> Enum<T>? = { input ->
-        try {
-            valueOf(Enum::class.java as Class<out Enum<*>>, input.uppercase()) as Enum<T>
-        } catch (e: IllegalArgumentException) {
-            null
-        }
-    },
-    block: EnumArgument<T>.() -> Unit = {},
-): EnumArgument<T> = addArgument(EnumArgument(name, T::class.java, converter, parse)).apply(block)
+    scope: CoroutineScope = StellarConfig.scope,
+    noinline block: ListArgument<Enum<T>, String>.() -> Unit = {},
+): ListArgument<Enum<T>, String> = listArgument<Enum<T>>(name, T::class.java.enumConstants.toList(), parse, converter, scope,block)
 
 /**
- * Adds an [EnumArgument] to the command with the given name. Only works in Kotlin.
+ * Adds an [EnumArgument] to the command with the given name.
  *
  * @param formatting The formatting style for the enum names (default: [EnumFormatting.LOWERCASE]).
  * @return The created [EnumArgument].
@@ -376,31 +413,6 @@ inline fun <reified T : Enum<T>> AbstractStellarCommand<*>.enumArgument(
     formatting: EnumFormatting = EnumFormatting.LOWERCASE,
     block: EnumArgument<T>.() -> Unit = {},
 ): EnumArgument<T> = addArgument(EnumArgument(name, T::class.java, { Suggestion.withText(formatting.action(it.name)) })).apply(block)
-
-/**
- * Adds an [EnumArgument] to the command with the given name.
- *
- * @param converter A function providing a [CommandSender] and an [Enum] instance from the [T], returning the [Suggestion] sent to the player.
- * If the [Suggestion] is null, then it will be filtered out (default: uses the `name` property).
- * This is useful when you wish to get the argument input and process the information yourself.
- * @param parse A function providing a [CommandSender] and the argument input, returning the parsed [Enum] (default: `enum.valueOf(input.uppercase())`).
- * @return The created [EnumArgument].
- */
-fun <T : Enum<T>> AbstractStellarCommand<*>.enumArgument(
-    name: String,
-    enum: Class<T>,
-    converter: CommandSender.(Enum<T>) -> Suggestion? = {
-        Suggestion.withText(it.name)
-    },
-    parse: CommandSender.(String) -> Enum<T>? = { input ->
-        try {
-            valueOf(Enum::class.java as Class<out Enum<*>>, input.uppercase()) as Enum<T>
-        } catch (e: IllegalArgumentException) {
-            null
-        }
-    },
-    block: EnumArgument<T>.() -> Unit = {},
-): EnumArgument<T> = addArgument(EnumArgument(name, enum, converter, parse)).apply(block)
 
 /**
  * Adds an [EnumArgument] to the command with the given name.
@@ -421,13 +433,19 @@ typealias KotlinOnlinePlayersArgument = ListArgument<Player, String>
  * Adds an [OnlinePlayersArgument] to the command with the given name. It is a list of all currently online players.
  *
  * @param filter A function to filter players (default: exclude sender).
+ * @param scope The [CoroutineScope] used to compute the list.
  * @return The created [OnlinePlayersArgument], which returns a [Player] when parsed.
  */
 fun AbstractStellarCommand<*>.onlinePlayersArgument(
     name: String,
-    filter: CommandSender.(Player) -> Boolean = { it != this },
+    filter: suspend CommandSender.(Player) -> Boolean = { it != this },
+    scope: CoroutineScope = StellarConfig.scope,
     block: OnlinePlayersArgument.() -> Unit = {},
-): OnlinePlayersArgument = addArgument(OnlinePlayersArgument(name, filter)).apply(block)
+): OnlinePlayersArgument = addArgument(OnlinePlayersArgument(name) { players ->
+    scope.future {
+        players.filter { filter(it) }
+    }
+}).apply(block)
 
 // Math
 /**
@@ -443,13 +461,13 @@ fun AbstractStellarCommand<*>.angleArgument(name: String, block: AngleArgument.(
 fun AbstractStellarCommand<*>.axisArgument(name: String, block: AxisArgument.() -> Unit = {}): AxisArgument = addArgument(AxisArgument(name)).apply(block)
 
 /**
- * Adds a [DoubleRangeArgument] to the command with the given name. Only works in Kotlin.
+ * Adds a [DoubleRangeArgument] to the command with the given name.
  * @return The created [DoubleRangeArgument].
  */
 fun AbstractStellarCommand<*>.doubleRangeArgument(name: String, block: DoubleRangeArgument.() -> Unit = {}): DoubleRangeArgument = addArgument(DoubleRangeArgument(name)).apply(block)
 
 /**
- * Adds an [IntRangeArgument] to the command with the given name. Only works in Kotlin.
+ * Adds an [IntRangeArgument] to the command with the given name.
  * @return The created [IntRangeArgument].
  */
 fun AbstractStellarCommand<*>.intRangeArgument(name: String, block: IntRangeArgument.() -> Unit = {}): IntRangeArgument = addArgument(IntRangeArgument(name)).apply(block)
