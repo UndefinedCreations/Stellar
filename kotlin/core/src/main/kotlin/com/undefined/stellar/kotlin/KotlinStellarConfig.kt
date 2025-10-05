@@ -17,7 +17,7 @@ object KotlinStellarConfig {
 
     private var _asyncScope: CoroutineScope? = null
     var asyncScope: CoroutineScope
-        get() = _scope ?: error("Scope has not been set!")
+        get() = _asyncScope ?: _scope ?: error("Neither the async scope or the scope has been set!")
         set(value) {
             _asyncScope = value
         }
