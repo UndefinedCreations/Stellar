@@ -29,12 +29,19 @@ inline fun <reified C : CommandSender> AbstractStellarCommand<*>.execution(
 }
 
 /**
- * Adds an async execution to the command with the use of [CompletableFuture].
+ * Adds an async execution to the command using [StellarConfig.asyncScope].
  *
  * @param C The type of CommandSender.
  * @param execution The execution block.
  */
-inline fun <reified C : CommandSender> AbstractStellarCommand<*>.asyncExecution(noinline execution: CommandContext<C>.() -> Unit) = addAsyncExecution(execution)
+inline fun <reified C : CommandSender> AbstractStellarCommand<*>.asyncExecution(
+    scope: CoroutineScope = StellarConfig.asyncScope,
+    noinline execution: suspend CommandContext<C>.() -> Unit,
+): AbstractStellarCommand<*> = addAsyncExecution<C> {
+    scope.launch {
+        execution()
+    }
+}
 
 /**
  * Adds a runnable to the command.
@@ -56,22 +63,28 @@ inline fun <reified C : CommandSender> AbstractStellarCommand<*>.runnable(
 }
 
 /**
- * Adds an async runnable to the command with the use of [CompletableFuture].
+ * Adds an async runnable to the command using [StellarConfig.asyncScope].
  *
  * @param C The type of CommandSender.
  * @param alwaysApplicable Whether it should always run or only when an execution is already present for the last argument.
  * @param execution The execution block.
  */
-inline fun <reified C : CommandSender> AbstractStellarCommand<*>.asyncRunnable(
+inline fun <reified C : CommandSender> AbstractStellarCommand<*>.asyncExecution(
     alwaysApplicable: Boolean = false,
-    noinline execution: CommandContext<C>.() -> Boolean,
-): AbstractStellarCommand<*> = addAsyncRunnable(alwaysApplicable, execution)
+    scope: CoroutineScope = StellarConfig.asyncScope,
+    noinline execution: suspend CommandContext<C>.() -> Unit,
+): AbstractStellarCommand<*> = addAsyncRunnable<C>(alwaysApplicable) {
+    scope.launch {
+        execution()
+    }
+    true
+}
 
 /**
  * Adds a failure execution to the command to be displayed when the command fails.
  *
  * @param C The type of CommandSender.
- * @param scope The [CoroutineScope] used to create
+ * @param scope The [CoroutineScope] used to run the [execution] block (default: [StellarConfig.scope]).
  * @param execution The execution block.
  * @return The modified command object.
  */
@@ -87,8 +100,10 @@ inline fun <reified C : CommandSender> AbstractStellarCommand<*>.failureExecutio
 /**
  * Adds a requirement that must be met for the command to be available to the player.
  *
+ * NOTE: the [requirement] block blocks the current thread.
+ *
  * @param C The type of CommandSender.
- * @param scope The [CoroutineScope] used to create
+ * @param scope The [CoroutineScope] used to run the [requirement] block (default: [StellarConfig.scope]).
  * @param requirement The condition that must be met.
  * @return The modified command object.
  */
@@ -132,14 +147,30 @@ fun ParameterArgument<*, *>.suggests(vararg suggestions: Suggestion) = addSugges
 fun ParameterArgument<*, *>.suggests(title: String, tooltip: String? = null) = addSuggestion(title, tooltip)
 
 /**
- * Adds a function that returns a list of [Suggestion] on top of the current suggestions. Only works in Kotlin.
+ * Adds a function that returns a list of [Suggestion] on top of the current suggestions.
  *
  * @param C The type of CommandSender.
- * @param scope The [CoroutineScope] used to create
+ * @param scope The [CoroutineScope] used to run the [suggestion] block (default: [StellarConfig.scope]).
  * @return The modified [ParameterArgument].
  */
 inline fun <reified C : CommandSender> ParameterArgument<*, *>.suggests(
     scope: CoroutineScope = StellarConfig.scope,
+    noinline suggestion: suspend CommandContext<C>.(input: String) -> List<Suggestion>,
+) = addFutureSuggestion<C> { input ->
+    scope.future {
+        suggestion(input)
+    }
+}
+
+/**
+ * Adds a function that returns a list of [Suggestion] on top of the current suggestions.
+ *
+ * @param C The type of CommandSender.
+ * @param scope The [CoroutineScope] used to run the [suggestion] block (default: [StellarConfig.asyncScope]).
+ * @return The modified [ParameterArgument].
+ */
+inline fun <reified C : CommandSender> ParameterArgument<*, *>.asyncSuggests(
+    scope: CoroutineScope = StellarConfig.asyncScope,
     noinline suggestion: suspend CommandContext<C>.(input: String) -> List<Suggestion>,
 ) = addFutureSuggestion<C> { input ->
     scope.future {

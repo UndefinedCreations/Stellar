@@ -22,7 +22,7 @@ object MojangAdapter {
             .appendNewline()
             .append(Component.text("... $message").color(NamedTextColor.GRAY))
             .append(Component.translatable("command.context.here"))
-        MessageComponentSerializer.message().serialize(component).also { println("message: $it") }
+        MessageComponentSerializer.message().serialize(component)
     }
 
     fun getStellarCommandContext(context: BrigadierCommandContext<Any>): CommandContext<CommandSender> {
