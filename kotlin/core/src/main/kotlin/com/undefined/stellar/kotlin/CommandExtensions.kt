@@ -69,7 +69,7 @@ inline fun <reified C : CommandSender> AbstractStellarCommand<*>.runnable(
  * @param alwaysApplicable Whether it should always run or only when an execution is already present for the last argument.
  * @param execution The execution block.
  */
-inline fun <reified C : CommandSender> AbstractStellarCommand<*>.asyncExecution(
+inline fun <reified C : CommandSender> AbstractStellarCommand<*>.asyncRunnable(
     alwaysApplicable: Boolean = false,
     scope: CoroutineScope = StellarConfig.asyncScope,
     noinline execution: suspend CommandContext<C>.() -> Unit,

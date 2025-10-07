@@ -28,6 +28,10 @@ fun StellarConfig.setScope(scope: CoroutineScope): StellarConfig = apply {
     KotlinStellarConfig.scope = scope
 }
 
+fun StellarConfig.setAsyncScope(scope: CoroutineScope): StellarConfig = apply {
+    KotlinStellarConfig.asyncScope = scope
+}
+
 /**
  * [CoroutineScope] used for any executions or blocks that have to be run in suspend.
  */
