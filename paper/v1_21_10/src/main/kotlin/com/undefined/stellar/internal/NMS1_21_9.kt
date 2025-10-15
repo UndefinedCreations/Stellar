@@ -8,7 +8,6 @@ import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.arguments.ArgumentType
 import com.mojang.brigadier.arguments.IntegerArgumentType
 import com.mojang.brigadier.context.CommandContext
-import com.mojang.serialization.Codec
 import com.mojang.serialization.JsonOps
 import com.undefined.stellar.ParameterArgument
 import com.undefined.stellar.argument.basic.StringArgument
@@ -51,8 +50,13 @@ import com.undefined.stellar.data.argument.ParticleData
 import com.undefined.stellar.data.exception.UnsupportedArgumentException
 import com.undefined.stellar.nms.NMS
 import com.undefined.stellar.nms.NMSHelper
+import io.papermc.paper.adventure.PaperAdventure
+import io.papermc.paper.command.brigadier.PaperCommands
+import io.papermc.paper.registry.PaperRegistries
+import io.papermc.paper.registry.RegistryAccess
+import io.papermc.paper.registry.RegistryKey
+import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import net.minecraft.commands.CommandBuildContext
 import net.minecraft.commands.CommandSource
 import net.minecraft.commands.CommandSourceStack
@@ -66,8 +70,6 @@ import net.minecraft.core.HolderLookup
 import net.minecraft.core.particles.*
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.ComponentSerialization
-import net.minecraft.resources.ResourceKey
-import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ColumnPos
 import net.minecraft.world.level.Level
@@ -81,14 +83,14 @@ import org.bukkit.block.data.BlockData
 import org.bukkit.block.structure.Mirror
 import org.bukkit.block.structure.StructureRotation
 import org.bukkit.command.CommandSender
-import org.bukkit.craftbukkit.v1_21_R6.CraftParticle
-import org.bukkit.craftbukkit.v1_21_R6.block.data.CraftBlockData
-import org.bukkit.craftbukkit.v1_21_R6.entity.CraftPlayer
-import org.bukkit.craftbukkit.v1_21_R6.inventory.CraftItemStack
-import org.bukkit.craftbukkit.v1_21_R6.util.CraftNamespacedKey
+import org.bukkit.craftbukkit.CraftParticle
+import org.bukkit.craftbukkit.block.data.CraftBlockData
+import org.bukkit.craftbukkit.entity.CraftPlayer
+import org.bukkit.craftbukkit.inventory.CraftItemStack
+import org.bukkit.craftbukkit.scoreboard.CraftScoreboardTranslations
+import org.bukkit.craftbukkit.util.CraftNamespacedKey
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
-import org.bukkit.scoreboard.DisplaySlot
 import java.util.*
 import java.util.function.Predicate
 import net.minecraft.commands.arguments.AngleArgument as BrigadierAngleArgument
@@ -112,14 +114,9 @@ import net.minecraft.commands.arguments.blocks.BlockPredicateArgument as Brigadi
 import net.minecraft.commands.arguments.coordinates.RotationArgument as BrigadierRotationArgument
 
 @Suppress("UNCHECKED_CAST", "DEPRECATION")
-object NMS1_21_9 : NMS {
+object NMS1_21_10 : NMS {
 
-    private val COMMAND_BUILD_CONTEXT: CommandBuildContext by lazy {
-        CommandBuildContext.simple(
-            MinecraftServer.getServer().registryAccess(),
-            MinecraftServer.getServer().worldData.dataConfiguration.enabledFeatures()
-        )
-    }
+    private val COMMAND_BUILD_CONTEXT: CommandBuildContext = PaperCommands.INSTANCE.buildContext
 
     override fun getCommandDispatcher(): CommandDispatcher<Any> = MinecraftServer.getServer().functions.dispatcher as CommandDispatcher<Any>
 
@@ -156,7 +153,10 @@ object NMS1_21_9 : NMS {
 
         // Misc
         is NamespacedKeyArgument -> ResourceLocationArgument.id()
-        is RegistryArgument -> ResourceArgument.resource(COMMAND_BUILD_CONTEXT, ResourceKey.createRegistryKey<Keyed>(ResourceLocation.withDefaultNamespace(RegistryArgument.registryNames[argument.registry] ?: throw IllegalArgumentException("Could not find registry!"))))
+        is RegistryArgument -> ResourceArgument.resource(
+            COMMAND_BUILD_CONTEXT,
+            PaperRegistries.registryToNms<Any, Any>(argument.registry as RegistryKey<Any>)
+        )
         is UUIDArgument -> UuidArgument.uuid()
 
         // Player
@@ -233,7 +233,7 @@ object NMS1_21_9 : NMS {
 
             // Misc
             is NamespacedKeyArgument -> CraftNamespacedKey.fromMinecraft(ResourceLocationArgument.getId(context, argument.name))
-            is RegistryArgument -> argument.registry.getOrThrow(NamespacedKey.fromString(NMSHelper.getArgumentInput(context, argument.name)!!)!!)
+            is RegistryArgument -> RegistryAccess.registryAccess().getRegistry(argument.registry as RegistryKey<Keyed>).getOrThrow(Key.key(NMSHelper.getArgumentInput(context, argument.name)!!))
             is UUIDArgument -> UuidArgument.getUuid(context, argument.name)
 
             // Player
@@ -241,14 +241,14 @@ object NMS1_21_9 : NMS {
             is GameProfileArgument -> BrigadierGameProfileArgument.getGameProfiles(context, argument.name)
 
             // Scoreboard
-            is DisplaySlotArgument -> DisplaySlot.valueOf(ScoreboardSlotArgument.getDisplaySlot(context, argument.name).serializedName)
-            is ObjectiveArgument -> Bukkit.getScoreboardManager()!!.mainScoreboard.getObjective(BrigadierObjectiveArgument.getObjective(context, argument.name).name)
+            is DisplaySlotArgument -> CraftScoreboardTranslations.toBukkitSlot(ScoreboardSlotArgument.getDisplaySlot(context, argument.name))
+            is ObjectiveArgument -> Bukkit.getScoreboardManager().mainScoreboard.getObjective(BrigadierObjectiveArgument.getObjective(context, argument.name).name)
             is ObjectiveCriteriaArgument -> BrigadierObjectiveCriteriaArgument.getCriteria(context, argument.name).name
             is ScoreHolderArgument -> when (argument.type) {
                 ScoreHolderType.SINGLE -> BrigadierScoreHolderArgument.getName(context, argument.name).scoreboardName
                 ScoreHolderType.MULTIPLE -> BrigadierScoreHolderArgument.getNames(context, argument.name).map { it.scoreboardName }
             }
-            is TeamArgument -> Bukkit.getScoreboardManager()!!.mainScoreboard.getTeam(BrigadierTeamArgument.getTeam(context, argument.name).name)
+            is TeamArgument -> Bukkit.getScoreboardManager().mainScoreboard.getTeam(BrigadierTeamArgument.getTeam(context, argument.name).name)
 
             // Structure
             is LootTableArgument -> BrigadierLootTableArgument.getLootTable(context, argument.name).value().craftLootTable
@@ -260,16 +260,9 @@ object NMS1_21_9 : NMS {
             is ComponentArgument -> GsonComponentSerializer.gson().deserialize(ComponentSerializer.toJson(BrigadierComponentArgument.getRawComponent(context, argument.name), COMMAND_BUILD_CONTEXT))
             is HexArgument -> HexColorArgument.getHexColor(context, argument.name)
             is MessageArgument -> GsonComponentSerializer.gson().deserialize(ComponentSerializer.toJson(BrigadierMessageArgument.getMessage(context, argument.name), COMMAND_BUILD_CONTEXT))
-            is StyleArgument -> {
-                ComponentSerialization.CODEC
-                Codec.LONG_STREAM
-                GsonComponentSerializer.gson().deserialize(
-                    ComponentSerializer.toJson(
-                        Component.empty().withStyle(BrigadierStyleArgument.getStyle(context, argument.name)),
-                        COMMAND_BUILD_CONTEXT
-                    )
-                ).style()
-            }
+            is StyleArgument -> GsonComponentSerializer.gson().deserialize(ComponentSerializer.toJson(
+                Component.empty().withStyle(BrigadierStyleArgument.getStyle(context, argument.name)), COMMAND_BUILD_CONTEXT
+            )).style()
 
             // World
             is EnvironmentArgument -> DimensionArgument.getDimension(context, argument.name).world.environment
@@ -280,7 +273,7 @@ object NMS1_21_9 : NMS {
                 LocationType.PRECISE_LOCATION_3D -> vec3ToLocation(Vec3Argument.getVec3(context, argument.name), context.source.level.world)
                 LocationType.PRECISE_LOCATION_2D -> vec2ToLocation(Vec2Argument.getVec2(context, argument.name), context.source.level.world)
             }
-            is ParticleArgument -> BrigadierParticleArgument.getParticle(context, argument.name).also { getParticleData(context, CraftParticle.minecraftToBukkit(it.type), it) }
+            is ParticleArgument -> BrigadierParticleArgument.getParticle(context, argument.name).let { getParticleData(context, CraftParticle.minecraftToBukkit(it.type), it) }
             else -> null
         }
     }
@@ -301,22 +294,19 @@ object NMS1_21_9 : NMS {
     }
 
     private data class Source(val sender: CommandSender) : CommandSource {
-        override fun sendSystemMessage(message: Component) = this.sender.sendMessage(LegacyComponentSerializer.legacySection().serialize(asAdventure(message)))
+        override fun sendSystemMessage(message: Component) = this.sender.sendMessage(PaperAdventure.asAdventure(message))
         override fun acceptsSuccess(): Boolean = true
         override fun acceptsFailure(): Boolean = true
         override fun shouldInformAdmins(): Boolean = false
         override fun getBukkitSender(stack: CommandSourceStack): CommandSender = this.sender
     }
 
-    fun asAdventure(component: Component): net.kyori.adventure.text.Component =
-        GsonComponentSerializer.gson().deserialize(ComponentSerializer.toJson(component, COMMAND_BUILD_CONTEXT))
-
     private fun blockPosToLocation(block: BlockPos, world: World) = Location(world, block.x.toDouble(), block.y.toDouble(), block.z.toDouble())
     private fun columnPosToLocation(column: ColumnPos, world: World) = Location(world, column.x.toDouble(), 0.0, column.z.toDouble())
     private fun vec3ToLocation(vec: Vec3, world: World) = Location(world, vec.x, vec.y, vec.z)
     private fun vec2ToLocation(vec: Vec2, world: World) = Location(world, vec.x.toDouble(), 0.0, vec.y.toDouble())
 
-    private fun getParticleData(context: CommandContext<CommandSourceStack>, particle: Particle, options: ParticleOptions): ParticleData<*> = when (options) {
+    fun getParticleData(context: CommandContext<CommandSourceStack>, particle: Particle, options: ParticleOptions): ParticleData<*> = when (options) {
         is SimpleParticleType -> ParticleData(particle, null)
         is BlockParticleOption -> ParticleData<BlockData>(particle, CraftBlockData.fromData(options.state))
         is DustColorTransitionOptions -> {
@@ -351,7 +341,7 @@ object NMS1_21_9 : NMS {
             if (options.destination is BlockPositionSource) {
                 val to: Vec3 = options.destination.getPosition(level).get()
                 destination = Vibration.Destination.BlockDestination(Location(level.world, to.x(), to.y(), to.z()))
-                ParticleData(particle, Vibration(Location(null, 0.0, 0.0, 0.0), destination, options.arrivalInTicks))
+                ParticleData(particle, Vibration(destination, options.arrivalInTicks))
             } else {
                 ParticleData(particle, null)
             }

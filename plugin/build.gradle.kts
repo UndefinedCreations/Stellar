@@ -16,8 +16,8 @@ repositories {
     maven("https://repo.codemc.org/repository/maven-public/")
 }
 
-val serverType = ServerType.PAPERMC
-val minecraftVersion = "1.21.9"
+val serverType = ServerType.SPIGOT
+val minecraftVersion = "1.21.10"
 
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.13-R0.1-SNAPSHOT")
