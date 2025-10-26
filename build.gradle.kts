@@ -20,7 +20,7 @@ dependencies {
 
     api(project(":spigot:api"))
 
-    dokkaPlugin("org.jetbrains.dokka:kotlin-as-java-plugin:2.0.0")
+    dokkaPlugin("org.jetbrains.dokka:kotlin-as-java-plugin:2.1.0")
 }
 
 subprojects {
