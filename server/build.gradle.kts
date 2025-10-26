@@ -26,7 +26,7 @@ dependencies {
     implementation(project(":kotlin:paper"))
     implementation(libs.kotlin.coroutines)
     implementation("com.undefined:lynx:1.1.1-SNAPSHOT")
-    implementation("com.undefined:akari:0.0.2")
+    implementation("com.undefined:akari:0.0.13")
     implementation("net.kyori:adventure-api:4.25.0")
     implementation("net.kyori:adventure-platform-bukkit:4.4.1")
     implementation("net.kyori:adventure-text-minimessage:4.25.0")
