@@ -5,7 +5,7 @@ plugins {
     id("setup")
     id("com.gradleup.shadow")
     `maven-publish`
-    id("org.jetbrains.dokka") version "2.0.0"
+    id("org.jetbrains.dokka") version "2.1.0"
     id("io.papermc.paperweight.userdev") version "2.0.0-beta.18" apply false
 }
 
