@@ -5,7 +5,7 @@ plugins {
     id("setup")
     id("com.gradleup.shadow")
     id("com.undefinedcreations.nova") version "0.0.8"
-    id("com.undefinedcreations.echo") version "0.0.11"
+    id("com.undefinedcreations.echo") version "0.0.15"
 }
 
 repositories {
