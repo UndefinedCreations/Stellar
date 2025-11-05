@@ -2,8 +2,11 @@ package com.undefined.stellar
 
 import com.undefined.stellar.kotlin.KotlinBaseStellarCommand
 import com.undefined.stellar.kotlin.asyncExecution
+import com.undefined.stellar.kotlin.asyncRunnable
+import com.undefined.stellar.kotlin.execution
 import com.undefined.stellar.kotlin.listArgument
 import com.undefined.stellar.kotlin.onlinePlayersArgument
+import com.undefined.stellar.kotlin.runnable
 import com.undefined.stellar.kotlin.setScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -16,18 +19,9 @@ object MenuCommands : KotlinBaseStellarCommand("menu", "menu.admin", listOf("men
     override fun setup(): StellarCommand = kotlinCommand {
         "open" {
             onlinePlayersArgument("player", filter = { true }) {
-                listArgument(
-                    "menu",
-                    { listOf("abc", "bcd", "cde") },
-                    parse = { id -> id },
-                    converter = { settings -> settings }
-                ) {
-                    asyncExecution<CommandSender> {
-                        val player: Player by args
-                        val menu: String by args
-
-                        player.sendMessage(menu)
-                    }
+                asyncRunnable<CommandSender> {
+                    sender.sendMessage("test")
+                    true
                 }
             }
         }
