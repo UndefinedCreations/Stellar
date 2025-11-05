@@ -167,7 +167,7 @@ fun AbstractStellarCommand<*>.listArgument(
     scope.future {
         list(this@ListArgument)
     }
-}, { Suggestion.create(it, tooltip(it)) }, { it },)).apply(block)
+}, { Suggestion.create(it, tooltip(it)) }, { it }) as ListArgument<String, String>).apply(block)
 
 /**
  * Adds a [ListArgument] to the command with the given name. It uses its [StringArgument] as a base wrapper.
@@ -183,7 +183,7 @@ fun AbstractStellarCommand<*>.listArgument(
     tooltip: (String) -> String? = { null },
     type: StringType = StringType.WORD,
     block: ListArgument<String, String>.() -> Unit = {},
-): ListArgument<String, String> = addArgument(ListArgument(StringArgument(name, type), list, { Suggestion.create(it, tooltip(it)) }, { it })).apply(block)
+): ListArgument<String, String> = addArgument(ListArgument(StringArgument(name, type), list, { Suggestion.create(it, tooltip(it)) }, { it }) as ListArgument<String, String>).apply(block)
 
 /**
  * Adds a [ListArgument] to the command with the given name.
@@ -205,7 +205,7 @@ fun <T> AbstractStellarCommand<*>.listArgument(
     scope.future {
         list.mapNotNull { converter(it)?.let { Suggestion.withText(it) } }
     }
-}, parse)).apply(block)
+}, parse) as ListArgument<T, String>).apply(block)
 
 /**
  * Adds a [ListArgument] to the command with the given name.
@@ -230,7 +230,7 @@ fun <T> AbstractStellarCommand<*>.listArgument(
             convertedText?.let { Suggestion.withText(convertedText) }
         }.filter { it.text.startsWith(input, true) && it.text != input }
     }
-}, parse)).apply(block)
+}, parse) as ListArgument<T, String>).apply(block)
 
 /**
  * Adds a [ListArgument] to the command wrapped around the given [AbstractStellarCommand].
@@ -256,7 +256,7 @@ fun <T, R> AbstractStellarCommand<*>.listArgument(
             convertedText?.let { Suggestion.withText(convertedText) }
         }.filter { it.text.startsWith(input, true) && it.text != input }
     }
-}, parse)).apply(block)
+}, parse) as ListArgument<T, R>).apply(block)
 
 /**
  * Adds a [ListArgument] to the command wrapped around the given [AbstractStellarCommand].
@@ -282,7 +282,7 @@ fun <T, R> AbstractStellarCommand<*>.listArgument(
             convertedText?.let { Suggestion.withText(convertedText) }
         }.filter { it.text.startsWith(input, true) && it.text != input }
     }
-}, parse)).apply(block)
+}, parse) as ListArgument<T, R>).apply(block)
 
 /**
  * Adds a [ListArgument] to the command with the given name.
@@ -306,7 +306,7 @@ fun <T> AbstractStellarCommand<*>.advancedListArgument(
             converter(it).takeIf { suggestion -> suggestion?.text?.isNotBlank() == true }
         }.filter { it.text.startsWith(input, true) && it.text != input }
     }
-}, parse)).apply(block)
+}, parse) as ListArgument<T, String>).apply(block)
 
 /**
  * Adds a [ListArgument] to the command with the given name.
@@ -330,7 +330,7 @@ fun <T> AbstractStellarCommand<*>.advancedListArgument(
             converter(it).takeIf { suggestion -> suggestion?.text?.isNotBlank() == true }
         }.filter { it.text.startsWith(input, true) && it.text != input }
     }
-}, parse)).apply(block)
+}, parse) as ListArgument<T, String>).apply(block)
 
 /**
  * Adds a [ListArgument] to the command wrapped around the given [AbstractStellarCommand].
@@ -355,7 +355,7 @@ fun <T, R> AbstractStellarCommand<*>.advancedListArgument(
             converter(it).takeIf { suggestion -> suggestion?.text?.isNotBlank() == true }
         }.filter { it.text.startsWith(input, true) && it.text != input }
     }
-}, parse)).apply(block).apply(block)
+}, parse) as ListArgument<T, R>).apply(block).apply(block)
 
 /**
  * Adds a [ListArgument] to the command wrapped around the given [AbstractStellarCommand].
@@ -380,7 +380,7 @@ fun <T, R> AbstractStellarCommand<*>.advancedListArgument(
             converter(it).takeIf { suggestion -> suggestion?.text?.isNotBlank() == true }
         }.filter { it.text.startsWith(input, true) && it.text != input }
     }
-}, parse)).apply(block).apply(block)
+}, parse) as ListArgument<T, R>).apply(block).apply(block)
 
 /**
  * Adds a [ListArgument] to the command with the given name with the values of [T].

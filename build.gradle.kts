@@ -1,11 +1,12 @@
 import org.gradle.jvm.tasks.Jar
-import org.jetbrains.dokka.gradle.DokkaTask
+import org.jetbrains.dokka.gradle.tasks.DokkaBaseTask
 
 plugins {
     id("setup")
     id("com.gradleup.shadow")
     `maven-publish`
     id("org.jetbrains.dokka") version "2.1.0"
+    id("org.jetbrains.dokka-javadoc") version "2.1.0"
     id("io.papermc.paperweight.userdev") version "2.0.0-beta.19" apply false
 }
 
@@ -25,7 +26,7 @@ dependencies {
 
 subprojects {
     apply(plugin = "org.jetbrains.dokka")
-    tasks.withType<DokkaTask>()
+    tasks.withType<DokkaBaseTask>()
 
     tasks.register<Jar>("sourceJar") {
         archiveClassifier = "sources"
@@ -37,8 +38,8 @@ val packageJavadoc by tasks.registering(Jar::class) {
     group = "stellar"
     archiveClassifier = "javadoc"
 
-    dependsOn(tasks.dokkaJavadocCollector)
-    from(tasks.dokkaJavadocCollector.filter { "kotlin" !in it.path }.flatMap { it.outputDirectory })
+    dependsOn(tasks.dokkaGenerateJavadoc)
+    from(tasks.dokkaGenerateModuleJavadoc.filter { "kotlin" !in it.path }.flatMap { it.outputDirectory })
 }
 
 val packageSources by tasks.registering(Jar::class) {
