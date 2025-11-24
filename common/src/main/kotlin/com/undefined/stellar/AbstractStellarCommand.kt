@@ -589,7 +589,9 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @return The modified command object.
      */
     fun addFailureMessage(message: Component): T = apply {
-        failureExecutions.add(ExecutableExecution(CommandSender::class, { it.sender.sendMessage(LegacyComponentSerializer.legacyAmpersand().serialize(message)) }, false))
+        failureExecutions.add(ExecutableExecution(CommandSender::class, {
+            it.sender.sendMessage(LegacyComponentSerializer.legacySection().serialize(message))
+        }, async = false))
     } as T
 
     /**
@@ -599,7 +601,9 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @return The modified command object.
      */
     fun addGlobalFailureMessage(message: Component): T = apply {
-        globalFailureExecutions.add(ExecutableExecution(CommandSender::class, { it.sender.sendMessage(LegacyComponentSerializer.legacyAmpersand().serialize(message)) }, false))
+        globalFailureExecutions.add(ExecutableExecution(CommandSender::class, {
+            it.sender.sendMessage(LegacyComponentSerializer.legacySection().serialize(message))
+        }, async = false))
     } as T
 
     /**
@@ -610,7 +614,9 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      */
     fun addFailureMessage(message: String): T = apply {
         val component = StellarConfig.miniMessage!!.deserialize(message)
-        failureExecutions.add(ExecutableExecution(CommandSender::class, { it.sender.sendMessage(LegacyComponentSerializer.legacyAmpersand().serialize(component)) }, false))
+        failureExecutions.add(ExecutableExecution(CommandSender::class, {
+            it.sender.sendMessage(LegacyComponentSerializer.legacySection().serialize(component))
+        }, async = false))
     } as T
 
     /**
@@ -621,7 +627,9 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      */
     fun addGlobalFailureMessage(message: String): T = apply {
         val component = StellarConfig.miniMessage!!.deserialize(message)
-        globalFailureExecutions.add(ExecutableExecution(CommandSender::class, { it.sender.sendMessage(LegacyComponentSerializer.legacyAmpersand().serialize(component)) }, false))
+        globalFailureExecutions.add(ExecutableExecution(CommandSender::class, {
+            it.sender.sendMessage(LegacyComponentSerializer.legacySection().serialize(component))
+        }, async = false))
     } as T
 
     /**

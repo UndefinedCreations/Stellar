@@ -18,7 +18,7 @@ repositories {
     }
 }
 
-val serverType = "paper"
+val serverType = "spigot"
 
 dependencies {
     compileOnly(libs.spigot)
