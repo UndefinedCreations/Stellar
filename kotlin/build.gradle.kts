@@ -1,8 +1,12 @@
+import org.gradle.kotlin.dsl.withType
+import org.jetbrains.dokka.gradle.tasks.DokkaBaseTask
+
 plugins {
     java
     id("setup")
     `maven-publish`
-    id("org.jetbrains.dokka") version "2.0.0"
+    id("org.jetbrains.dokka") version "2.1.0"
+    id("org.jetbrains.dokka-javadoc") version "2.1.0"
     id("com.gradleup.shadow")
 }
 
@@ -23,8 +27,8 @@ val packageKotlinJavadoc by tasks.registering(Jar::class) {
     group = "stellar"
     archiveClassifier = "javadoc"
 
-    dependsOn(tasks.dokkaJavadocCollector)
-    from(tasks.dokkaJavadocCollector.flatMap { it.outputDirectory })
+    dependsOn(tasks.dokkaGenerateJavadoc)
+    from(tasks.dokkaGenerateModuleJavadoc.flatMap { it.outputDirectory })
 }
 
 val packageKotlinSources by tasks.registering(Jar::class) {

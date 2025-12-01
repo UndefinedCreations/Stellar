@@ -4,7 +4,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     id("setup")
     id("com.gradleup.shadow")
-    id("com.undefinedcreations.nova") version "0.0.4"
+    id("com.undefinedcreations.nova") version "0.0.8"
 }
 
 repositories {
@@ -18,7 +18,7 @@ repositories {
     }
 }
 
-val serverType = "paper"
+val serverType = "spigot"
 
 dependencies {
     compileOnly(libs.spigot)
@@ -27,9 +27,9 @@ dependencies {
     implementation(libs.kotlin.coroutines)
     implementation("com.undefined:lynx:1.1.1-SNAPSHOT")
     implementation("com.undefined:akari:0.0.2")
-    implementation("net.kyori:adventure-api:4.20.0")
-    implementation("net.kyori:adventure-platform-bukkit:4.3.4")
-    implementation("net.kyori:adventure-text-minimessage:4.20.0")
+    implementation("net.kyori:adventure-api:4.25.0")
+    implementation("net.kyori:adventure-platform-bukkit:4.4.1")
+    implementation("net.kyori:adventure-text-minimessage:4.25.0")
     implementation(project(":$serverType:api"))
 }
 

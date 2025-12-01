@@ -99,7 +99,7 @@ object NMSManager {
 
     private fun handleExecutions(command: AbstractStellarCommand<*>, builder: ArgumentBuilder<Any, *>, plugin: JavaPlugin) {
         val subArguments = ArgumentHelper.getCommandAndArguments(command)
-        if (command.executions.isEmpty() && subArguments.none { it.runnables.any { it.alwaysApplicable } }) return
+        if (command.executions.isEmpty() && command.runnables.isEmpty() && subArguments.none { it.runnables.any { it.alwaysApplicable } }) return
         builder.executes { context ->
             val stellarContext = MojangAdapter.getStellarCommandContext(context)
 
@@ -111,10 +111,9 @@ object NMSManager {
             val rootNodeName = context.rootNode.name.takeIf { it.isNotBlank() }
             val baseCommand = StellarConfig.getStellarCommand(context.input.split(' ').first()) ?: throw IllegalStateException("Cannot get root command.")
 
-            for (runnable in command.runnables.filter { it.async }) runnable(stellarContext)
             val arguments = ArgumentHelper.getArguments(baseCommand, context, if (rootNodeName != null) 0 else 1)
             for (runnable in baseCommand.runnables.filter { it.async }) if (!runnable(stellarContext)) return@executes 1
-            for (argument in arguments + command) for (runnable in argument.runnables.filter { it.async }) if (!runnable(stellarContext)) return@executes 1
+            for (argument in arguments.filter { it != command } + command) for (runnable in argument.runnables.filter { it.async }) if (!runnable(stellarContext)) return@executes 1
             for (execution in command.executions.filter { it.async }) execution(stellarContext)
 
             Bukkit.getScheduler().runTask(plugin, Runnable {

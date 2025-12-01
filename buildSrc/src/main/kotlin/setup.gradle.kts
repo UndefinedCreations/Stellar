@@ -28,10 +28,10 @@ repositories {
 }
 
 dependencies {
-    compileOnly("net.kyori:adventure-api:4.22.0")
-    compileOnly("net.kyori:adventure-text-minimessage:4.22.0")
-    compileOnly("net.kyori:adventure-platform-bukkit:4.4.0")
-    compileOnly("net.kyori:adventure-text-serializer-legacy:4.22.0")
+    compileOnly("net.kyori:adventure-api:4.25.0")
+    compileOnly("net.kyori:adventure-text-minimessage:4.25.0")
+    compileOnly("net.kyori:adventure-platform-bukkit:4.4.1")
+    compileOnly("net.kyori:adventure-text-serializer-legacy:4.25.0")
     compileOnly(libs.findLibrary("kotlin-coroutines").orElseThrow())
 }
 

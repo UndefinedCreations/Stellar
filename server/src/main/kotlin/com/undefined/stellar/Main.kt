@@ -1,32 +1,10 @@
 package com.undefined.stellar
 
-import com.undefined.stellar.kotlin.KotlinBaseStellarCommand
-import com.undefined.stellar.kotlin.asyncExecution
-import com.undefined.stellar.kotlin.listArgument
 import com.undefined.stellar.kotlin.setScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import org.bukkit.command.CommandSender
+import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
-
-object MenuCommands : KotlinBaseStellarCommand("menu", "menu.admin", listOf("menus")) {
-    override fun setup(): StellarCommand = kotlinCommand {
-        "open" {
-            listArgument(
-                "menu",
-                { listOf("abc", "bcd", "cde") },
-                parse = { id -> id },
-                converter = { settings -> settings }
-            ) {
-                asyncExecution<CommandSender> {
-                    val menu: String by args
-
-                    sender.sendMessage(menu)
-                }
-            }
-        }
-    }
-}
 
 class Main : JavaPlugin() {
 
@@ -36,7 +14,16 @@ class Main : JavaPlugin() {
         StellarConfig.setPlugin(this)
         StellarConfig.setScope(scope)
 
-        MenuCommands.register(this)
+        StellarCommand("balance")
+            .addAliases("bal")
+            .setDescription("Check your balance")
+            .setUsageText("/balance")
+            .hideDefaultFailureMessages(hide = true, global = true)
+            .addGlobalFailureMessage("<red>Usage: /balance")
+            .addExecution<Player> {
+                sender.sendMessage("<gray>Your balance: 100 euros")
+            }
+            .register()
     }
 
 }
