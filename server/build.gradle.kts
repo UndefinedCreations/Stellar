@@ -39,7 +39,6 @@ tasks {
     }
     shadowJar {
         archiveFileName = "server.jar"
-        outputs.upToDateWhen { false }
     }
     compileKotlin {
         compilerOptions.jvmTarget = JvmTarget.JVM_21
