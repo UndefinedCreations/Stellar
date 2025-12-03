@@ -155,18 +155,24 @@ object NMSManager {
 
     private fun handleSuggestions(argument: AbstractStellarCommand<*>, argumentBuilder: ArgumentBuilder<Any, *>) {
         if (argument !is ParameterArgument<*, *> || argument._suggestions.isEmpty() || argumentBuilder !is RequiredArgumentBuilder<Any, *>) return
-        argumentBuilder.suggests { context, builder ->
-            val stellarContext = MojangAdapter.getStellarCommandContext(context)
-            val range = StringRange.between(builder.start + argument.suggestionOffset, builder.input.length)
-
+        argumentBuilder.suggests { context, rawBuilder ->
             CompletableFuture.supplyAsync {
+                val stellarContext = MojangAdapter.getStellarCommandContext(context)
                 val suggestions: MutableList<Suggestion> = mutableListOf()
-                for (suggestion in argument._suggestions) suggestions.addAll(suggestion.get(stellarContext, builder.remaining).get())
+                for (suggestion in argument._suggestions)
+                    suggestions.addAll(suggestion.get(stellarContext, rawBuilder.remaining).get())
 
-                Suggestions(range, suggestions.map { suggestion ->
-                    if (suggestion.tooltip == null || suggestion.tooltip!!.isBlank()) BrigadierSuggestion(range, suggestion.text)
-                    else BrigadierSuggestion(range, suggestion.text) { suggestion.tooltip }
-                })
+                val builder = if (argument.suggestionOffset != 0) rawBuilder.createOffset(rawBuilder.start + argument.suggestionOffset) else rawBuilder
+
+                for (suggestion in suggestions) {
+                    if (suggestion.text.startsWith(rawBuilder.remaining.substringAfterLast(' '), true))
+                    if (suggestion.tooltip == null)
+                        builder.suggest(suggestion.text)
+                    else
+                        builder.suggest(suggestion.text) { suggestion.tooltip }
+                }
+
+                builder.build()
             }
         }
     }

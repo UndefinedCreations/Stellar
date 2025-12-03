@@ -42,11 +42,22 @@ class PhraseArgument(name: String) : StringArgument(name, StringType.PHRASE) {
                 it == ' '
             }
 
-            setSuggestionOffset(greedyContext.phraseInput.length)
+            setSuggestionOffset(0)
+            if (greedyContext.phraseInput.isNotEmpty()) {
+                var tot = 0
+                for ((i, word) in greedyContext.arguments.withIndex()) {
+                    if ((greedyContext.arguments.lastIndex == i && !greedyContext.input.endsWith(' ')) || word.isEmpty()) break
+                    tot += word.length + 1
+                    addSuggestionOffset(word.length + 1)
+                }
+            }
+
             val suggestions: MutableList<Suggestion> = mutableListOf()
             val word = words[amountOfSpaces] ?: return@addSuggestion emptyList()
             for (stellarSuggestion in word.suggestions)
-                for (suggestion in stellarSuggestion.get(greedyContext)) suggestions.add(Suggestion.create(suggestion.text, suggestion.tooltip))
+                for (suggestion in stellarSuggestion.get(greedyContext)) {
+                    suggestions.add(Suggestion.create(suggestion.text, suggestion.tooltip))
+                }
             suggestions
         }
     }
@@ -55,7 +66,7 @@ class PhraseArgument(name: String) : StringArgument(name, StringType.PHRASE) {
      * Creates a [WordArgument] at the [index], that you can configure with [init]. Only works in Kotlin.
      * @return The modified [PhraseArgument] instance.
      */
-	inline fun addWordArgument(index: Int, init: WordArgument.() -> Unit = {}): PhraseArgument {
+    inline fun addWordArgument(index: Int, init: WordArgument.() -> Unit = {}): PhraseArgument {
         val word = WordArgument()
         word.init()
         words[index] = word
@@ -228,10 +239,11 @@ class PhraseArgument(name: String) : StringArgument(name, StringType.PHRASE) {
         val input = context.input.removePrefix("/")
         val words = input.split(' ').toMutableList()
 
-        val totalOtherArguments = context.args.size - 1
-        for (i in (0..totalOtherArguments)) words.removeFirst()
+        val totalOtherArguments = if (this.name in context.args.keys) context.args.size - 1 else context.args.size
+        words.removeFirst() // to remove the base command like /[give]
+        for (i in (0 until totalOtherArguments)) words.removeFirst()
 
-        return PhraseCommandContext(context, words, context.sender, input.substring(input.indexOf(' ')), input)
+        return PhraseCommandContext(context, words, context.sender, words.joinToString(" "), input)
     }
 
 }

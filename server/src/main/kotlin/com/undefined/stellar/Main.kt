@@ -24,6 +24,8 @@ class Main : JavaPlugin() {
                 sender.sendMessage("<gray>Your balance: 100 euros")
             }
             .register()
+
+        BaseCommand.register(this)
     }
 
 }
