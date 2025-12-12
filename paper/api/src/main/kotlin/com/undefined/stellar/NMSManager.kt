@@ -44,15 +44,20 @@ object NMSManager {
     )
 
     fun register(command: StellarCommand, plugin: JavaPlugin, prefix: String) {
-        if (!StellarListener.hasBeenInitialized) Bukkit.getPluginManager().registerEvents(StellarListener, plugin).also { StellarListener.hasBeenInitialized = true }
+        if (!StellarListener.hasBeenInitialized) Bukkit.getPluginManager().registerEvents(StellarListener, plugin)
+            .also { StellarListener.hasBeenInitialized = true }
 
         StellarConfig.commands.add(command)
         val builder = getLiteralArgumentBuilder(command, plugin)
         val dispatcher = nms.getCommandDispatcher()
         val mainNode = dispatcher.register(builder)
-        Bukkit.getServer().helpMap.addTopic(StellarCommandHelpTopic(command.name, command.information["Description"] ?: "", command.information.reversed().entries.associateBy({ it.key }) { it.value }) {
-            command.requirements.all { it(this) }
-        })
+        Bukkit.getServer().helpMap.addTopic(
+            StellarCommandHelpTopic(
+                command.name,
+                command.information["Description"] ?: "",
+                command.information.reversed().entries.associateBy({ it.key }) { it.value }) {
+                command.requirements.all { it(this) }
+            })
 
         // Register command name with the prefix, e.g. minecraft:ban
         val fallbackPrefix = prefix.takeIf { it.isNotBlank() } ?: plugin.pluginMeta.name.lowercase()
@@ -62,14 +67,28 @@ object NMSManager {
             dispatcher.register(getLiteralArgumentBuilder(command, plugin, name))
             dispatcher.register(getLiteralArgumentBuilder(command, plugin, "$fallbackPrefix:$name"))
             if (name !in command.aliases) {
-                Bukkit.getServer().helpMap.addTopic(StellarCommandHelpTopic(name, command.information["Description"] ?: "", command.information.reversed().entries.associateBy({ it.key }) { it.value }) {
-                    command.requirements.all { it(this) }
-                })
-            } else Bukkit.getServer().helpMap.addTopic(CommandAliasHelpTopic(name, command.name, Bukkit.getServer().helpMap))
+                Bukkit.getServer().helpMap.addTopic(
+                    StellarCommandHelpTopic(
+                        name,
+                        command.information["Description"] ?: "",
+                        command.information.reversed().entries.associateBy({ it.key }) { it.value }) {
+                        command.requirements.all { it(this) }
+                    })
+            } else Bukkit.getServer().helpMap.addTopic(
+                CommandAliasHelpTopic(
+                    name,
+                    command.name,
+                    Bukkit.getServer().helpMap
+                )
+            )
         }
     }
 
-    private fun getLiteralArgumentBuilder(command: AbstractStellarCommand<*>, plugin: JavaPlugin, name: String = command.name): LiteralArgumentBuilder<Any> {
+    private fun getLiteralArgumentBuilder(
+        command: AbstractStellarCommand<*>,
+        plugin: JavaPlugin,
+        name: String = command.name
+    ): LiteralArgumentBuilder<Any> {
         command.nms = nms
         val builder: LiteralArgumentBuilder<Any> = LiteralArgumentBuilder.literal(name)
         handleArguments(command, builder, plugin)
@@ -77,27 +96,48 @@ object NMSManager {
         return builder
     }
 
-    private fun getRequiredArgumentBuilder(argument: ParameterArgument<*, *>, plugin: JavaPlugin): RequiredArgumentBuilder<Any, *> {
+    private fun getRequiredArgumentBuilder(
+        argument: ParameterArgument<*, *>,
+        plugin: JavaPlugin
+    ): RequiredArgumentBuilder<Any, *> {
         argument.nms = nms
-        val builder: RequiredArgumentBuilder<Any, *> = RequiredArgumentBuilder.argument(argument.name, argument.argumentType ?: nms.getArgumentType(if (argument is ListArgument<*, *>) argument.base else argument, plugin))
+        val builder: RequiredArgumentBuilder<Any, *> = RequiredArgumentBuilder.argument(
+            argument.name,
+            argument.argumentType
+                ?: nms.getArgumentType(if (argument is ListArgument<*, *>) argument.base else argument, plugin)
+        )
         handleArguments(argument, builder, plugin)
         handleCommandFunctions(argument, builder, plugin)
         return builder
     }
 
-    private fun handleArguments(command: AbstractStellarCommand<*>, builder: ArgumentBuilder<Any, *>, plugin: JavaPlugin) {
+    private fun handleArguments(
+        command: AbstractStellarCommand<*>,
+        builder: ArgumentBuilder<Any, *>,
+        plugin: JavaPlugin
+    ) {
         for (argument in command.arguments)
-            if (argument is LiteralArgument) for (name in argument.aliases + argument.name) builder.then(getLiteralArgumentBuilder(argument, plugin, name))
+            if (argument is LiteralArgument) for (name in argument.aliases + argument.name) builder.then(
+                getLiteralArgumentBuilder(argument, plugin, name)
+            )
             else if (argument is ParameterArgument<*, *>) builder.then(getRequiredArgumentBuilder(argument, plugin))
     }
 
-    private fun handleCommandFunctions(command: AbstractStellarCommand<*>, builder: ArgumentBuilder<Any, *>, plugin: JavaPlugin) {
+    private fun handleCommandFunctions(
+        command: AbstractStellarCommand<*>,
+        builder: ArgumentBuilder<Any, *>,
+        plugin: JavaPlugin
+    ) {
         handleExecutions(command, builder, plugin)
         handleSuggestions(command, builder)
         handleRequirements(command, builder)
     }
 
-    private fun handleExecutions(command: AbstractStellarCommand<*>, builder: ArgumentBuilder<Any, *>, plugin: JavaPlugin) {
+    private fun handleExecutions(
+        command: AbstractStellarCommand<*>,
+        builder: ArgumentBuilder<Any, *>,
+        plugin: JavaPlugin
+    ) {
         val subArguments = ArgumentHelper.getCommandAndArguments(command)
         if (command.executions.isEmpty() && command.runnables.isEmpty() && subArguments.none { it.runnables.any { it.alwaysApplicable } }) return
         builder.executes { context ->
@@ -109,21 +149,93 @@ object NMSManager {
             }
 
             val rootNodeName = context.rootNode.name.takeIf { it.isNotBlank() }
-            val baseCommand = StellarConfig.getStellarCommand(context.input.split(' ').first()) ?: throw IllegalStateException("Cannot get root command.")
+            val baseCommand = StellarConfig.getStellarCommand(context.input.split(' ').first())
+                ?: throw IllegalStateException("Cannot get root command.")
 
             val arguments = ArgumentHelper.getArguments(baseCommand, context, if (rootNodeName != null) 0 else 1)
+
+            var cmdFuture: CompletableFuture<Boolean>? = null
+            for (runnable in baseCommand.runnables) {
+                cmdFuture = if (cmdFuture == null) runnable(stellarContext)
+                else cmdFuture.thenCompose { res ->
+                    if (!res) return@thenCompose CompletableFuture.completedFuture(false)
+                    if (!runnable.async) {
+                        val mainFuture = CompletableFuture<Boolean>()
+                        Bukkit.getScheduler().callSyncMethod(plugin) {
+                            runnable(stellarContext).thenAccept {
+                                mainFuture.complete(it)
+                            }
+                        }
+                        mainFuture
+                    } else runnable(stellarContext)
+                }
+            }
+            if (cmdFuture == null) cmdFuture = CompletableFuture.completedFuture(true)
+
+            cmdFuture!!.thenCompose { res ->
+                if (!res) return@thenCompose CompletableFuture.completedFuture(res)
+                val actualArguments = arguments.filter { it.runnables.isNotEmpty() && it != command } + command
+
+                var future: CompletableFuture<Boolean>? = null
+                for (argument in actualArguments) {
+                    for (runnable in argument.runnables) {
+                        future = if (future == null) runnable(stellarContext)
+                        else future.thenCompose { res ->
+                            if (!res) return@thenCompose CompletableFuture.completedFuture(res)
+                            if (!runnable.async) {
+                                val mainFuture = CompletableFuture<Boolean>()
+                                Bukkit.getScheduler().callSyncMethod(plugin) {
+                                    runnable(stellarContext).thenAccept {
+                                        mainFuture.complete(it)
+                                    }
+                                }
+                                mainFuture
+                            } else runnable(stellarContext)
+                        }
+                    }
+                }
+                future
+            }.thenAccept { res ->
+                if (!res) return@thenAccept
+                for (execution in command.executions) {
+                    if (!execution.async) {
+                        Bukkit.getScheduler().callSyncMethod(plugin) { execution(stellarContext) }
+                    } else {
+                        execution(stellarContext)
+                    }
+                }
+            }
+
+            /*
             for (runnable in baseCommand.runnables.filter { it.async }) if (!runnable(stellarContext)) return@executes 1
-            for (argument in arguments.filter { it != command } + command) for (runnable in argument.runnables.filter { it.async }) if (!runnable(stellarContext)) return@executes 1
+            for (argument in arguments.filter { it != command } + command) for (runnable in argument.runnables.filter { it.async }) if (!runnable(
+                    stellarContext
+                )
+            ) return@executes 1
             for (execution in command.executions.filter { it.async }) execution(stellarContext)
 
             Bukkit.getScheduler().runTask(plugin, Runnable {
                 for (runnable in baseCommand.runnables.filter { !it.async }) if (!runnable(stellarContext)) return@Runnable
                 for (runnable in command.runnables.filter { !it.async }) if (!runnable(stellarContext)) return@Runnable
-                for (argument in arguments) for (runnable in argument.runnables.filter { !it.async }) if (!runnable(stellarContext)) return@Runnable
+                for (argument in arguments) for (runnable in argument.runnables.filter { !it.async }) if (!runnable(
+                        stellarContext
+                    )
+                ) return@Runnable
                 for (execution in command.executions.filter { !it.async }) execution(stellarContext)
             })
+             */
             1
         }
+    }
+
+    private fun <T> chainFuture(collection: Collection<CompletableFuture<T>>): CompletableFuture<Void> {
+        var chain: CompletableFuture<Void> = CompletableFuture.completedFuture(null)
+        for (supplier in collection) {
+            chain = chain.thenCompose {
+                supplier.thenAccept { _ -> Unit }
+            }
+        }
+        return chain
     }
 
     private fun handleSuggestions(argument: AbstractStellarCommand<*>, argumentBuilder: ArgumentBuilder<Any, *>) {
@@ -134,10 +246,18 @@ object NMSManager {
 
             CompletableFuture.supplyAsync {
                 val suggestions: MutableList<Suggestion> = mutableListOf()
-                for (suggestion in argument._suggestions) suggestions.addAll(suggestion.get(stellarContext, builder.remaining).get())
+                for (suggestion in argument._suggestions) suggestions.addAll(
+                    suggestion.get(
+                        stellarContext,
+                        builder.remaining
+                    ).get()
+                )
 
                 Suggestions(range, suggestions.map { suggestion ->
-                    if (suggestion.tooltip == null || suggestion.tooltip!!.isBlank()) BrigadierSuggestion(range, suggestion.text)
+                    if (suggestion.tooltip == null || suggestion.tooltip!!.isBlank()) BrigadierSuggestion(
+                        range,
+                        suggestion.text
+                    )
                     else BrigadierSuggestion(range, suggestion.text) { suggestion.tooltip }
                 })
             }

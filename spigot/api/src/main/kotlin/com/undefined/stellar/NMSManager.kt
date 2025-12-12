@@ -139,6 +139,61 @@ object NMSManager {
             val baseCommand = StellarConfig.getStellarCommand(context.input.split(' ').first()) ?: throw IllegalStateException("Cannot get root command.")
 
             val arguments = ArgumentHelper.getArguments(baseCommand, context, if (rootNodeName != null) 0 else 1)
+
+
+            var cmdFuture: CompletableFuture<Boolean>? = null
+            for (runnable in baseCommand.runnables) {
+                cmdFuture = if (cmdFuture == null) runnable(stellarContext)
+                else cmdFuture.thenCompose { res ->
+                    if (!res) return@thenCompose CompletableFuture.completedFuture(false)
+                    if (!runnable.async) {
+                        val mainFuture = CompletableFuture<Boolean>()
+                        Bukkit.getScheduler().callSyncMethod(plugin) {
+                            runnable(stellarContext).thenAccept {
+                                mainFuture.complete(it)
+                            }
+                        }
+                        mainFuture
+                    } else runnable(stellarContext)
+                }
+            }
+            if (cmdFuture == null) cmdFuture = CompletableFuture.completedFuture(true)
+
+            cmdFuture!!.thenCompose { res ->
+                if (!res) return@thenCompose CompletableFuture.completedFuture(res)
+                val actualArguments = arguments.filter { it.runnables.isNotEmpty() && it != command } + command
+
+                var future: CompletableFuture<Boolean>? = null
+                for (argument in actualArguments) {
+                    for (runnable in argument.runnables) {
+                        future = if (future == null) runnable(stellarContext)
+                        else future.thenCompose { res ->
+                            if (!res) return@thenCompose CompletableFuture.completedFuture(res)
+                            if (!runnable.async) {
+                                val mainFuture = CompletableFuture<Boolean>()
+                                Bukkit.getScheduler().callSyncMethod(plugin) {
+                                    runnable(stellarContext).thenAccept {
+                                        mainFuture.complete(it)
+                                    }
+                                }
+                                mainFuture
+                            } else runnable(stellarContext)
+                        }
+                    }
+                }
+                future
+            }.thenAccept { res ->
+                if (!res) return@thenAccept
+                for (execution in command.executions) {
+                    if (!execution.async) {
+                        Bukkit.getScheduler().callSyncMethod(plugin) { execution(stellarContext) }
+                    } else {
+                        execution(stellarContext)
+                    }
+                }
+            }
+
+            /*
             for (runnable in baseCommand.runnables.filter { it.async }) if (!runnable(stellarContext)) return@executes 1
             for (argument in arguments.filter { it != command } + command) for (runnable in argument.runnables.filter { it.async }) if (!runnable(stellarContext)) return@executes 1
             for (execution in command.executions.filter { it.async }) execution(stellarContext)
@@ -149,6 +204,8 @@ object NMSManager {
                 for (argument in arguments) for (runnable in argument.runnables.filter { !it.async }) if (!runnable(stellarContext)) return@Runnable
                 for (execution in command.executions.filter { !it.async }) execution(stellarContext)
             })
+
+             */
             1
         }
     }

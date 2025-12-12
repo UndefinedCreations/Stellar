@@ -36,6 +36,7 @@ import com.undefined.stellar.data.execution.ExecutableExecution
 import com.undefined.stellar.data.execution.ExecutableRunnable
 import com.undefined.stellar.data.execution.StellarExecution
 import com.undefined.stellar.data.execution.StellarRunnable
+import com.undefined.stellar.data.execution.SyncStellarRunnable
 import com.undefined.stellar.data.failure.HideDefaultFailureMessages
 import com.undefined.stellar.data.requirement.ExecutableRequirement
 import com.undefined.stellar.data.requirement.StellarRequirement
@@ -53,6 +54,7 @@ import org.bukkit.plugin.java.JavaPlugin
 import org.jetbrains.annotations.ApiStatus
 import java.lang.Enum.valueOf
 import java.util.*
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 
 /**
@@ -509,7 +511,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param runnable The execution block.
      * @return The modified command object.
      */
-    inline fun <reified C : CommandSender> addAsyncRunnable(alwaysApplicable: Boolean = false, noinline runnable: CommandContext<C>.() -> Boolean): T = apply {
+    inline fun <reified C : CommandSender> addAsyncRunnable(alwaysApplicable: Boolean = false, noinline runnable: CommandContext<C>.() -> CompletableFuture<Boolean>): T = apply {
         runnables.add(ExecutableRunnable(alwaysApplicable, C::class, runnable, true))
     } as T
 
