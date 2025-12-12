@@ -9,12 +9,12 @@ import org.bukkit.plugin.java.JavaPlugin
  * @param name The name of the argument.
  */
 @Suppress("UNCHECKED_CAST")
-abstract class StellarArgument<T : StellarArgument<T>>(name: String) : StellarCommand<T>(name) {
+abstract class AbstractStellarArgument<T : AbstractStellarArgument<T>>(name: String) : AbstractStellarCommand<T>(name) {
 
     /**
      * Represents the parent command, whether it's a command or an argument. This is automatically set internally.
      */
-    open lateinit var parent: StellarCommand<*>
+    open lateinit var parent: AbstractStellarCommand<*>
 
     override val globalFailureExecutions: MutableSet<ExecutableExecution<*>>
         get() = parent.globalFailureExecutions

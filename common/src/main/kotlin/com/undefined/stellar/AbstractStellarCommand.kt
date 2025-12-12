@@ -61,7 +61,7 @@ import java.util.concurrent.TimeUnit
  * @param name The command name.
  */
 @Suppress("UNCHECKED_CAST")
-abstract class StellarCommand<T : StellarCommand<T>>(val name: String) {
+abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: String) {
 
     @ApiStatus.Internal
     lateinit var nms: NMS
@@ -71,7 +71,7 @@ abstract class StellarCommand<T : StellarCommand<T>>(val name: String) {
     @ApiStatus.Internal
     val requirements: MutableList<ExecutableRequirement<*>> = mutableListOf()
     @ApiStatus.Internal
-    val arguments: MutableSet<StellarArgument<*>> = mutableSetOf()
+    val arguments: MutableSet<AbstractStellarArgument<*>> = mutableSetOf()
     @ApiStatus.Internal
     val lastExecutions = HashMap<UUID, Long>()
     @ApiStatus.Internal
@@ -656,8 +656,8 @@ abstract class StellarCommand<T : StellarCommand<T>>(val name: String) {
      * @return The modified command.
      */
     @JvmOverloads
-    fun <U : StellarArgument<*>> then(argument: StellarArgument<*>, block: ArgumentConfiguration<U> = ArgumentConfiguration {}): T = apply {
-        addArgument(argument, block as StellarArgument<*>.() -> Unit)
+    fun <U : AbstractStellarArgument<*>> then(argument: AbstractStellarArgument<*>, block: ArgumentConfiguration<U> = ArgumentConfiguration {}): T = apply {
+        addArgument(argument, block as AbstractStellarArgument<*>.() -> Unit)
     } as T
 
     /**
@@ -669,8 +669,8 @@ abstract class StellarCommand<T : StellarCommand<T>>(val name: String) {
      */
     @JvmOverloads
     @JvmName("thenKotlin")
-    fun <U : StellarArgument<*>> then(argument: StellarArgument<*>, block: U.() -> Unit = {}): T = apply {
-        addArgument(argument, block as StellarArgument<*>.() -> Unit)
+    fun <U : AbstractStellarArgument<*>> then(argument: AbstractStellarArgument<*>, block: U.() -> Unit = {}): T = apply {
+        addArgument(argument, block as AbstractStellarArgument<*>.() -> Unit)
     } as T
 
     /**
@@ -702,9 +702,9 @@ abstract class StellarCommand<T : StellarCommand<T>>(val name: String) {
      * @return The added argument.
      */
     @JvmOverloads
-    fun <T : StellarArgument<*>> addArgument(argument: T, block: ArgumentConfiguration<T> = ArgumentConfiguration {}): T = argument.apply {
-        argument.parent = this@StellarCommand
-        this@StellarCommand.arguments.add(argument)
+    fun <T : AbstractStellarArgument<*>> addArgument(argument: T, block: ArgumentConfiguration<T> = ArgumentConfiguration {}): T = argument.apply {
+        argument.parent = this@AbstractStellarCommand
+        this@AbstractStellarCommand.arguments.add(argument)
         block.create(argument)
     }
 
@@ -925,7 +925,7 @@ abstract class StellarCommand<T : StellarCommand<T>>(val name: String) {
     ): ListArgument<T, String> = addArgument(ListArgument.create(StringArgument(name, StringType.WORD), list, { converter(it)?.let { Suggestion.withText(it) } }, parse, async))
 
     /**
-     * Adds a [ListArgument] to the command wrapped around the given [StellarCommand].
+     * Adds a [ListArgument] to the command wrapped around the given [AbstractStellarCommand].
      *
      * @param type The base argument the list is wrapped around to.
      * @param list The list of possible values.
@@ -942,7 +942,7 @@ abstract class StellarCommand<T : StellarCommand<T>>(val name: String) {
     ): ListArgument<T, R> = addArgument(ListArgument(type, list, { converter(it)?.let { Suggestion.withText(it) } }, parse))
 
     /**
-     * Adds a [ListArgument] to the command wrapped around the given [StellarCommand].
+     * Adds a [ListArgument] to the command wrapped around the given [AbstractStellarCommand].
      *
      * @param type The base argument the list is wrapped around to.
      * @param list The list of possible values.
@@ -963,7 +963,7 @@ abstract class StellarCommand<T : StellarCommand<T>>(val name: String) {
     ): ListArgument<T, R> = addArgument(ListArgument(type, list, { converter(it)?.let { Suggestion.withText(it) } }, parse, async))
 
     /**
-     * Adds a [ListArgument] to the command wrapped around the given [StellarCommand].
+     * Adds a [ListArgument] to the command wrapped around the given [AbstractStellarCommand].
      *
      * @param type The base argument the list is wrapped around to.
      * @param list A function returning the list of possible values.
@@ -1040,7 +1040,7 @@ abstract class StellarCommand<T : StellarCommand<T>>(val name: String) {
     ): ListArgument<T, String> = addArgument(ListArgument.create(StringArgument(name, StringType.WORD), list, converter, parse, async))
 
     /**
-     * Adds a [ListArgument] to the command wrapped around the given [StellarCommand].
+     * Adds a [ListArgument] to the command wrapped around the given [AbstractStellarCommand].
      *
      * @param type The base argument the list is wrapped around to.
      * @param list The list of possible values.
@@ -1057,7 +1057,7 @@ abstract class StellarCommand<T : StellarCommand<T>>(val name: String) {
     ): ListArgument<T, R> = addArgument(ListArgument(type, list, converter, parse))
 
     /**
-     * Adds a [ListArgument] to the command wrapped around the given [StellarCommand].
+     * Adds a [ListArgument] to the command wrapped around the given [AbstractStellarCommand].
      *
      * @param type The base argument the list is wrapped around to.
      * @param list The list of possible values.
@@ -1078,7 +1078,7 @@ abstract class StellarCommand<T : StellarCommand<T>>(val name: String) {
     ): ListArgument<T, R> = addArgument(ListArgument(type, list, converter, parse, async))
 
     /**
-     * Adds a [ListArgument] to the command wrapped around the given [StellarCommand].
+     * Adds a [ListArgument] to the command wrapped around the given [AbstractStellarCommand].
      *
      * @param type The base argument the list is wrapped around to.
      * @param list A function returning the list of possible values.

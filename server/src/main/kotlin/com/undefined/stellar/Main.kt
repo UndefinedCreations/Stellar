@@ -1,10 +1,13 @@
 package com.undefined.stellar
 
+import com.undefined.stellar.data.argument.CommandContext
+import com.undefined.stellar.data.execution.StellarExecution
 import com.undefined.stellar.kotlin.setScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
+import org.bukkit.profile.PlayerProfile
 
 class Main : JavaPlugin() {
 
@@ -14,7 +17,7 @@ class Main : JavaPlugin() {
         StellarConfig.setPlugin(this)
         StellarConfig.setScope(scope)
 
-        StellarCommandImpl("balance")
+        StellarCommand("balance")
             .addAliases("bal")
             .setDescription("Check your balance")
             .setUsageText("/balance")

@@ -14,15 +14,15 @@ import org.jetbrains.annotations.ApiStatus
 abstract class BaseStellarCommand(val name: String, val permission: String = "", val aliases: List<String> = listOf()) {
 
     private var hasBeenRegistered = false
-    private val command: StellarCommandImpl by lazy {
+    private val command: StellarCommand by lazy {
         setup().apply { for (argument in arguments()) addArgument(argument.fullArgument) }
     }
 
     /**
-     * Sets up and returns the core [StellarCommandImpl] instance for this command.
+     * Sets up and returns the core [StellarCommand] instance for this command.
      * Called once during command initialization.
      */
-    abstract fun setup(): StellarCommandImpl
+    abstract fun setup(): StellarCommand
 
     /**
      * Optionally provides additional [StellarArgument]s to be added to the command.
@@ -32,7 +32,7 @@ abstract class BaseStellarCommand(val name: String, val permission: String = "",
     open fun arguments(): List<StellarArgument> = listOf()
 
     /**
-     * Creates a new [StellarCommandImpl] instance with the given configuration block.
+     * Creates a new [StellarCommand] instance with the given configuration block.
      *
      * Usually, this is used along with the [setup] method as such:
      * ```kotlin
@@ -42,10 +42,10 @@ abstract class BaseStellarCommand(val name: String, val permission: String = "",
      * ```
      *
      * @param init A lambda to configure the command instance.
-     * @return The configured [StellarCommandImpl].
+     * @return The configured [StellarCommand].
      */
-    open fun createCommand(init: StellarCommandImpl.() -> Unit): StellarCommandImpl {
-        val command = StellarCommandImpl(name, permission, aliases)
+    open fun createCommand(init: StellarCommand.() -> Unit): StellarCommand {
+        val command = StellarCommand(name, permission, aliases)
         command.init()
         return command
     }

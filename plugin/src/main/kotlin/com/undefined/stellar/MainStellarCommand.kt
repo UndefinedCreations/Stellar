@@ -6,7 +6,7 @@ import org.bukkit.command.CommandSender
 
 class MainStellarCommand : BaseStellarCommand("stellar", "com.undefined.stellar") {
 
-    override fun setup(): StellarCommandImpl = createCommand {
+    override fun setup(): StellarCommand = createCommand {
         setDescription("Manages any stellar commands, and plugin configurations.")
 
         addArgument("list")

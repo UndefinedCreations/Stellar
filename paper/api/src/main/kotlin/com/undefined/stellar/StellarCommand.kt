@@ -14,7 +14,7 @@ open class StellarCommand @JvmOverloads constructor(
     name: String,
     permissions: Iterable<String> = listOf(),
     aliases: Iterable<String> = listOf(),
-) : StellarCommand<StellarCommand>(name) {
+) : AbstractStellarCommand<StellarCommand>(name) {
 
     val information: SortedMap<String, String> = sortedMapOf()
 

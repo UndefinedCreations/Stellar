@@ -1,6 +1,6 @@
 package com.undefined.stellar.kotlin
 
-import com.undefined.stellar.StellarCommand
+import com.undefined.stellar.AbstractStellarCommand
 import com.undefined.stellar.ParameterArgument
 import com.undefined.stellar.StellarConfig
 import com.undefined.stellar.argument.LiteralArgument
@@ -44,20 +44,20 @@ import java.lang.Enum.valueOf
  * Adds a [LiteralArgument] to the command with the given name and aliases.
  * @return The created [LiteralArgument].
  */
-fun StellarCommand<*>.argument(name: String, vararg aliases: String, block: LiteralArgument.() -> Unit = {}): LiteralArgument = addArgument(LiteralArgument(name).apply { addAliases(*aliases) }).apply(block)
+fun AbstractStellarCommand<*>.argument(name: String, vararg aliases: String, block: LiteralArgument.() -> Unit = {}): LiteralArgument = addArgument(LiteralArgument(name).apply { addAliases(*aliases) }).apply(block)
 
 /**
  * Adds a [LiteralArgument] to the command with the given name and aliases.
  * @return The created [LiteralArgument].
  */
-fun StellarCommand<*>.literalArgument(name: String, vararg aliases: String, block: LiteralArgument.() -> Unit = {}): LiteralArgument = addArgument(LiteralArgument(name).apply { addAliases(*aliases) }).apply(block)
+fun AbstractStellarCommand<*>.literalArgument(name: String, vararg aliases: String, block: LiteralArgument.() -> Unit = {}): LiteralArgument = addArgument(LiteralArgument(name).apply { addAliases(*aliases) }).apply(block)
 
 // Basic
 /**
  * Adds a [BooleanArgument] to the command with the given name.
  * @return The created [BooleanArgument].
  */
-fun StellarCommand<*>.booleanArgument(name: String, block: BooleanArgument.() -> Unit = {}): BooleanArgument = addArgument(BooleanArgument(name)).apply(block)
+fun AbstractStellarCommand<*>.booleanArgument(name: String, block: BooleanArgument.() -> Unit = {}): BooleanArgument = addArgument(BooleanArgument(name)).apply(block)
 
 /**
  * Adds a [DoubleArgument] to the command with the given name.
@@ -66,7 +66,7 @@ fun StellarCommand<*>.booleanArgument(name: String, block: BooleanArgument.() ->
  * @param maximum The maximum allowed value (default: [Double.Companion.MAX_VALUE]).
  * @return The created [DoubleArgument].
  */
-fun StellarCommand<*>.doubleArgument(name: String, minimum: Double = Double.MIN_VALUE, maximum: Double = Double.MAX_VALUE, block: DoubleArgument.() -> Unit = {}): DoubleArgument = addArgument(DoubleArgument(name, minimum, maximum)).apply(block)
+fun AbstractStellarCommand<*>.doubleArgument(name: String, minimum: Double = Double.MIN_VALUE, maximum: Double = Double.MAX_VALUE, block: DoubleArgument.() -> Unit = {}): DoubleArgument = addArgument(DoubleArgument(name, minimum, maximum)).apply(block)
 
 /**
  * Adds a [FloatArgument] to the command with the given name.
@@ -75,7 +75,7 @@ fun StellarCommand<*>.doubleArgument(name: String, minimum: Double = Double.MIN_
  * @param maximum The maximum allowed value (default: [Float.Companion.MAX_VALUE]).
  * @return The created [FloatArgument].
  */
-fun StellarCommand<*>.floatArgument(name: String, minimum: Float = Float.MIN_VALUE, maximum: Float = Float.MAX_VALUE, block: FloatArgument.() -> Unit = {}): FloatArgument = addArgument(FloatArgument(name, minimum, maximum)).apply(block)
+fun AbstractStellarCommand<*>.floatArgument(name: String, minimum: Float = Float.MIN_VALUE, maximum: Float = Float.MAX_VALUE, block: FloatArgument.() -> Unit = {}): FloatArgument = addArgument(FloatArgument(name, minimum, maximum)).apply(block)
 
 /**
  * Adds an [IntegerArgument] to the command with the given name.
@@ -84,7 +84,7 @@ fun StellarCommand<*>.floatArgument(name: String, minimum: Float = Float.MIN_VAL
  * @param maximum The maximum allowed value (default: [Int.Companion.MAX_VALUE]).
  * @return The created [IntegerArgument].
  */
-fun StellarCommand<*>.integerArgument(name: String, minimum: Int = Int.MIN_VALUE, maximum: Int = Int.MAX_VALUE, block: IntegerArgument.() -> Unit = {}): IntegerArgument = addArgument(IntegerArgument(name, minimum, maximum)).apply(block)
+fun AbstractStellarCommand<*>.integerArgument(name: String, minimum: Int = Int.MIN_VALUE, maximum: Int = Int.MAX_VALUE, block: IntegerArgument.() -> Unit = {}): IntegerArgument = addArgument(IntegerArgument(name, minimum, maximum)).apply(block)
 
 /**
  * Adds a [LongArgument] to the command with the given name.
@@ -93,58 +93,58 @@ fun StellarCommand<*>.integerArgument(name: String, minimum: Int = Int.MIN_VALUE
  * @param maximum The maximum allowed value (default: [Long.Companion.MAX_VALUE]).
  * @return The created [LongArgument].
  */
-fun StellarCommand<*>.longArgument(name: String, minimum: Long = Long.MIN_VALUE, maximum: Long = Long.MAX_VALUE, block: LongArgument.() -> Unit = {}): LongArgument = addArgument(LongArgument(name, minimum, maximum)).apply(block)
+fun AbstractStellarCommand<*>.longArgument(name: String, minimum: Long = Long.MIN_VALUE, maximum: Long = Long.MAX_VALUE, block: LongArgument.() -> Unit = {}): LongArgument = addArgument(LongArgument(name, minimum, maximum)).apply(block)
 
 /**
  * Adds a [StringArgument] to the command with the given name.
  * @return The created [StringArgument].
  */
-fun StellarCommand<*>.stringArgument(name: String, type: StringType = StringType.WORD, block: StringArgument.() -> Unit = {}): StringArgument = addArgument(StringArgument(name, type)).apply(block)
+fun AbstractStellarCommand<*>.stringArgument(name: String, type: StringType = StringType.WORD, block: StringArgument.() -> Unit = {}): StringArgument = addArgument(StringArgument(name, type)).apply(block)
 
 // Block
 /**
  * Adds a [BlockDataArgument] to the command with the given name.
  * @return The created [BlockDataArgument].
  */
-fun StellarCommand<*>.blockDataArgument(name: String, block: BlockDataArgument.() -> Unit = {}): BlockDataArgument = addArgument(BlockDataArgument(name)).apply(block)
+fun AbstractStellarCommand<*>.blockDataArgument(name: String, block: BlockDataArgument.() -> Unit = {}): BlockDataArgument = addArgument(BlockDataArgument(name)).apply(block)
 
 /**
  * Adds a [BlockPredicateArgument] to the command with the given name.
  * @return The created [BlockPredicateArgument].
  */
-fun StellarCommand<*>.blockPredicateArgument(name: String, block: BlockPredicateArgument.() -> Unit = {}): BlockPredicateArgument = addArgument(BlockPredicateArgument(name)).apply(block)
+fun AbstractStellarCommand<*>.blockPredicateArgument(name: String, block: BlockPredicateArgument.() -> Unit = {}): BlockPredicateArgument = addArgument(BlockPredicateArgument(name)).apply(block)
 
 // Entity
 /**
  * Adds an [EntityAnchorArgument] to the command with the given name.
  * @return The created [EntityAnchorArgument].
  */
-fun StellarCommand<*>.entityAnchorArgument(name: String, block: EntityAnchorArgument.() -> Unit = {}): EntityAnchorArgument = addArgument(EntityAnchorArgument(name)).apply(block)
+fun AbstractStellarCommand<*>.entityAnchorArgument(name: String, block: EntityAnchorArgument.() -> Unit = {}): EntityAnchorArgument = addArgument(EntityAnchorArgument(name)).apply(block)
 
 /**
  * Adds an [EntityArgument] to the command with the given name.
  * @return The created [EntityArgument].
  */
-fun StellarCommand<*>.entityArgument(name: String, type: EntityDisplayType, block: EntityArgument.() -> Unit = {}): EntityArgument = addArgument(EntityArgument(name, type)).apply(block)
+fun AbstractStellarCommand<*>.entityArgument(name: String, type: EntityDisplayType, block: EntityArgument.() -> Unit = {}): EntityArgument = addArgument(EntityArgument(name, type)).apply(block)
 
 // Item
 /**
  * Adds an [ItemSlotArgument] to the command with the given name.
  * @return The created [ItemSlotArgument].
  */
-fun StellarCommand<*>.itemSlotArgument(name: String, multiple: Boolean = false, block: ItemSlotArgument.() -> Unit = {}): ItemSlotArgument = addArgument(ItemSlotArgument(name, multiple)).apply(block)
+fun AbstractStellarCommand<*>.itemSlotArgument(name: String, multiple: Boolean = false, block: ItemSlotArgument.() -> Unit = {}): ItemSlotArgument = addArgument(ItemSlotArgument(name, multiple)).apply(block)
 
 /**
  * Adds an [ItemStackArgument] to the command with the given name.
  * @return The created [ItemStackArgument].
  */
-fun StellarCommand<*>.itemStackArgument(name: String, block: ItemStackArgument.() -> Unit = {}): ItemStackArgument = addArgument(ItemStackArgument(name)).apply(block)
+fun AbstractStellarCommand<*>.itemStackArgument(name: String, block: ItemStackArgument.() -> Unit = {}): ItemStackArgument = addArgument(ItemStackArgument(name)).apply(block)
 
 /**
  * Adds an [ItemStackPredicateArgument] to the command with the given name.
  * @return The created [ItemStackPredicateArgument].
  */
-fun StellarCommand<*>.itemPredicateArgument(name: String, block: ItemStackPredicateArgument.() -> Unit = {}): ItemStackPredicateArgument = addArgument(ItemStackPredicateArgument(name)).apply(block)
+fun AbstractStellarCommand<*>.itemPredicateArgument(name: String, block: ItemStackPredicateArgument.() -> Unit = {}): ItemStackPredicateArgument = addArgument(ItemStackPredicateArgument(name)).apply(block)
 
 // List
 /**
@@ -156,7 +156,7 @@ fun StellarCommand<*>.itemPredicateArgument(name: String, block: ItemStackPredic
  * @param scope The [CoroutineScope] used to compute the list.
  * @return The created [ListArgument].
  */
-fun StellarCommand<*>.listArgument(
+fun AbstractStellarCommand<*>.listArgument(
     name: String,
     list: suspend CommandContext<CommandSender>.() -> List<String>,
     tooltip: (String) -> String? = { null },
@@ -177,7 +177,7 @@ fun StellarCommand<*>.listArgument(
  * @param type The [StringType] it will use in the [StringArgument].
  * @return The created [ListArgument].
  */
-fun StellarCommand<*>.listArgument(
+fun AbstractStellarCommand<*>.listArgument(
     name: String,
     list: List<String>,
     tooltip: (String) -> String? = { null },
@@ -194,7 +194,7 @@ fun StellarCommand<*>.listArgument(
  * @param scope The [CoroutineScope] used to compute the list.
  * @return The created [ListArgument].
  */
-fun <T> StellarCommand<*>.listArgument(
+fun <T> AbstractStellarCommand<*>.listArgument(
     name: String,
     list: List<T>,
     parse: CommandSender.(String) -> T,
@@ -216,7 +216,7 @@ fun <T> StellarCommand<*>.listArgument(
  * @param scope The [CoroutineScope] used to compute the list.
  * @return The created [ListArgument].
  */
-fun <T> StellarCommand<*>.listArgument(
+fun <T> AbstractStellarCommand<*>.listArgument(
     name: String,
     list: suspend CommandContext<CommandSender>.() -> Iterable<T>,
     parse: CommandSender.(String) -> T,
@@ -233,7 +233,7 @@ fun <T> StellarCommand<*>.listArgument(
 }, parse) as ListArgument<T, String>).apply(block)
 
 /**
- * Adds a [ListArgument] to the command wrapped around the given [StellarCommand].
+ * Adds a [ListArgument] to the command wrapped around the given [AbstractStellarCommand].
  *
  * @param type The base argument the list is wrapped around to.
  * @param list The list of possible values.
@@ -242,7 +242,7 @@ fun <T> StellarCommand<*>.listArgument(
  * @param scope The [CoroutineScope] used to compute the list.
  * @return The created [ListArgument].
  */
-fun <T, R> StellarCommand<*>.listArgument(
+fun <T, R> AbstractStellarCommand<*>.listArgument(
     type: ParameterArgument<*, R>,
     list: List<T>,
     parse: CommandSender.(R) -> T,
@@ -259,7 +259,7 @@ fun <T, R> StellarCommand<*>.listArgument(
 }, parse) as ListArgument<T, R>).apply(block)
 
 /**
- * Adds a [ListArgument] to the command wrapped around the given [StellarCommand].
+ * Adds a [ListArgument] to the command wrapped around the given [AbstractStellarCommand].
  *
  * @param type The base argument the list is wrapped around to.
  * @param list A function returning the list of possible values.
@@ -268,7 +268,7 @@ fun <T, R> StellarCommand<*>.listArgument(
  * @param scope The [CoroutineScope] used to compute the list.
  * @return The created [ListArgument].
  */
-fun <T, R> StellarCommand<*>.listArgument(
+fun <T, R> AbstractStellarCommand<*>.listArgument(
     type: ParameterArgument<*, R>,
     list: suspend CommandContext<CommandSender>.() -> List<T>,
     parse: CommandSender.(R) -> T,
@@ -293,7 +293,7 @@ fun <T, R> StellarCommand<*>.listArgument(
  * @param scope The [CoroutineScope] used to compute the list.
  * @return The created [ListArgument].
  */
-fun <T> StellarCommand<*>.advancedListArgument(
+fun <T> AbstractStellarCommand<*>.advancedListArgument(
     name: String,
     list: Collection<T>,
     parse: CommandSender.(String) -> T,
@@ -317,7 +317,7 @@ fun <T> StellarCommand<*>.advancedListArgument(
  * @param scope The [CoroutineScope] used to compute the list.
  * @return The created [ListArgument].
  */
-fun <T> StellarCommand<*>.advancedListArgument(
+fun <T> AbstractStellarCommand<*>.advancedListArgument(
     name: String,
     list: suspend CommandContext<CommandSender>.() -> List<T>,
     parse: CommandSender.(String) -> T,
@@ -333,7 +333,7 @@ fun <T> StellarCommand<*>.advancedListArgument(
 }, parse) as ListArgument<T, String>).apply(block)
 
 /**
- * Adds a [ListArgument] to the command wrapped around the given [StellarCommand].
+ * Adds a [ListArgument] to the command wrapped around the given [AbstractStellarCommand].
  *
  * @param type The base argument the list is wrapped around to.
  * @param list The list of possible values.
@@ -342,7 +342,7 @@ fun <T> StellarCommand<*>.advancedListArgument(
  * @param scope The [CoroutineScope] used to compute the list.
  * @return The created [ListArgument].
  */
-fun <T, R> StellarCommand<*>.advancedListArgument(
+fun <T, R> AbstractStellarCommand<*>.advancedListArgument(
     type: ParameterArgument<*, R>,
     list: List<T>,
     parse: CommandSender.(R) -> T,
@@ -358,7 +358,7 @@ fun <T, R> StellarCommand<*>.advancedListArgument(
 }, parse) as ListArgument<T, R>).apply(block).apply(block)
 
 /**
- * Adds a [ListArgument] to the command wrapped around the given [StellarCommand].
+ * Adds a [ListArgument] to the command wrapped around the given [AbstractStellarCommand].
  *
  * @param type The base argument the list is wrapped around to.
  * @param list A function returning the list of possible values.
@@ -367,7 +367,7 @@ fun <T, R> StellarCommand<*>.advancedListArgument(
  * @param scope The [CoroutineScope] used to compute the list.
  * @return The created [ListArgument].
  */
-fun <T, R> StellarCommand<*>.advancedListArgument(
+fun <T, R> AbstractStellarCommand<*>.advancedListArgument(
     type: ParameterArgument<*, R>,
     list: suspend CommandContext<CommandSender>.() -> List<T>,
     parse: CommandSender.(R) -> T,
@@ -392,7 +392,7 @@ fun <T, R> StellarCommand<*>.advancedListArgument(
  * @param scope The [CoroutineScope] used to compute the list.
  * @return The created [ListArgument].
  */
-inline fun <reified T : Enum<T>> StellarCommand<*>.enumArgument(
+inline fun <reified T : Enum<T>> AbstractStellarCommand<*>.enumArgument(
     name: String,
     noinline converter: suspend CommandContext<CommandSender>.(Enum<T>) -> String? = { it.name },
     noinline parse: CommandSender.(String) -> Enum<T> = { input ->
@@ -408,7 +408,7 @@ inline fun <reified T : Enum<T>> StellarCommand<*>.enumArgument(
  * @param formatting The formatting style for the enum names (default: [EnumFormatting.LOWERCASE]).
  * @return The created [EnumArgument].
  */
-inline fun <reified T : Enum<T>> StellarCommand<*>.enumArgument(
+inline fun <reified T : Enum<T>> AbstractStellarCommand<*>.enumArgument(
     name: String,
     formatting: EnumFormatting = EnumFormatting.LOWERCASE,
     block: EnumArgument<T>.() -> Unit = {},
@@ -420,7 +420,7 @@ inline fun <reified T : Enum<T>> StellarCommand<*>.enumArgument(
  * @param formatting The formatting style for the enum names (default: [EnumFormatting.LOWERCASE]).
  * @return The created [EnumArgument].
  */
-fun <T : Enum<T>> StellarCommand<*>.enumArgument(
+fun <T : Enum<T>> AbstractStellarCommand<*>.enumArgument(
     name: String,
     enum: Class<T>,
     formatting: EnumFormatting = EnumFormatting.LOWERCASE,
@@ -436,7 +436,7 @@ typealias KotlinOnlinePlayersArgument = ListArgument<Player, String>
  * @param scope The [CoroutineScope] used to compute the list.
  * @return The created [OnlinePlayersArgument], which returns a [Player] when parsed.
  */
-fun StellarCommand<*>.onlinePlayersArgument(
+fun AbstractStellarCommand<*>.onlinePlayersArgument(
     name: String,
     filter: suspend CommandSender.(Player) -> Boolean = { it != this },
     scope: CoroutineScope = StellarConfig.scope,
@@ -452,37 +452,37 @@ fun StellarCommand<*>.onlinePlayersArgument(
  * Adds an [AngleArgument] to the command with the given name.
  * @return The created [AngleArgument].
  */
-fun StellarCommand<*>.angleArgument(name: String, block: AngleArgument.() -> Unit = {}): AngleArgument = addArgument(AngleArgument(name)).apply(block)
+fun AbstractStellarCommand<*>.angleArgument(name: String, block: AngleArgument.() -> Unit = {}): AngleArgument = addArgument(AngleArgument(name)).apply(block)
 
 /**
  * Adds an [AxisArgument] to the command with the given name.
  * @return The created [AxisArgument].
  */
-fun StellarCommand<*>.axisArgument(name: String, block: AxisArgument.() -> Unit = {}): AxisArgument = addArgument(AxisArgument(name)).apply(block)
+fun AbstractStellarCommand<*>.axisArgument(name: String, block: AxisArgument.() -> Unit = {}): AxisArgument = addArgument(AxisArgument(name)).apply(block)
 
 /**
  * Adds a [DoubleRangeArgument] to the command with the given name.
  * @return The created [DoubleRangeArgument].
  */
-fun StellarCommand<*>.doubleRangeArgument(name: String, block: DoubleRangeArgument.() -> Unit = {}): DoubleRangeArgument = addArgument(DoubleRangeArgument(name)).apply(block)
+fun AbstractStellarCommand<*>.doubleRangeArgument(name: String, block: DoubleRangeArgument.() -> Unit = {}): DoubleRangeArgument = addArgument(DoubleRangeArgument(name)).apply(block)
 
 /**
  * Adds an [IntRangeArgument] to the command with the given name.
  * @return The created [IntRangeArgument].
  */
-fun StellarCommand<*>.intRangeArgument(name: String, block: IntRangeArgument.() -> Unit = {}): IntRangeArgument = addArgument(IntRangeArgument(name)).apply(block)
+fun AbstractStellarCommand<*>.intRangeArgument(name: String, block: IntRangeArgument.() -> Unit = {}): IntRangeArgument = addArgument(IntRangeArgument(name)).apply(block)
 
 /**
  * Adds an [OperationArgument] to the command with the given name.
  * @return The created [OperationArgument].
  */
-fun StellarCommand<*>.operationArgument(name: String, block: OperationArgument.() -> Unit = {}): OperationArgument = addArgument(OperationArgument(name)).apply(block)
+fun AbstractStellarCommand<*>.operationArgument(name: String, block: OperationArgument.() -> Unit = {}): OperationArgument = addArgument(OperationArgument(name)).apply(block)
 
 /**
  * Adds a [RotationArgument] to the command with the given name.
  * @return The created [RotationArgument].
  */
-fun StellarCommand<*>.rotationArgument(name: String, block: RotationArgument.() -> Unit = {}): RotationArgument = addArgument(RotationArgument(name)).apply(block)
+fun AbstractStellarCommand<*>.rotationArgument(name: String, block: RotationArgument.() -> Unit = {}): RotationArgument = addArgument(RotationArgument(name)).apply(block)
 
 /**
  * Adds a [TimeArgument] to the command with the given name.
@@ -490,59 +490,59 @@ fun StellarCommand<*>.rotationArgument(name: String, block: RotationArgument.() 
  * @param minimum The minimum allowed time value (default: `0`).
  * @return The created [TimeArgument].
  */
-fun StellarCommand<*>.timeArgument(name: String, minimum: Int = 0, block: TimeArgument.() -> Unit = {}): TimeArgument = addArgument(TimeArgument(name, minimum)).apply(block)
+fun AbstractStellarCommand<*>.timeArgument(name: String, minimum: Int = 0, block: TimeArgument.() -> Unit = {}): TimeArgument = addArgument(TimeArgument(name, minimum)).apply(block)
 
 // Misc
 /**
  * Adds a [NamespacedKeyArgument] to the command with the given name.
  * @return The created [NamespacedKeyArgument].
  */
-fun StellarCommand<*>.namespacedKeyArgument(name: String, block: NamespacedKeyArgument.() -> Unit = {}): NamespacedKeyArgument = addArgument(NamespacedKeyArgument(name)).apply(block)
+fun AbstractStellarCommand<*>.namespacedKeyArgument(name: String, block: NamespacedKeyArgument.() -> Unit = {}): NamespacedKeyArgument = addArgument(NamespacedKeyArgument(name)).apply(block)
 
 /**
  * Adds a [UUIDArgument] to the command with the given name.
  * @return The created [UUIDArgument].
  */
-fun StellarCommand<*>.uuidArgument(name: String, block: UUIDArgument.() -> Unit = {}): UUIDArgument = addArgument(UUIDArgument(name)).apply(block)
+fun AbstractStellarCommand<*>.uuidArgument(name: String, block: UUIDArgument.() -> Unit = {}): UUIDArgument = addArgument(UUIDArgument(name)).apply(block)
 
 // Phrase
 /**
  * Adds a [PhraseArgument] to the command with the given name.
  * @return The created [PhraseArgument].
  */
-fun StellarCommand<*>.phraseArgument(name: String, block: PhraseArgument.() -> Unit = {}): PhraseArgument = addArgument(PhraseArgument(name)).apply(block)
+fun AbstractStellarCommand<*>.phraseArgument(name: String, block: PhraseArgument.() -> Unit = {}): PhraseArgument = addArgument(PhraseArgument(name)).apply(block)
 
 // Player
 /**
  * Adds a [GameModeArgument] to the command with the given name.
  * @return The created [GameModeArgument].
  */
-fun StellarCommand<*>.gameModeArgument(name: String, block: GameModeArgument.() -> Unit = {}): GameModeArgument = addArgument(GameModeArgument(name)).apply(block).apply(block)
+fun AbstractStellarCommand<*>.gameModeArgument(name: String, block: GameModeArgument.() -> Unit = {}): GameModeArgument = addArgument(GameModeArgument(name)).apply(block).apply(block)
 
 /**
  * Adds a [GameProfileArgument] to the command with the given name.
  * @return The created [GameProfileArgument].
  */
-fun StellarCommand<*>.gameProfileArgument(name: String, block: GameProfileArgument.() -> Unit = {}): GameProfileArgument = addArgument(GameProfileArgument(name)).apply(block).apply(block)
+fun AbstractStellarCommand<*>.gameProfileArgument(name: String, block: GameProfileArgument.() -> Unit = {}): GameProfileArgument = addArgument(GameProfileArgument(name)).apply(block).apply(block)
 
 // Scoreboard
 /**
  * Adds a [DisplaySlotArgument] to the command with the given name.
  * @return The created [DisplaySlotArgument].
  */
-fun StellarCommand<*>.displaySlotArgument(name: String, block: DisplaySlotArgument.() -> Unit = {}): DisplaySlotArgument = addArgument(DisplaySlotArgument(name)).apply(block).apply(block)
+fun AbstractStellarCommand<*>.displaySlotArgument(name: String, block: DisplaySlotArgument.() -> Unit = {}): DisplaySlotArgument = addArgument(DisplaySlotArgument(name)).apply(block).apply(block)
 
 /**
  * Adds an [ObjectiveArgument] to the command with the given name.
  * @return The created [ObjectiveArgument].
  */
-fun StellarCommand<*>.objectiveArgument(name: String, block: ObjectiveArgument.() -> Unit = {}): ObjectiveArgument = addArgument(ObjectiveArgument(name)).apply(block).apply(block)
+fun AbstractStellarCommand<*>.objectiveArgument(name: String, block: ObjectiveArgument.() -> Unit = {}): ObjectiveArgument = addArgument(ObjectiveArgument(name)).apply(block).apply(block)
 
 /**
  * Adds an [ObjectiveCriteriaArgument] to the command with the given name.
  * @return The created [ObjectiveCriteriaArgument].
  */
-fun StellarCommand<*>.objectiveCriteriaArgument(name: String, block: ObjectiveCriteriaArgument.() -> Unit = {}): ObjectiveCriteriaArgument = addArgument(ObjectiveCriteriaArgument(name)).apply(block)
+fun AbstractStellarCommand<*>.objectiveCriteriaArgument(name: String, block: ObjectiveCriteriaArgument.() -> Unit = {}): ObjectiveCriteriaArgument = addArgument(ObjectiveCriteriaArgument(name)).apply(block)
 
 /**
  * Adds a [ScoreHolderArgument] to the command with the given name.
@@ -550,76 +550,76 @@ fun StellarCommand<*>.objectiveCriteriaArgument(name: String, block: ObjectiveCr
  * @param type The type of score holder.
  * @return The created [ScoreHolderArgument].
  */
-fun StellarCommand<*>.scoreHolderArgument(name: String, type: ScoreHolderType, block: ScoreHolderArgument.() -> Unit = {}): ScoreHolderArgument = addArgument(ScoreHolderArgument(name, type)).apply(block)
+fun AbstractStellarCommand<*>.scoreHolderArgument(name: String, type: ScoreHolderType, block: ScoreHolderArgument.() -> Unit = {}): ScoreHolderArgument = addArgument(ScoreHolderArgument(name, type)).apply(block)
 
 /**
  * Adds a [TeamArgument] to the command with the given name.
  * @return The created [TeamArgument].
  */
-fun StellarCommand<*>.teamArgument(name: String, block: TeamArgument.() -> Unit = {}): TeamArgument = addArgument(TeamArgument(name)).apply(block)
+fun AbstractStellarCommand<*>.teamArgument(name: String, block: TeamArgument.() -> Unit = {}): TeamArgument = addArgument(TeamArgument(name)).apply(block)
 
 // Structure
 /**
  * Adds a [LootTableArgument] to the command with the given name.
  * @return The created [LootTableArgument].
  */
-fun StellarCommand<*>.lootTableArgument(name: String, block: LootTableArgument.() -> Unit = {}): LootTableArgument = addArgument(LootTableArgument(name)).apply(block)
+fun AbstractStellarCommand<*>.lootTableArgument(name: String, block: LootTableArgument.() -> Unit = {}): LootTableArgument = addArgument(LootTableArgument(name)).apply(block)
 
 /**
  * Adds a [MirrorArgument] to the command with the given name.
  * @return The created [MirrorArgument].
  */
-fun StellarCommand<*>.mirrorArgument(name: String, block: MirrorArgument.() -> Unit = {}): MirrorArgument = addArgument(MirrorArgument(name)).apply(block)
+fun AbstractStellarCommand<*>.mirrorArgument(name: String, block: MirrorArgument.() -> Unit = {}): MirrorArgument = addArgument(MirrorArgument(name)).apply(block)
 
 /**
  * Adds a [StructureRotationArgument] to the command with the given name.
  * @return The created [StructureRotationArgument].
  */
-fun StellarCommand<*>.structureRotationArgument(name: String, block: StructureRotationArgument.() -> Unit = {}): StructureRotationArgument = addArgument(StructureRotationArgument(name)).apply(block)
+fun AbstractStellarCommand<*>.structureRotationArgument(name: String, block: StructureRotationArgument.() -> Unit = {}): StructureRotationArgument = addArgument(StructureRotationArgument(name)).apply(block)
 
 // Text
 /**
  * Adds a [ColorArgument] to the command with the given name.
  * @return The created [ColorArgument].
  */
-fun StellarCommand<*>.colorArgument(name: String, block: ColorArgument.() -> Unit = {}): ColorArgument = addArgument(ColorArgument(name)).apply(block)
+fun AbstractStellarCommand<*>.colorArgument(name: String, block: ColorArgument.() -> Unit = {}): ColorArgument = addArgument(ColorArgument(name)).apply(block)
 
 /**
  * Adds a [ComponentArgument] to the command with the given name.
  * @return The created [ComponentArgument].
  */
-fun StellarCommand<*>.componentArgument(name: String, block: ComponentArgument.() -> Unit = {}): ComponentArgument = addArgument(ComponentArgument(name)).apply(block)
+fun AbstractStellarCommand<*>.componentArgument(name: String, block: ComponentArgument.() -> Unit = {}): ComponentArgument = addArgument(ComponentArgument(name)).apply(block)
 
 /**
  * Adds a [HexArgument] to the command with the given name.
  * @return The created [HexArgument].
  */
-fun StellarCommand<*>.hexArgument(name: String, block: HexArgument.() -> Unit = {}): HexArgument = addArgument(HexArgument(name)).apply(block)
+fun AbstractStellarCommand<*>.hexArgument(name: String, block: HexArgument.() -> Unit = {}): HexArgument = addArgument(HexArgument(name)).apply(block)
 
 /**
  * Adds a [MessageArgument] to the command with the given name.
  * @return The created [MessageArgument].
  */
-fun StellarCommand<*>.messageArgument(name: String, block: MessageArgument.() -> Unit = {}): MessageArgument = addArgument(MessageArgument(name)).apply(block)
+fun AbstractStellarCommand<*>.messageArgument(name: String, block: MessageArgument.() -> Unit = {}): MessageArgument = addArgument(MessageArgument(name)).apply(block)
 
 /**
  * Adds a [StyleArgument] to the command with the given name.
  * @return The created [StyleArgument].
  */
-fun StellarCommand<*>.styleArgument(name: String, block: StyleArgument.() -> Unit = {}): StyleArgument = addArgument(StyleArgument(name)).apply(block)
+fun AbstractStellarCommand<*>.styleArgument(name: String, block: StyleArgument.() -> Unit = {}): StyleArgument = addArgument(StyleArgument(name)).apply(block)
 
 // World
 /**
  * Adds an [EnvironmentArgument] to the command with the given name.
  * @return The created [EnvironmentArgument].
  */
-fun StellarCommand<*>.environmentArgument(name: String, block: EnvironmentArgument.() -> Unit = {}): EnvironmentArgument = addArgument(EnvironmentArgument(name)).apply(block)
+fun AbstractStellarCommand<*>.environmentArgument(name: String, block: EnvironmentArgument.() -> Unit = {}): EnvironmentArgument = addArgument(EnvironmentArgument(name)).apply(block)
 
 /**
  * Adds a [HeightMapArgument] to the command with the given name.
  * @return The created [HeightMapArgument].
  */
-fun StellarCommand<*>.heightMapArgument(name: String, block: HeightMapArgument.() -> Unit = {}): HeightMapArgument = addArgument(HeightMapArgument(name)).apply(block)
+fun AbstractStellarCommand<*>.heightMapArgument(name: String, block: HeightMapArgument.() -> Unit = {}): HeightMapArgument = addArgument(HeightMapArgument(name)).apply(block)
 
 /**
  * Adds a [LocationArgument] to the command with the given name.
@@ -627,4 +627,4 @@ fun StellarCommand<*>.heightMapArgument(name: String, block: HeightMapArgument.(
  * @param type The type of location.
  * @return The created [LocationArgument].
  */
-fun StellarCommand<*>.locationArgument(name: String, type: LocationType, block: LocationArgument.() -> Unit = {}): LocationArgument = addArgument(LocationArgument(name, type)).apply(block)
+fun AbstractStellarCommand<*>.locationArgument(name: String, type: LocationType, block: LocationArgument.() -> Unit = {}): LocationArgument = addArgument(LocationArgument(name, type)).apply(block)

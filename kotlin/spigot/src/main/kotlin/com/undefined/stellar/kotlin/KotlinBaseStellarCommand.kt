@@ -1,7 +1,7 @@
 package com.undefined.stellar.kotlin
 
 import com.undefined.stellar.BaseStellarCommand
-import com.undefined.stellar.StellarCommandImpl
+import com.undefined.stellar.StellarCommand
 import org.jetbrains.annotations.ApiStatus
 
 /**
@@ -11,7 +11,7 @@ import org.jetbrains.annotations.ApiStatus
 abstract class KotlinBaseStellarCommand(name: String, permission: String = "", aliases: List<String> = listOf()) : BaseStellarCommand(name, permission, aliases) {
 
     /**
-     * Creates a new [StellarCommandImpl] instance with the given configuration block.
+     * Creates a new [StellarCommand] instance with the given configuration block.
      *
      * Usually, this is used along with the [setup] method as such:
      * ```kotlin
@@ -21,9 +21,9 @@ abstract class KotlinBaseStellarCommand(name: String, permission: String = "", a
      * ```
      *
      * @param init A lambda to configure the command instance.
-     * @return The configured [StellarCommandImpl].
+     * @return The configured [StellarCommand].
      */
-    fun kotlinCommand(init: KotlinStellarCommandImpl.() -> Unit): KotlinStellarCommandImpl = command(name) {
+    fun kotlinCommand(init: KotlinStellarCommand.() -> Unit): KotlinStellarCommand = command(name) {
         aliases += this@KotlinBaseStellarCommand.aliases
         requires(permission)
         init()

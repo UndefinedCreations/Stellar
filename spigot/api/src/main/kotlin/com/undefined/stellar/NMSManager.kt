@@ -75,7 +75,7 @@ object NMSManager {
         "1.13" to { NMS1_13 },
     )
 
-    fun register(command: StellarCommandImpl, plugin: JavaPlugin, prefix: String) {
+    fun register(command: StellarCommand, plugin: JavaPlugin, prefix: String) {
         if (!StellarListener.hasBeenInitialized) Bukkit.getPluginManager().registerEvents(StellarListener, plugin).also { StellarListener.hasBeenInitialized = true }
 
         StellarConfig.commands.add(command)
@@ -96,7 +96,7 @@ object NMSManager {
         }
     }
 
-    private fun getLiteralArgumentBuilder(command: StellarCommand<*>, plugin: JavaPlugin, name: String = command.name): LiteralArgumentBuilder<Any> {
+    private fun getLiteralArgumentBuilder(command: AbstractStellarCommand<*>, plugin: JavaPlugin, name: String = command.name): LiteralArgumentBuilder<Any> {
         command.nms = nms
         val builder: LiteralArgumentBuilder<Any> = LiteralArgumentBuilder.literal(name)
         handleArguments(command, builder, plugin)
@@ -112,19 +112,19 @@ object NMSManager {
         return builder
     }
 
-    private fun handleArguments(command: StellarCommand<*>, builder: ArgumentBuilder<Any, *>, plugin: JavaPlugin) {
+    private fun handleArguments(command: AbstractStellarCommand<*>, builder: ArgumentBuilder<Any, *>, plugin: JavaPlugin) {
         for (argument in command.arguments)
             if (argument is LiteralArgument) for (name in argument.aliases + argument.name) builder.then(getLiteralArgumentBuilder(argument, plugin, name))
             else if (argument is ParameterArgument<*, *>) builder.then(getRequiredArgumentBuilder(argument, plugin))
     }
 
-    private fun handleCommandFunctions(command: StellarCommand<*>, builder: ArgumentBuilder<Any, *>, plugin: JavaPlugin) {
+    private fun handleCommandFunctions(command: AbstractStellarCommand<*>, builder: ArgumentBuilder<Any, *>, plugin: JavaPlugin) {
         handleExecutions(command, builder, plugin)
         handleSuggestions(command, builder)
         handleRequirements(command, builder)
     }
 
-    private fun handleExecutions(command: StellarCommand<*>, builder: ArgumentBuilder<Any, *>, plugin: JavaPlugin) {
+    private fun handleExecutions(command: AbstractStellarCommand<*>, builder: ArgumentBuilder<Any, *>, plugin: JavaPlugin) {
         val subArguments = ArgumentHelper.getCommandAndArguments(command)
         if (command.executions.isEmpty() && command.runnables.isEmpty() && subArguments.none { it.runnables.any { it.alwaysApplicable } }) return
         builder.executes { context ->
@@ -153,7 +153,7 @@ object NMSManager {
         }
     }
 
-    private fun handleSuggestions(argument: StellarCommand<*>, argumentBuilder: ArgumentBuilder<Any, *>) {
+    private fun handleSuggestions(argument: AbstractStellarCommand<*>, argumentBuilder: ArgumentBuilder<Any, *>) {
         if (argument !is ParameterArgument<*, *> || argument._suggestions.isEmpty() || argumentBuilder !is RequiredArgumentBuilder<Any, *>) return
         argumentBuilder.suggests { context, builder ->
             val stellarContext = MojangAdapter.getStellarCommandContext(context)
@@ -171,7 +171,7 @@ object NMSManager {
         }
     }
 
-    private fun handleRequirements(command: StellarCommand<*>, builder: ArgumentBuilder<Any, *>) {
+    private fun handleRequirements(command: AbstractStellarCommand<*>, builder: ArgumentBuilder<Any, *>) {
         builder.requires { source ->
             val sender = NMSHelper.getBukkitSender(source)
             command.requirements.all { it(sender) }
