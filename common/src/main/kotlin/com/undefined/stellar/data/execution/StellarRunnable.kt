@@ -10,10 +10,3 @@ import java.util.concurrent.CompletableFuture
 fun interface StellarRunnable<C : CommandSender> {
     operator fun invoke(context: CommandContext<C>): CompletableFuture<Boolean>
 }
-
-fun interface SyncStellarRunnable<C : CommandSender> {
-    operator fun invoke(context: CommandContext<C>): Boolean
-}
-
-fun <T : CommandSender> SyncStellarRunnable<T>.toAsync(): StellarRunnable<T> =
-    StellarRunnable { this@toAsync(it).let { CompletableFuture.completedFuture(it) } }
