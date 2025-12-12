@@ -1,6 +1,6 @@
 package com.undefined.stellar.argument.misc
 
-import com.undefined.stellar.AbstractStellarCommand
+import com.undefined.stellar.StellarCommand
 import com.undefined.stellar.ParameterArgument
 import org.bukkit.Registry
 
@@ -51,4 +51,4 @@ class RegistryArgument(
  * Adds a [RegistryArgument] to the command with the given name and [Registry].
  * @return The created [RegistryArgument].
  */
-fun AbstractStellarCommand<*>.addRegistryArgument(name: String, registry: Registry<*>): RegistryArgument = addArgument(RegistryArgument(name, registry))
+fun StellarCommand<*>.addRegistryArgument(name: String, registry: Registry<*>): RegistryArgument = addArgument(RegistryArgument(name, registry))

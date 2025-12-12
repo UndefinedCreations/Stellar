@@ -17,10 +17,10 @@ object StellarConfig {
     var plugin: JavaPlugin? = null
         private set
     @ApiStatus.Internal
-    val commands: MutableList<AbstractStellarCommand<*>> = mutableListOf()
+    val commands: MutableList<StellarCommand<*>> = mutableListOf()
 
     @ApiStatus.Internal
-    fun getStellarCommand(name: String): AbstractStellarCommand<*>? =
+    fun getStellarCommand(name: String): StellarCommand<*>? =
         commands.firstOrNull { it.name == name.substringAfter(':') || name in it.aliases }
 
     /**

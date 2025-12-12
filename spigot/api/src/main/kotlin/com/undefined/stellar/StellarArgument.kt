@@ -42,7 +42,7 @@ abstract class StellarArgument(val base: ParameterArgument<*, *>, vararg val per
      * ```
      *
      * @param init A lambda to configure the argument instance.
-     * @return The configured [StellarCommand].
+     * @return The configured [StellarCommandImpl].
      */
     fun createArgument(init: ParameterArgument<*, *>.() -> Unit): ParameterArgument<*, *> = base.apply { init() }
 

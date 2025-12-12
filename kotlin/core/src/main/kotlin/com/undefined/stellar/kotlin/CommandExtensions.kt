@@ -1,6 +1,6 @@
 package com.undefined.stellar.kotlin
 
-import com.undefined.stellar.AbstractStellarCommand
+import com.undefined.stellar.StellarCommand
 import com.undefined.stellar.ParameterArgument
 import com.undefined.stellar.StellarConfig
 import com.undefined.stellar.data.argument.CommandContext
@@ -19,10 +19,10 @@ import java.util.concurrent.CompletableFuture
  * @param execution The execution block.
  * @return The modified command object.
  */
-inline fun <reified C : CommandSender> AbstractStellarCommand<*>.execution(
+inline fun <reified C : CommandSender> StellarCommand<*>.execution(
     scope: CoroutineScope = StellarConfig.scope,
     noinline execution: suspend CommandContext<C>.() -> Unit,
-): AbstractStellarCommand<*> = addExecution<C> {
+): StellarCommand<*> = addExecution<C> {
     scope.launch {
         execution()
     }
@@ -34,7 +34,7 @@ inline fun <reified C : CommandSender> AbstractStellarCommand<*>.execution(
  * @param C The type of CommandSender.
  * @param execution The execution block.
  */
-inline fun <reified C : CommandSender> AbstractStellarCommand<*>.asyncExecution(noinline execution: CommandContext<C>.() -> Unit) = addAsyncExecution(execution)
+inline fun <reified C : CommandSender> StellarCommand<*>.asyncExecution(noinline execution: CommandContext<C>.() -> Unit) = addAsyncExecution(execution)
 
 /**
  * Adds a runnable to the command.
@@ -45,11 +45,11 @@ inline fun <reified C : CommandSender> AbstractStellarCommand<*>.asyncExecution(
  * @param runnable The execution block.
  * @return The modified command object.
  */
-inline fun <reified C : CommandSender> AbstractStellarCommand<*>.runnable(
+inline fun <reified C : CommandSender> StellarCommand<*>.runnable(
     alwaysApplicable: Boolean = false,
     scope: CoroutineScope = StellarConfig.scope,
     noinline runnable: suspend CommandContext<C>.() -> Boolean,
-): AbstractStellarCommand<*> = addRunnable<C>(alwaysApplicable = alwaysApplicable) {
+): StellarCommand<*> = addRunnable<C>(alwaysApplicable = alwaysApplicable) {
     scope.future {
         runnable()
     }.get()
@@ -62,10 +62,10 @@ inline fun <reified C : CommandSender> AbstractStellarCommand<*>.runnable(
  * @param alwaysApplicable Whether it should always run or only when an execution is already present for the last argument.
  * @param execution The execution block.
  */
-inline fun <reified C : CommandSender> AbstractStellarCommand<*>.asyncRunnable(
+inline fun <reified C : CommandSender> StellarCommand<*>.asyncRunnable(
     alwaysApplicable: Boolean = false,
     noinline execution: CommandContext<C>.() -> Boolean,
-): AbstractStellarCommand<*> = addAsyncRunnable(alwaysApplicable, execution)
+): StellarCommand<*> = addAsyncRunnable(alwaysApplicable, execution)
 
 /**
  * Adds a failure execution to the command to be displayed when the command fails.
@@ -75,10 +75,10 @@ inline fun <reified C : CommandSender> AbstractStellarCommand<*>.asyncRunnable(
  * @param execution The execution block.
  * @return The modified command object.
  */
-inline fun <reified C : CommandSender> AbstractStellarCommand<*>.failureExecution(
+inline fun <reified C : CommandSender> StellarCommand<*>.failureExecution(
     scope: CoroutineScope = StellarConfig.scope,
     noinline execution: suspend CommandContext<C>.() -> Unit,
-): AbstractStellarCommand<*> = addFailureExecution<C> {
+): StellarCommand<*> = addFailureExecution<C> {
     scope.launch {
         execution()
     }
@@ -92,10 +92,10 @@ inline fun <reified C : CommandSender> AbstractStellarCommand<*>.failureExecutio
  * @param requirement The condition that must be met.
  * @return The modified command object.
  */
-inline fun <reified C : CommandSender> AbstractStellarCommand<*>.requires(
+inline fun <reified C : CommandSender> StellarCommand<*>.requires(
     scope: CoroutineScope = StellarConfig.scope,
     noinline requirement: suspend C.() -> Boolean,
-): AbstractStellarCommand<*> = addRequirement<C> {
+): StellarCommand<*> = addRequirement<C> {
     scope.future {
         requirement()
     }.get()
@@ -108,14 +108,14 @@ inline fun <reified C : CommandSender> AbstractStellarCommand<*>.requires(
  *
  * @param level The required permission level.
  */
-fun AbstractStellarCommand<*>.requires(level: Int) = addRequirement(1)
+fun StellarCommand<*>.requires(level: Int) = addRequirement(1)
 
 /**
  * Adds a Bukkit permission requirement for the command to be available to the player.
  *
  * @param permission The permission string.
  */
-fun AbstractStellarCommand<*>.requires(permission: String) = addRequirement<CommandSender> { hasPermission(permission) }
+fun StellarCommand<*>.requires(permission: String) = addRequirement<CommandSender> { hasPermission(permission) }
 
 /**
  * Adds any number of [Suggestion] on top of the current suggestions.

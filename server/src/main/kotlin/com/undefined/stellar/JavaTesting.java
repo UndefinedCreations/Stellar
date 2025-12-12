@@ -9,7 +9,7 @@ public class JavaTesting extends JavaPlugin {
     public void onEnable() {
         StellarConfig.setPlugin(this);
 
-        new StellarCommand("server")
+        new StellarCommandImpl("server")
                 .then("test", (arg) -> {
                     arg.getName();
                 })

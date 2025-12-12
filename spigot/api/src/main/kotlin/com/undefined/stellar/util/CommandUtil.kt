@@ -4,7 +4,7 @@ package com.undefined.stellar.util
 
 import com.mojang.brigadier.tree.CommandNode
 import com.undefined.stellar.NMSManager
-import com.undefined.stellar.StellarCommand
+import com.undefined.stellar.StellarCommandImpl
 import com.undefined.stellar.StellarConfig
 import org.bukkit.Bukkit
 import org.bukkit.command.Command
@@ -45,8 +45,8 @@ fun unregisterCommand(name: String, plugin: JavaPlugin = StellarConfig.plugin ?:
 
 @Deprecated("Use the kotlin module")
 @ApiStatus.ScheduledForRemoval()
-fun command(name: String, description: String, permissions: List<String>, aliases: List<String>, builder: StellarCommand.() -> Unit): StellarCommand {
-    val command = StellarCommand(name, permissions, aliases)
+fun command(name: String, description: String, permissions: List<String>, aliases: List<String>, builder: StellarCommandImpl.() -> Unit): StellarCommandImpl {
+    val command = StellarCommandImpl(name, permissions, aliases)
     command.setDescription(description)
     command.builder()
     return command
@@ -54,48 +54,48 @@ fun command(name: String, description: String, permissions: List<String>, aliase
 
 @Deprecated("Use the kotlin module")
 @ApiStatus.ScheduledForRemoval()
-fun command(name: String, description: String, builder: StellarCommand.() -> Unit): StellarCommand = command(name, description, listOf(), listOf(), builder)
+fun command(name: String, description: String, builder: StellarCommandImpl.() -> Unit): StellarCommandImpl = command(name, description, listOf(), listOf(), builder)
 
 @Deprecated("Use the kotlin module")
 @ApiStatus.ScheduledForRemoval()
-fun command(name: String, description: String, permissions: List<String>, builder: StellarCommand.() -> Unit): StellarCommand = command(name, description, permissions, listOf(), builder)
+fun command(name: String, description: String, permissions: List<String>, builder: StellarCommandImpl.() -> Unit): StellarCommandImpl = command(name, description, permissions, listOf(), builder)
 
 @Deprecated("Use the kotlin module")
 @ApiStatus.ScheduledForRemoval()
-fun command(name: String, permissions: List<String>, builder: StellarCommand.() -> Unit): StellarCommand = command(name, "", permissions, listOf(), builder)
+fun command(name: String, permissions: List<String>, builder: StellarCommandImpl.() -> Unit): StellarCommandImpl = command(name, "", permissions, listOf(), builder)
 
 @Deprecated("Use the kotlin module")
 @ApiStatus.ScheduledForRemoval()
-fun command(name: String, permissions: List<String>, aliases: List<String>, builder: StellarCommand.() -> Unit): StellarCommand = command(name, "", permissions, aliases, builder)
+fun command(name: String, permissions: List<String>, aliases: List<String>, builder: StellarCommandImpl.() -> Unit): StellarCommandImpl = command(name, "", permissions, aliases, builder)
 
 @Deprecated("Use the kotlin module")
 @ApiStatus.ScheduledForRemoval()
-fun command(name: String, builder: StellarCommand.() -> Unit): StellarCommand = command(name, "", builder)
+fun command(name: String, builder: StellarCommandImpl.() -> Unit): StellarCommandImpl = command(name, "", builder)
 
 @Deprecated("Use the kotlin module")
 @ApiStatus.ScheduledForRemoval()
-fun command(name: String, description: String, permissions: List<String>, aliases: List<String>): StellarCommand {
-    val command = StellarCommand(name, permissions, aliases)
+fun command(name: String, description: String, permissions: List<String>, aliases: List<String>): StellarCommandImpl {
+    val command = StellarCommandImpl(name, permissions, aliases)
     command.setDescription(description)
     return command
 }
 
 @Deprecated("Use the kotlin module")
 @ApiStatus.ScheduledForRemoval()
-fun command(name: String, description: String): StellarCommand = command(name, description, listOf(), listOf())
+fun command(name: String, description: String): StellarCommandImpl = command(name, description, listOf(), listOf())
 
 @Deprecated("Use the kotlin module")
 @ApiStatus.ScheduledForRemoval()
-fun command(name: String, description: String, permissions: List<String>): StellarCommand = command(name, description, permissions, listOf())
+fun command(name: String, description: String, permissions: List<String>): StellarCommandImpl = command(name, description, permissions, listOf())
 
 @Deprecated("Use the kotlin module")
 @ApiStatus.ScheduledForRemoval()
-fun command(name: String, permissions: List<String>): StellarCommand = command(name, "", permissions, listOf())
+fun command(name: String, permissions: List<String>): StellarCommandImpl = command(name, "", permissions, listOf())
 
 @Deprecated("Use the kotlin module")
 @ApiStatus.ScheduledForRemoval()
-fun command(name: String, permissions: List<String>, aliases: List<String>): StellarCommand = command(name, "", permissions, aliases)
+fun command(name: String, permissions: List<String>, aliases: List<String>): StellarCommandImpl = command(name, "", permissions, aliases)
 
 @Deprecated("Use the kotlin module")
 @ApiStatus.ScheduledForRemoval()
-fun command(name: String): StellarCommand = command(name, "")
+fun command(name: String): StellarCommandImpl = command(name, "")

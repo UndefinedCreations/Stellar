@@ -1,6 +1,6 @@
 package com.undefined.stellar.argument.world
 
-import com.undefined.stellar.AbstractStellarCommand
+import com.undefined.stellar.StellarCommand
 import com.undefined.stellar.ParameterArgument
 import org.bukkit.Particle
 
@@ -13,4 +13,4 @@ class ParticleArgument(name: String) : ParameterArgument<ParticleArgument, Parti
  * Adds a [ParticleArgument] to the command with the given name.
  * @return The created [ParticleArgument].
  */
-fun AbstractStellarCommand<*>.addParticleArgument(name: String): ParticleArgument = addArgument(ParticleArgument(name))
+fun StellarCommand<*>.addParticleArgument(name: String): ParticleArgument = addArgument(ParticleArgument(name))

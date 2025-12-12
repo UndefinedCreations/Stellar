@@ -10,11 +10,11 @@ import java.util.*
  * @param permissions An `Iterable` of Bukkit string permissions to be applied as a requirement.
  * @param aliases An `Iterable` of name aliases.
  */
-open class StellarCommand @JvmOverloads constructor(
+open class StellarCommandImpl @JvmOverloads constructor(
     name: String,
     permissions: Iterable<String> = listOf(),
     aliases: Iterable<String> = listOf(),
-) : AbstractStellarCommand<StellarCommand>(name.lowercase()) {
+) : StellarCommand<StellarCommandImpl>(name.lowercase()) {
 
     val information: SortedMap<String, String> = sortedMapOf()
 
@@ -34,10 +34,10 @@ open class StellarCommand @JvmOverloads constructor(
         addAliases(*aliases.toList().toTypedArray())
     }
 
-    override fun setInformation(name: String, text: String): StellarCommand = apply { information[name] = text }
-    override fun setDescription(text: String): StellarCommand = setInformation("Description", text)
-    override fun setUsageText(text: String): StellarCommand = setInformation("Usage", text)
-    override fun clearInformation(): StellarCommand = apply { aliases.clear() }
+    override fun setInformation(name: String, text: String): StellarCommandImpl = apply { information[name] = text }
+    override fun setDescription(text: String): StellarCommandImpl = setInformation("Description", text)
+    override fun setUsageText(text: String): StellarCommandImpl = setInformation("Usage", text)
+    override fun clearInformation(): StellarCommandImpl = apply { aliases.clear() }
 
     override fun register(plugin: JavaPlugin, prefix: String) = apply {
         if (aliases.isNotEmpty()) setInformation("Aliases", aliases.joinToString())

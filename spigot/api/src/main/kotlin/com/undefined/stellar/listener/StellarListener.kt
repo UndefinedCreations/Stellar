@@ -1,6 +1,6 @@
 package com.undefined.stellar.listener
 
-import com.undefined.stellar.AbstractStellarCommand
+import com.undefined.stellar.StellarCommand
 import com.undefined.stellar.NMSManager
 import com.undefined.stellar.StellarConfig
 import com.undefined.stellar.data.argument.ArgumentHelper
@@ -35,7 +35,7 @@ object StellarListener : Listener {
         if (context.nodes.isEmpty()) return false
 
         val rootNodeName = context.rootNode.name.takeIf { it.isNotBlank() }
-        val baseCommand: AbstractStellarCommand<*> = StellarConfig.getStellarCommand(rootNodeName ?: context.nodes[0].node.name) ?: return false
+        val baseCommand: StellarCommand<*> = StellarConfig.getStellarCommand(rootNodeName ?: context.nodes[0].node.name) ?: return false
         val argument = ArgumentHelper.getArguments(baseCommand, context, if (rootNodeName != null) 0 else 1).lastOrNull()
         argument?.let {
             sendFailureExecutions(argument, context)
@@ -48,7 +48,7 @@ object StellarListener : Listener {
         return baseCommand.hasGlobalHiddenDefaultFailureMessages()
     }
 
-    fun sendFailureExecutions(command: AbstractStellarCommand<*>, context: BrigadierCommandContext<Any>) {
+    fun sendFailureExecutions(command: StellarCommand<*>, context: BrigadierCommandContext<Any>) {
         val stellarContext = MojangAdapter.getStellarCommandContext(context)
         for (execution in command.failureExecutions) execution(stellarContext)
         for (execution in command.globalFailureExecutions) execution(stellarContext)

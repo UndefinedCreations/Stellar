@@ -1,17 +1,17 @@
 package com.undefined.stellar.kotlin
 
-import com.undefined.stellar.StellarCommand
+import com.undefined.stellar.StellarCommandImpl
 import com.undefined.stellar.StellarConfig
 import com.undefined.stellar.argument.LiteralArgument
 import org.bukkit.plugin.java.JavaPlugin
 
 /**
- * An extension of [StellarCommand] improved for Kotlin DSL.
+ * An extension of [StellarCommandImpl] improved for Kotlin DSL.
  */
-class KotlinStellarCommand(name: String) : StellarCommand(name) {
+class KotlinStellarCommandImpl(name: String) : StellarCommandImpl(name) {
 
     /**
-     * The description of this command, stored in [StellarCommand.information]. This is mostly used by the command help topic.
+     * The description of this command, stored in [StellarCommandImpl.information]. This is mostly used by the command help topic.
      */
     var description: String?
         get() = information["Description"]
@@ -20,7 +20,7 @@ class KotlinStellarCommand(name: String) : StellarCommand(name) {
         }
 
     /**
-     * The usage of this command, stored in [StellarCommand.information]. This is mostly used by the command help topic.
+     * The usage of this command, stored in [StellarCommandImpl.information]. This is mostly used by the command help topic.
      */
     var usage: String?
         get() = information["Usage"]
@@ -42,12 +42,12 @@ class KotlinStellarCommand(name: String) : StellarCommand(name) {
  *
  * @param name The name of the command.
  * @param plugin The plugin with which the command will be registered. If this is null, it will not register the command.
- * @return The created [StellarCommand] instance.
+ * @return The created [StellarCommandImpl] instance.
  */
 fun command(
     name: String,
     plugin: JavaPlugin? = StellarConfig.plugin,
-    builder: KotlinStellarCommand.() -> Unit,
-): KotlinStellarCommand = KotlinStellarCommand(name).apply(builder).also { command ->
+    builder: KotlinStellarCommandImpl.() -> Unit,
+): KotlinStellarCommandImpl = KotlinStellarCommandImpl(name).apply(builder).also { command ->
     plugin?.let { command.register(plugin) }
 }

@@ -8,13 +8,13 @@ import org.jetbrains.annotations.ApiStatus
 import java.util.concurrent.CompletableFuture
 
 /**
- * Being an extension of [AbstractStellarArgument], it represents an argument.
+ * Being an extension of [StellarArgument], it represents an argument.
  *
  * @param name The name of the argument.
  * @param argumentType This is used internally and should not be used by the end user. Is used when the Brigadier library contains the argument type wanted.
  */
 @Suppress("UNCHECKED_CAST", "PropertyName")
-abstract class ParameterArgument<T : ParameterArgument<T, *>, R>(name: String, val argumentType: ArgumentType<R>? = null) : AbstractStellarArgument<T>(name) {
+abstract class ParameterArgument<T : ParameterArgument<T, *>, R>(name: String, val argumentType: ArgumentType<R>? = null) : StellarArgument<T>(name) {
 
     @ApiStatus.Internal
     open val _suggestions: MutableSet<ExecutableSuggestion<*>> = mutableSetOf()
