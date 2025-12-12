@@ -3,7 +3,6 @@ package com.undefined.stellar.nms
 import com.mojang.brigadier.Command
 import com.mojang.brigadier.context.CommandContext
 import com.undefined.stellar.AbstractStellarCommand
-import com.undefined.stellar.BukkitCtx
 import com.undefined.stellar.StellarConfig
 import com.undefined.stellar.data.argument.ArgumentHelper
 import org.bukkit.command.CommandSender
@@ -17,7 +16,7 @@ abstract class AbstractNMSManager {
         context: CommandContext<Any>,
         subArguments: List<AbstractStellarCommand<*>>
     ): Int {
-        if (subArguments.any { it.runnables.any { it.alwaysApplicable } }) {
+        if (subArguments.any { arg -> arg.runnables.any { it.alwaysApplicable } }) {
             for (argument in subArguments) for (runnable in argument.runnables) runnable(stellarContext)
             return Command.SINGLE_SUCCESS
         }
@@ -52,17 +51,11 @@ abstract class AbstractNMSManager {
                     }
                 }
             }
-            future
+            future ?: CompletableFuture.completedFuture(true)
         }.thenAccept { res ->
             if (!res) return@thenAccept
             for (execution in command.executions) {
-                if (!execution.async) {
-                    BukkitCtx {
-                        execution(stellarContext)
-                    }
-                } else {
-                    execution(stellarContext)
-                }
+                execution(stellarContext)
             }
         }
 

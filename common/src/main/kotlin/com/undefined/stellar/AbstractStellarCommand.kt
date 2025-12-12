@@ -42,6 +42,7 @@ import com.undefined.stellar.data.requirement.StellarRequirement
 import com.undefined.stellar.data.suggestion.Suggestion
 import com.undefined.stellar.nms.NMS
 import com.undefined.stellar.nms.NMSHelper
+import kotlinx.coroutines.launch
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.minimessage.MiniMessage
@@ -71,20 +72,28 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
 
     @ApiStatus.Internal
     val requirements: MutableList<ExecutableRequirement<*>> = mutableListOf()
+
     @ApiStatus.Internal
     val arguments: MutableSet<AbstractStellarArgument<*>> = mutableSetOf()
+
     @ApiStatus.Internal
     val lastExecutions = HashMap<UUID, Long>()
+
     @ApiStatus.Internal
     val executions: MutableSet<ExecutableExecution<*>> = mutableSetOf()
+
     @ApiStatus.Internal
     val runnables: MutableSet<ExecutableRunnable<*>> = mutableSetOf()
+
     @ApiStatus.Internal
     val failureExecutions: MutableSet<ExecutableExecution<*>> = mutableSetOf()
+
     @ApiStatus.Internal
     open val globalFailureExecutions: MutableSet<ExecutableExecution<*>> = mutableSetOf()
+
     @ApiStatus.Internal
-    var hideDefaultFailureMessages: HideDefaultFailureMessages = HideDefaultFailureMessages(hide = false, global = false)
+    var hideDefaultFailureMessages: HideDefaultFailureMessages =
+        HideDefaultFailureMessages(hide = false, global = false)
 
     /**
      * Add a command alias in addition to the existing command aliases.
@@ -158,7 +167,8 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param permissions The permission strings.
      * @return The modified command object.
      */
-    fun addRequirements(vararg permissions: String): T = addRequirement<CommandSender> { permissions.all { hasPermission(it) } }
+    fun addRequirements(vararg permissions: String): T =
+        addRequirement<CommandSender> { permissions.all { hasPermission(it) } }
 
     /**
      * Adds multiple level requirements for the command to be available to the player.
@@ -168,7 +178,8 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param levels The required permission levels.
      * @return The modified command object.
      */
-    fun addRequirements(vararg levels: Int): T = addRequirement<Player> { levels.all { NMSHelper.hasPermission(this, it) } }
+    fun addRequirements(vararg levels: Int): T =
+        addRequirement<Player> { levels.all { NMSHelper.hasPermission(this, it) } }
 
     /**
      * Adds a cooldown to the command for each player.
@@ -296,7 +307,10 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
     inline fun addComponentMessageCooldown(
         duration: Long,
         crossinline message: CommandContext<Player>.(remaining: Long) -> Component = { remaining ->
-            Component.text("Please wait ${TimeUnit.MILLISECONDS.toSeconds(remaining)} more seconds!", NamedTextColor.RED)
+            Component.text(
+                "Please wait ${TimeUnit.MILLISECONDS.toSeconds(remaining)} more seconds!",
+                NamedTextColor.RED
+            )
         },
     ): T = addCooldown(duration) { remaining ->
         sender.sendMessage(LegacyComponentSerializer.legacySection().serialize(message(remaining)))
@@ -318,7 +332,10 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
         duration: Long,
         unit: TimeUnit,
         crossinline message: CommandContext<Player>.(remaining: Long) -> Component = { remaining ->
-            Component.text("Please wait ${TimeUnit.MILLISECONDS.toSeconds(remaining)} more seconds!", NamedTextColor.RED)
+            Component.text(
+                "Please wait ${TimeUnit.MILLISECONDS.toSeconds(remaining)} more seconds!",
+                NamedTextColor.RED
+            )
         },
     ): T = addComponentMessageCooldown(TimeUnit.MILLISECONDS.convert(duration, unit), message)
 
@@ -339,7 +356,10 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
             "<red>Please wait ${TimeUnit.MILLISECONDS.toSeconds(remaining)} more seconds!"
         },
     ): T = addCooldown(duration) { remaining ->
-        sender.sendMessage(LegacyComponentSerializer.legacySection().serialize(StellarConfig.miniMessage!!.deserialize(message(remaining))))
+        sender.sendMessage(
+            LegacyComponentSerializer.legacySection()
+                .serialize(StellarConfig.miniMessage!!.deserialize(message(remaining)))
+        )
     }
 
     /**
@@ -408,7 +428,11 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @return The modified command object.
      */
     inline fun <reified C : CommandSender> addExecution(noinline execution: CommandContext<C>.() -> Unit): T = apply {
-        executions.add(ExecutableExecution(C::class, execution, false))
+        executions.add(ExecutableExecution(C::class) {
+            BukkitCtx {
+                execution(it)
+            }
+        })
     } as T
 
     /**
@@ -418,7 +442,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @return The modified command object.
      */
     fun addExecution(execution: StellarExecution<CommandSender>): T = apply {
-        executions.add(ExecutableExecution(CommandSender::class, execution, false))
+        executions.add(ExecutableExecution(CommandSender::class) { BukkitCtx { execution(it) } })
     } as T
 
     /**
@@ -430,7 +454,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @return The modified command object.
      */
     fun <C : CommandSender> addExecution(sender: Class<C>, execution: StellarExecution<C>): T = apply {
-        executions.add(ExecutableExecution(sender.kotlin, execution, false))
+        executions.add(ExecutableExecution(sender.kotlin) { BukkitCtx { execution(it) } })
     } as T
 
     /**
@@ -440,9 +464,14 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param execution The execution block.
      * @return The modified command object.
      */
-    inline fun <reified C : CommandSender> addAsyncExecution(noinline execution: CommandContext<C>.() -> Unit): T = apply {
-        executions.add(ExecutableExecution(C::class, execution, true))
-    } as T
+    inline fun <reified C : CommandSender> addAsyncExecution(noinline execution: CommandContext<C>.() -> Unit): T =
+        apply {
+            executions.add(ExecutableExecution(C::class) {
+                StellarConfig.getScope().launch {
+                    execution(it)
+                }
+            })
+        } as T
 
     /**
      * Adds an async execution to the command.
@@ -451,7 +480,9 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @return The modified command object.
      */
     fun addAsyncExecution(execution: StellarExecution<CommandSender>): T = apply {
-        executions.add(ExecutableExecution(CommandSender::class, execution, true))
+        executions.add(ExecutableExecution(CommandSender::class) {
+            StellarConfig.getScope().launch { execution(it) }
+        })
     } as T
 
     /**
@@ -463,7 +494,9 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @return The modified command object.
      */
     fun <C : CommandSender> addAsyncExecution(sender: Class<C>, execution: StellarExecution<C>): T = apply {
-        executions.add(ExecutableExecution(sender.kotlin, execution, true))
+        executions.add(ExecutableExecution(sender.kotlin) {
+            StellarConfig.getScope().launch { execution(it) }
+        })
     } as T
 
     /**
@@ -474,7 +507,10 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param runnable The execution block.
      * @return The modified command object.
      */
-    inline fun <reified C : CommandSender> addRunnable(alwaysApplicable: Boolean = false, noinline runnable: CommandContext<C>.() -> Boolean): T = apply {
+    inline fun <reified C : CommandSender> addRunnable(
+        alwaysApplicable: Boolean = false,
+        noinline runnable: CommandContext<C>.() -> Boolean
+    ): T = apply {
         runnables.add(ExecutableRunnable(alwaysApplicable, C::class, runnable))
     } as T
 
@@ -498,7 +534,11 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param runnable The execution block.
      * @return The modified command object.
      */
-    fun <C : CommandSender> addRunnable(alwaysApplicable: Boolean = false, sender: Class<C>, runnable: StellarRunnable<C>): T = apply {
+    fun <C : CommandSender> addRunnable(
+        alwaysApplicable: Boolean = false,
+        sender: Class<C>,
+        runnable: StellarRunnable<C>
+    ): T = apply {
         runnables.add(ExecutableRunnable(alwaysApplicable, sender.kotlin, runnable))
     } as T
 
@@ -510,7 +550,10 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param runnable The execution block.
      * @return The modified command object.
      */
-    inline fun <reified C : CommandSender> addAsyncRunnable(alwaysApplicable: Boolean = false, noinline runnable: CommandContext<C>.() -> CompletableFuture<Boolean>): T = apply {
+    inline fun <reified C : CommandSender> addAsyncRunnable(
+        alwaysApplicable: Boolean = false,
+        noinline runnable: CommandContext<C>.() -> CompletableFuture<Boolean>
+    ): T = apply {
         runnables.add(ExecutableRunnable(alwaysApplicable, C::class, runnable))
     } as T
 
@@ -523,7 +566,11 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param runnable The execution block.
      * @return The modified command object.
      */
-    fun <C : CommandSender> addAsyncRunnable(alwaysApplicable: Boolean = false, sender: Class<C>, runnable: StellarRunnable<C>): T = apply {
+    fun <C : CommandSender> addAsyncRunnable(
+        alwaysApplicable: Boolean = false,
+        sender: Class<C>,
+        runnable: StellarRunnable<C>
+    ): T = apply {
         runnables.add(ExecutableRunnable(alwaysApplicable, sender.kotlin, runnable))
     } as T
 
@@ -534,9 +581,14 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param execution The execution block.
      * @return The modified command object.
      */
-    inline fun <reified C : CommandSender> addFailureExecution(noinline execution: CommandContext<C>.() -> Unit): T = apply {
-        failureExecutions.add(ExecutableExecution(C::class, execution, false))
-    } as T
+    inline fun <reified C : CommandSender> addFailureExecution(noinline execution: CommandContext<C>.() -> Unit): T =
+        apply {
+            failureExecutions.add(ExecutableExecution(C::class) {
+                BukkitCtx {
+                    execution(it)
+                }
+            })
+        } as T
 
     /**
      * Adds a failure execution to the command to be displayed when the command fails.
@@ -547,7 +599,9 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @return The modified command object.
      */
     fun <C : CommandSender> addFailureExecution(sender: Class<C>, execution: StellarExecution<C>): T = apply {
-        failureExecutions.add(ExecutableExecution(sender.kotlin, execution, false))
+        failureExecutions.add(ExecutableExecution(sender.kotlin) {
+            BukkitCtx { execution(it) }
+        })
     } as T
 
     /**
@@ -557,9 +611,14 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param execution The execution block.
      * @return The modified command object.
      */
-    inline fun <reified C : CommandSender> addGlobalFailureExecution(noinline execution: CommandContext<C>.() -> Unit): T = apply {
-        globalFailureExecutions.add(ExecutableExecution(C::class, execution, false))
-    } as T
+    inline fun <reified C : CommandSender> addGlobalFailureExecution(noinline execution: CommandContext<C>.() -> Unit): T =
+        apply {
+            globalFailureExecutions.add(ExecutableExecution(C::class) {
+                BukkitCtx {
+                    execution(it)
+                }
+            })
+        } as T
 
     /**
      * Adds a failure execution to the _root_ command to be displayed when the command fails.
@@ -568,7 +627,9 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @return The modified command object.
      */
     fun addGlobalFailureExecution(execution: StellarExecution<CommandSender>): T = apply {
-        globalFailureExecutions.add(ExecutableExecution(CommandSender::class, execution, false))
+        globalFailureExecutions.add(ExecutableExecution(CommandSender::class) {
+            BukkitCtx { execution(it) }
+        })
     } as T
 
     /**
@@ -580,7 +641,9 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @return The modified command object.
      */
     fun <C : CommandSender> addGlobalFailureExecution(sender: Class<C>, execution: StellarExecution<C>): T = apply {
-        globalFailureExecutions.add(ExecutableExecution(sender.kotlin, execution, false))
+        globalFailureExecutions.add(ExecutableExecution(sender.kotlin) {
+            BukkitCtx { execution(it) }
+        })
     } as T
 
     /**
@@ -590,9 +653,11 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @return The modified command object.
      */
     fun addFailureMessage(message: Component): T = apply {
-        failureExecutions.add(ExecutableExecution(CommandSender::class, {
-            it.sender.sendMessage(LegacyComponentSerializer.legacySection().serialize(message))
-        }, async = false))
+        failureExecutions.add(ExecutableExecution(CommandSender::class) {
+            BukkitCtx {
+                it.sender.sendMessage(LegacyComponentSerializer.legacySection().serialize(message))
+            }
+        })
     } as T
 
     /**
@@ -602,9 +667,11 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @return The modified command object.
      */
     fun addGlobalFailureMessage(message: Component): T = apply {
-        globalFailureExecutions.add(ExecutableExecution(CommandSender::class, {
-            it.sender.sendMessage(LegacyComponentSerializer.legacySection().serialize(message))
-        }, async = false))
+        globalFailureExecutions.add(ExecutableExecution(CommandSender::class) {
+            BukkitCtx {
+                it.sender.sendMessage(LegacyComponentSerializer.legacySection().serialize(message))
+            }
+        })
     } as T
 
     /**
@@ -615,9 +682,11 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      */
     fun addFailureMessage(message: String): T = apply {
         val component = StellarConfig.miniMessage!!.deserialize(message)
-        failureExecutions.add(ExecutableExecution(CommandSender::class, {
-            it.sender.sendMessage(LegacyComponentSerializer.legacySection().serialize(component))
-        }, async = false))
+        failureExecutions.add(ExecutableExecution(CommandSender::class) {
+            BukkitCtx {
+                it.sender.sendMessage(LegacyComponentSerializer.legacySection().serialize(component))
+            }
+        })
     } as T
 
     /**
@@ -628,9 +697,11 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      */
     fun addGlobalFailureMessage(message: String): T = apply {
         val component = StellarConfig.miniMessage!!.deserialize(message)
-        globalFailureExecutions.add(ExecutableExecution(CommandSender::class, {
-            it.sender.sendMessage(LegacyComponentSerializer.legacySection().serialize(component))
-        }, async = false))
+        globalFailureExecutions.add(ExecutableExecution(CommandSender::class) {
+            BukkitCtx {
+                it.sender.sendMessage(LegacyComponentSerializer.legacySection().serialize(component))
+            }
+        })
     } as T
 
     /**
@@ -646,7 +717,8 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
     } as T
 
     @ApiStatus.Internal
-    open fun hasGlobalHiddenDefaultFailureMessages(): Boolean = hideDefaultFailureMessages.hide && hideDefaultFailureMessages.global
+    open fun hasGlobalHiddenDefaultFailureMessages(): Boolean =
+        hideDefaultFailureMessages.hide && hideDefaultFailureMessages.global
 
     // Arguments
     /**
@@ -657,7 +729,10 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @return The modified command.
      */
     @JvmOverloads
-    fun <U : AbstractStellarArgument<*>> then(argument: AbstractStellarArgument<*>, block: ArgumentConfiguration<U> = ArgumentConfiguration {}): T = apply {
+    fun <U : AbstractStellarArgument<*>> then(
+        argument: AbstractStellarArgument<*>,
+        block: ArgumentConfiguration<U> = ArgumentConfiguration {}
+    ): T = apply {
         addArgument(argument, block as AbstractStellarArgument<*>.() -> Unit)
     } as T
 
@@ -670,9 +745,10 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      */
     @JvmOverloads
     @JvmName("thenKotlin")
-    fun <U : AbstractStellarArgument<*>> then(argument: AbstractStellarArgument<*>, block: U.() -> Unit = {}): T = apply {
-        addArgument(argument, block as AbstractStellarArgument<*>.() -> Unit)
-    } as T
+    fun <U : AbstractStellarArgument<*>> then(argument: AbstractStellarArgument<*>, block: U.() -> Unit = {}): T =
+        apply {
+            addArgument(argument, block as AbstractStellarArgument<*>.() -> Unit)
+        } as T
 
     /**
      * Adds a [LiteralArgument] with the given name to the command and returns the modified command.
@@ -682,7 +758,8 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @return The modified command.
      */
     @JvmOverloads
-    fun then(name: String, block: ArgumentConfiguration<LiteralArgument> = ArgumentConfiguration {}): T = then(LiteralArgument(name), block)
+    fun then(name: String, block: ArgumentConfiguration<LiteralArgument> = ArgumentConfiguration {}): T =
+        then(LiteralArgument(name), block)
 
     /**
      * Adds a [LiteralArgument] with the given name to the command and returns the modified command.
@@ -703,7 +780,10 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @return The added argument.
      */
     @JvmOverloads
-    fun <T : AbstractStellarArgument<*>> addArgument(argument: T, block: ArgumentConfiguration<T> = ArgumentConfiguration {}): T = argument.apply {
+    fun <T : AbstractStellarArgument<*>> addArgument(
+        argument: T,
+        block: ArgumentConfiguration<T> = ArgumentConfiguration {}
+    ): T = argument.apply {
         argument.parent = this@AbstractStellarCommand
         this@AbstractStellarCommand.arguments.add(argument)
         block.create(argument)
@@ -713,13 +793,15 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * Adds a [LiteralArgument] to the command with the given name and aliases.
      * @return The created [LiteralArgument].
      */
-    fun addArgument(name: String, vararg aliases: String): LiteralArgument = addArgument(LiteralArgument(name).apply { addAliases(*aliases) })
+    fun addArgument(name: String, vararg aliases: String): LiteralArgument =
+        addArgument(LiteralArgument(name).apply { addAliases(*aliases) })
 
     /**
      * Adds a [LiteralArgument] to the command with the given name and aliases.
      * @return The created [LiteralArgument].
      */
-    fun addLiteralArgument(name: String, vararg aliases: String): LiteralArgument = addArgument(LiteralArgument(name).apply { addAliases(*aliases) })
+    fun addLiteralArgument(name: String, vararg aliases: String): LiteralArgument =
+        addArgument(LiteralArgument(name).apply { addAliases(*aliases) })
 
     // Basic
     /**
@@ -736,7 +818,11 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @return The created [DoubleArgument].
      */
     @JvmOverloads
-    fun addDoubleArgument(name: String, minimum: Double = Double.MIN_VALUE, maximum: Double = Double.MAX_VALUE): DoubleArgument = addArgument(DoubleArgument(name, minimum, maximum))
+    fun addDoubleArgument(
+        name: String,
+        minimum: Double = Double.MIN_VALUE,
+        maximum: Double = Double.MAX_VALUE
+    ): DoubleArgument = addArgument(DoubleArgument(name, minimum, maximum))
 
     /**
      * Adds a [FloatArgument] to the command with the given name.
@@ -746,7 +832,11 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @return The created [FloatArgument].
      */
     @JvmOverloads
-    fun addFloatArgument(name: String, minimum: Float = Float.MIN_VALUE, maximum: Float = Float.MAX_VALUE): FloatArgument = addArgument(FloatArgument(name, minimum, maximum))
+    fun addFloatArgument(
+        name: String,
+        minimum: Float = Float.MIN_VALUE,
+        maximum: Float = Float.MAX_VALUE
+    ): FloatArgument = addArgument(FloatArgument(name, minimum, maximum))
 
     /**
      * Adds an [IntegerArgument] to the command with the given name.
@@ -756,7 +846,8 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @return The created [IntegerArgument].
      */
     @JvmOverloads
-    fun addIntegerArgument(name: String, minimum: Int = Int.MIN_VALUE, maximum: Int = Int.MAX_VALUE): IntegerArgument = addArgument(IntegerArgument(name, minimum, maximum))
+    fun addIntegerArgument(name: String, minimum: Int = Int.MIN_VALUE, maximum: Int = Int.MAX_VALUE): IntegerArgument =
+        addArgument(IntegerArgument(name, minimum, maximum))
 
     /**
      * Adds a [LongArgument] to the command with the given name.
@@ -766,14 +857,16 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @return The created [LongArgument].
      */
     @JvmOverloads
-    fun addLongArgument(name: String, minimum: Long = Long.MIN_VALUE, maximum: Long = Long.MAX_VALUE): LongArgument = addArgument(LongArgument(name, minimum, maximum))
+    fun addLongArgument(name: String, minimum: Long = Long.MIN_VALUE, maximum: Long = Long.MAX_VALUE): LongArgument =
+        addArgument(LongArgument(name, minimum, maximum))
 
     /**
      * Adds a [StringArgument] to the command with the given name.
      * @return The created [StringArgument].
      */
     @JvmOverloads
-    fun addStringArgument(name: String, type: StringType = StringType.WORD): StringArgument = addArgument(StringArgument(name, type))
+    fun addStringArgument(name: String, type: StringType = StringType.WORD): StringArgument =
+        addArgument(StringArgument(name, type))
 
     // Block
     /**
@@ -799,14 +892,16 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * Adds an [EntityArgument] to the command with the given name.
      * @return The created [EntityArgument].
      */
-    fun addEntityArgument(name: String, type: EntityDisplayType): EntityArgument = addArgument(EntityArgument(name, type))
+    fun addEntityArgument(name: String, type: EntityDisplayType): EntityArgument =
+        addArgument(EntityArgument(name, type))
 
     // Item
     /**
      * Adds an [ItemSlotArgument] to the command with the given name.
      * @return The created [ItemSlotArgument].
      */
-    fun addItemSlotArgument(name: String, multiple: Boolean = false): ItemSlotArgument = addArgument(ItemSlotArgument(name, multiple))
+    fun addItemSlotArgument(name: String, multiple: Boolean = false): ItemSlotArgument =
+        addArgument(ItemSlotArgument(name, multiple))
 
     /**
      * Adds an [ItemStackArgument] to the command with the given name.
@@ -818,7 +913,8 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * Adds an [ItemStackPredicateArgument] to the command with the given name.
      * @return The created [ItemStackPredicateArgument].
      */
-    fun addItemPredicateArgument(name: String): ItemStackPredicateArgument = addArgument(ItemStackPredicateArgument(name))
+    fun addItemPredicateArgument(name: String): ItemStackPredicateArgument =
+        addArgument(ItemStackPredicateArgument(name))
 
     // List
     /**
@@ -835,7 +931,13 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
         list: CommandContext<CommandSender>.() -> List<String>,
         tooltip: (String) -> String? = { null },
         type: StringType = StringType.WORD
-    ): ListArgument<String, String> = addArgument(ListArgument.create(StringArgument(name, type), list, { Suggestion.create(it, tooltip(it)) }, { it }))
+    ): ListArgument<String, String> = addArgument(
+        ListArgument.create(
+            StringArgument(name, type),
+            list,
+            { Suggestion.create(it, tooltip(it)) },
+            { it })
+    )
 
     /**
      * Adds a [ListArgument] to the command with the given name. It uses its [StringArgument] as a base wrapper.
@@ -851,7 +953,8 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
         list: List<String>,
         tooltip: (String) -> String? = { null },
         type: StringType = StringType.WORD
-    ): ListArgument<String, String> = addArgument(ListArgument(StringArgument(name, type), list, { Suggestion.create(it, tooltip(it)) }, { it }))
+    ): ListArgument<String, String> =
+        addArgument(ListArgument(StringArgument(name, type), list, { Suggestion.create(it, tooltip(it)) }, { it }))
 
     /**
      * Adds a [ListArgument] to the command with the given name.
@@ -867,7 +970,14 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
         list: List<T>,
         parse: CommandSender.(String) -> T,
         converter: CommandSender.(T) -> String? = { it.toString() },
-    ): ListArgument<T, String> = addArgument(ListArgument(StringArgument(name, StringType.WORD), list, { converter(it)?.let { Suggestion.withText(it) } }, parse))
+    ): ListArgument<T, String> = addArgument(
+        ListArgument(
+            StringArgument(name, StringType.WORD),
+            list,
+            { converter(it)?.let { Suggestion.withText(it) } },
+            parse
+        )
+    )
 
     /**
      * Adds a [ListArgument] to the command with the given name.
@@ -887,7 +997,15 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
         parse: CommandSender.(String) -> T,
         converter: CommandSender.(T) -> String? = { it.toString() },
         async: Boolean,
-    ): ListArgument<T, String> = addArgument(ListArgument(StringArgument(name, StringType.WORD), list, { converter(it)?.let { Suggestion.withText(it) } }, parse, async))
+    ): ListArgument<T, String> = addArgument(
+        ListArgument(
+            StringArgument(name, StringType.WORD),
+            list,
+            { converter(it)?.let { Suggestion.withText(it) } },
+            parse,
+            async
+        )
+    )
 
     /**
      * Adds a [ListArgument] to the command with the given name.
@@ -903,7 +1021,14 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
         list: CommandContext<CommandSender>.() -> List<T>,
         parse: CommandSender.(String) -> T,
         converter: CommandSender.(T) -> String? = { it.toString() },
-    ): ListArgument<T, String> = addArgument(ListArgument.create(StringArgument(name, StringType.WORD), list, { converter(it)?.let { Suggestion.withText(it) } }, parse))
+    ): ListArgument<T, String> = addArgument(
+        ListArgument.create(
+            StringArgument(name, StringType.WORD),
+            list,
+            { converter(it)?.let { Suggestion.withText(it) } },
+            parse
+        )
+    )
 
     /**
      * Adds a [ListArgument] to the command with the given name.
@@ -923,7 +1048,15 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
         parse: CommandSender.(String) -> T,
         converter: CommandSender.(T) -> String? = { it.toString() },
         async: Boolean,
-    ): ListArgument<T, String> = addArgument(ListArgument.create(StringArgument(name, StringType.WORD), list, { converter(it)?.let { Suggestion.withText(it) } }, parse, async))
+    ): ListArgument<T, String> = addArgument(
+        ListArgument.create(
+            StringArgument(name, StringType.WORD),
+            list,
+            { converter(it)?.let { Suggestion.withText(it) } },
+            parse,
+            async
+        )
+    )
 
     /**
      * Adds a [ListArgument] to the command wrapped around the given [AbstractStellarCommand].
@@ -940,7 +1073,8 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
         list: List<T>,
         parse: CommandSender.(R) -> T,
         converter: CommandSender.(T) -> String? = { it.toString() },
-    ): ListArgument<T, R> = addArgument(ListArgument(type, list, { converter(it)?.let { Suggestion.withText(it) } }, parse))
+    ): ListArgument<T, R> =
+        addArgument(ListArgument(type, list, { converter(it)?.let { Suggestion.withText(it) } }, parse))
 
     /**
      * Adds a [ListArgument] to the command wrapped around the given [AbstractStellarCommand].
@@ -961,7 +1095,8 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
         parse: CommandSender.(R) -> T,
         converter: CommandSender.(T) -> String? = { it.toString() },
         async: Boolean,
-    ): ListArgument<T, R> = addArgument(ListArgument(type, list, { converter(it)?.let { Suggestion.withText(it) } }, parse, async))
+    ): ListArgument<T, R> =
+        addArgument(ListArgument(type, list, { converter(it)?.let { Suggestion.withText(it) } }, parse, async))
 
     /**
      * Adds a [ListArgument] to the command wrapped around the given [AbstractStellarCommand].
@@ -982,7 +1117,8 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
         parse: CommandSender.(R) -> T,
         converter: CommandSender.(T) -> String? = { it.toString() },
         async: Boolean,
-    ): ListArgument<T, R> = addArgument(ListArgument.create(type, list, { converter(it)?.let { Suggestion.withText(it) } }, parse, async))
+    ): ListArgument<T, R> =
+        addArgument(ListArgument.create(type, list, { converter(it)?.let { Suggestion.withText(it) } }, parse, async))
 
     /**
      * Adds a [ListArgument] to the command with the given name.
@@ -998,7 +1134,8 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
         list: List<T>,
         parse: CommandSender.(String) -> T,
         converter: CommandSender.(T) -> Suggestion? = { Suggestion.withText(it.toString()) },
-    ): ListArgument<T, String> = addArgument(ListArgument(StringArgument(name, StringType.WORD), list, converter, parse))
+    ): ListArgument<T, String> =
+        addArgument(ListArgument(StringArgument(name, StringType.WORD), list, converter, parse))
 
     /**
      * Adds a [ListArgument] to the command with the given name.
@@ -1018,7 +1155,8 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
         parse: CommandSender.(String) -> T,
         converter: CommandSender.(T) -> Suggestion? = { Suggestion.withText(it.toString()) },
         async: Boolean,
-    ): ListArgument<T, String> = addArgument(ListArgument(StringArgument(name, StringType.WORD), list, converter, parse, async))
+    ): ListArgument<T, String> =
+        addArgument(ListArgument(StringArgument(name, StringType.WORD), list, converter, parse, async))
 
     /**
      * Adds a [ListArgument] to the command with the given name.
@@ -1038,7 +1176,8 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
         parse: CommandSender.(String) -> T,
         converter: CommandSender.(T) -> Suggestion? = { Suggestion.withText(it.toString()) },
         async: Boolean,
-    ): ListArgument<T, String> = addArgument(ListArgument.create(StringArgument(name, StringType.WORD), list, converter, parse, async))
+    ): ListArgument<T, String> =
+        addArgument(ListArgument.create(StringArgument(name, StringType.WORD), list, converter, parse, async))
 
     /**
      * Adds a [ListArgument] to the command wrapped around the given [AbstractStellarCommand].
@@ -1165,7 +1304,14 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
         name: String,
         formatting: EnumFormatting,
         async: Boolean,
-    ): EnumArgument<T> = addArgument(EnumArgument(name, T::class.java, { Suggestion.withText(formatting.action(it.name)) }, async = async))
+    ): EnumArgument<T> = addArgument(
+        EnumArgument(
+            name,
+            T::class.java,
+            { Suggestion.withText(formatting.action(it.name)) },
+            async = async
+        )
+    )
 
     /**
      * Adds an [EnumArgument] to the command with the given name. Only works in Kotlin.
@@ -1176,7 +1322,8 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
     inline fun <reified T : Enum<T>> addEnumArgument(
         name: String,
         formatting: EnumFormatting = EnumFormatting.LOWERCASE,
-    ): EnumArgument<T> = addArgument(EnumArgument(name, T::class.java, { Suggestion.withText(formatting.action(it.name)) }))
+    ): EnumArgument<T> =
+        addArgument(EnumArgument(name, T::class.java, { Suggestion.withText(formatting.action(it.name)) }))
 
     /**
      * Adds an [EnumArgument] to the command with the given name.
@@ -1248,7 +1395,8 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
         enum: Class<T>,
         formatting: EnumFormatting = EnumFormatting.LOWERCASE,
         async: Boolean,
-    ): EnumArgument<T> = addArgument(EnumArgument(name, enum, { Suggestion.withText(formatting.action(it.name)) }, async = async))
+    ): EnumArgument<T> =
+        addArgument(EnumArgument(name, enum, { Suggestion.withText(formatting.action(it.name)) }, async = async))
 
     /**
      * Adds an [EnumArgument] to the command with the given name.
@@ -1387,7 +1535,8 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * Adds an [ObjectiveCriteriaArgument] to the command with the given name.
      * @return The created [ObjectiveCriteriaArgument].
      */
-    fun addObjectiveCriteriaArgument(name: String): ObjectiveCriteriaArgument = addArgument(ObjectiveCriteriaArgument(name))
+    fun addObjectiveCriteriaArgument(name: String): ObjectiveCriteriaArgument =
+        addArgument(ObjectiveCriteriaArgument(name))
 
     /**
      * Adds a [ScoreHolderArgument] to the command with the given name.
@@ -1395,7 +1544,8 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param type The type of score holder.
      * @return The created [ScoreHolderArgument].
      */
-    fun addScoreHolderArgument(name: String, type: ScoreHolderType): ScoreHolderArgument = addArgument(ScoreHolderArgument(name, type))
+    fun addScoreHolderArgument(name: String, type: ScoreHolderType): ScoreHolderArgument =
+        addArgument(ScoreHolderArgument(name, type))
 
     /**
      * Adds a [TeamArgument] to the command with the given name.
@@ -1420,7 +1570,8 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * Adds a [StructureRotationArgument] to the command with the given name.
      * @return The created [StructureRotationArgument].
      */
-    fun addStructureRotationArgument(name: String): StructureRotationArgument = addArgument(StructureRotationArgument(name))
+    fun addStructureRotationArgument(name: String): StructureRotationArgument =
+        addArgument(StructureRotationArgument(name))
 
     // Text
     /**
@@ -1472,7 +1623,8 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param type The type of location.
      * @return The created [LocationArgument].
      */
-    fun addLocationArgument(name: String, type: LocationType): LocationArgument = addArgument(LocationArgument(name, type))
+    fun addLocationArgument(name: String, type: LocationType): LocationArgument =
+        addArgument(LocationArgument(name, type))
 
     /**
      * Adds or sets a piece of information with the given name and text.
@@ -1507,7 +1659,10 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @param plugin The given `JavaPlugin` instance (default: plugin in [StellarConfig]).
      * @return The registered command object.
      */
-    abstract fun register(plugin: JavaPlugin = StellarConfig.plugin ?: throw IllegalArgumentException("Plugin cannot be null!"), prefix: String = StellarConfig.prefix): T
+    abstract fun register(
+        plugin: JavaPlugin = StellarConfig.plugin ?: throw IllegalArgumentException("Plugin cannot be null!"),
+        prefix: String = StellarConfig.prefix
+    ): T
 
     /**
      * Registers the command with the given plugin.
@@ -1516,6 +1671,8 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @return The registered command object.
      */
     @JvmOverloads
-    fun register(plugin: JavaPlugin = StellarConfig.plugin ?: throw IllegalArgumentException("Plugin cannot be null!")): T = register(plugin, StellarConfig.prefix)
+    fun register(
+        plugin: JavaPlugin = StellarConfig.plugin ?: throw IllegalArgumentException("Plugin cannot be null!")
+    ): T = register(plugin, StellarConfig.prefix)
 
 }

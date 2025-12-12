@@ -1,9 +1,12 @@
 package com.undefined.stellar.kotlin
 
 import com.undefined.stellar.AbstractStellarCommand
+import com.undefined.stellar.BukkitCtx
+import com.undefined.stellar.BukkitCtx.invoke
 import com.undefined.stellar.ParameterArgument
 import com.undefined.stellar.StellarConfig
 import com.undefined.stellar.data.argument.CommandContext
+import com.undefined.stellar.data.execution.ExecutableExecution
 import com.undefined.stellar.data.suggestion.Suggestion
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.future.future
@@ -22,10 +25,12 @@ import java.util.concurrent.CompletableFuture
 inline fun <reified C : CommandSender> AbstractStellarCommand<*>.execution(
     scope: CoroutineScope = StellarConfig.scope,
     noinline execution: suspend CommandContext<C>.() -> Unit,
-): AbstractStellarCommand<*> = addExecution<C> {
-    scope.launch {
-        execution()
-    }
+): AbstractStellarCommand<*> = apply {
+    executions.add(ExecutableExecution(C::class) {
+        scope.launch {
+            execution(it)
+        }
+    })
 }
 
 /**
@@ -34,7 +39,8 @@ inline fun <reified C : CommandSender> AbstractStellarCommand<*>.execution(
  * @param C The type of CommandSender.
  * @param execution The execution block.
  */
-inline fun <reified C : CommandSender> AbstractStellarCommand<*>.asyncExecution(noinline execution: CommandContext<C>.() -> Unit) = addAsyncExecution(execution)
+inline fun <reified C : CommandSender> AbstractStellarCommand<*>.asyncExecution(noinline execution: CommandContext<C>.() -> Unit) =
+    addAsyncExecution(execution)
 
 /**
  * Adds a runnable to the command.
@@ -66,10 +72,12 @@ inline fun <reified C : CommandSender> AbstractStellarCommand<*>.runnable(
 inline fun <reified C : CommandSender> AbstractStellarCommand<*>.failureExecution(
     scope: CoroutineScope = StellarConfig.scope,
     noinline execution: suspend CommandContext<C>.() -> Unit,
-): AbstractStellarCommand<*> = addFailureExecution<C> {
-    scope.launch {
-        execution()
-    }
+): AbstractStellarCommand<*> = apply {
+    failureExecutions.add(ExecutableExecution(C::class) {
+        scope.launch {
+            execution(it)
+        }
+    })
 }
 
 /**

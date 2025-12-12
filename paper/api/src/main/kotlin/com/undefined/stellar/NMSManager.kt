@@ -1,6 +1,5 @@
 package com.undefined.stellar
 
-import com.mojang.brigadier.Command
 import com.mojang.brigadier.builder.ArgumentBuilder
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.builder.RequiredArgumentBuilder
@@ -13,7 +12,6 @@ import com.undefined.stellar.data.argument.MojangAdapter
 import com.undefined.stellar.data.exception.UnsupportedVersionException
 import com.undefined.stellar.data.help.CommandAliasHelpTopic
 import com.undefined.stellar.data.help.StellarCommandHelpTopic
-import com.undefined.stellar.data.suggestion.Suggestion
 import com.undefined.stellar.internal.*
 import com.undefined.stellar.listener.StellarListener
 import com.undefined.stellar.nms.AbstractNMSManager
@@ -160,15 +158,10 @@ object NMSManager: AbstractNMSManager() {
             val stellarContext = MojangAdapter.getStellarCommandContext(context)
             val range = StringRange.between(builder.start + argument.suggestionOffset, builder.input.length)
 
-            CompletableFuture.supplyAsync {
-                val suggestions: MutableList<Suggestion> = mutableListOf()
-                for (suggestion in argument._suggestions) suggestions.addAll(
-                    suggestion.get(
-                        stellarContext,
-                        builder.remaining
-                    ).get()
-                )
+            val suggestionFutures = argument._suggestions.map { it.get(stellarContext, builder.remaining) }
 
+            CompletableFuture.allOf(*suggestionFutures.toTypedArray()).thenApply {
+                val suggestions = suggestionFutures.flatMap { it.get() }
                 Suggestions(range, suggestions.map { suggestion ->
                     if (suggestion.tooltip == null || suggestion.tooltip!!.isBlank()) BrigadierSuggestion(
                         range,

@@ -167,7 +167,7 @@ fun AbstractStellarCommand<*>.listArgument(
     scope.future {
         list(this@ListArgument)
     }
-}, { Suggestion.create(it, tooltip(it)) }, { it }) as ListArgument<String, String>).apply(block)
+}, { Suggestion.create(it, tooltip(it)) }, { it })).apply(block)
 
 /**
  * Adds a [ListArgument] to the command with the given name. It uses its [StringArgument] as a base wrapper.
@@ -205,7 +205,7 @@ fun <T> AbstractStellarCommand<*>.listArgument(
     scope.future {
         list.mapNotNull { converter(it)?.let { Suggestion.withText(it) } }
     }
-}, parse) as ListArgument<T, String>).apply(block)
+}, parse)).apply(block)
 
 /**
  * Adds a [ListArgument] to the command with the given name.
@@ -230,7 +230,7 @@ fun <T> AbstractStellarCommand<*>.listArgument(
             convertedText?.let { Suggestion.withText(convertedText) }
         }.filter { it.text.startsWith(input, true) && it.text != input }
     }
-}, parse) as ListArgument<T, String>).apply(block)
+}, parse)).apply(block)
 
 /**
  * Adds a [ListArgument] to the command wrapped around the given [AbstractStellarCommand].
@@ -256,7 +256,7 @@ fun <T, R> AbstractStellarCommand<*>.listArgument(
             convertedText?.let { Suggestion.withText(convertedText) }
         }.filter { it.text.startsWith(input, true) && it.text != input }
     }
-}, parse) as ListArgument<T, R>).apply(block)
+}, parse)).apply(block)
 
 /**
  * Adds a [ListArgument] to the command wrapped around the given [AbstractStellarCommand].
