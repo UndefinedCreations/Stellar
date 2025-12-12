@@ -161,7 +161,7 @@ fun AbstractStellarCommand<*>.listArgument(
     list: suspend CommandContext<CommandSender>.() -> List<String>,
     tooltip: (String) -> String? = { null },
     type: StringType = StringType.WORD,
-    scope: CoroutineScope = StellarConfig.scope,
+    scope: CoroutineScope = StellarConfig.getScope(),
     block: ListArgument<String, String>.() -> Unit = {},
 ): ListArgument<String, String> = addArgument(ListArgument(StringArgument(name, type), {
     scope.future {
@@ -199,11 +199,11 @@ fun <T> AbstractStellarCommand<*>.listArgument(
     list: List<T>,
     parse: CommandSender.(String) -> T,
     converter: suspend CommandContext<CommandSender>.(T) -> String? = { it.toString() },
-    scope: CoroutineScope = StellarConfig.scope,
+    scope: CoroutineScope = StellarConfig.getScope(),
     block: ListArgument<T, String>.() -> Unit = {},
 ): ListArgument<T, String> = addArgument(ListArgument(StringArgument(name, StringType.WORD), {
     scope.future {
-        list.mapNotNull { converter(it)?.let { Suggestion.withText(it) } }
+        list.mapNotNull { value -> converter(value)?.let { Suggestion.withText(it) } }
     }
 }, parse)).apply(block)
 
@@ -221,7 +221,7 @@ fun <T> AbstractStellarCommand<*>.listArgument(
     list: suspend CommandContext<CommandSender>.() -> Iterable<T>,
     parse: CommandSender.(String) -> T,
     converter: suspend CommandContext<CommandSender>.(T) -> String? = { it.toString() },
-    scope: CoroutineScope = StellarConfig.scope,
+    scope: CoroutineScope = StellarConfig.getScope(),
     block: ListArgument<T, String>.() -> Unit = {},
 ): ListArgument<T, String> = addArgument(ListArgument(StringArgument(name, StringType.WORD), {
     scope.future {
@@ -247,7 +247,7 @@ fun <T, R> AbstractStellarCommand<*>.listArgument(
     list: List<T>,
     parse: CommandSender.(R) -> T,
     converter: suspend CommandContext<CommandSender>.(T) -> String? = { it.toString() },
-    scope: CoroutineScope = StellarConfig.scope,
+    scope: CoroutineScope = StellarConfig.getScope(),
     block: ListArgument<T, R>.() -> Unit = {},
 ): ListArgument<T, R> = addArgument(ListArgument(type, {
     scope.future {
@@ -273,7 +273,7 @@ fun <T, R> AbstractStellarCommand<*>.listArgument(
     list: suspend CommandContext<CommandSender>.() -> List<T>,
     parse: CommandSender.(R) -> T,
     converter: suspend CommandContext<CommandSender>.(T) -> String? = { it.toString() },
-    scope: CoroutineScope = StellarConfig.scope,
+    scope: CoroutineScope = StellarConfig.getScope(),
     block: ListArgument<T, R>.() -> Unit = {},
 ): ListArgument<T, R> = addArgument(ListArgument(type, {
     scope.future {
@@ -298,7 +298,7 @@ fun <T> AbstractStellarCommand<*>.advancedListArgument(
     list: Collection<T>,
     parse: CommandSender.(String) -> T,
     converter: suspend CommandContext<CommandSender>.(T) -> Suggestion? = { Suggestion.withText(it.toString()) },
-    scope: CoroutineScope = StellarConfig.scope,
+    scope: CoroutineScope = StellarConfig.getScope(),
     block: ListArgument<T, String>.() -> Unit = {},
 ): ListArgument<T, String> = addArgument(ListArgument(StringArgument(name, StringType.WORD), {
     scope.future {
@@ -322,7 +322,7 @@ fun <T> AbstractStellarCommand<*>.advancedListArgument(
     list: suspend CommandContext<CommandSender>.() -> List<T>,
     parse: CommandSender.(String) -> T,
     converter: suspend CommandContext<CommandSender>.(T) -> Suggestion? = { Suggestion.withText(it.toString()) },
-    scope: CoroutineScope = StellarConfig.scope,
+    scope: CoroutineScope = StellarConfig.getScope(),
     block: ListArgument<T, String>.() -> Unit = {},
 ): ListArgument<T, String> = addArgument(ListArgument(StringArgument(name, StringType.WORD), {
     scope.future {
@@ -347,7 +347,7 @@ fun <T, R> AbstractStellarCommand<*>.advancedListArgument(
     list: List<T>,
     parse: CommandSender.(R) -> T,
     converter: suspend CommandContext<CommandSender>.(T) -> Suggestion? = { Suggestion.withText(it.toString()) },
-    scope: CoroutineScope = StellarConfig.scope,
+    scope: CoroutineScope = StellarConfig.getScope(),
     block: ListArgument<T, R>.() -> Unit = {},
 ): ListArgument<T, R> = addArgument(ListArgument(type, {
     scope.future {
@@ -372,7 +372,7 @@ fun <T, R> AbstractStellarCommand<*>.advancedListArgument(
     list: suspend CommandContext<CommandSender>.() -> List<T>,
     parse: CommandSender.(R) -> T,
     converter: suspend CommandContext<CommandSender>.(T) -> Suggestion? = { Suggestion.withText(it.toString()) },
-    scope: CoroutineScope = StellarConfig.scope,
+    scope: CoroutineScope = StellarConfig.getScope(),
     block: ListArgument<T, R>.() -> Unit = {},
 ): ListArgument<T, R> = addArgument(ListArgument(type, {
     scope.future {
@@ -396,9 +396,9 @@ inline fun <reified T : Enum<T>> AbstractStellarCommand<*>.enumArgument(
     name: String,
     noinline converter: suspend CommandContext<CommandSender>.(Enum<T>) -> String? = { it.name },
     noinline parse: CommandSender.(String) -> Enum<T> = { input ->
-        valueOf(Enum::class.java as Class<out Enum<*>>, input.uppercase()) as Enum<T>
+        enumValueOf<T>(input.uppercase())
     },
-    scope: CoroutineScope = StellarConfig.scope,
+    scope: CoroutineScope = StellarConfig.getScope(),
     noinline block: ListArgument<Enum<T>, String>.() -> Unit = {},
 ): ListArgument<Enum<T>, String> = listArgument<Enum<T>>(name, T::class.java.enumConstants.toList(), parse, converter, scope,block)
 
@@ -439,7 +439,7 @@ typealias KotlinOnlinePlayersArgument = ListArgument<Player, String>
 fun AbstractStellarCommand<*>.onlinePlayersArgument(
     name: String,
     filter: suspend CommandSender.(Player) -> Boolean = { it != this },
-    scope: CoroutineScope = StellarConfig.scope,
+    scope: CoroutineScope = StellarConfig.getScope(),
     block: OnlinePlayersArgument.() -> Unit = {},
 ): OnlinePlayersArgument = addArgument(OnlinePlayersArgument(name) { players ->
     scope.future {

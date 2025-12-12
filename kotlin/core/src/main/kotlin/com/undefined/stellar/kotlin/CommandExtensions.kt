@@ -23,7 +23,7 @@ import java.util.concurrent.CompletableFuture
  * @return The modified command object.
  */
 inline fun <reified C : CommandSender> AbstractStellarCommand<*>.execution(
-    scope: CoroutineScope = StellarConfig.scope,
+    scope: CoroutineScope = StellarConfig.getScope(),
     noinline execution: suspend CommandContext<C>.() -> Unit,
 ): AbstractStellarCommand<*> = apply {
     executions.add(ExecutableExecution(C::class) {
@@ -53,7 +53,7 @@ inline fun <reified C : CommandSender> AbstractStellarCommand<*>.asyncExecution(
  */
 inline fun <reified C : CommandSender> AbstractStellarCommand<*>.runnable(
     alwaysApplicable: Boolean = false,
-    scope: CoroutineScope = StellarConfig.scope,
+    scope: CoroutineScope = StellarConfig.getScope(),
     noinline runnable: suspend CommandContext<C>.() -> Boolean,
 ): AbstractStellarCommand<*> = addAsyncRunnable<C>(alwaysApplicable = alwaysApplicable) {
     scope.future {
@@ -70,7 +70,7 @@ inline fun <reified C : CommandSender> AbstractStellarCommand<*>.runnable(
  * @return The modified command object.
  */
 inline fun <reified C : CommandSender> AbstractStellarCommand<*>.failureExecution(
-    scope: CoroutineScope = StellarConfig.scope,
+    scope: CoroutineScope = StellarConfig.getScope(),
     noinline execution: suspend CommandContext<C>.() -> Unit,
 ): AbstractStellarCommand<*> = apply {
     failureExecutions.add(ExecutableExecution(C::class) {
@@ -118,7 +118,7 @@ fun ParameterArgument<*, *>.suggests(title: String, tooltip: String? = null) = a
  * @return The modified [ParameterArgument].
  */
 inline fun <reified C : CommandSender> ParameterArgument<*, *>.suggests(
-    scope: CoroutineScope = StellarConfig.scope,
+    scope: CoroutineScope = StellarConfig.getScope(),
     noinline suggestion: suspend CommandContext<C>.(input: String) -> List<Suggestion>,
 ) = addFutureSuggestion<C> { input ->
     scope.future {
