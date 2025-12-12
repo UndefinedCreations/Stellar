@@ -476,7 +476,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @return The modified command object.
      */
     inline fun <reified C : CommandSender> addRunnable(alwaysApplicable: Boolean = false, noinline runnable: CommandContext<C>.() -> Boolean): T = apply {
-        runnables.add(ExecutableRunnable(alwaysApplicable, C::class, runnable, false))
+        runnables.add(ExecutableRunnable(alwaysApplicable, C::class, runnable))
     } as T
 
     /**
@@ -487,7 +487,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @return The modified command object.
      */
     fun addRunnable(alwaysApplicable: Boolean = false, runnable: StellarRunnable<CommandSender>): T = apply {
-        runnables.add(ExecutableRunnable(alwaysApplicable, CommandSender::class, runnable, false))
+        runnables.add(ExecutableRunnable(alwaysApplicable, CommandSender::class, runnable))
     } as T
 
     /**
@@ -500,7 +500,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @return The modified command object.
      */
     fun <C : CommandSender> addRunnable(alwaysApplicable: Boolean = false, sender: Class<C>, runnable: StellarRunnable<C>): T = apply {
-        runnables.add(ExecutableRunnable(alwaysApplicable, sender.kotlin, runnable, false))
+        runnables.add(ExecutableRunnable(alwaysApplicable, sender.kotlin, runnable))
     } as T
 
     /**
@@ -512,7 +512,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @return The modified command object.
      */
     inline fun <reified C : CommandSender> addAsyncRunnable(alwaysApplicable: Boolean = false, noinline runnable: CommandContext<C>.() -> CompletableFuture<Boolean>): T = apply {
-        runnables.add(ExecutableRunnable(alwaysApplicable, C::class, runnable, true))
+        runnables.add(ExecutableRunnable(alwaysApplicable, C::class, runnable))
     } as T
 
     /**
@@ -525,7 +525,7 @@ abstract class AbstractStellarCommand<T : AbstractStellarCommand<T>>(val name: S
      * @return The modified command object.
      */
     fun <C : CommandSender> addAsyncRunnable(alwaysApplicable: Boolean = false, sender: Class<C>, runnable: StellarRunnable<C>): T = apply {
-        runnables.add(ExecutableRunnable(alwaysApplicable, sender.kotlin, runnable, true))
+        runnables.add(ExecutableRunnable(alwaysApplicable, sender.kotlin, runnable))
     } as T
 
     /**
