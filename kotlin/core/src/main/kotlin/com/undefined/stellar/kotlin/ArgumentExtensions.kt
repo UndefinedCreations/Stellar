@@ -223,7 +223,7 @@ fun <T> AbstractStellarCommand<*>.listArgument(
     converter: suspend CommandContext<CommandSender>.(T) -> String? = { it.toString() },
     scope: CoroutineScope = StellarConfig.scope,
     block: ListArgument<T, String>.() -> Unit = {},
-): ListArgument<T, String> = addArgument(ListArgument(StringArgument(name, StringType.WORD), {
+): ListArgument<T, String> = addArgument(ListArgument(StringArgument(name, StringType.WORD), { input ->
     scope.future {
         list().mapNotNull {
             val convertedText = converter(it).takeIf { suggestion -> suggestion?.isNotBlank() == true }
@@ -249,7 +249,7 @@ fun <T, R> AbstractStellarCommand<*>.listArgument(
     converter: suspend CommandContext<CommandSender>.(T) -> String? = { it.toString() },
     scope: CoroutineScope = StellarConfig.scope,
     block: ListArgument<T, R>.() -> Unit = {},
-): ListArgument<T, R> = addArgument(ListArgument(type, {
+): ListArgument<T, R> = addArgument(ListArgument(type, { input ->
     scope.future {
         list.mapNotNull {
             val convertedText = converter(it).takeIf { suggestion -> suggestion?.isNotBlank() == true }
@@ -270,12 +270,12 @@ fun <T, R> AbstractStellarCommand<*>.listArgument(
  */
 fun <T, R> AbstractStellarCommand<*>.listArgument(
     type: ParameterArgument<*, R>,
-    list: suspend CommandContext<CommandSender>.() -> List<T>,
+    list: suspend CommandContext<CommandSender>.() -> Iterable<T>,
     parse: CommandSender.(R) -> T,
     converter: suspend CommandContext<CommandSender>.(T) -> String? = { it.toString() },
     scope: CoroutineScope = StellarConfig.scope,
     block: ListArgument<T, R>.() -> Unit = {},
-): ListArgument<T, R> = addArgument(ListArgument(type, {
+): ListArgument<T, R> = addArgument(ListArgument(type, { input ->
     scope.future {
         list().mapNotNull {
             val convertedText = converter(it).takeIf { suggestion -> suggestion?.isNotBlank() == true }
@@ -300,7 +300,7 @@ fun <T> AbstractStellarCommand<*>.advancedListArgument(
     converter: suspend CommandContext<CommandSender>.(T) -> Suggestion? = { Suggestion.withText(it.toString()) },
     scope: CoroutineScope = StellarConfig.scope,
     block: ListArgument<T, String>.() -> Unit = {},
-): ListArgument<T, String> = addArgument(ListArgument(StringArgument(name, StringType.WORD), {
+): ListArgument<T, String> = addArgument(ListArgument(StringArgument(name, StringType.WORD), { input ->
     scope.future {
         list.mapNotNull {
             converter(it).takeIf { suggestion -> suggestion?.text?.isNotBlank() == true }
@@ -324,7 +324,7 @@ fun <T> AbstractStellarCommand<*>.advancedListArgument(
     converter: suspend CommandContext<CommandSender>.(T) -> Suggestion? = { Suggestion.withText(it.toString()) },
     scope: CoroutineScope = StellarConfig.scope,
     block: ListArgument<T, String>.() -> Unit = {},
-): ListArgument<T, String> = addArgument(ListArgument(StringArgument(name, StringType.WORD), {
+): ListArgument<T, String> = addArgument(ListArgument(StringArgument(name, StringType.WORD), { input ->
     scope.future {
         list().mapNotNull {
             converter(it).takeIf { suggestion -> suggestion?.text?.isNotBlank() == true }
@@ -349,7 +349,7 @@ fun <T, R> AbstractStellarCommand<*>.advancedListArgument(
     converter: suspend CommandContext<CommandSender>.(T) -> Suggestion? = { Suggestion.withText(it.toString()) },
     scope: CoroutineScope = StellarConfig.scope,
     block: ListArgument<T, R>.() -> Unit = {},
-): ListArgument<T, R> = addArgument(ListArgument(type, {
+): ListArgument<T, R> = addArgument(ListArgument(type, { input ->
     scope.future {
         list.mapNotNull {
             converter(it).takeIf { suggestion -> suggestion?.text?.isNotBlank() == true }
@@ -374,7 +374,7 @@ fun <T, R> AbstractStellarCommand<*>.advancedListArgument(
     converter: suspend CommandContext<CommandSender>.(T) -> Suggestion? = { Suggestion.withText(it.toString()) },
     scope: CoroutineScope = StellarConfig.scope,
     block: ListArgument<T, R>.() -> Unit = {},
-): ListArgument<T, R> = addArgument(ListArgument(type, {
+): ListArgument<T, R> = addArgument(ListArgument(type, { input ->
     scope.future {
         list().mapNotNull {
             converter(it).takeIf { suggestion -> suggestion?.text?.isNotBlank() == true }
