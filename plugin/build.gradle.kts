@@ -16,7 +16,7 @@ repositories {
     maven("https://repo.codemc.org/repository/maven-public/")
 }
 
-val serverType = ServerType.SPIGOT
+val serverType = ServerType.PAPERMC
 val minecraftVersion = "1.21.10"
 
 dependencies {
