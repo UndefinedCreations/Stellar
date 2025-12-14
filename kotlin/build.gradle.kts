@@ -39,6 +39,11 @@ val packageKotlinSources by tasks.registering(Jar::class) {
     from(subprojects.map { it.sourceSets.main.get().allSource })
 }
 
+val maven_username =
+    if (env.isPresent("MAVEN_USERNAME")) env.fetch("MAVEN_USERNAME") else System.getenv("mavenUser")?.toString() ?: ""
+val maven_password =
+    if (env.isPresent("MAVEN_PASSWORD")) env.fetch("MAVEN_PASSWORD") else System.getenv("mavenPassword")?.toString() ?: ""
+
 publishing {
     publications {
         create<MavenPublication>("kotlin") {
@@ -87,16 +92,16 @@ publishing {
             name = "undefined-releases"
             url = uri("https://repo.undefinedcreations.com/releases")
             credentials(PasswordCredentials::class) {
-                username = System.getenv("MAVEN_NAME") ?: property("mavenUser").toString()
-                password = System.getenv("MAVEN_SECRET") ?: property("mavenPassword").toString()
+                username = maven_username
+                password = maven_password
             }
         }
         maven {
             name = "undefined-snapshots"
             url = uri("https://repo.undefinedcreations.com/snapshots")
             credentials(PasswordCredentials::class) {
-                username = System.getenv("MAVEN_NAME") ?: property("mavenUser").toString()
-                password = System.getenv("MAVEN_SECRET") ?: property("mavenPassword").toString()
+                username = maven_username
+                password = maven_password
             }
         }
     }
