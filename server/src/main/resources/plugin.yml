@@ -1,0 +1,4 @@
+name: TestingPlugin
+version: 1.0.0
+main: com.undefined.stellar.server.TestingPlugin
+api-version: '1.21'
