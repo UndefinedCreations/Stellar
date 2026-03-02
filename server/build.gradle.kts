@@ -1,5 +1,5 @@
 plugins {
-    alias(libs.plugins.kotlin.jvm)
+    kotlin("jvm")
     alias(libs.plugins.run.paper)
     alias(libs.plugins.gradleup.shadow)
 }

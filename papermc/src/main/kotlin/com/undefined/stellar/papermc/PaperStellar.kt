@@ -1,8 +1,6 @@
 package com.undefined.stellar.papermc
 
-import com.undefined.stellar.command.Command
 import com.undefined.stellar.papermc.command.PaperCommand
-import com.undefined.stellar.papermc.context.PaperCommandContext
 import org.bukkit.plugin.java.JavaPlugin
 
 interface PaperStellar {

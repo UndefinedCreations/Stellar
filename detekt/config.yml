@@ -1,0 +1,42 @@
+comments:
+  DeprecatedBlockTag:
+    active: true
+
+complexity:
+  CognitiveComplexMethod:
+    active: true
+  ComplexInterface:
+    active: true
+
+coroutines:
+  CoroutineLaunchedInTestWithoutRunTest:
+    active: true
+  GlobalCoroutineUsage:
+    active: true
+  SuspendFunInFinallySection:
+    active: true
+  SuspendFunWithCoroutineScopeReceiver:
+    active: true
+
+exceptions:
+  ErrorUsageWithThrowable:
+    active: true
+  ObjectExtendsThrowable:
+    active: true
+
+performance:
+  CouldBeSequence:
+    active: true
+  UnnecessaryInitOnArray:
+    active: true
+  UnnecessaryTypeCasting:
+    active: true
+
+potential-bugs:
+  MissingUseCall:
+    active: true
+
+style:
+  BracesOnIfStatements:
+    active: true
+    singleLine: consistent

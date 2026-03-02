@@ -3,6 +3,7 @@ kotlin = "2.3.0"
 minecraft-latest = "1.21.11-R0.1-SNAPSHOT"
 run-paper = "3.0.2"
 gradleup-shadow = "9.3.1"
+detekt = "2.0.0-alpha.2"
 
 [libraries]
 papermc = { module = "io.papermc.paper:paper-api", version.ref = "minecraft-latest" }
@@ -11,3 +12,4 @@ papermc = { module = "io.papermc.paper:paper-api", version.ref = "minecraft-late
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 run-paper = { id = "xyz.jpenilla.run-paper", version.ref = "run-paper" }
 gradleup-shadow = { id = "com.gradleup.shadow", version.ref = "gradleup-shadow" }
+detekt = { id = "dev.detekt", version.ref = "detekt" }
